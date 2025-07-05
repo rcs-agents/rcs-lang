@@ -1,60 +1,37 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RCLParser = void 0;
-const Parser = __importStar(require("tree-sitter"));
-// Note: In a real implementation, this would import the compiled RCL language
-// For now, we'll create a mock implementation that handles the basic structure
+const tree_sitter_1 = __importDefault(require("tree-sitter"));
+// Import the compiled RCL language
 let rclLanguage;
 try {
-    // This would be the actual tree-sitter RCL language binding
-    // rclLanguage = require('tree-sitter-rcl');
+    // Try to load the actual tree-sitter RCL language binding
+    rclLanguage = require('/home/ubuntu/tree-sitter/bindings/node');
+    console.log('Successfully loaded tree-sitter RCL language');
 }
 catch (error) {
-    console.warn('Tree-sitter RCL language not found, using mock parser');
+    console.warn('Tree-sitter RCL language not found, using mock parser:', error);
 }
 class RCLParser {
     constructor() {
         this.documentCache = new Map();
-        this.parser = new Parser();
         if (rclLanguage) {
-            this.parser.setLanguage(rclLanguage);
+            try {
+                this.parser = new tree_sitter_1.default();
+                this.parser.setLanguage(rclLanguage.language);
+                console.log('RCL parser initialized with real tree-sitter grammar');
+            }
+            catch (error) {
+                console.warn('Failed to initialize real parser, falling back to mock:', error);
+                rclLanguage = null; // Force fallback to mock parser
+            }
         }
         else {
-            // Mock parser for development
-            console.log('Using mock RCL parser');
+            // Don't initialize tree-sitter parser if we don't have the language
+            console.log('Using mock RCL parser - no tree-sitter grammar available');
         }
     }
     parseDocument(document) {
@@ -80,7 +57,7 @@ class RCLParser {
         return rclDocument;
     }
     parseText(text) {
-        if (!rclLanguage) {
+        if (!rclLanguage || !this.parser) {
             return this.mockParse(text);
         }
         try {
@@ -88,37 +65,118 @@ class RCLParser {
             return this.convertToRCLNode(tree.rootNode);
         }
         catch (error) {
-            console.error('Error parsing RCL document:', error);
-            return null;
+            console.error('Error parsing RCL document with tree-sitter:', error);
+            console.log('Falling back to mock parser');
+            return this.mockParse(text);
         }
     }
     mockParse(text) {
-        // Simple mock parser for basic RCL structure
+        // Enhanced mock parser that properly handles RCL indentation-based syntax
         const lines = text.split('\n');
         const mockNode = {
             type: 'source_file',
             text: text,
             startPosition: { row: 0, column: 0 },
-            endPosition: { row: lines.length - 1, column: lines[lines.length - 1].length },
+            endPosition: { row: lines.length - 1, column: lines[lines.length - 1]?.length || 0 },
             children: [],
             parent: null
         };
-        // Look for agent definitions
+        let currentSection = null;
+        let currentIndentLevel = 0;
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (line.startsWith('agent ')) {
-                const agentName = line.substring(6).trim();
-                mockNode.children.push({
-                    type: 'agent_definition',
-                    text: line,
-                    startPosition: { row: i, column: 0 },
-                    endPosition: { row: i, column: line.length },
-                    children: [],
-                    parent: mockNode
-                });
+            const line = lines[i];
+            const trimmedLine = line.trim();
+            // Skip empty lines and comments
+            if (!trimmedLine || trimmedLine.startsWith('#')) {
+                continue;
+            }
+            const indentLevel = this.getIndentLevel(line);
+            // Top-level definitions (agent, flow, messages, etc.)
+            if (indentLevel === 0) {
+                if (trimmedLine.match(/^(agent|flow|messages|configuration|defaults|import)\s+/)) {
+                    const [keyword, ...nameParts] = trimmedLine.split(/\s+/);
+                    const name = nameParts.join(' ');
+                    currentSection = {
+                        type: `${keyword}_definition`,
+                        text: line,
+                        startPosition: { row: i, column: 0 },
+                        endPosition: { row: i, column: line.length },
+                        children: [],
+                        parent: mockNode,
+                        name: name
+                    };
+                    mockNode.children.push(currentSection);
+                    currentIndentLevel = 0;
+                }
+            }
+            // Indented content within sections
+            else if (currentSection && indentLevel > currentIndentLevel) {
+                this.parseIndentedContent(currentSection, line, i, indentLevel);
             }
         }
         return mockNode;
+    }
+    getIndentLevel(line) {
+        let indent = 0;
+        for (const char of line) {
+            if (char === ' ') {
+                indent++;
+            }
+            else if (char === '\t') {
+                indent += 2; // Treat tab as 2 spaces
+            }
+            else {
+                break;
+            }
+        }
+        return indent;
+    }
+    parseIndentedContent(parent, line, lineNumber, indentLevel) {
+        const trimmedLine = line.trim();
+        // Handle different types of indented content
+        if (trimmedLine.includes(':')) {
+            // Property or state definition
+            const [key, ...valueParts] = trimmedLine.split(':');
+            const value = valueParts.join(':').trim();
+            const propertyNode = {
+                type: 'property',
+                text: line,
+                startPosition: { row: lineNumber, column: 0 },
+                endPosition: { row: lineNumber, column: line.length },
+                children: [],
+                parent: parent,
+                name: key.trim(),
+                value: value
+            };
+            parent.children.push(propertyNode);
+        }
+        else if (trimmedLine.includes('->')) {
+            // Flow transition
+            const [from, to] = trimmedLine.split('->').map(s => s.trim());
+            const transitionNode = {
+                type: 'transition',
+                text: line,
+                startPosition: { row: lineNumber, column: 0 },
+                endPosition: { row: lineNumber, column: line.length },
+                children: [],
+                parent: parent,
+                from: from,
+                to: to
+            };
+            parent.children.push(transitionNode);
+        }
+        else {
+            // Generic content
+            const contentNode = {
+                type: 'content',
+                text: line,
+                startPosition: { row: lineNumber, column: 0 },
+                endPosition: { row: lineNumber, column: line.length },
+                children: [],
+                parent: parent
+            };
+            parent.children.push(contentNode);
+        }
     }
     convertToRCLNode(node) {
         const rclNode = {

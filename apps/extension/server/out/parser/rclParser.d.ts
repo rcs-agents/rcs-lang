@@ -8,6 +8,8 @@ export declare class RCLParser {
     parseDocument(document: TextDocument): RCLDocument;
     private parseText;
     private mockParse;
+    private getIndentLevel;
+    private parseIndentedContent;
     private convertToRCLNode;
     private extractImports;
     private extractSymbols;
