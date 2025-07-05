@@ -7,13 +7,22 @@
     "vscode": "^1.75.0"
   },
   "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "test": "npm run compile && mocha out/test/**/*.test.js"
+  },
   "dependencies": {
     "vscode-languageclient": "^8.0.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.75.0",
     "@types/node": "^20.0.0",
+    "@types/mocha": "^10.0.0",
+    "@types/glob": "^8.1.0",
     "@vscode/test-electron": "^2.3.0",
+    "mocha": "^10.2.0",
+    "glob": "^8.1.0",
     "typescript": "^5.0.0"
   }
 }
