@@ -1,0 +1,97 @@
+{
+  "name": "rcl-language-support",
+  "displayName": "RCL Language Support",
+  "description": "Rich Communication Language (RCL) support for Visual Studio Code",
+  "version": "0.1.0",
+  "publisher": "rcl-lang",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "rcl",
+    "rich communication language",
+    "rcs",
+    "chatbot",
+    "language server"
+  ],
+  "activationEvents": [
+    "onLanguage:rcl"
+  ],
+  "main": "./client/out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "rcl",
+        "aliases": ["RCL", "Rich Communication Language"],
+        "extensions": [".rcl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rcl",
+        "scopeName": "source.rcl",
+        "path": "./syntaxes/rcl.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "RCL Language Server",
+      "properties": {
+        "rcl.server.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "rcl.validation.enabled": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Enable RCL validation"
+        },
+        "rcl.completion.enabled": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code completion"
+        },
+        "rcl.formatting.enabled": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code formatting"
+        },
+        "rcl.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "lint": "eslint client/src server/src --ext ts",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "test": "npm run compile && node ./client/out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

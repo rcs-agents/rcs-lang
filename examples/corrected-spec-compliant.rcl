@@ -1,0 +1,8 @@
+agent Customer Support
+  displayName: "Customer Support Agent"
+  
+  flow Welcome Flow
+    :start -> text "Hello! How can I help you today?"
+  
+  messages Messages
+    text "Thank you for contacting us!"

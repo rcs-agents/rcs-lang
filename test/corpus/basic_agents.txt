@@ -1,0 +1,215 @@
+================================================================================
+Simple agent with message shortcuts
+================================================================================
+
+agent TestAgent
+  displayName: "Test Agent"
+  flow MainFlow
+    :start -> Welcome
+    Welcome -> End
+  messages Messages
+    text Welcome "Hello! How can I help?"
+    text End "Done"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent with brandName property
+================================================================================
+
+agent BrandAgent
+  displayName: "Brand Test Agent"
+  brandName: "ACME Corp"
+  flow TestFlow
+    :start -> Welcome
+  messages Messages
+    text Welcome "Hello from ACME Corp!"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent with multiple flows
+================================================================================
+
+agent MultiFlowAgent
+  displayName: "Multi Flow Agent"
+  flow WelcomeFlow
+    :start -> Welcome
+  flow SupportFlow
+    :start -> Help
+  messages Messages
+    text Welcome "Welcome!"
+    text Help "How can we help?"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Complex flow with multiple transitions
+================================================================================
+
+agent ComplexAgent
+  displayName: "Complex Flow Agent"
+  flow ComplexFlow
+    :start -> Welcome
+    Welcome -> Help
+    Help -> Support
+    Support -> End
+  messages Messages
+    text Welcome "Welcome to our service!"
+    text Help "Need help with something?"
+    text Support "Let me connect you to support"
+    text End "Thank you!"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

@@ -1,0 +1,34 @@
+{
+  "comments": {
+    "lineComment": "#"
+  },
+  "brackets": [
+    ["{", "}"],
+    ["(", ")"],
+    ["<", ">"]
+  ],
+  "autoClosingPairs": [
+    ["{", "}"],
+    ["(", ")"],
+    ["<", ">"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["(", ")"],
+    ["<", ">"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(agent|flow|messages|defaults|configuration|import)\\s+.*:?\\s*$",
+    "decreaseIndentPattern": "^\\s*(agent|flow|messages|defaults|configuration|import)\\s+.*$"
+  },
+  "folding": {
+    "markers": {
+      "start": "^\\s*(agent|flow|messages|defaults|configuration)\\s+.*:?\\s*$",
+      "end": "^\\s*$"
+    }
+  }
+}
