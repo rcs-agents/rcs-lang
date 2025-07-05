@@ -148,6 +148,31 @@ export interface CommentNode extends RCLNode {
   content: string;
 }
 
+export interface PropertyNode extends RCLNode {
+  type: 'property';
+  name: string;
+  value: string;
+}
+
+export interface ContentNode extends RCLNode {
+  type: 'content';
+}
+
+export interface MessagesDefinitionNode extends RCLNode {
+  type: 'messages_definition';
+  name: string;
+}
+
+export interface DefaultsDefinitionNode extends RCLNode {
+  type: 'defaults_definition';
+  name: string;
+}
+
+export interface ConfigurationDefinitionNode extends RCLNode {
+  type: 'configuration_definition';
+  name: string;
+}
+
 export type RCLASTNode =
   | SourceFileNode
   | AgentNode
@@ -170,4 +195,9 @@ export type RCLASTNode =
   | StringNode
   | NumberNode
   | IsoDurationNode
-  | CommentNode;
+  | CommentNode
+  | PropertyNode
+  | ContentNode
+  | MessagesDefinitionNode
+  | DefaultsDefinitionNode
+  | ConfigurationDefinitionNode;
