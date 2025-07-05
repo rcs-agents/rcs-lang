@@ -8,6 +8,11 @@ prebuilds/
 node_modules/
 package-lock.json
 
+# TypeScript build artifacts
+*.tsbuildinfo
+*/out/
+*/.vscode-test/
+
 # Swift artifacts
 .build/
 Package.resolved
@@ -48,3 +53,7 @@ zig-out/
 *.tar.gz
 *.tgz
 *.zip
+node_modules
+**/.vscode-test
+**/out
+**/*.tsbuildinfo
