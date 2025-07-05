@@ -10,13 +10,13 @@
     "test": "npm run compile && mocha out/test/**/*.test.js"
   },
   "dependencies": {
+    "tree-sitter": "^0.21.1",
     "vscode-languageserver": "^8.0.0",
-    "vscode-languageserver-textdocument": "^1.0.0",
-    "tree-sitter": "^0.20.0"
+    "vscode-languageserver-textdocument": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
     "mocha": "^10.2.0",
     "typescript": "^5.0.0"
   }
