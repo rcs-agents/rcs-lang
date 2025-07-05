@@ -1,0 +1,20 @@
+agent CustomerSupport
+  displayName: "Customer Support Agent"
+  brandName: "ACME Corp"
+  
+  flow WelcomeFlow
+    :start -> Welcome
+    Welcome -> Help
+    Help -> ThankYou
+  
+  flow OrderFlow
+    :start -> OrderStart
+    OrderStart -> OrderStatus
+  
+  messages Messages
+    Welcome: "Hello! How can I help you today?"
+    Help: "I can assist with orders, returns, and general questions"
+    ThankYou: "Thank you for contacting us!"
+    OrderStart: "Let me help you with your order"
+    OrderStatus: "Checking your order status..."
+    Goodbye: "Have a great day!"

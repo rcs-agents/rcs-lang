@@ -1,0 +1,4 @@
+agent Test
+  displayName: "Test Agent"
+  messages Messages
+    text "Hello"

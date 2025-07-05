@@ -1,0 +1,236 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "RCL",
+  "scopeName": "source.rcl",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#section-definitions"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#multiline-strings"
+    },
+    {
+      "include": "#expressions"
+    },
+    {
+      "include": "#type-tags"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#booleans"
+    },
+    {
+      "include": "#atoms"
+    },
+    {
+      "include": "#identifiers"
+    },
+    {
+      "include": "#transitions"
+    },
+    {
+      "include": "#collections"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "name": "comment.line.number-sign.rcl",
+      "match": "#.*$"
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.rcl",
+          "match": "\\b(True|False|Yes|No|On|Off|Enabled|Disabled|Active|Inactive|Null|None|Void)\\b"
+        }
+      ]
+    },
+    "section-definitions": {
+      "patterns": [
+        {
+          "name": "entity.name.section.rcl",
+          "match": "^\\s*(agent|flow|messages|defaults|configuration|import)\\s+([A-Z][A-Za-z0-9\\-_\\s]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.section.rcl"
+            },
+            "2": {
+              "name": "entity.name.type.rcl"
+            }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.rcl",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.rcl",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "multiline-strings": {
+      "patterns": [
+        {
+          "name": "string.multiline.rcl",
+          "begin": "\\|\\-?\\s*$",
+          "end": "^(?=\\S)",
+          "patterns": [
+            {
+              "name": "string.multiline.content.rcl",
+              "match": ".*"
+            }
+          ]
+        },
+        {
+          "name": "string.multiline.preserve.rcl",
+          "begin": "\\+\\|\\+?\\s*$",
+          "end": "^(?=\\S)",
+          "patterns": [
+            {
+              "name": "string.multiline.content.rcl",
+              "match": ".*"
+            }
+          ]
+        }
+      ]
+    },
+    "expressions": {
+      "patterns": [
+        {
+          "name": "meta.expression.inline.rcl",
+          "begin": "\\$((js|ts)?>)",
+          "end": "$",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.expression.rcl"
+            }
+          },
+          "patterns": [
+            {
+              "name": "source.js.embedded.rcl",
+              "match": ".*"
+            }
+          ]
+        },
+        {
+          "name": "meta.expression.multiline.rcl",
+          "begin": "\\$((js|ts)?)>>>",
+          "end": "^(?=\\S)",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.expression.rcl"
+            }
+          },
+          "patterns": [
+            {
+              "name": "source.js.embedded.rcl",
+              "match": ".*"
+            }
+          ]
+        }
+      ]
+    },
+    "type-tags": {
+      "name": "meta.type-tag.rcl",
+      "begin": "<([a-zA-Z]+)",
+      "end": ">",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.type.tag.rcl"
+        }
+      },
+      "patterns": [
+        {
+          "name": "string.unquoted.type-tag.value.rcl",
+          "match": "\\|[^>]+"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.duration.rcl",
+          "match": "\\b(P((\\d+Y)|(\\d+M)|(\\d+W)|(\\d+D)|(T((\\d+H)|(\\d+M)|(\\d+(\\..+)?S))+))+)|(\\d+(\\.\\d+)?s)\\b"
+        },
+        {
+          "name": "constant.numeric.rcl",
+          "match": "\\b\\d+(\\.\\d+)?([eE][-+]?\\d+)?\\b"
+        }
+      ]
+    },
+    "booleans": {
+      "name": "constant.language.boolean.rcl",
+      "match": "\\b(True|False|Yes|No|On|Off|Enabled|Disabled|Active|Inactive)\\b"
+    },
+    "atoms": {
+      "name": "constant.other.atom.rcl",
+      "match": ":([_a-zA-Z][\\w_]*|\"[^\"\\\\]*\")"
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.identifier.rcl",
+          "match": "\\b[A-Z][A-Za-z0-9\\-_]*\\b"
+        },
+        {
+          "name": "variable.other.attribute.rcl",
+          "match": "\\b[a-z][a-zA-Z0-9_]*(?=\\s*:)"
+        }
+      ]
+    },
+    "transitions": {
+      "name": "meta.transition.rcl",
+      "match": "([a-zA-Z0-9_]+|:[a-zA-Z0-9_]+)\\s*(->)\\s*([a-zA-Z0-9_]+)",
+      "captures": {
+        "1": {
+          "name": "entity.name.state.from.rcl"
+        },
+        "2": {
+          "name": "keyword.operator.transition.rcl"
+        },
+        "3": {
+          "name": "entity.name.state.to.rcl"
+        }
+      }
+    },
+    "collections": {
+      "patterns": [
+        {
+          "name": "meta.collection.list.rcl",
+          "begin": "\\(",
+          "end": "\\)",
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.collection.dict.rcl",
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

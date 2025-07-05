@@ -1,0 +1,8 @@
+agent TestAgent
+  displayName: "Test Agent"
+  flow MainFlow
+    :start -> Welcome
+    Welcome -> End
+  messages Messages
+    text Welcome "Hello\!"
+    text End "Done"
