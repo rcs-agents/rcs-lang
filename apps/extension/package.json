@@ -84,7 +84,9 @@
     "watch": "tsc -b -w",
     "lint": "eslint client/src server/src --ext ts",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "npm run compile && node ./client/out/test/runTest.js"
+    "test": "npm run test:server && npm run test:client",
+    "test:server": "cd server && npm test",
+    "test:client": "cd client && npm test"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
