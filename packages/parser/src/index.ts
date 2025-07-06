@@ -5,3 +5,6 @@ export { ASTWalker } from './astWalker';
 // Type exports
 export * from './astTypes';
 export * from './rclTypes';
+
+// Validation exports
+export * from './validation';
