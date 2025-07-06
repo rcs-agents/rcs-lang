@@ -40,14 +40,31 @@ const fs = __importStar(require("fs"));
 const cp = __importStar(require("child_process"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
+const previewProvider_1 = require("./previewProvider");
 let client;
 function activate(context) {
     console.log('RCL Language Server extension is now active!');
-    // Register the Show Agent Output command
+    // Create preview provider
+    const previewProvider = new previewProvider_1.RCLPreviewProvider(context);
+    // Register webview view provider
+    context.subscriptions.push(vscode_1.window.registerWebviewViewProvider(previewProvider_1.RCLPreviewProvider.viewType, previewProvider));
+    // Register commands
     const showAgentOutputCommand = vscode_1.commands.registerCommand('rcl.showAgentOutput', async (uri) => {
         await showAgentOutput(uri);
     });
     context.subscriptions.push(showAgentOutputCommand);
+    const showPreviewCommand = vscode_1.commands.registerCommand('rcl.showPreview', async (uri) => {
+        await showPreview(uri, previewProvider);
+    });
+    context.subscriptions.push(showPreviewCommand);
+    const showJSONOutputCommand = vscode_1.commands.registerCommand('rcl.showJSONOutput', async (uri) => {
+        await showJSONOutput(uri);
+    });
+    context.subscriptions.push(showJSONOutputCommand);
+    const exportCompiledCommand = vscode_1.commands.registerCommand('rcl.exportCompiled', async (uri) => {
+        await exportCompiled(uri);
+    });
+    context.subscriptions.push(exportCompiledCommand);
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
     // If the extension is launched in debug mode then the debug server options are used
@@ -95,6 +112,138 @@ function deactivate() {
     }
     console.log('Deactivating RCL Language Server extension');
     return client.stop();
+}
+async function showPreview(uri, previewProvider) {
+    let targetUri;
+    if (uri) {
+        targetUri = uri;
+    }
+    else {
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showErrorMessage('No RCL file is currently open');
+            return;
+        }
+        targetUri = activeEditor.document.uri;
+    }
+    if (!targetUri.fsPath.endsWith('.rcl')) {
+        vscode_1.window.showErrorMessage('Please select an RCL file');
+        return;
+    }
+    try {
+        const document = await vscode_1.workspace.openTextDocument(targetUri);
+        if (previewProvider) {
+            await previewProvider.showPreview(document);
+        }
+        // Open the webview view if not already visible
+        await vscode_1.commands.executeCommand('workbench.view.extension.rclPreview');
+        vscode_1.window.showInformationMessage('RCL Preview opened');
+    }
+    catch (error) {
+        vscode_1.window.showErrorMessage(`Failed to open preview: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+async function showJSONOutput(uri) {
+    let targetUri;
+    if (uri) {
+        targetUri = uri;
+    }
+    else {
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showErrorMessage('No RCL file is currently open');
+            return;
+        }
+        targetUri = activeEditor.document.uri;
+    }
+    if (!targetUri.fsPath.endsWith('.rcl')) {
+        vscode_1.window.showErrorMessage('Please select an RCL file');
+        return;
+    }
+    const workspaceFolder = vscode_1.workspace.getWorkspaceFolder(targetUri);
+    if (!workspaceFolder) {
+        vscode_1.window.showErrorMessage('File must be within a workspace folder');
+        return;
+    }
+    try {
+        const cliPath = findRclCli(workspaceFolder.uri.fsPath);
+        if (!cliPath) {
+            vscode_1.window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
+            return;
+        }
+        await vscode_1.window.withProgress({
+            location: { viewId: 'workbench.view.explorer' },
+            title: 'Compiling RCL to JSON...',
+            cancellable: false
+        }, async () => {
+            const rclFilePath = targetUri.fsPath;
+            const outputPath = rclFilePath.replace('.rcl', '.json');
+            const result = await runRclCli(cliPath, rclFilePath, outputPath, 'json');
+            if (result.success) {
+                const outputUri = vscode_1.Uri.file(outputPath);
+                const document = await vscode_1.workspace.openTextDocument(outputUri);
+                await vscode_1.window.showTextDocument(document, vscode_1.ViewColumn.Beside);
+                vscode_1.window.showInformationMessage(`JSON output generated successfully: ${path.basename(outputPath)}`);
+            }
+            else {
+                vscode_1.window.showErrorMessage(`Failed to compile RCL file: ${result.error}`);
+            }
+        });
+    }
+    catch (error) {
+        vscode_1.window.showErrorMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+async function exportCompiled(uri) {
+    let targetUri;
+    if (uri) {
+        targetUri = uri;
+    }
+    else {
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showErrorMessage('No RCL file is currently open');
+            return;
+        }
+        targetUri = activeEditor.document.uri;
+    }
+    if (!targetUri.fsPath.endsWith('.rcl')) {
+        vscode_1.window.showErrorMessage('Please select an RCL file');
+        return;
+    }
+    // Ask user for format preference
+    const format = await vscode_1.window.showQuickPick([
+        { label: 'JavaScript (.js)', value: 'js' },
+        { label: 'JSON (.json)', value: 'json' }
+    ], { placeHolder: 'Select export format' });
+    if (!format) {
+        return; // User cancelled
+    }
+    const workspaceFolder = vscode_1.workspace.getWorkspaceFolder(targetUri);
+    if (!workspaceFolder) {
+        vscode_1.window.showErrorMessage('File must be within a workspace folder');
+        return;
+    }
+    try {
+        const cliPath = findRclCli(workspaceFolder.uri.fsPath);
+        if (!cliPath) {
+            vscode_1.window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
+            return;
+        }
+        const rclFilePath = targetUri.fsPath;
+        const extension = format.value === 'js' ? '.js' : '.json';
+        const outputPath = rclFilePath.replace('.rcl', extension);
+        const result = await runRclCli(cliPath, rclFilePath, outputPath, format.value);
+        if (result.success) {
+            vscode_1.window.showInformationMessage(`Compiled output exported successfully: ${path.basename(outputPath)}`);
+        }
+        else {
+            vscode_1.window.showErrorMessage(`Failed to export compiled output: ${result.error}`);
+        }
+    }
+    catch (error) {
+        vscode_1.window.showErrorMessage(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
 }
 async function showAgentOutput(uri) {
     let targetUri;
@@ -173,9 +322,9 @@ function findRclCli(workspacePath) {
     }
     return null;
 }
-function runRclCli(cliPath, inputPath, outputPath) {
+function runRclCli(cliPath, inputPath, outputPath, format = 'js') {
     return new Promise((resolve) => {
-        const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}"`;
+        const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
         cp.exec(command, (error, stdout, stderr) => {
             if (error) {
                 resolve({ success: false, error: error.message });
