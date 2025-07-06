@@ -1,11 +1,13 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
+id: cli
+
 type: application
 language: typescript
 platform: node
 
 dependsOn:
-  - id: "parser:build"
+  - id: "parser"
 
 tasks:
   build:
@@ -40,7 +42,7 @@ tasks:
     local: true
     inputs:
       - "demo.js"
-      - "../../example.rcl"
+      - "./examples/example.rcl"
 
   lint:
     command: "eslint src --ext .ts"
