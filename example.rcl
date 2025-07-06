@@ -1,0 +1,13 @@
+agent WelcomeBot
+  display-name: "Welcome Assistant"
+  brand-name: "ACME Corp"
+  
+  flow WelcomeFlow
+    start -> greeting
+    greeting -> question
+    question -> end
+    
+  messages
+    greeting: "Hello! Welcome to our service. How can I help you today?"
+    question: "What would you like to know about our products?"
+    goodbye: "Thank you for contacting us. Have a great day!"
