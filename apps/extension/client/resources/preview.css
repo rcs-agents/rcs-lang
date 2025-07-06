@@ -205,9 +205,31 @@ body {
 .flow-container {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: auto;
+}
+
+.flow-diagram {
+  flex: 1;
+  min-height: 400px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  background: var(--vscode-background);
+  border: 1px solid var(--vscode-border);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.flow-diagram.hidden {
+  display: none;
+}
+
+.flow-diagram svg {
+  max-width: 100%;
+  max-height: 100%;
+  background: var(--vscode-background);
 }
 
 .placeholder {
@@ -215,6 +237,71 @@ body {
   opacity: 0.6;
   font-style: italic;
   text-align: center;
+  padding: 20px;
+}
+
+.flow-details {
+  padding: 16px;
+}
+
+.flow-details h3 {
+  margin-bottom: 12px;
+  color: var(--vscode-foreground);
+  font-size: 16px;
+}
+
+.flow-config {
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--vscode-foreground);
+  overflow: auto;
+  max-height: 300px;
+  white-space: pre-wrap;
+}
+
+.flow-summary {
+  padding: 16px;
+}
+
+.flow-summary h3 {
+  margin-bottom: 16px;
+  color: var(--vscode-foreground);
+  font-size: 16px;
+}
+
+.flow-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.flow-item {
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.flow-item:hover {
+  background: var(--vscode-button-hover-background);
+}
+
+.flow-item strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--vscode-foreground);
+}
+
+.flow-item small {
+  color: var(--vscode-foreground);
+  opacity: 0.7;
 }
 
 /* Error View */

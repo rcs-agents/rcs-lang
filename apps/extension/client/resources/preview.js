@@ -11,17 +11,22 @@
         flows: {},
         agent: {},
         selectedFlow: null,
-        compilationErrors: null
+        compilationErrors: null,
+        cursorFollowingEnabled: false
     };
 
     // DOM elements
     let elements = {};
+    
+    // Mermaid initialization
+    let mermaidInitialized = false;
 
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeElements();
         setupEventListeners();
         setupMessageHandlers();
+        initializeMermaid();
         
         // Notify extension that webview is ready
         vscode.postMessage({ type: 'ready' });
@@ -33,6 +38,7 @@
             refreshBtn: document.getElementById('refreshBtn'),
             flowSelect: document.getElementById('flowSelect'),
             allFlowsBtn: document.getElementById('allFlowsBtn'),
+            cursorFollowBtn: document.getElementById('cursorFollowBtn'),
             exportJsonBtn: document.getElementById('exportJsonBtn'),
             exportJsBtn: document.getElementById('exportJsBtn'),
             settingsBtn: document.getElementById('settingsBtn'),
@@ -49,8 +55,37 @@
             // Containers
             jsonContainer: document.getElementById('jsonContainer'),
             flowContainer: document.getElementById('flowContainer'),
+            flowDiagram: document.getElementById('flowDiagram'),
             errorList: document.getElementById('errorList')
         };
+    }
+
+    function initializeMermaid() {
+        if (typeof mermaid !== 'undefined' && !mermaidInitialized) {
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#569cd6',
+                    primaryTextColor: '#cccccc',
+                    primaryBorderColor: '#569cd6',
+                    lineColor: '#6796b9',
+                    secondaryColor: '#3a3d41',
+                    tertiaryColor: '#2d2d30',
+                    background: '#1e1e1e',
+                    mainBkg: '#2d2d30',
+                    secondBkg: '#3e3e42',
+                    tertiaryBkg: '#404045'
+                },
+                fontFamily: 'var(--vscode-font-family)',
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true,
+                    curve: 'basis'
+                }
+            });
+            mermaidInitialized = true;
+        }
     }
 
     function setupEventListeners() {
@@ -72,6 +107,15 @@
             currentState.selectedFlow = null;
             elements.flowSelect.value = '';
             updateFlowView();
+        });
+
+        elements.cursorFollowBtn.addEventListener('click', () => {
+            currentState.cursorFollowingEnabled = !currentState.cursorFollowingEnabled;
+            updateCursorFollowButton();
+            vscode.postMessage({ 
+                type: 'toggleCursorFollowing', 
+                data: { enabled: currentState.cursorFollowingEnabled } 
+            });
         });
 
         elements.exportJsonBtn.addEventListener('click', () => {
@@ -101,6 +145,9 @@
                 case 'updateData':
                     handleDataUpdate(message.data);
                     break;
+                case 'cursorMove':
+                    handleCursorMove(message.data);
+                    break;
                 default:
                     console.log('Unknown message type:', message.type);
             }
@@ -118,6 +165,9 @@
             updateJsonView();
             updateFlowView();
         }
+        
+        // Initialize cursor follow button state
+        updateCursorFollowButton();
     }
 
     function switchTab(tabName) {
@@ -286,6 +336,7 @@
 
     function updateFlowView() {
         if (!currentState.flows || Object.keys(currentState.flows).length === 0) {
+            elements.flowDiagram.classList.add('hidden');
             elements.flowContainer.innerHTML = '<div class="placeholder">No flows found in the current RCL file.</div>';
             return;
         }
@@ -293,34 +344,310 @@
         if (currentState.selectedFlow) {
             const flow = currentState.flows[currentState.selectedFlow];
             if (flow) {
-                elements.flowContainer.innerHTML = `
-                    <div class="flow-details">
-                        <h3>Flow: ${escapeHtml(currentState.selectedFlow)}</h3>
-                        <div class="placeholder">Flow diagram visualization will be implemented with Mermaid.js</div>
-                        <pre class="flow-config">${JSON.stringify(flow, null, 2)}</pre>
-                    </div>
-                `;
+                renderFlowDiagram(currentState.selectedFlow, flow);
             } else {
+                elements.flowDiagram.classList.add('hidden');
                 elements.flowContainer.innerHTML = '<div class="placeholder">Selected flow not found.</div>';
             }
         } else {
-            const flowCount = Object.keys(currentState.flows).length;
-            elements.flowContainer.innerHTML = `
-                <div class="flow-summary">
-                    <h3>All Flows (${flowCount})</h3>
-                    <div class="placeholder">Combined flow diagram will show all flows in a single view</div>
-                    <div class="flow-list">
-                        ${Object.keys(currentState.flows).map(flowId => 
-                            `<div class="flow-item">
-                                <strong>${escapeHtml(flowId)}</strong>
-                                <br>
-                                <small>${Object.keys(currentState.flows[flowId].states || {}).length} states</small>
-                            </div>`
-                        ).join('')}
+            renderAllFlows();
+        }
+    }
+
+    function renderFlowDiagram(flowId, flow) {
+        if (!mermaidInitialized) {
+            elements.flowDiagram.classList.add('hidden');
+            elements.flowContainer.innerHTML = '<div class="placeholder">Mermaid.js not loaded yet...</div>';
+            return;
+        }
+
+        const mermaidSyntax = convertFlowToMermaid(flowId, flow);
+        
+        // Clear previous diagram
+        elements.flowDiagram.innerHTML = '';
+        elements.flowDiagram.classList.remove('hidden');
+        
+        // Hide placeholder
+        const placeholder = elements.flowContainer.querySelector('.placeholder');
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+
+        try {
+            const diagramId = `diagram-${Date.now()}`;
+            mermaid.render(diagramId, mermaidSyntax).then(({ svg }) => {
+                elements.flowDiagram.innerHTML = svg;
+                
+                // Add flow details below diagram
+                const detailsHtml = `
+                    <div class="flow-details">
+                        <h3>Flow: ${escapeHtml(flowId)}</h3>
+                        <div class="flow-info">
+                            <strong>States:</strong> ${Object.keys(flow.states || {}).length}<br>
+                            <strong>Initial State:</strong> ${flow.initial || 'start'}
+                        </div>
+                        <details>
+                            <summary>Flow Configuration (JSON)</summary>
+                            <pre class="flow-config">${JSON.stringify(flow, null, 2)}</pre>
+                        </details>
                     </div>
-                </div>
+                `;
+                elements.flowDiagram.insertAdjacentHTML('afterend', detailsHtml);
+            }).catch(error => {
+                console.error('Mermaid rendering error:', error);
+                elements.flowDiagram.innerHTML = `
+                    <div class="placeholder">Error rendering flow diagram: ${error.message}</div>
+                `;
+            });
+        } catch (error) {
+            console.error('Mermaid syntax error:', error);
+            elements.flowDiagram.innerHTML = `
+                <div class="placeholder">Error in flow syntax: ${error.message}</div>
             `;
         }
+    }
+
+    function renderAllFlows() {
+        if (!mermaidInitialized) {
+            elements.flowDiagram.classList.add('hidden');
+            elements.flowContainer.innerHTML = '<div class="placeholder">Mermaid.js not loaded yet...</div>';
+            return;
+        }
+
+        const flows = currentState.flows;
+        const flowCount = Object.keys(flows).length;
+        
+        if (flowCount === 1) {
+            // If only one flow, render it directly
+            const flowId = Object.keys(flows)[0];
+            renderFlowDiagram(flowId, flows[flowId]);
+            return;
+        }
+
+        // Render multiple flows in a combined diagram
+        const combinedMermaid = convertMultipleFlowsToMermaid(flows);
+        
+        // Clear previous diagram
+        elements.flowDiagram.innerHTML = '';
+        elements.flowDiagram.classList.remove('hidden');
+        
+        // Hide placeholder
+        const placeholder = elements.flowContainer.querySelector('.placeholder');
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+
+        try {
+            const diagramId = `combined-diagram-${Date.now()}`;
+            mermaid.render(diagramId, combinedMermaid).then(({ svg }) => {
+                elements.flowDiagram.innerHTML = svg;
+                
+                // Add summary below diagram
+                const summaryHtml = `
+                    <div class="flow-summary">
+                        <h3>All Flows (${flowCount})</h3>
+                        <div class="flow-list">
+                            ${Object.keys(flows).map(flowId => {
+                                const flow = flows[flowId];
+                                return `<div class="flow-item" onclick="selectFlow('${flowId}')">
+                                    <strong>${escapeHtml(flowId)}</strong>
+                                    <br>
+                                    <small>${Object.keys(flow.states || {}).length} states</small>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                elements.flowDiagram.insertAdjacentHTML('afterend', summaryHtml);
+            }).catch(error => {
+                console.error('Mermaid rendering error:', error);
+                elements.flowDiagram.innerHTML = `
+                    <div class="placeholder">Error rendering combined flow diagram: ${error.message}</div>
+                `;
+            });
+        } catch (error) {
+            console.error('Mermaid syntax error:', error);
+            elements.flowDiagram.innerHTML = `
+                <div class="placeholder">Error in combined flow syntax: ${error.message}</div>
+            `;
+        }
+    }
+
+    function convertFlowToMermaid(flowId, flow) {
+        const states = flow.states || {};
+        const initial = flow.initial || 'start';
+        
+        let mermaid = 'flowchart TD\n';
+        
+        // Add initial state marker
+        mermaid += `    Start([Start]) --> ${initial}\n`;
+        
+        // Add states and transitions
+        Object.keys(states).forEach(stateId => {
+            const state = states[stateId];
+            
+            // Format state node
+            let stateLabel = stateId;
+            if (state.type === 'final') {
+                mermaid += `    ${stateId}([${stateLabel}])\n`;
+            } else {
+                mermaid += `    ${stateId}[${stateLabel}]\n`;
+            }
+            
+            // Add transitions
+            if (state.on) {
+                Object.keys(state.on).forEach(event => {
+                    const target = state.on[event];
+                    const eventLabel = event === 'NEXT' ? '' : event;
+                    if (eventLabel) {
+                        mermaid += `    ${stateId} -->|${eventLabel}| ${target}\n`;
+                    } else {
+                        mermaid += `    ${stateId} --> ${target}\n`;
+                    }
+                });
+            }
+        });
+        
+        // Add styling
+        mermaid += '\n';
+        mermaid += '    classDef startNode fill:#4CAF50,stroke:#45a049,color:#fff\n';
+        mermaid += '    classDef finalNode fill:#f44336,stroke:#da190b,color:#fff\n';
+        mermaid += '    classDef messageNode fill:#2196F3,stroke:#1976D2,color:#fff\n';
+        mermaid += '    class Start startNode\n';
+        
+        // Apply classes to nodes
+        Object.keys(states).forEach(stateId => {
+            const state = states[stateId];
+            if (state.type === 'final') {
+                mermaid += `    class ${stateId} finalNode\n`;
+            } else {
+                mermaid += `    class ${stateId} messageNode\n`;
+            }
+        });
+        
+        return mermaid;
+    }
+
+    function convertMultipleFlowsToMermaid(flows) {
+        let mermaid = 'flowchart TD\n';
+        let nodeCounter = 0;
+        
+        // Create subgraphs for each flow
+        Object.keys(flows).forEach(flowId => {
+            const flow = flows[flowId];
+            const states = flow.states || {};
+            const initial = flow.initial || 'start';
+            
+            mermaid += `    subgraph ${flowId} ["${flowId}"]\n`;
+            
+            // Add states for this flow
+            Object.keys(states).forEach(stateId => {
+                const state = states[stateId];
+                const nodeId = `${flowId}_${stateId}`;
+                
+                if (state.type === 'final') {
+                    mermaid += `        ${nodeId}([${stateId}])\n`;
+                } else {
+                    mermaid += `        ${nodeId}[${stateId}]\n`;
+                }
+                
+                // Add transitions within this flow
+                if (state.on) {
+                    Object.keys(state.on).forEach(event => {
+                        const target = state.on[event];
+                        const targetNodeId = `${flowId}_${target}`;
+                        const eventLabel = event === 'NEXT' ? '' : event;
+                        if (eventLabel) {
+                            mermaid += `        ${nodeId} -->|${eventLabel}| ${targetNodeId}\n`;
+                        } else {
+                            mermaid += `        ${nodeId} --> ${targetNodeId}\n`;
+                        }
+                    });
+                }
+            });
+            
+            mermaid += '    end\n\n';
+        });
+        
+        // Add styling
+        mermaid += '    classDef finalNode fill:#f44336,stroke:#da190b,color:#fff\n';
+        mermaid += '    classDef messageNode fill:#2196F3,stroke:#1976D2,color:#fff\n';
+        
+        return mermaid;
+    }
+
+    function handleCursorMove(data) {
+        if (currentState.cursorFollowingEnabled && data.flowId) {
+            currentState.selectedFlow = data.flowId;
+            elements.flowSelect.value = data.flowId;
+            updateFlowView();
+            
+            // Switch to flow tab if not already active
+            if (!elements.flowTab.classList.contains('active')) {
+                switchTab('flow');
+            }
+            
+            // Highlight the current line info (optional feature)
+            showCursorInfo(data);
+        }
+    }
+
+    function updateCursorFollowButton() {
+        if (currentState.cursorFollowingEnabled) {
+            elements.cursorFollowBtn.classList.add('active');
+            elements.cursorFollowBtn.style.backgroundColor = 'var(--vscode-button-background)';
+            elements.cursorFollowBtn.title = 'Cursor Following: ON (click to disable)';
+        } else {
+            elements.cursorFollowBtn.classList.remove('active');
+            elements.cursorFollowBtn.style.backgroundColor = '';
+            elements.cursorFollowBtn.title = 'Follow Cursor (click to enable)';
+        }
+    }
+
+    function showCursorInfo(data) {
+        // Show a brief indicator of cursor position
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'cursor-info';
+        infoDiv.innerHTML = `
+            <small>Following cursor: Line ${data.line + 1}</small>
+        `;
+        infoDiv.style.cssText = `
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        `;
+        
+        document.body.appendChild(infoDiv);
+        
+        // Remove after 2 seconds
+        setTimeout(() => {
+            if (infoDiv.parentNode) {
+                infoDiv.style.opacity = '0';
+                setTimeout(() => {
+                    if (infoDiv.parentNode) {
+                        infoDiv.parentNode.removeChild(infoDiv);
+                    }
+                }, 300);
+            }
+        }, 2000);
+    }
+
+    function selectFlow(flowId) {
+        currentState.selectedFlow = flowId;
+        elements.flowSelect.value = flowId;
+        vscode.postMessage({ 
+            type: 'selectFlow', 
+            data: { flowId } 
+        });
+        updateFlowView();
     }
 
     function showErrors(errors) {
