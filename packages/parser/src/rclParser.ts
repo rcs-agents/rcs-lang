@@ -1,7 +1,6 @@
 import Parser from 'tree-sitter';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLNode, RCLASTNode } from '../types/astTypes';
-import { RCLDocument } from '../types/rclTypes';
+import { RCLNode, RCLASTNode } from './astTypes';
+import { RCLDocument } from './rclTypes';
 
 // Import the compiled RCL language
 let rclLanguage: any;
@@ -15,7 +14,7 @@ try {
 }
 
 export class RCLParser {
-  private parser: Parser;
+  private parser: Parser | null = null;
   private documentCache: Map<string, RCLDocument> = new Map();
 
   constructor() {
@@ -34,10 +33,7 @@ export class RCLParser {
     }
   }
 
-  public parseDocument(document: TextDocument): RCLDocument {
-    const uri = document.uri;
-    const version = document.version;
-    const content = document.getText();
+  public parseDocument(content: string, uri: string, version = 1): RCLDocument {
 
     // Check cache
     const cached = this.documentCache.get(uri);
@@ -207,7 +203,7 @@ export class RCLParser {
     };
 
     // Set parent references
-    rclNode.children.forEach(child => {
+    rclNode.children?.forEach(child => {
       child.parent = rclNode;
     });
 
@@ -258,7 +254,7 @@ export class RCLParser {
 
   private extractImportPath(node: RCLASTNode): string {
     // Extract import path from import statement
-    return node.text.replace(/^import\s+/, '').trim();
+    return node.text?.replace(/^import\s+/, '').trim() || '';
   }
 
   private extractNodeName(node: RCLASTNode): string {
@@ -268,7 +264,7 @@ export class RCLParser {
     }
     
     // Fallback: extract from text
-    const match = node.text.match(/^\w+\s+(\w+)/);
+    const match = node.text?.match(/^\w+\s+(\w+)/);
     return match ? match[1] : 'unknown';
   }
 

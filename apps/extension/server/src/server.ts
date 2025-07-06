@@ -33,8 +33,8 @@ import {
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from './parser/rclParser';
-import { SyntaxValidator } from './parser/syntaxValidation';
+import { RCLParser } from '@rcl/parser';
+import { SyntaxValidator } from './syntaxValidator';
 import { CompletionProvider } from './features/completion';
 import { HoverProvider } from './features/hover';
 import { DefinitionProvider } from './features/definition';
@@ -44,7 +44,7 @@ import { FormattingProvider } from './features/formatting';
 import { FoldingProvider } from './features/folding';
 import { SemanticTokensProvider } from './features/semanticTokens';
 import { DiagnosticsProvider } from './features/diagnostics';
-import { RCLSettings } from './types/rclTypes';
+import { RCLSettings } from '@rcl/parser';
 
 // Create a connection for the server, using Node's IPC as a transport
 const connection = createConnection(ProposedFeatures.all);
@@ -158,10 +158,15 @@ connection.onInitialized(() => {
 // Default settings
 const defaultSettings: RCLSettings = {
   maxNumberOfProblems: 1000,
-  validationEnabled: true,
-  completionEnabled: true,
-  formattingEnabled: true,
-  traceServer: 'off'
+  validation: {
+    enabled: true
+  },
+  completion: {
+    enabled: true
+  },
+  formatting: {
+    enabled: true
+  }
 };
 
 let globalSettings: RCLSettings = defaultSettings;
@@ -232,12 +237,12 @@ connection.languages.diagnostics.on(async (params) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
   const settings = await getDocumentSettings(textDocument.uri);
   
-  if (!settings.validationEnabled) {
+  if (!settings.validation.enabled) {
     return [];
   }
   
   try {
-    const rclDocument = parser.parseDocument(textDocument);
+    const rclDocument = parser.parseDocument(textDocument.getText(), textDocument.uri, textDocument.version);
     const diagnostics = await diagnosticsProvider.getDiagnostics(rclDocument, settings);
     
     // Limit the number of problems reported

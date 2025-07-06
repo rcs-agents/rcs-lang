@@ -1,4 +1,4 @@
-import { RCLASTNode } from '../../../apps/extension/server/src/types/astTypes';
+import { RCLNode } from '@rcl/parser';
 
 export interface AgentConfig {
   name: string;
@@ -65,7 +65,7 @@ export interface BillingConfig {
 }
 
 export class AgentExtractor {
-  extractAgentConfig(ast: RCLASTNode): AgentConfig | null {
+  extractAgentConfig(ast: RCLNode): AgentConfig | null {
     let agentConfig: AgentConfig | null = null;
     
     this.traverseAST(ast, (node) => {
@@ -77,14 +77,14 @@ export class AgentExtractor {
     return agentConfig;
   }
 
-  private traverseAST(node: RCLASTNode, callback: (node: RCLASTNode) => void): void {
+  private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
     callback(node);
     if (node.children) {
       node.children.forEach(child => this.traverseAST(child, callback));
     }
   }
 
-  private parseAgentDefinition(node: RCLASTNode): AgentConfig {
+  private parseAgentDefinition(node: RCLNode): AgentConfig {
     const agentName = this.extractAgentName(node);
     const config: AgentConfig = {
       name: agentName || 'UnknownAgent',
@@ -131,23 +131,23 @@ export class AgentExtractor {
     return config;
   }
 
-  private extractAgentName(node: RCLASTNode): string | null {
+  private extractAgentName(node: RCLNode): string | null {
     // Agent name should be the second child (identifier)
     if (node.children && node.children.length >= 2) {
       const nameNode = node.children[1];
       if (nameNode.type === 'identifier') {
-        return nameNode.text || null;
+        return nameNode.text || undefined;
       }
     }
     return null;
   }
 
-  private isPropertyNode(node: RCLASTNode, propertyName: string): boolean {
+  private isPropertyNode(node: RCLNode, propertyName: string): boolean {
     // Check if this is a property node with specific name
     return node.text?.trim().startsWith(`${propertyName}:`) || false;
   }
 
-  private extractPropertyValue(node: RCLASTNode): string | null {
+  private extractPropertyValue(node: RCLNode): string | null {
     // Extract value from property node
     const text = node.text || '';
     const colonIndex = text.indexOf(':');
@@ -158,7 +158,7 @@ export class AgentExtractor {
     return null;
   }
 
-  private parseConfigSection(node: RCLASTNode): AgentConfigSection {
+  private parseConfigSection(node: RCLNode): AgentConfigSection {
     const config: AgentConfigSection = {};
     
     this.traverseAST(node, (child) => {
@@ -170,7 +170,7 @@ export class AgentExtractor {
     return config;
   }
 
-  private parseConfigProperty(node: RCLASTNode, config: AgentConfigSection): void {
+  private parseConfigProperty(node: RCLNode, config: AgentConfigSection): void {
     const text = node.text || '';
     
     if (text.includes('description:')) {
@@ -200,7 +200,7 @@ export class AgentExtractor {
     }
   }
 
-  private parsePhoneNumberEntry(node: RCLASTNode): PhoneNumberEntry | undefined {
+  private parsePhoneNumberEntry(node: RCLNode): PhoneNumberEntry | undefined {
     let number = '';
     let label: string | undefined;
     
@@ -216,7 +216,7 @@ export class AgentExtractor {
     return number ? { number, label } : undefined;
   }
 
-  private parseEmailEntry(node: RCLASTNode): EmailEntry | undefined {
+  private parseEmailEntry(node: RCLNode): EmailEntry | undefined {
     let address = '';
     let label: string | undefined;
     
@@ -232,7 +232,7 @@ export class AgentExtractor {
     return address ? { address, label } : undefined;
   }
 
-  private parseWebsiteEntry(node: RCLASTNode): WebsiteEntry | undefined {
+  private parseWebsiteEntry(node: RCLNode): WebsiteEntry | undefined {
     let url = '';
     let label: string | undefined;
     
@@ -248,7 +248,7 @@ export class AgentExtractor {
     return url ? { url, label } : undefined;
   }
 
-  private parsePrivacyEntry(node: RCLASTNode): PrivacyEntry | undefined {
+  private parsePrivacyEntry(node: RCLNode): PrivacyEntry | undefined {
     let url = '';
     let label: string | undefined;
     
@@ -264,7 +264,7 @@ export class AgentExtractor {
     return url ? { url, label } : undefined;
   }
 
-  private parseTermsConditionsEntry(node: RCLASTNode): TermsConditionsEntry | undefined {
+  private parseTermsConditionsEntry(node: RCLNode): TermsConditionsEntry | undefined {
     let url = '';
     let label: string | undefined;
     
@@ -280,7 +280,7 @@ export class AgentExtractor {
     return url ? { url, label } : undefined;
   }
 
-  private parseBillingConfig(node: RCLASTNode): BillingConfig | undefined {
+  private parseBillingConfig(node: RCLNode): BillingConfig | undefined {
     let billingCategory: string | undefined;
     
     this.traverseAST(node, (child) => {
@@ -292,7 +292,7 @@ export class AgentExtractor {
     return billingCategory ? { billingCategory } : undefined;
   }
 
-  private parseDefaultsSection(node: RCLASTNode): AgentDefaultsSection {
+  private parseDefaultsSection(node: RCLNode): AgentDefaultsSection {
     const defaults: AgentDefaultsSection = {};
     
     this.traverseAST(node, (child) => {
@@ -304,7 +304,7 @@ export class AgentExtractor {
     return defaults;
   }
 
-  private parseDefaultProperty(node: RCLASTNode, defaults: AgentDefaultsSection): void {
+  private parseDefaultProperty(node: RCLNode, defaults: AgentDefaultsSection): void {
     const text = node.text || '';
     
     if (text.includes('fallbackMessage:')) {
@@ -320,7 +320,7 @@ export class AgentExtractor {
     }
   }
 
-  private parseExpressions(node: RCLASTNode): { language?: string } {
+  private parseExpressions(node: RCLNode): { language?: string } {
     const expressions: { language?: string } = {};
     
     this.traverseAST(node, (child) => {
@@ -332,18 +332,18 @@ export class AgentExtractor {
     return expressions;
   }
 
-  private extractFlowName(node: RCLASTNode): string | null {
+  private extractFlowName(node: RCLNode): string | null {
     // Flow name should be the second child (identifier)
     if (node.children && node.children.length >= 2) {
       const nameNode = node.children[1];
       if (nameNode.type === 'identifier') {
-        return nameNode.text || null;
+        return nameNode.text || undefined;
       }
     }
     return null;
   }
 
-  private extractMessageIds(node: RCLASTNode): string[] {
+  private extractMessageIds(node: RCLNode): string[] {
     const messageIds: string[] = [];
     
     this.traverseAST(node, (child) => {
@@ -365,23 +365,23 @@ export class AgentExtractor {
     return messageIds;
   }
 
-  private extractMessageIdFromShortcut(node: RCLASTNode): string | null {
+  private extractMessageIdFromShortcut(node: RCLNode): string | null {
     // Message ID should be the second child (identifier)
     if (node.children && node.children.length >= 2) {
       const idNode = node.children[1];
       if (idNode.type === 'identifier') {
-        return idNode.text || null;
+        return idNode.text || undefined;
       }
     }
     return null;
   }
 
-  private extractMessageIdFromAgentMessage(node: RCLASTNode): string | null {
+  private extractMessageIdFromAgentMessage(node: RCLNode): string | null {
     // Look for identifier in agent message
     if (node.children) {
       for (const child of node.children) {
         if (child.type === 'identifier') {
-          return child.text || null;
+          return child.text || undefined;
         }
       }
     }

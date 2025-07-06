@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { RCLParser } from './parser/rclParser';
+import { RCLParser } from '@rcl/parser';
 import { MessageNormalizer } from './normalizers/messageNormalizer';
 import { FlowCompiler } from './compilers/flowCompiler';
 import { AgentExtractor } from './extractors/agentExtractor';

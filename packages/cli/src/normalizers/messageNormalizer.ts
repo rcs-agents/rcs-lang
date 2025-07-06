@@ -1,4 +1,4 @@
-import { RCLNode } from '../types';
+import { RCLNode } from '@rcl/parser';
 
 export interface AgentMessage {
   contentMessage: AgentContentMessage;
@@ -158,7 +158,7 @@ export class MessageNormalizer {
     if (node.children && node.children.length >= 2) {
       const idNode = node.children[1];
       if (idNode.type === 'identifier') {
-        return idNode.text || null;
+        return idNode.text || undefined;
       }
     }
     return null;
@@ -222,7 +222,7 @@ export class MessageNormalizer {
     return suggestions;
   }
 
-  private parseReplyShortcut(node: RCLASTNode): SuggestedReply | null {
+  private parseReplyShortcut(node: RCLNode): SuggestedReply | null {
     if (node.children && node.children.length >= 2) {
       const text = this.cleanStringValue(node.children[1]?.text || '');
       const postbackData = this.generatePostbackData(text, 'reply');
@@ -237,7 +237,7 @@ export class MessageNormalizer {
     return null;
   }
 
-  private parseDialShortcut(node: RCLASTNode): SuggestedAction | null {
+  private parseDialShortcut(node: RCLNode): SuggestedAction | null {
     if (node.children && node.children.length >= 3) {
       const text = this.cleanStringValue(node.children[1]?.text || '');
       const phoneNumber = this.cleanStringValue(node.children[2]?.text || '');
@@ -253,7 +253,7 @@ export class MessageNormalizer {
     return null;
   }
 
-  private parseOpenUrlShortcut(node: RCLASTNode): SuggestedAction | null {
+  private parseOpenUrlShortcut(node: RCLNode): SuggestedAction | null {
     if (node.children && node.children.length >= 3) {
       const text = this.cleanStringValue(node.children[1]?.text || '');
       const url = this.cleanStringValue(node.children[2]?.text || '');
@@ -269,19 +269,19 @@ export class MessageNormalizer {
     return null;
   }
 
-  private extractAgentMessageId(node: RCLASTNode): string | null {
+  private extractAgentMessageId(node: RCLNode): string | null {
     // Extract ID from agentMessage node
     if (node.children) {
       for (const child of node.children) {
         if (child.type === 'identifier') {
-          return child.text || null;
+          return child.text || undefined;
         }
       }
     }
     return null;
   }
 
-  private normalizeAgentMessage(node: RCLASTNode): AgentMessage | null {
+  private normalizeAgentMessage(node: RCLNode): AgentMessage | null {
     // Parse full agent message structure
     let messageTrafficType: MessageTrafficType = 'TRANSACTION';
     let contentMessage: AgentContentMessage = {};
@@ -317,7 +317,7 @@ export class MessageNormalizer {
     };
   }
 
-  private parseContentMessage(node: RCLASTNode): AgentContentMessage {
+  private parseContentMessage(node: RCLNode): AgentContentMessage {
     const contentMessage: AgentContentMessage = {};
     
     this.traverseAST(node, (child) => {

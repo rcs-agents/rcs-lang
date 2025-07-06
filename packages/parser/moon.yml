@@ -1,0 +1,48 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+type: library
+language: typescript
+platform: node
+
+dependsOn:
+  - id: "^:build"
+
+tasks:
+  build:
+    command: pnpm tsc
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"
+    outputs:
+      - "dist"
+    env:
+      NODE_ENV: "production"
+
+  dev:
+    command: pnpm tsc --watch
+    local: true
+
+  test:
+    command: pnpm jest
+    inputs:
+      - "src/**/*"
+      - "tests/**/*"
+      - "jest.config.js"
+    env:
+      NODE_ENV: "test"
+
+  clean:
+    command: rm -rf dist
+    local: true
+
+  lint:
+    command: "eslint src --ext .ts"
+    inputs:
+      - "src/**/*"
+      - ".eslintrc.js"
+
+  typecheck:
+    command: pnpm tsc --noEmit
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"

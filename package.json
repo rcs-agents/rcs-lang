@@ -51,6 +51,12 @@
     "test": "tree-sitter test && vitest run",
     "test:tree-sitter": "tree-sitter test",
     "test:vitest": "vitest run",
-    "test:watch": "vitest"
-  }
+    "test:watch": "vitest",
+    "build": "moon run :build",
+    "dev": "moon run :dev",
+    "clean": "moon run :clean",
+    "lint": "moon run :lint",
+    "typecheck": "moon run :typecheck"
+  },
+  "packageManager": "pnpm@9.14.2"
 }

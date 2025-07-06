@@ -59,7 +59,7 @@ export const agent = ${agentJson};
  * @returns {object|null} - The normalized message object or null if not found
  */
 export function getMessage(messageId) {
-  return messages[messageId] || null;
+  return messages[messageId] || undefined;
 }
 
 /**
@@ -68,7 +68,7 @@ export function getMessage(messageId) {
  * @returns {object|null} - The XState configuration or null if not found
  */
 export function getFlow(flowId) {
-  return flows[flowId] || null;
+  return flows[flowId] || undefined;
 }
 
 /**

@@ -1,5 +1,10 @@
-import { Diagnostic, Range, Position } from 'vscode-languageserver/node';
-import { RCLASTNode } from './astTypes';
+import { RCLASTNode, Position, Range } from './astTypes';
+
+export interface Diagnostic {
+  range: Range;
+  message: string;
+  severity?: number;
+}
 
 export interface RCLDocument {
   uri: string;
@@ -42,6 +47,24 @@ export enum SymbolKind {
   Expression = 'expression'
 }
 
+export interface RCLSettings {
+  maxNumberOfProblems: number;
+  validation: {
+    enabled: boolean;
+  };
+  completion: {
+    enabled: boolean;
+  };
+  formatting: {
+    enabled: boolean;
+  };
+  // Legacy properties for backward compatibility
+  validationEnabled?: boolean;
+  completionEnabled?: boolean;
+  formattingEnabled?: boolean;
+  traceServer?: string;
+}
+
 export interface CompletionContext {
   position: Position;
   word: string;
@@ -57,13 +80,6 @@ export interface ValidationRule {
   check: (node: RCLASTNode, document: RCLDocument) => Diagnostic[];
 }
 
-export interface RCLSettings {
-  maxNumberOfProblems: number;
-  validationEnabled: boolean;
-  completionEnabled: boolean;
-  formattingEnabled: boolean;
-  traceServer: 'off' | 'messages' | 'verbose';
-}
 
 export interface HoverInfo {
   range: Range;

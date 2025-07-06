@@ -102,14 +102,13 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "pnpm compile",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint client/src server/src --ext ts",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "npm run test:server && npm run test:client",
-    "test:server": "cd server && npm test",
-    "test:client": "cd client && npm test"
+    "test": "pnpm test:server && pnpm test:client",
+    "test:server": "cd server && pnpm test",
+    "test:client": "cd client && pnpm test"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -1,4 +1,4 @@
-import { RCLASTNode } from '../../../apps/extension/server/src/types/astTypes';
+import { RCLNode } from '@rcl/parser';
 
 export interface XStateConfig {
   id: string;
@@ -22,7 +22,7 @@ export interface XStateTransition {
 }
 
 export class FlowCompiler {
-  compileFlows(ast: RCLASTNode): Record<string, XStateConfig> {
+  compileFlows(ast: RCLNode): Record<string, XStateConfig> {
     const flows: Record<string, XStateConfig> = {};
     
     this.traverseAST(ast, (node) => {
@@ -39,25 +39,25 @@ export class FlowCompiler {
     return flows;
   }
 
-  private traverseAST(node: RCLASTNode, callback: (node: RCLASTNode) => void): void {
+  private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
     callback(node);
     if (node.children) {
       node.children.forEach(child => this.traverseAST(child, callback));
     }
   }
 
-  private extractFlowId(node: RCLASTNode): string | null {
+  private extractFlowId(node: RCLNode): string | null {
     // Flow section should have identifier as second child
     if (node.children && node.children.length >= 2) {
       const idNode = node.children[1];
       if (idNode.type === 'identifier') {
-        return idNode.text || null;
+        return idNode.text || undefined;
       }
     }
     return null;
   }
 
-  private compileFlow(node: RCLASTNode): XStateConfig | null {
+  private compileFlow(node: RCLNode): XStateConfig | null {
     const flowId = this.extractFlowId(node);
     if (!flowId) return null;
 
@@ -73,7 +73,7 @@ export class FlowCompiler {
     };
   }
 
-  private extractTransitions(node: RCLASTNode): FlowTransition[] {
+  private extractTransitions(node: RCLNode): FlowTransition[] {
     const transitions: FlowTransition[] = [];
     
     this.traverseAST(node, (child) => {
@@ -86,7 +86,7 @@ export class FlowCompiler {
     return transitions;
   }
 
-  private parseFlowRule(node: RCLASTNode): FlowTransition[] {
+  private parseFlowRule(node: RCLNode): FlowTransition[] {
     const transitions: FlowTransition[] = [];
     const operands: string[] = [];
     let conditions: string[] = [];
@@ -132,7 +132,7 @@ export class FlowCompiler {
     return transitions;
   }
 
-  private extractOperand(node: RCLASTNode): string | null {
+  private extractOperand(node: RCLNode): string | null {
     // Handle different types of operands
     if (node.children && node.children.length > 0) {
       const firstChild = node.children[0];
@@ -162,7 +162,7 @@ export class FlowCompiler {
     return null;
   }
 
-  private extractCondition(node: RCLASTNode): string | null {
+  private extractCondition(node: RCLNode): string | null {
     // Extract JavaScript/TypeScript conditions
     for (const child of node.children || []) {
       if (child.type === 'embedded_code') {
@@ -172,7 +172,7 @@ export class FlowCompiler {
     return null;
   }
 
-  private extractWithClause(node: RCLASTNode): string | null {
+  private extractWithClause(node: RCLNode): string | null {
     // Extract action parameters from with clause
     const params: Record<string, any> = {};
     
@@ -189,7 +189,7 @@ export class FlowCompiler {
     return Object.keys(params).length > 0 ? JSON.stringify(params) : null;
   }
 
-  private extractAttributeValue(node: RCLASTNode): any {
+  private extractAttributeValue(node: RCLNode): any {
     for (const child of node.children || []) {
       if (child.type === 'string') {
         return this.cleanStringValue(child.text || '');
@@ -207,7 +207,7 @@ export class FlowCompiler {
     return null;
   }
 
-  private extractEmbeddedCode(node: RCLASTNode): string | null {
+  private extractEmbeddedCode(node: RCLNode): string | null {
     // Extract JavaScript/TypeScript code from embedded code blocks
     if (node.children) {
       for (const child of node.children) {
@@ -308,7 +308,7 @@ export class FlowCompiler {
     return transitions.length > 0 ? transitions[0].from : null;
   }
 
-  private extractFlowContext(node: RCLASTNode): Record<string, any> {
+  private extractFlowContext(node: RCLNode): Record<string, any> {
     const context: Record<string, any> = {};
     
     // Extract default values and configuration from the flow
