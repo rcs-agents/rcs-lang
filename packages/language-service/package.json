@@ -1,0 +1,25 @@
+{
+  "name": "@rcl/language-service",
+  "version": "0.1.0",
+  "description": "Advanced language service providers for RCL",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@rcl/parser": "workspace:*",
+    "tree-sitter": "^0.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
