@@ -24,7 +24,7 @@
     },
     "identifier": {
       "type": "PATTERN",
-      "value": "[A-Z][A-Za-z0-9\\-_]*"
+      "value": "[A-Z][A-Za-z0-9\\-_]*(\\s[A-Z][A-Za-z0-9\\-_]*)*"
     },
     "attribute_key": {
       "type": "PATTERN",

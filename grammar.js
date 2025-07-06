@@ -34,7 +34,8 @@ module.exports = grammar({
     comment: $ => /#.*/,
 
     // Lexical rules (terminals)
-    identifier: $ => /[A-Z][A-Za-z0-9\-_]*/,
+    // Simplified identifier - supports basic spaced identifiers
+    identifier: $ => /[A-Z][A-Za-z0-9\-_]*(\s[A-Z][A-Za-z0-9\-_]*)*/, 
     attribute_key: $ => /[a-z][a-zA-Z0-9_]*/,
     section_type: $ => /[a-z][a-zA-Z0-9]*/,
     
