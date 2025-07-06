@@ -13,12 +13,12 @@ interface PreviewState {
 }
 
 interface ExtensionMessage {
-  type: 'updateData' | 'cursorMove' | 'compile' | 'export';
+  type: 'updateData' | 'cursorMove' | 'compile' | 'export' | 'cursorFollowingToggle';
   data: any;
 }
 
 interface WebviewMessage {
-  type: 'ready' | 'selectFlow' | 'export' | 'error' | 'refresh';
+  type: 'ready' | 'selectFlow' | 'export' | 'error' | 'refresh' | 'toggleCursorFollowing';
   data: any;
 }
 
@@ -29,6 +29,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
   private _currentDocument?: vscode.TextDocument;
   private _fileWatcher?: vscode.FileSystemWatcher;
   private _debounceTimer?: NodeJS.Timeout;
+  private _cursorFollowingEnabled: boolean = false;
   private _state: PreviewState = {
     messages: {},
     flows: {},
@@ -69,6 +70,12 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
         case 'export':
           this._exportCompiled(message.data);
           break;
+        case 'toggleCursorFollowing':
+          this._cursorFollowingEnabled = message.data.enabled;
+          if (this._cursorFollowingEnabled) {
+            this._handleCursorMove();
+          }
+          break;
       }
     });
 
@@ -89,6 +96,17 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
       if (editor && editor.document.languageId === 'rcl') {
         this._currentDocument = editor.document;
         this._compileCurrentDocument();
+        if (this._cursorFollowingEnabled) {
+          this._handleCursorMove();
+        }
+      }
+    });
+
+    // Watch for cursor changes
+    vscode.window.onDidChangeTextEditorSelection((event) => {
+      if (this._cursorFollowingEnabled && 
+          event.textEditor.document === this._currentDocument) {
+        this._handleCursorMove();
       }
     });
 
@@ -229,6 +247,66 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  private _handleCursorMove() {
+    if (!this._currentDocument || !vscode.window.activeTextEditor) {
+      return;
+    }
+
+    const editor = vscode.window.activeTextEditor;
+    const position = editor.selection.active;
+    const currentLine = position.line;
+    const lineText = this._currentDocument.lineAt(currentLine).text;
+    
+    // Try to detect flow context from cursor position
+    const flowId = this._detectFlowAtCursor(currentLine);
+    
+    if (flowId && flowId !== this._state.selectedFlow) {
+      this._state.selectedFlow = flowId;
+      const message: ExtensionMessage = {
+        type: 'cursorMove',
+        data: { flowId, line: currentLine, text: lineText }
+      };
+      if (this._view) {
+        this._view.webview.postMessage(message);
+      }
+    }
+  }
+
+  private _detectFlowAtCursor(currentLine: number): string | null {
+    if (!this._currentDocument) {
+      return null;
+    }
+
+    const text = this._currentDocument.getText();
+    const lines = text.split('\n');
+    
+    // Look backwards from cursor to find the most recent flow definition
+    let currentFlowId: string | null = null;
+    
+    for (let i = currentLine; i >= 0; i--) {
+      const line = lines[i].trim();
+      
+      // Check for flow definition
+      const flowMatch = line.match(/^flow\s+([A-Za-z][A-Za-z0-9_]*)/);
+      if (flowMatch) {
+        currentFlowId = flowMatch[1];
+        break;
+      }
+      
+      // If we hit another section (agent, messages), stop looking
+      if (line.startsWith('agent ') || line === 'messages') {
+        break;
+      }
+    }
+    
+    // Verify this flow exists in our compiled flows
+    if (currentFlowId && this._state.flows && this._state.flows[currentFlowId]) {
+      return currentFlowId;
+    }
+    
+    return null;
+  }
+
   private async _exportCompiled(options: { format: string; path?: string }) {
     if (!this._currentDocument) {
       vscode.window.showErrorMessage('No RCL document is currently active');
@@ -267,6 +345,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     // Get URIs for resources
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.css'));
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.js'));
+    const mermaidUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'mermaid.min.js'));
 
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();
@@ -289,6 +368,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
                         <option value="">Select Flow...</option>
                     </select>
                     <button id="allFlowsBtn" class="toolbar-btn" title="Show All Flows">All Flows</button>
+                    <button id="cursorFollowBtn" class="toolbar-btn" title="Follow Cursor">📍</button>
                 </div>
                 <div class="toolbar-right">
                     <button id="exportJsonBtn" class="toolbar-btn" title="Export JSON">📤 JSON</button>
@@ -312,7 +392,8 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
                     
                     <div id="flowView" class="view-content">
                         <div id="flowContainer" class="flow-container">
-                            <div class="placeholder">Flow visualization coming soon...</div>
+                            <div id="flowDiagram" class="flow-diagram"></div>
+                            <div class="placeholder">Select a flow to view diagram...</div>
                         </div>
                     </div>
                     
@@ -326,6 +407,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
             </div>
         </div>
         
+        <script nonce="${nonce}" src="${mermaidUri}"></script>
         <script nonce="${nonce}" src="${scriptUri}"></script>
     </body>
     </html>`;
