@@ -1,5 +1,7 @@
 import * as path from 'path';
-import { workspace, ExtensionContext, window } from 'vscode';
+import * as fs from 'fs';
+import * as cp from 'child_process';
+import { workspace, ExtensionContext, window, commands, Uri, ViewColumn } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -11,6 +13,12 @@ let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
   console.log('RCL Language Server extension is now active!');
+
+  // Register the Show Agent Output command
+  const showAgentOutputCommand = commands.registerCommand('rcl.showAgentOutput', async (uri?: Uri) => {
+    await showAgentOutput(uri);
+  });
+  context.subscriptions.push(showAgentOutputCommand);
 
   // The server is implemented in node
   const serverModule = context.asAbsolutePath(
@@ -71,4 +79,103 @@ export function deactivate(): Thenable<void> | undefined {
   }
   console.log('Deactivating RCL Language Server extension');
   return client.stop();
+}
+
+async function showAgentOutput(uri?: Uri): Promise<void> {
+  let targetUri: Uri;
+  
+  if (uri) {
+    targetUri = uri;
+  } else {
+    const activeEditor = window.activeTextEditor;
+    if (!activeEditor) {
+      window.showErrorMessage('No RCL file is currently open');
+      return;
+    }
+    targetUri = activeEditor.document.uri;
+  }
+
+  if (!targetUri.fsPath.endsWith('.rcl')) {
+    window.showErrorMessage('Please select an RCL file');
+    return;
+  }
+
+  const workspaceFolder = workspace.getWorkspaceFolder(targetUri);
+  if (!workspaceFolder) {
+    window.showErrorMessage('File must be within a workspace folder');
+    return;
+  }
+
+  try {
+    // Find the CLI demo tool
+    const cliPath = findRclCli(workspaceFolder.uri.fsPath);
+    if (!cliPath) {
+      window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
+      return;
+    }
+
+    // Show progress indicator
+    await window.withProgress({
+      location: { viewId: 'workbench.view.explorer' },
+      title: 'Compiling RCL agent...',
+      cancellable: false
+    }, async () => {
+      const rclFilePath = targetUri.fsPath;
+      const outputPath = rclFilePath.replace('.rcl', '.js');
+      
+      // Run the CLI tool
+      const result = await runRclCli(cliPath, rclFilePath, outputPath);
+      
+      if (result.success) {
+        // Open the generated file
+        const outputUri = Uri.file(outputPath);
+        const document = await workspace.openTextDocument(outputUri);
+        await window.showTextDocument(document, ViewColumn.Beside);
+        
+        window.showInformationMessage(
+          `Agent output generated successfully: ${path.basename(outputPath)}`
+        );
+      } else {
+        window.showErrorMessage(`Failed to compile RCL file: ${result.error}`);
+      }
+    });
+  } catch (error) {
+    window.showErrorMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+function findRclCli(workspacePath: string): string | null {
+  // Look for the CLI tool in common locations
+  const possiblePaths = [
+    path.join(workspacePath, 'cli', 'demo.js'),
+    path.join(workspacePath, 'node_modules', '.bin', 'rcl-cli'),
+    path.join(workspacePath, 'node_modules', 'rcl-cli', 'cli', 'demo.js'),
+    // Look in parent directories for mono-repo setups
+    path.join(workspacePath, '..', 'cli', 'demo.js'),
+    path.join(workspacePath, '..', '..', 'cli', 'demo.js'),
+  ];
+
+  for (const cliPath of possiblePaths) {
+    if (fs.existsSync(cliPath)) {
+      return cliPath;
+    }
+  }
+
+  return null;
+}
+
+function runRclCli(cliPath: string, inputPath: string, outputPath: string): Promise<{ success: boolean; error?: string }> {
+  return new Promise((resolve) => {
+    const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}"`;
+    
+    cp.exec(command, (error, stdout, stderr) => {
+      if (error) {
+        resolve({ success: false, error: error.message });
+      } else if (stderr) {
+        resolve({ success: false, error: stderr });
+      } else {
+        resolve({ success: true });
+      }
+    });
+  });
 }
