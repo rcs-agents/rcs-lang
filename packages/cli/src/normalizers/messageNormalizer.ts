@@ -382,16 +382,564 @@ export class MessageNormalizer {
 
   private parseContentMessage(node: RCLNode): AgentContentMessage {
     const contentMessage: AgentContentMessage = {};
+    let hasContent = false;
     
     this.traverseAST(node, (child) => {
-      if (child.type === 'string' && child.parent?.text?.includes('text')) {
-        contentMessage.text = this.cleanStringValue(child.text || '');
+      // Parse text content (only if no other content type is present)
+      if (!hasContent && (child.type === 'text_property' || (child.type === 'string' && child.parent?.text?.includes('text')))) {
+        const textValue = this.extractPropertyValue(child, 'text');
+        if (textValue) {
+          contentMessage.text = textValue;
+          hasContent = true;
+        }
       }
       
-      // Add parsing for rich cards, files, etc. as needed
+      // Parse rich cards (only if no other content type is present)
+      if (!hasContent && (child.type === 'rich_card_property' || child.type === 'rich_card')) {
+        const richCard = this.parseRichCard(child);
+        if (richCard) {
+          contentMessage.richCard = richCard;
+          hasContent = true;
+        }
+      }
+      
+      // Parse content info (for file messages, only if no other content type is present)
+      if (!hasContent && (child.type === 'content_info_property' || child.type === 'content_info')) {
+        const contentInfo = this.parseContentInfo(child);
+        if (contentInfo) {
+          contentMessage.contentInfo = contentInfo;
+          hasContent = true;
+        }
+      }
+      
+      // Parse suggestions at content message level (can coexist with content)
+      if (child.type === 'suggestions_property' || child.type === 'suggestions') {
+        const suggestions = this.parseSuggestions(child);
+        if (suggestions.length > 0) {
+          contentMessage.suggestions = suggestions;
+        }
+      }
     });
     
     return contentMessage;
+  }
+
+  /**
+   * Parse rich card structures (standalone or carousel)
+   */
+  private parseRichCard(node: RCLNode): RichCard | null {
+    const richCard: RichCard = {};
+    
+    this.traverseAST(node, (child) => {
+      // Parse standalone card
+      if (child.type === 'standalone_card_property' || child.type === 'standalone_card') {
+        const standaloneCard = this.parseStandaloneCard(child);
+        if (standaloneCard) {
+          richCard.standaloneCard = standaloneCard;
+        }
+      }
+      
+      // Parse carousel card
+      if (child.type === 'carousel_card_property' || child.type === 'carousel_card') {
+        const carouselCard = this.parseCarouselCard(child);
+        if (carouselCard) {
+          richCard.carouselCard = carouselCard;
+        }
+      }
+    });
+    
+    return Object.keys(richCard).length > 0 ? richCard : null;
+  }
+
+  /**
+   * Parse standalone card
+   */
+  private parseStandaloneCard(node: RCLNode): StandaloneCard | null {
+    const standaloneCard: StandaloneCard = {
+      cardOrientation: 'CARD_ORIENTATION_UNSPECIFIED',
+      cardContent: {}
+    };
+    
+    this.traverseAST(node, (child) => {
+      // Parse card orientation
+      if (child.type === 'card_orientation_property' || (child.type === 'atom' && child.parent?.text?.includes('cardOrientation'))) {
+        const orientation = this.extractAtomValue(child, 'cardOrientation');
+        if (orientation) {
+          standaloneCard.cardOrientation = orientation as any;
+        }
+      }
+      
+      // Parse thumbnail image alignment
+      if (child.type === 'thumbnail_image_alignment_property') {
+        const alignment = this.extractAtomValue(child, 'thumbnailImageAlignment');
+        if (alignment) {
+          standaloneCard.thumbnailImageAlignment = alignment as any;
+        }
+      }
+      
+      // Parse card content
+      if (child.type === 'card_content_property' || child.type === 'card_content') {
+        const cardContent = this.parseCardContent(child);
+        if (cardContent) {
+          standaloneCard.cardContent = cardContent;
+        }
+      }
+    });
+    
+    return standaloneCard;
+  }
+
+  /**
+   * Parse carousel card
+   */
+  private parseCarouselCard(node: RCLNode): CarouselCard | null {
+    const carouselCard: CarouselCard = {
+      cardWidth: 'CARD_WIDTH_UNSPECIFIED',
+      cardContents: []
+    };
+    
+    this.traverseAST(node, (child) => {
+      // Parse card width
+      if (child.type === 'card_width_property' || (child.type === 'atom' && child.parent?.text?.includes('cardWidth'))) {
+        const width = this.extractAtomValue(child, 'cardWidth');
+        if (width) {
+          carouselCard.cardWidth = width as any;
+        }
+      }
+      
+      // Parse card contents
+      if (child.type === 'card_contents_property' || child.type === 'card_contents') {
+        const cardContents = this.parseCardContents(child);
+        carouselCard.cardContents = cardContents;
+      }
+    });
+    
+    return carouselCard;
+  }
+
+  /**
+   * Parse individual card content
+   */
+  private parseCardContent(node: RCLNode): CardContent | null {
+    const cardContent: CardContent = {};
+    
+    this.traverseAST(node, (child) => {
+      // Parse title
+      if (child.type === 'title_property') {
+        const title = this.extractPropertyValue(child, 'title');
+        if (title) {
+          cardContent.title = title;
+        }
+      }
+      
+      // Parse description
+      if (child.type === 'description_property') {
+        const description = this.extractPropertyValue(child, 'description');
+        if (description) {
+          cardContent.description = description;
+        }
+      }
+      
+      // Parse media
+      if (child.type === 'media_property' || child.type === 'media') {
+        const media = this.parseMedia(child);
+        if (media) {
+          cardContent.media = media;
+        }
+      }
+      
+      // Parse suggestions
+      if (child.type === 'suggestions_property' || child.type === 'suggestions') {
+        const suggestions = this.parseSuggestions(child);
+        if (suggestions.length > 0) {
+          cardContent.suggestions = suggestions;
+        }
+      }
+    });
+    
+    return Object.keys(cardContent).length > 0 ? cardContent : null;
+  }
+
+  /**
+   * Parse multiple card contents (for carousel)
+   */
+  private parseCardContents(node: RCLNode): CardContent[] {
+    const cardContents: CardContent[] = [];
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'card_content') {
+        const cardContent = this.parseCardContent(child);
+        if (cardContent) {
+          cardContents.push(cardContent);
+        }
+      }
+    });
+    
+    return cardContents;
+  }
+
+  /**
+   * Parse media content
+   */
+  private parseMedia(node: RCLNode): Media | null {
+    const media: Media = {
+      height: 'HEIGHT_UNSPECIFIED'
+    };
+    
+    this.traverseAST(node, (child) => {
+      // Parse height
+      if (child.type === 'height_property' || (child.type === 'atom' && child.parent?.text?.includes('height'))) {
+        const height = this.extractAtomValue(child, 'height');
+        if (height) {
+          media.height = height as any;
+        }
+      }
+      
+      // Parse file
+      if (child.type === 'file_property' || child.type === 'uploaded_rbm_file') {
+        const file = this.parseUploadedRbmFile(child);
+        if (file) {
+          media.file = file;
+        }
+      }
+      
+      // Parse content info
+      if (child.type === 'content_info_property' || child.type === 'content_info') {
+        const contentInfo = this.parseContentInfo(child);
+        if (contentInfo) {
+          media.contentInfo = contentInfo;
+        }
+      }
+    });
+    
+    return media;
+  }
+
+  /**
+   * Parse content info
+   */
+  private parseContentInfo(node: RCLNode): ContentInfo | null {
+    const contentInfo: ContentInfo = {
+      fileUrl: ''
+    };
+    
+    this.traverseAST(node, (child) => {
+      // Parse file URL
+      if (child.type === 'file_url_property') {
+        const fileUrl = this.extractPropertyValue(child, 'fileUrl');
+        if (fileUrl) {
+          contentInfo.fileUrl = fileUrl;
+        }
+      }
+      
+      // Parse thumbnail URL
+      if (child.type === 'thumbnail_url_property') {
+        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnailUrl');
+        if (thumbnailUrl) {
+          contentInfo.thumbnailUrl = thumbnailUrl;
+        }
+      }
+      
+      // Parse alt text
+      if (child.type === 'alt_text_property') {
+        const altText = this.extractPropertyValue(child, 'altText');
+        if (altText) {
+          contentInfo.altText = altText;
+        }
+      }
+      
+      // Parse force refresh
+      if (child.type === 'force_refresh_property') {
+        const forceRefresh = this.extractBooleanValue(child, 'forceRefresh');
+        if (forceRefresh !== null) {
+          contentInfo.forceRefresh = forceRefresh;
+        }
+      }
+    });
+    
+    return contentInfo.fileUrl ? contentInfo : null;
+  }
+
+  /**
+   * Parse uploaded RBM file
+   */
+  private parseUploadedRbmFile(node: RCLNode): UploadedRbmFile | null {
+    const file: UploadedRbmFile = {
+      fileName: ''
+    };
+    
+    this.traverseAST(node, (child) => {
+      // Parse file name
+      if (child.type === 'file_name_property') {
+        const fileName = this.extractPropertyValue(child, 'fileName');
+        if (fileName) {
+          file.fileName = fileName;
+        }
+      }
+      
+      // Parse thumbnail URL
+      if (child.type === 'thumbnail_url_property') {
+        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnailUrl');
+        if (thumbnailUrl) {
+          file.thumbnailUrl = thumbnailUrl;
+        }
+      }
+      
+      // Parse thumbnail name
+      if (child.type === 'thumbnail_name_property') {
+        const thumbnailName = this.extractPropertyValue(child, 'thumbnailName');
+        if (thumbnailName) {
+          file.thumbnailName = thumbnailName;
+        }
+      }
+    });
+    
+    return file.fileName ? file : null;
+  }
+
+  /**
+   * Parse suggestions list
+   */
+  private parseSuggestions(node: RCLNode): Suggestion[] {
+    const suggestions: Suggestion[] = [];
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'suggestion') {
+        const suggestion = this.parseSuggestion(child);
+        if (suggestion) {
+          suggestions.push(suggestion);
+        }
+      }
+    });
+    
+    return suggestions.slice(0, 11); // Max 11 suggestions
+  }
+
+  /**
+   * Parse individual suggestion
+   */
+  private parseSuggestion(node: RCLNode): Suggestion | null {
+    let suggestion: Suggestion = {};
+    
+    this.traverseAST(node, (child) => {
+      // Parse reply suggestion
+      if (child.type === 'reply') {
+        const reply = this.parseReply(child);
+        if (reply) {
+          suggestion.reply = reply;
+        }
+      }
+      
+      // Parse action suggestion
+      if (child.type === 'action') {
+        const action = this.parseAction(child);
+        if (action) {
+          suggestion.action = action;
+        }
+      }
+    });
+    
+    return Object.keys(suggestion).length > 0 ? suggestion : null;
+  }
+
+  /**
+   * Parse reply suggestion
+   */
+  private parseReply(node: RCLNode): SuggestedReply | null {
+    const reply: SuggestedReply = {
+      text: '',
+      postbackData: ''
+    };
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'text_property') {
+        const text = this.extractPropertyValue(child, 'text');
+        if (text) {
+          reply.text = text.substring(0, 25); // Max 25 characters
+        }
+      }
+      
+      if (child.type === 'postback_data_property') {
+        const postbackData = this.extractPropertyValue(child, 'postbackData');
+        if (postbackData) {
+          reply.postbackData = postbackData.substring(0, 2048); // Max 2048 characters
+        }
+      }
+    });
+    
+    // Generate postback data if not provided
+    if (!reply.postbackData && reply.text) {
+      reply.postbackData = this.generatePostbackData(reply.text, 'reply');
+    }
+    
+    return reply.text ? reply : null;
+  }
+
+  /**
+   * Parse action suggestion
+   */
+  private parseAction(node: RCLNode): SuggestedAction | null {
+    const action: SuggestedAction = {
+      text: '',
+      postbackData: ''
+    };
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'text_property') {
+        const text = this.extractPropertyValue(child, 'text');
+        if (text) {
+          action.text = text.substring(0, 25); // Max 25 characters
+        }
+      }
+      
+      if (child.type === 'postback_data_property') {
+        const postbackData = this.extractPropertyValue(child, 'postbackData');
+        if (postbackData) {
+          action.postbackData = postbackData.substring(0, 2048); // Max 2048 characters
+        }
+      }
+      
+      // Parse various action types
+      if (child.type === 'open_url_action') {
+        action.openUrlAction = this.parseOpenUrlAction(child);
+      }
+      
+      if (child.type === 'dial_action') {
+        action.dialAction = this.parseDialAction(child);
+      }
+      
+      if (child.type === 'view_location_action') {
+        action.viewLocationAction = this.parseViewLocationAction(child);
+      }
+      
+      if (child.type === 'create_calendar_event_action') {
+        action.createCalendarEventAction = this.parseCreateCalendarEventAction(child);
+      }
+      
+      if (child.type === 'share_location_action') {
+        action.shareLocationAction = {};
+      }
+    });
+    
+    // Generate postback data if not provided
+    if (!action.postbackData && action.text) {
+      action.postbackData = this.generatePostbackData(action.text, 'action');
+    }
+    
+    return action.text ? action : null;
+  }
+
+  /**
+   * Utility methods for parsing
+   */
+  private extractPropertyValue(node: RCLNode, propertyName: string): string | null {
+    if (node.type === `${propertyName}_property`) {
+      // Find string value in children
+      for (const child of node.children || []) {
+        if (child.type === 'string') {
+          return this.cleanStringValue(child.text || '');
+        }
+      }
+    }
+    
+    // Also check if this node itself is a string and the parent matches the property
+    if (node.type === 'string' && node.parent?.type === `${propertyName}_property`) {
+      return this.cleanStringValue(node.text || '');
+    }
+    
+    return null;
+  }
+
+  private extractAtomValue(node: RCLNode, propertyName: string): string | null {
+    if (node.type === `${propertyName}_property`) {
+      // Find atom value in children
+      for (const child of node.children || []) {
+        if (child.type === 'atom') {
+          return (child.text || '').replace(':', '');
+        }
+      }
+    }
+    
+    // Also check if this node itself is an atom and the parent matches the property
+    if (node.type === 'atom' && node.parent?.type === `${propertyName}_property`) {
+      return (node.text || '').replace(':', '');
+    }
+    
+    return null;
+  }
+
+  private extractBooleanValue(node: RCLNode, propertyName: string): boolean | null {
+    const value = this.extractPropertyValue(node, propertyName);
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return null;
+  }
+
+  private parseOpenUrlAction(node: RCLNode): OpenUrlAction | null {
+    const url = this.extractPropertyValue(node, 'url');
+    return url ? { url } : null;
+  }
+
+  private parseDialAction(node: RCLNode): DialAction | null {
+    const phoneNumber = this.extractPropertyValue(node, 'phoneNumber');
+    return phoneNumber ? { phoneNumber } : null;
+  }
+
+  private parseViewLocationAction(node: RCLNode): ViewLocationAction | null {
+    const action: ViewLocationAction = {};
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'label_property') {
+        const label = this.extractPropertyValue(child, 'label');
+        if (label) action.label = label;
+      }
+      
+      if (child.type === 'query_property') {
+        const query = this.extractPropertyValue(child, 'query');
+        if (query) action.query = query;
+      }
+      
+      // Parse latLong if present
+      if (child.type === 'lat_long_property') {
+        // This would need more complex parsing for latitude/longitude object
+        // For now, use query as fallback
+      }
+    });
+    
+    return Object.keys(action).length > 0 ? action : null;
+  }
+
+  private parseCreateCalendarEventAction(node: RCLNode): CreateCalendarEventAction | null {
+    const action: CreateCalendarEventAction = {
+      startTime: '',
+      endTime: '',
+      title: '',
+      description: ''
+    };
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'start_time_property') {
+        const startTime = this.extractPropertyValue(child, 'startTime');
+        if (startTime) action.startTime = startTime;
+      }
+      
+      if (child.type === 'end_time_property') {
+        const endTime = this.extractPropertyValue(child, 'endTime');
+        if (endTime) action.endTime = endTime;
+      }
+      
+      if (child.type === 'title_property') {
+        const title = this.extractPropertyValue(child, 'title');
+        if (title) action.title = title;
+      }
+      
+      if (child.type === 'description_property') {
+        const description = this.extractPropertyValue(child, 'description');
+        if (description) action.description = description;
+      }
+    });
+    
+    return action.startTime && action.endTime && action.title ? action : null;
   }
 
   private cleanStringValue(value: string): string {
