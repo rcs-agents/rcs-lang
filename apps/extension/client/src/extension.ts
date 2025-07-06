@@ -9,6 +9,7 @@ import {
   TransportKind
 } from 'vscode-languageclient/node';
 import { RCLPreviewProvider } from './previewProvider';
+import { InteractiveDiagramProvider } from './interactiveDiagramProvider';
 
 let client: LanguageClient;
 
@@ -17,6 +18,7 @@ export function activate(context: ExtensionContext) {
 
   // Create preview provider
   const previewProvider = new RCLPreviewProvider(context);
+  const interactiveDiagramProvider = new InteractiveDiagramProvider(context);
 
   // Register webview view provider
   context.subscriptions.push(
@@ -43,6 +45,11 @@ export function activate(context: ExtensionContext) {
     await exportCompiled(uri);
   });
   context.subscriptions.push(exportCompiledCommand);
+
+  const openInteractiveDiagramCommand = commands.registerCommand('rcl.openInteractiveDiagram', async (uri?: Uri) => {
+    await openInteractiveDiagram(uri, interactiveDiagramProvider);
+  });
+  context.subscriptions.push(openInteractiveDiagramCommand);
 
   // The server is implemented in node
   const serverModule = context.asAbsolutePath(
@@ -258,6 +265,37 @@ async function exportCompiled(uri?: Uri): Promise<void> {
     }
   } catch (error) {
     window.showErrorMessage(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+async function openInteractiveDiagram(uri?: Uri, diagramProvider?: any): Promise<void> {
+  let targetUri: Uri;
+  
+  if (uri) {
+    targetUri = uri;
+  } else {
+    const activeEditor = window.activeTextEditor;
+    if (!activeEditor) {
+      window.showErrorMessage('No RCL file is currently open');
+      return;
+    }
+    targetUri = activeEditor.document.uri;
+  }
+
+  if (!targetUri.fsPath.endsWith('.rcl')) {
+    window.showErrorMessage('Please select an RCL file');
+    return;
+  }
+
+  try {
+    const document = await workspace.openTextDocument(targetUri);
+    if (diagramProvider) {
+      await diagramProvider.openInteractiveDiagram(document);
+    }
+    
+    window.showInformationMessage('Interactive diagram opened');
+  } catch (error) {
+    window.showErrorMessage(`Failed to open interactive diagram: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
