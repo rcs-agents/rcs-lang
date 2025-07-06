@@ -1,11 +1,13 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
+id: extension
+
 type: application
 language: typescript
 platform: node
 
 dependsOn:
-  - id: "parser:build"
+  - "parser"
 
 tasks:
   build:
