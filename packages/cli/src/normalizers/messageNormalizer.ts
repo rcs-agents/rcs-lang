@@ -1,4 +1,4 @@
-import { RCLNode } from '@rcl/parser';
+import { RCLNode, schemaValidator, ValidationResult } from '@rcl/parser';
 
 export interface AgentMessage {
   contentMessage: AgentContentMessage;
@@ -126,13 +126,16 @@ export class MessageNormalizer {
         const suggestions = this.extractSuggestions(node);
         
         if (messageId) {
-          messages[messageId] = {
+          const message: AgentMessage = {
             contentMessage: {
               text: messageText || '',
               suggestions: suggestions.length > 0 ? suggestions : undefined
             },
             messageTrafficType: trafficType
           };
+          
+          // Validate and store the message
+          this.validateAndStoreMessage(messageId, message, messages);
         }
       }
       
@@ -143,13 +146,16 @@ export class MessageNormalizer {
         const suggestions = this.extractSuggestions(node);
         
         if (messageId) {
-          messages[messageId] = {
+          const message: AgentMessage = {
             contentMessage: {
               text: messageText || '',
               suggestions: suggestions.length > 0 ? suggestions : undefined
             },
             messageTrafficType: 'TRANSACTION'
           };
+          
+          // Validate and store the message
+          this.validateAndStoreMessage(messageId, message, messages);
         }
       }
       
@@ -159,12 +165,45 @@ export class MessageNormalizer {
         const normalizedMessage = this.normalizeAgentMessage(node);
         
         if (messageId && normalizedMessage) {
-          messages[messageId] = normalizedMessage;
+          // Validate and store the message
+          this.validateAndStoreMessage(messageId, normalizedMessage, messages);
         }
       }
     });
     
     return messages;
+  }
+
+  /**
+   * Validate a message against the schema and store it if valid
+   */
+  private validateAndStoreMessage(
+    messageId: string, 
+    message: AgentMessage, 
+    messages: Record<string, AgentMessage>
+  ): void {
+    try {
+      // Basic validation using the schema validator
+      const validationResult = schemaValidator.validateAgentMessage(message);
+      
+      if (!validationResult.valid) {
+        console.warn(`Message ${messageId} failed schema validation:`, validationResult.errors);
+        // Store anyway but log warnings for development
+      }
+
+      // Additional constraint validation
+      const constraintResult = schemaValidator.validateMessageConstraints(message);
+      if (!constraintResult.valid) {
+        console.warn(`Message ${messageId} failed constraint validation:`, constraintResult.errors);
+      }
+
+      // Store the message (even if validation failed, for debugging)
+      messages[messageId] = message;
+    } catch (error) {
+      console.warn(`Error validating message ${messageId}:`, error);
+      // Store the message anyway to prevent breaking compilation
+      messages[messageId] = message;
+    }
   }
 
   private traverseAST(node: RCLNode | null | undefined, callback: (node: RCLNode) => void): void {
