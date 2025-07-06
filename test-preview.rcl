@@ -1,0 +1,14 @@
+agent TestAgent
+display-name: "Test Agent"
+brand-name: "Test Brand"
+
+messages
+MsgWelcome: "Welcome to our service!"
+MsgHelp: "How can I help you today?"
+
+flow MainFlow
+  start -> MsgWelcome
+  MsgWelcome -> MsgHelp
+  MsgHelp -> end
+
+transactional MsgGoodbye "Thank you for using our service!"

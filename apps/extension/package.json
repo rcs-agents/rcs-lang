@@ -45,6 +45,21 @@
         "command": "rcl.showAgentOutput",
         "title": "Show Agent Output",
         "category": "RCL"
+      },
+      {
+        "command": "rcl.showPreview",
+        "title": "Show Live Preview",
+        "category": "RCL"
+      },
+      {
+        "command": "rcl.showJSONOutput",
+        "title": "Show JSON Output",
+        "category": "RCL"
+      },
+      {
+        "command": "rcl.exportCompiled",
+        "title": "Export Compiled Output",
+        "category": "RCL"
       }
     ],
     "menus": {
@@ -53,6 +68,16 @@
           "when": "resourceExtname == .rcl",
           "command": "rcl.showAgentOutput",
           "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showPreview",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showJSONOutput",
+          "group": "navigation"
         }
       ],
       "explorer/context": [
@@ -60,6 +85,26 @@
           "when": "resourceExtname == .rcl",
           "command": "rcl.showAgentOutput",
           "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showPreview",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showJSONOutput",
+          "group": "navigation"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "rclPreview",
+          "name": "RCL Preview",
+          "when": "resourceExtname == .rcl"
         }
       ]
     },

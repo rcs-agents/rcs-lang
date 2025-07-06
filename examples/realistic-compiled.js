@@ -18,10 +18,9 @@ export const flows = {};
  * Includes display name, branding, contact info, and default settings
  */
 export const agent = {
-  "name": "UnknownAgent",
+  "displayName": "BMW",
   "flows": [],
   "messages": [],
-  "displayName": "BMW",
   "brandName": "BMW"
 };
 

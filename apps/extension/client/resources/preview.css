@@ -1,0 +1,367 @@
+/* RCL Preview Webview Styles */
+:root {
+  --vscode-foreground: var(--vscode-editor-foreground);
+  --vscode-background: var(--vscode-editor-background);
+  --vscode-border: var(--vscode-panel-border);
+  --vscode-button-background: var(--vscode-button-background);
+  --vscode-button-foreground: var(--vscode-button-foreground);
+  --vscode-button-hover-background: var(--vscode-button-hoverBackground);
+  --vscode-input-background: var(--vscode-input-background);
+  --vscode-input-border: var(--vscode-input-border);
+  --vscode-dropdown-background: var(--vscode-dropdown-background);
+  --vscode-dropdown-border: var(--vscode-dropdown-border);
+  --vscode-error-foreground: var(--vscode-errorForeground);
+  --vscode-warning-foreground: var(--vscode-warningForeground);
+  --vscode-success-foreground: var(--vscode-terminal-ansiGreen);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background: var(--vscode-background);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Toolbar Styles */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--vscode-border);
+  background: var(--vscode-background);
+  min-height: 48px;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-btn {
+  padding: 6px 12px;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: var(--vscode-button-hover-background);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flow-select {
+  padding: 6px 8px;
+  background: var(--vscode-dropdown-background);
+  color: var(--vscode-foreground);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 3px;
+  font-size: 12px;
+  min-width: 150px;
+}
+
+/* Content Area */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.view-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabs */
+.view-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--vscode-border);
+  background: var(--vscode-background);
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--vscode-foreground);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  border-bottom-color: var(--vscode-button-background);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* View Content */
+.view-content {
+  flex: 1;
+  overflow: hidden;
+  display: none;
+}
+
+.view-content.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* JSON View */
+.json-container {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.json-content {
+  background: var(--vscode-background);
+  border: 1px solid var(--vscode-border);
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 100%;
+}
+
+/* JSON Tree Styles */
+.json-tree {
+  padding: 8px;
+}
+
+.json-key {
+  color: var(--vscode-symbolIcon-keyForeground, #569cd6);
+  font-weight: bold;
+}
+
+.json-string {
+  color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+}
+
+.json-number {
+  color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+}
+
+.json-boolean {
+  color: var(--vscode-symbolIcon-booleanForeground, #569cd6);
+}
+
+.json-null {
+  color: var(--vscode-symbolIcon-nullForeground, #808080);
+}
+
+.json-object,
+.json-array {
+  margin-left: 16px;
+}
+
+.json-expandable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.json-expandable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.json-expanded .json-toggle::before {
+  content: '▼ ';
+}
+
+.json-collapsed .json-toggle::before {
+  content: '▶ ';
+}
+
+/* Flow View */
+.flow-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.placeholder {
+  color: var(--vscode-foreground);
+  opacity: 0.6;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Error View */
+.error-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--vscode-background);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-view.hidden {
+  display: none;
+}
+
+.error-content {
+  max-width: 80%;
+  padding: 24px;
+  text-align: center;
+}
+
+.error-content h3 {
+  color: var(--vscode-error-foreground);
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.error-list {
+  text-align: left;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--vscode-error-foreground);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.error-item {
+  margin-bottom: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.error-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Loading States */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--vscode-foreground);
+  opacity: 0.6;
+}
+
+.loading::before {
+  content: '⏳ ';
+  margin-right: 8px;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vscode-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vscode-border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-button-background);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .toolbar {
+    flex-direction: column;
+    gap: 8px;
+    min-height: auto;
+    padding: 12px;
+  }
+  
+  .toolbar-left,
+  .toolbar-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .flow-select {
+    min-width: 120px;
+  }
+  
+  .json-container {
+    padding: 8px;
+  }
+}
+
+/* Animation for smooth transitions */
+.view-content {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.toolbar-btn,
+.tab-btn {
+  transition: all 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+.toolbar-btn:focus,
+.tab-btn:focus,
+.flow-select:focus {
+  outline: 2px solid var(--vscode-button-background);
+  outline-offset: 2px;
+}
+
+/* Success and info states */
+.info-message {
+  color: var(--vscode-success-foreground);
+  background: rgba(0, 255, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+  border-left: 4px solid var(--vscode-success-foreground);
+}
+
+.warning-message {
+  color: var(--vscode-warning-foreground);
+  background: rgba(255, 255, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+  border-left: 4px solid var(--vscode-warning-foreground);
+}
