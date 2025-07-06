@@ -13,16 +13,21 @@
     "test": "npm run compile && mocha out/test/**/*.test.js"
   },
   "dependencies": {
+    "inversify": "^7.5.4",
+    "reflect-metadata": "^0.2.2",
+    "sprotty": "^1.4.0",
+    "sprotty-vscode": "^1.0.0",
+    "sprotty-vscode-webview": "^1.0.0",
     "vscode-languageclient": "^8.0.0"
   },
   "devDependencies": {
-    "@types/vscode": "^1.75.0",
-    "@types/node": "^20.0.0",
-    "@types/mocha": "^10.0.0",
     "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
     "@vscode/test-electron": "^2.3.0",
-    "mocha": "^10.2.0",
     "glob": "^8.1.0",
+    "mocha": "^10.2.0",
     "typescript": "^5.0.0"
   }
 }

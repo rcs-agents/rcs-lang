@@ -60,6 +60,11 @@
         "command": "rcl.exportCompiled",
         "title": "Export Compiled Output",
         "category": "RCL"
+      },
+      {
+        "command": "rcl.openInteractiveDiagram",
+        "title": "Open Interactive Diagram",
+        "category": "RCL"
       }
     ],
     "menus": {
@@ -78,6 +83,11 @@
           "when": "resourceExtname == .rcl",
           "command": "rcl.showJSONOutput",
           "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.openInteractiveDiagram",
+          "group": "navigation"
         }
       ],
       "explorer/context": [
@@ -94,6 +104,11 @@
         {
           "when": "resourceExtname == .rcl",
           "command": "rcl.showJSONOutput",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.openInteractiveDiagram",
           "group": "navigation"
         }
       ]

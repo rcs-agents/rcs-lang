@@ -41,11 +41,13 @@ const cp = __importStar(require("child_process"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
 const previewProvider_1 = require("./previewProvider");
+const interactiveDiagramProvider_1 = require("./interactiveDiagramProvider");
 let client;
 function activate(context) {
     console.log('RCL Language Server extension is now active!');
     // Create preview provider
     const previewProvider = new previewProvider_1.RCLPreviewProvider(context);
+    const interactiveDiagramProvider = new interactiveDiagramProvider_1.InteractiveDiagramProvider(context);
     // Register webview view provider
     context.subscriptions.push(vscode_1.window.registerWebviewViewProvider(previewProvider_1.RCLPreviewProvider.viewType, previewProvider));
     // Register commands
@@ -65,6 +67,10 @@ function activate(context) {
         await exportCompiled(uri);
     });
     context.subscriptions.push(exportCompiledCommand);
+    const openInteractiveDiagramCommand = vscode_1.commands.registerCommand('rcl.openInteractiveDiagram', async (uri) => {
+        await openInteractiveDiagram(uri, interactiveDiagramProvider);
+    });
+    context.subscriptions.push(openInteractiveDiagramCommand);
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
     // If the extension is launched in debug mode then the debug server options are used
@@ -243,6 +249,34 @@ async function exportCompiled(uri) {
     }
     catch (error) {
         vscode_1.window.showErrorMessage(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+async function openInteractiveDiagram(uri, diagramProvider) {
+    let targetUri;
+    if (uri) {
+        targetUri = uri;
+    }
+    else {
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showErrorMessage('No RCL file is currently open');
+            return;
+        }
+        targetUri = activeEditor.document.uri;
+    }
+    if (!targetUri.fsPath.endsWith('.rcl')) {
+        vscode_1.window.showErrorMessage('Please select an RCL file');
+        return;
+    }
+    try {
+        const document = await vscode_1.workspace.openTextDocument(targetUri);
+        if (diagramProvider) {
+            await diagramProvider.openInteractiveDiagram(document);
+        }
+        vscode_1.window.showInformationMessage('Interactive diagram opened');
+    }
+    catch (error) {
+        vscode_1.window.showErrorMessage(`Failed to open interactive diagram: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
 async function showAgentOutput(uri) {
