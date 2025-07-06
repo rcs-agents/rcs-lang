@@ -20,23 +20,7 @@ export interface Definition {
   symbolName?: string;
 }
 
-/**
- * Text document representation for LSP compatibility
- */
-export interface TextDocument {
-  uri: string;
-  getText(): string;
-  positionAt(offset: number): { line: number; character: number };
-  offsetAt(position: { line: number; character: number }): number;
-}
-
-/**
- * Position in a document
- */
-export interface Position {
-  line: number;
-  character: number;
-}
+import { TextDocument, Position } from './types';
 
 /**
  * Provides "Go to Definition" functionality for RCL files

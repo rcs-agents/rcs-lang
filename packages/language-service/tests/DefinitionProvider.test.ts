@@ -5,7 +5,8 @@ import * as os from 'os';
 import { RCLParser } from '@rcl/parser';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
 import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex';
-import { DefinitionProvider, TextDocument, Position } from '../src/providers/DefinitionProvider';
+import { DefinitionProvider } from '../src/providers/DefinitionProvider';
+import { TextDocument, Position } from '../src/providers/types';
 
 // Mock TextDocument implementation
 class MockTextDocument implements TextDocument {

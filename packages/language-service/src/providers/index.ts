@@ -1,4 +1,5 @@
-// Language service providers will be implemented here
+// Language service providers
+export * from './types';
 export * from './CompletionProvider';
 export * from './DefinitionProvider';
 export * from './ReferencesProvider';
