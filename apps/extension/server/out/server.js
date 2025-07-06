@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
 const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
-const rclParser_1 = require("./parser/rclParser");
-const syntaxValidation_1 = require("./parser/syntaxValidation");
+const parser_1 = require("@rcl/parser");
+const syntaxValidator_1 = require("./syntaxValidator");
 const completion_1 = require("./features/completion");
 const hover_1 = require("./features/hover");
 const definition_1 = require("./features/definition");
@@ -18,8 +18,8 @@ const connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
 // Create a simple text document manager
 const documents = new node_1.TextDocuments(vscode_languageserver_textdocument_1.TextDocument);
 // Initialize providers
-const parser = new rclParser_1.RCLParser();
-const syntaxValidator = new syntaxValidation_1.SyntaxValidator();
+const parser = new parser_1.RCLParser();
+const syntaxValidator = new syntaxValidator_1.SyntaxValidator();
 const completionProvider = new completion_1.CompletionProvider(parser);
 const hoverProvider = new hover_1.HoverProvider(parser);
 const definitionProvider = new definition_1.DefinitionProvider(parser);
@@ -106,10 +106,15 @@ connection.onInitialized(() => {
 // Default settings
 const defaultSettings = {
     maxNumberOfProblems: 1000,
-    validationEnabled: true,
-    completionEnabled: true,
-    formattingEnabled: true,
-    traceServer: 'off'
+    validation: {
+        enabled: true
+    },
+    completion: {
+        enabled: true
+    },
+    formatting: {
+        enabled: true
+    }
 };
 let globalSettings = defaultSettings;
 // Cache settings of all open documents
@@ -169,11 +174,11 @@ connection.languages.diagnostics.on(async (params) => {
 });
 async function validateTextDocument(textDocument) {
     const settings = await getDocumentSettings(textDocument.uri);
-    if (!settings.validationEnabled) {
+    if (!settings.validation.enabled) {
         return [];
     }
     try {
-        const rclDocument = parser.parseDocument(textDocument);
+        const rclDocument = parser.parseDocument(textDocument.getText(), textDocument.uri, textDocument.version);
         const diagnostics = await diagnosticsProvider.getDiagnostics(rclDocument, settings);
         // Limit the number of problems reported
         return diagnostics.slice(0, settings.maxNumberOfProblems);

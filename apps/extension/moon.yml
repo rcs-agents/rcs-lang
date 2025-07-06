@@ -1,0 +1,59 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+type: application
+language: typescript
+platform: node
+
+dependsOn:
+  - id: "parser:build"
+
+tasks:
+  build:
+    command: pnpm compile
+    inputs:
+      - "**/*.ts"
+      - "**/*.json"
+      - "tsconfig.json"
+    outputs:
+      - "client/out"
+      - "server/out"
+    env:
+      NODE_ENV: "production"
+
+  compile:
+    command: tsc -b
+    inputs:
+      - "**/*.ts"
+      - "**/*.json"
+      - "tsconfig.json"
+    outputs:
+      - "client/out"
+      - "server/out"
+
+  test:
+    command: pnpm test
+    inputs:
+      - "**/*.ts"
+      - "**/*.json"
+    env:
+      NODE_ENV: "test"
+
+  clean:
+    command: "rm -rf client/out server/out client/tsconfig.tsbuildinfo server/tsconfig.tsbuildinfo"
+    local: true
+
+  lint:
+    command: "pnpm lint"
+    inputs:
+      - "**/*.ts"
+      - ".eslintrc.js"
+
+  package:
+    command: "vsce package --no-dependencies"
+    inputs:
+      - "client/out"
+      - "server/out"
+      - "package.json"
+      - "syntaxes/**/*"
+    outputs:
+      - "*.vsix"

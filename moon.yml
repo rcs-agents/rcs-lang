@@ -1,0 +1,32 @@
+$schema: "https://moonrepo.dev/schemas/workspace.json"
+
+version: 1
+
+workspace:
+  syncing:
+    syncProjectWorkspaceDeps: true
+    syncDependencies: true
+
+projects:
+  - "apps/*"
+  - "packages/*"
+
+dependencyManager: pnpm
+
+docker:
+  scaffold:
+    include:
+      - "apps/**/*"
+      - "packages/**/*"
+
+vcs:
+  manager: git
+  defaultBranch: main
+
+experiments:
+  - "interactiveTaskRunner"
+
+# TypeScript configuration for the workspace
+typescript:
+  projectReferences: true
+  routeOutDirToCache: true

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '../parser/rclParser';
+import { RCLParser } from '@rcl/parser';
 
 describe('RCL Parser Real Tests', () => {
   let parser: RCLParser;
@@ -23,7 +23,7 @@ describe('RCL Parser Real Tests', () => {
     end: "Thank you!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
       expect(result.ast!.type).to.equal('source_file');
@@ -50,7 +50,7 @@ describe('RCL Parser Real Tests', () => {
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
       
       expect(() => {
-        const result = parser.parseDocument(document);
+        const result = parser.parseDocument(document.getText(), document.uri, document.version);
         expect(result).to.not.be.null;
         expect(result.diagnostics).to.have.length(0);
       }).to.not.throw();
@@ -68,7 +68,7 @@ describe('RCL Parser Real Tests', () => {
     greeting: "Hello world!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
       expect(result.symbols).to.have.length(1);
@@ -90,7 +90,7 @@ describe('RCL Parser Real Tests', () => {
     answer: "Great!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
       expect(result.ast!.type).to.equal('source_file');
@@ -112,7 +112,7 @@ describe('RCL Parser Real Tests', () => {
     greeting: "Hello mixed indent!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
       expect(result.ast!.type).to.equal('source_file');
@@ -130,7 +130,7 @@ describe('RCL Parser Real Tests', () => {
     welcome: "Welcome!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.symbols).to.have.length(1);
       expect(result.symbols[0].name).to.equal('SymbolTest');
@@ -153,7 +153,7 @@ agent CommentTest
     # End comment`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
       expect(result.ast!.type).to.equal('source_file');
@@ -171,7 +171,7 @@ agent CommentTest
     greeting: "Hello!"`;
 
       const document = TextDocument.create('file:///test.rcl', 'rcl', 1, content);
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
 
       // Test finding node at position (line 0, character 6 - should be in "agent")
       const nodeAtAgent = parser.getNodeAt(result, 0, 6);
@@ -195,10 +195,10 @@ agent CommentTest
       const document = TextDocument.create('file:///cache-test.rcl', 'rcl', 1, content);
       
       // Parse first time
-      const result1 = parser.parseDocument(document);
+      const result1 = parser.parseDocument(document.getText(), document.uri, document.version);
       
       // Parse same document again (should use cache)
-      const result2 = parser.parseDocument(document);
+      const result2 = parser.parseDocument(document.getText(), document.uri, document.version);
       
       expect(result1).to.equal(result2);
     });
@@ -213,8 +213,8 @@ agent CommentTest
       const document1 = TextDocument.create('file:///version-test.rcl', 'rcl', 1, content);
       const document2 = TextDocument.create('file:///version-test.rcl', 'rcl', 2, content);
       
-      const result1 = parser.parseDocument(document1);
-      const result2 = parser.parseDocument(document2);
+      const result1 = parser.parseDocument(document1.getText(), document1.uri, document1.version);
+      const result2 = parser.parseDocument(document2.getText(), document2.uri, document2.version);
       
       expect(result1).to.not.equal(result2);
       expect(result1.version).to.equal(1);
@@ -231,13 +231,13 @@ agent CommentTest
       const document = TextDocument.create('file:///clear-test.rcl', 'rcl', 1, content);
       
       // Parse and cache
-      parser.parseDocument(document);
+      parser.parseDocument(document.getText(), document.uri, document.version);
       
       // Clear cache
       parser.clearCache('file:///clear-test.rcl');
       
       // This should work without errors even after cache clear
-      const result = parser.parseDocument(document);
+      const result = parser.parseDocument(document.getText(), document.uri, document.version);
       expect(result).to.not.be.null;
     });
   });

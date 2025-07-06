@@ -1,4 +1,4 @@
-import { RCLASTNode, RCLNode } from '../types/astTypes';
+import { RCLASTNode, RCLNode } from './astTypes';
 
 export type ASTVisitor = (node: RCLASTNode, depth: number, parent?: RCLASTNode) => boolean | void;
 

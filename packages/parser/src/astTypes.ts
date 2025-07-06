@@ -1,5 +1,15 @@
 import { SyntaxNode } from 'tree-sitter';
 
+export interface Position {
+  line: number;
+  character: number;
+}
+
+export interface Range {
+  start: Position;
+  end: Position;
+}
+
 export interface RCLNode {
   type: string;
   text?: string;

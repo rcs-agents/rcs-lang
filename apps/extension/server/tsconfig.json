@@ -1,18 +1,13 @@
 {
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES2020",
     "outDir": "out",
     "rootDir": "src",
-    "lib": ["ES2020"],
-    "sourceMap": true,
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "composite": true
+    "strict": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out"]
+  "exclude": ["node_modules", "out"],
+  "references": [
+    { "path": "../../../packages/parser" }
+  ]
 }

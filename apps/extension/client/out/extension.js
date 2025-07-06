@@ -154,6 +154,11 @@ async function showAgentOutput(uri) {
 function findRclCli(workspacePath) {
     // Look for the CLI tool in common locations
     const possiblePaths = [
+        // New monorepo structure
+        path.join(workspacePath, 'packages', 'cli', 'demo.js'),
+        path.join(workspacePath, '..', 'packages', 'cli', 'demo.js'),
+        path.join(workspacePath, '..', '..', 'packages', 'cli', 'demo.js'),
+        // Legacy paths for backwards compatibility
         path.join(workspacePath, 'cli', 'demo.js'),
         path.join(workspacePath, 'node_modules', '.bin', 'rcl-cli'),
         path.join(workspacePath, 'node_modules', 'rcl-cli', 'cli', 'demo.js'),

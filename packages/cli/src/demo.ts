@@ -113,11 +113,11 @@ export const agent = ${JSON.stringify(output.agent, null, 2)};
 
 // Utility functions
 export function getMessage(id) {
-  return messages[id] || null;
+  return messages[id] || undefined;
 }
 
 export function getFlow(id) {
-  return flows[id] || null;
+  return flows[id] || undefined;
 }
 
 export default { messages, flows, agent, getMessage, getFlow };

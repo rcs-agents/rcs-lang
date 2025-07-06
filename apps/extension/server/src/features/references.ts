@@ -1,6 +1,6 @@
 import { Location, Position, ReferenceContext } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '../parser/rclParser';
+import { RCLParser } from '@rcl/parser';
 
 export class ReferencesProvider {
   constructor(private parser: RCLParser) {}
