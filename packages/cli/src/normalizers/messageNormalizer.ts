@@ -463,7 +463,7 @@ export class MessageNormalizer {
     this.traverseAST(node, (child) => {
       // Parse card orientation
       if (child.type === 'card_orientation_property' || (child.type === 'atom' && child.parent?.text?.includes('cardOrientation'))) {
-        const orientation = this.extractAtomValue(child, 'cardOrientation');
+        const orientation = this.extractAtomValue(child, 'card_orientation');
         if (orientation) {
           standaloneCard.cardOrientation = orientation as any;
         }
@@ -471,7 +471,7 @@ export class MessageNormalizer {
       
       // Parse thumbnail image alignment
       if (child.type === 'thumbnail_image_alignment_property') {
-        const alignment = this.extractAtomValue(child, 'thumbnailImageAlignment');
+        const alignment = this.extractAtomValue(child, 'thumbnail_image_alignment');
         if (alignment) {
           standaloneCard.thumbnailImageAlignment = alignment as any;
         }
@@ -501,7 +501,7 @@ export class MessageNormalizer {
     this.traverseAST(node, (child) => {
       // Parse card width
       if (child.type === 'card_width_property' || (child.type === 'atom' && child.parent?.text?.includes('cardWidth'))) {
-        const width = this.extractAtomValue(child, 'cardWidth');
+        const width = this.extractAtomValue(child, 'card_width');
         if (width) {
           carouselCard.cardWidth = width as any;
         }
@@ -626,7 +626,7 @@ export class MessageNormalizer {
     this.traverseAST(node, (child) => {
       // Parse file URL
       if (child.type === 'file_url_property') {
-        const fileUrl = this.extractPropertyValue(child, 'fileUrl');
+        const fileUrl = this.extractPropertyValue(child, 'file_url');
         if (fileUrl) {
           contentInfo.fileUrl = fileUrl;
         }
@@ -634,7 +634,7 @@ export class MessageNormalizer {
       
       // Parse thumbnail URL
       if (child.type === 'thumbnail_url_property') {
-        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnailUrl');
+        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnail_url');
         if (thumbnailUrl) {
           contentInfo.thumbnailUrl = thumbnailUrl;
         }
@@ -642,7 +642,7 @@ export class MessageNormalizer {
       
       // Parse alt text
       if (child.type === 'alt_text_property') {
-        const altText = this.extractPropertyValue(child, 'altText');
+        const altText = this.extractPropertyValue(child, 'alt_text');
         if (altText) {
           contentInfo.altText = altText;
         }
@@ -650,7 +650,7 @@ export class MessageNormalizer {
       
       // Parse force refresh
       if (child.type === 'force_refresh_property') {
-        const forceRefresh = this.extractBooleanValue(child, 'forceRefresh');
+        const forceRefresh = this.extractBooleanValue(child, 'force_refresh');
         if (forceRefresh !== null) {
           contentInfo.forceRefresh = forceRefresh;
         }
@@ -671,7 +671,7 @@ export class MessageNormalizer {
     this.traverseAST(node, (child) => {
       // Parse file name
       if (child.type === 'file_name_property') {
-        const fileName = this.extractPropertyValue(child, 'fileName');
+        const fileName = this.extractPropertyValue(child, 'file_name');
         if (fileName) {
           file.fileName = fileName;
         }
@@ -679,7 +679,7 @@ export class MessageNormalizer {
       
       // Parse thumbnail URL
       if (child.type === 'thumbnail_url_property') {
-        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnailUrl');
+        const thumbnailUrl = this.extractPropertyValue(child, 'thumbnail_url');
         if (thumbnailUrl) {
           file.thumbnailUrl = thumbnailUrl;
         }
@@ -687,7 +687,7 @@ export class MessageNormalizer {
       
       // Parse thumbnail name
       if (child.type === 'thumbnail_name_property') {
-        const thumbnailName = this.extractPropertyValue(child, 'thumbnailName');
+        const thumbnailName = this.extractPropertyValue(child, 'thumbnail_name');
         if (thumbnailName) {
           file.thumbnailName = thumbnailName;
         }
@@ -746,87 +746,111 @@ export class MessageNormalizer {
    * Parse reply suggestion
    */
   private parseReply(node: RCLNode): SuggestedReply | null {
-    const reply: SuggestedReply = {
-      text: '',
-      postbackData: ''
-    };
+    let text = '';
+    let postbackData = '';
+    let hasProvidedPostbackData = false;
     
     this.traverseAST(node, (child) => {
       if (child.type === 'text_property') {
-        const text = this.extractPropertyValue(child, 'text');
-        if (text) {
-          reply.text = text.substring(0, 25); // Max 25 characters
+        const extractedText = this.extractPropertyValue(child, 'text');
+        if (extractedText) {
+          text = extractedText.substring(0, 25); // Max 25 characters
         }
       }
       
       if (child.type === 'postback_data_property') {
-        const postbackData = this.extractPropertyValue(child, 'postbackData');
-        if (postbackData) {
-          reply.postbackData = postbackData.substring(0, 2048); // Max 2048 characters
+        const extractedPostback = this.extractPropertyValue(child, 'postback_data');
+        if (extractedPostback) {
+          postbackData = extractedPostback.substring(0, 2048); // Max 2048 characters
+          hasProvidedPostbackData = true;
         }
       }
     });
     
-    // Generate postback data if not provided
-    if (!reply.postbackData && reply.text) {
-      reply.postbackData = this.generatePostbackData(reply.text, 'reply');
+    // Generate postback data only if not provided
+    if (!hasProvidedPostbackData && text) {
+      postbackData = this.generatePostbackData(text, 'reply');
     }
     
-    return reply.text ? reply : null;
+    return text ? { text, postbackData } : null;
   }
 
   /**
    * Parse action suggestion
    */
   private parseAction(node: RCLNode): SuggestedAction | null {
-    const action: SuggestedAction = {
-      text: '',
-      postbackData: ''
-    };
+    let text = '';
+    let postbackData = '';
+    let hasProvidedPostbackData = false;
+    let fallbackUrl: string | undefined;
+    let openUrlAction: OpenUrlAction | undefined;
+    let dialAction: DialAction | undefined;
+    let viewLocationAction: ViewLocationAction | undefined;
+    let createCalendarEventAction: CreateCalendarEventAction | undefined;
+    let shareLocationAction: ShareLocationAction | undefined;
     
     this.traverseAST(node, (child) => {
       if (child.type === 'text_property') {
-        const text = this.extractPropertyValue(child, 'text');
-        if (text) {
-          action.text = text.substring(0, 25); // Max 25 characters
+        const extractedText = this.extractPropertyValue(child, 'text');
+        if (extractedText) {
+          text = extractedText.substring(0, 25); // Max 25 characters
         }
       }
       
       if (child.type === 'postback_data_property') {
-        const postbackData = this.extractPropertyValue(child, 'postbackData');
-        if (postbackData) {
-          action.postbackData = postbackData.substring(0, 2048); // Max 2048 characters
+        const extractedPostback = this.extractPropertyValue(child, 'postback_data');
+        if (extractedPostback) {
+          postbackData = extractedPostback.substring(0, 2048); // Max 2048 characters
+          hasProvidedPostbackData = true;
         }
+      }
+      
+      // Parse fallback URL
+      if (child.type === 'fallback_url_property') {
+        fallbackUrl = this.extractPropertyValue(child, 'fallback_url') || undefined;
       }
       
       // Parse various action types
       if (child.type === 'open_url_action') {
-        action.openUrlAction = this.parseOpenUrlAction(child);
+        openUrlAction = this.parseOpenUrlAction(child) || undefined;
       }
       
       if (child.type === 'dial_action') {
-        action.dialAction = this.parseDialAction(child);
+        dialAction = this.parseDialAction(child) || undefined;
       }
       
       if (child.type === 'view_location_action') {
-        action.viewLocationAction = this.parseViewLocationAction(child);
+        viewLocationAction = this.parseViewLocationAction(child) || undefined;
       }
       
       if (child.type === 'create_calendar_event_action') {
-        action.createCalendarEventAction = this.parseCreateCalendarEventAction(child);
+        createCalendarEventAction = this.parseCreateCalendarEventAction(child) || undefined;
       }
       
       if (child.type === 'share_location_action') {
-        action.shareLocationAction = {};
+        shareLocationAction = {};
       }
     });
     
-    // Generate postback data if not provided
-    if (!action.postbackData && action.text) {
-      action.postbackData = this.generatePostbackData(action.text, 'action');
+    // Generate postback data only if not provided
+    if (!hasProvidedPostbackData && text) {
+      postbackData = this.generatePostbackData(text, 'action');
     }
     
-    return action.text ? action : null;
+    if (!text) {
+      return null;
+    }
+    
+    const action: SuggestedAction = { text, postbackData };
+    
+    if (fallbackUrl) action.fallbackUrl = fallbackUrl;
+    if (openUrlAction) action.openUrlAction = openUrlAction;
+    if (dialAction) action.dialAction = dialAction;
+    if (viewLocationAction) action.viewLocationAction = viewLocationAction;
+    if (createCalendarEventAction) action.createCalendarEventAction = createCalendarEventAction;
+    if (shareLocationAction) action.shareLocationAction = shareLocationAction;
+    
+    return action;
   }
 
   /**
@@ -876,12 +900,26 @@ export class MessageNormalizer {
   }
 
   private parseOpenUrlAction(node: RCLNode): OpenUrlAction | null {
-    const url = this.extractPropertyValue(node, 'url');
+    let url: string | null = null;
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'url_property') {
+        url = this.extractPropertyValue(child, 'url');
+      }
+    });
+    
     return url ? { url } : null;
   }
 
   private parseDialAction(node: RCLNode): DialAction | null {
-    const phoneNumber = this.extractPropertyValue(node, 'phoneNumber');
+    let phoneNumber: string | null = null;
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'phone_number_property') {
+        phoneNumber = this.extractPropertyValue(child, 'phone_number');
+      }
+    });
+    
     return phoneNumber ? { phoneNumber } : null;
   }
 
@@ -919,12 +957,12 @@ export class MessageNormalizer {
     
     this.traverseAST(node, (child) => {
       if (child.type === 'start_time_property') {
-        const startTime = this.extractPropertyValue(child, 'startTime');
+        const startTime = this.extractPropertyValue(child, 'start_time');
         if (startTime) action.startTime = startTime;
       }
       
       if (child.type === 'end_time_property') {
-        const endTime = this.extractPropertyValue(child, 'endTime');
+        const endTime = this.extractPropertyValue(child, 'end_time');
         if (endTime) action.endTime = endTime;
       }
       

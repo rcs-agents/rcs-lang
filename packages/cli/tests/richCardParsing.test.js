@@ -336,7 +336,7 @@ describe('Rich Card Parsing', () => {
         {
           reply: {
             text: 'Learn More',
-            postbackData: expect.stringContaining('Learn More')
+            postbackData: 'learn_more'
           }
         }
       ]);
