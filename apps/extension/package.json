@@ -40,6 +40,29 @@
         "path": "./syntaxes/rcl.tmLanguage.json"
       }
     ],
+    "commands": [
+      {
+        "command": "rcl.showAgentOutput",
+        "title": "Show Agent Output",
+        "category": "RCL"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showAgentOutput",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceExtname == .rcl",
+          "command": "rcl.showAgentOutput",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
       "title": "RCL Language Server",

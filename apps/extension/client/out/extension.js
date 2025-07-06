@@ -36,11 +36,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+const cp = __importStar(require("child_process"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
 let client;
 function activate(context) {
     console.log('RCL Language Server extension is now active!');
+    // Register the Show Agent Output command
+    const showAgentOutputCommand = vscode_1.commands.registerCommand('rcl.showAgentOutput', async (uri) => {
+        await showAgentOutput(uri);
+    });
+    context.subscriptions.push(showAgentOutputCommand);
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js'));
     // If the extension is launched in debug mode then the debug server options are used
@@ -88,5 +95,93 @@ function deactivate() {
     }
     console.log('Deactivating RCL Language Server extension');
     return client.stop();
+}
+async function showAgentOutput(uri) {
+    let targetUri;
+    if (uri) {
+        targetUri = uri;
+    }
+    else {
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showErrorMessage('No RCL file is currently open');
+            return;
+        }
+        targetUri = activeEditor.document.uri;
+    }
+    if (!targetUri.fsPath.endsWith('.rcl')) {
+        vscode_1.window.showErrorMessage('Please select an RCL file');
+        return;
+    }
+    const workspaceFolder = vscode_1.workspace.getWorkspaceFolder(targetUri);
+    if (!workspaceFolder) {
+        vscode_1.window.showErrorMessage('File must be within a workspace folder');
+        return;
+    }
+    try {
+        // Find the CLI demo tool
+        const cliPath = findRclCli(workspaceFolder.uri.fsPath);
+        if (!cliPath) {
+            vscode_1.window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
+            return;
+        }
+        // Show progress indicator
+        await vscode_1.window.withProgress({
+            location: { viewId: 'workbench.view.explorer' },
+            title: 'Compiling RCL agent...',
+            cancellable: false
+        }, async () => {
+            const rclFilePath = targetUri.fsPath;
+            const outputPath = rclFilePath.replace('.rcl', '.js');
+            // Run the CLI tool
+            const result = await runRclCli(cliPath, rclFilePath, outputPath);
+            if (result.success) {
+                // Open the generated file
+                const outputUri = vscode_1.Uri.file(outputPath);
+                const document = await vscode_1.workspace.openTextDocument(outputUri);
+                await vscode_1.window.showTextDocument(document, vscode_1.ViewColumn.Beside);
+                vscode_1.window.showInformationMessage(`Agent output generated successfully: ${path.basename(outputPath)}`);
+            }
+            else {
+                vscode_1.window.showErrorMessage(`Failed to compile RCL file: ${result.error}`);
+            }
+        });
+    }
+    catch (error) {
+        vscode_1.window.showErrorMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+function findRclCli(workspacePath) {
+    // Look for the CLI tool in common locations
+    const possiblePaths = [
+        path.join(workspacePath, 'cli', 'demo.js'),
+        path.join(workspacePath, 'node_modules', '.bin', 'rcl-cli'),
+        path.join(workspacePath, 'node_modules', 'rcl-cli', 'cli', 'demo.js'),
+        // Look in parent directories for mono-repo setups
+        path.join(workspacePath, '..', 'cli', 'demo.js'),
+        path.join(workspacePath, '..', '..', 'cli', 'demo.js'),
+    ];
+    for (const cliPath of possiblePaths) {
+        if (fs.existsSync(cliPath)) {
+            return cliPath;
+        }
+    }
+    return null;
+}
+function runRclCli(cliPath, inputPath, outputPath) {
+    return new Promise((resolve) => {
+        const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}"`;
+        cp.exec(command, (error, stdout, stderr) => {
+            if (error) {
+                resolve({ success: false, error: error.message });
+            }
+            else if (stderr) {
+                resolve({ success: false, error: stderr });
+            }
+            else {
+                resolve({ success: true });
+            }
+        });
+    });
 }
 //# sourceMappingURL=extension.js.map
