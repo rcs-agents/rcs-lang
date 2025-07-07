@@ -1,68 +1,34 @@
 {
-  "name": "tree-sitter-rcl",
+  "name": "rcl-tree-sitter-monorepo",
   "version": "0.1.0",
-  "description": "Rcl grammar for tree-sitter",
-  "repository": "https://github.com/rcs-agents/rcl-tree-sitter",
-  "license": "MIT",
   "author": {
     "name": "Saulo Vallory",
     "email": "saulo@tokilabs.io",
     "url": "https://tokilabs.io/"
   },
-  "main": "bindings/node",
-  "types": "bindings/node",
-  "keywords": [
-    "incremental",
-    "parsing",
-    "tree-sitter",
-    "rcl"
-  ],
-  "files": [
-    "grammar.js",
-    "tree-sitter.json",
-    "binding.gyp",
-    "prebuilds/**",
-    "bindings/node/*",
-    "queries/*",
-    "src/**",
-    "*.wasm"
-  ],
+  "repository": "https://github.com/rcs-agents/rcl-tree-sitter",
+  "description": "RCL Language Monorepo - Tree-sitter grammar and language tools",
+  "engines": {
+    "node": "~20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@antfu/ni": "^25.0.0",
+    "tree-sitter": "^0.21.1",
+    "tree-sitter-cli": "^0.25.6"
+  },
+  "private": true,
+  "scripts": {
+    "build": "moon run :build",
+    "dev": "moon run :dev",
+    "test": "moon run :test",
+    "clean": "moon run :clean",
+    "lint": "moon run :lint",
+    "format": "moon run :format",
+    "typecheck": "moon run :typecheck"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "node-addon-api": "^8.2.1",
-    "node-gyp-build": "^4.8.4"
-  },
-  "devDependencies": {
-    "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.25.6",
-    "vitest": "^3.2.4"
-  },
-  "peerDependencies": {
-    "tree-sitter": "^0.21.1"
-  },
-  "peerDependenciesMeta": {
-    "tree-sitter": {
-      "optional": true
-    }
-  },
-  "scripts": {
-    "install": "node-gyp-build",
-    "prestart": "tree-sitter build --wasm",
-    "start": "tree-sitter playground",
-    "test": "tree-sitter test && vitest run",
-    "test:tree-sitter": "tree-sitter test",
-    "test:vitest": "vitest run",
-    "test:watch": "vitest",
-    "build": "moon run :build",
-    "dev": "moon run :dev",
-    "clean": "moon run :clean",
-    "lint": "moon run :lint",
-    "typecheck": "moon run :typecheck"
-  },
-  "engines": {
-    "node": "20.18.0"
-  }
+  ]
 }

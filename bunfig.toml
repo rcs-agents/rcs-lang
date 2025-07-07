@@ -1,0 +1,20 @@
+[test]
+# Run both TypeScript and JavaScript test files, but exclude build outputs
+include = [
+  "**/*.test.ts",
+  "**/*.spec.ts",
+  "**/packages/cli/tests/*.test.js"
+]
+
+exclude = [
+  "**/node_modules/**",
+  "**/dist/**", 
+  "**/build/**",
+  "**/out/**",
+  "**/generated/**",
+  "**/*.d.ts"
+]
+
+# Test runner configuration
+timeout = 30000
+coverage = false

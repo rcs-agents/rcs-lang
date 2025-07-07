@@ -1,0 +1,48 @@
+================================================================================
+Missing agent definition
+================================================================================
+
+# Just a comment, no agent
+flow SomeFlow
+  :start -> End
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (comment)
+  (ERROR
+    (UNEXPECTED 'S')
+    (UNEXPECTED 'd')))
+
+================================================================================
+Invalid flow syntax
+================================================================================
+
+agent ErrorAgent
+  displayName: "Error Test"
+  flow BadFlow
+    start -> End
+  messages Messages
+    text End "Done"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (MISSING identifier))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

@@ -1,0 +1,151 @@
+================================================================================
+Simple import
+================================================================================
+
+import Utils
+agent TestAgent
+  displayName: "Import Test"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path
+      (identifier)))
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Import with alias
+================================================================================
+
+import Common as Shared
+agent TestAgent
+  displayName: "Import Test"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path
+      (identifier))
+    (identifier))
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Multi-level import path
+================================================================================
+
+import Shared / Common Flows / Support
+agent TestAgent
+  displayName: "Import Test"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path
+      (identifier)
+      (identifier)
+      (identifier)))
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Import with spaced alias
+================================================================================
+
+import Utils / Message Templates as Common Messages
+agent TestAgent
+  displayName: "Import Test"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path
+      (identifier)
+      (identifier))
+    (identifier))
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Multiple imports
+================================================================================
+
+import Shared
+import Utils / Helpers
+import Common / Flows / Support as Support Flow
+agent TestAgent
+  displayName: "Import Test"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path
+      (identifier)))
+  (import_statement
+    (import_path
+      (identifier)
+      (identifier)))
+  (import_statement
+    (import_path
+      (identifier)
+      (identifier)
+      (identifier))
+    (identifier))
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

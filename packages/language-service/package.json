@@ -5,19 +5,26 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:ts",
+    "build:ts": "tsc",
+    "compile": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "NODE_ENV=test vitest run",
+    "test:watch": "NODE_ENV=test vitest",
+    "clean": "rm -rf dist",
+    "lint": "biome lint src",
+    "format": "biome format src --write",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/parser": "workspace:*",
+    "@rcl/parser": "file:../parser",
     "tree-sitter": "^0.21.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vitest/ui": "^3.2.4",
     "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
+    "vitest": "^3.2.4"
   },
   "files": [
     "dist/**/*"

@@ -1,5 +1,8 @@
 const { MessageNormalizer } = require('../dist/normalizers/messageNormalizer');
 
+// Note: This test file uses mock AST structures instead of real parser
+// No conditional import needed as it doesn't directly use tree-sitter
+
 describe('Comprehensive Suggestion Parsing', () => {
   let normalizer;
 

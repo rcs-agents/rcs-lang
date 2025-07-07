@@ -6,9 +6,9 @@ export class ReferencesProvider {
   constructor(private parser: RCLParser) {}
 
   public async getReferences(
-    document: TextDocument, 
-    position: Position, 
-    context: ReferenceContext
+    document: TextDocument,
+    position: Position,
+    context: ReferenceContext,
   ): Promise<Location[]> {
     // Basic implementation - can be enhanced later
     return [];

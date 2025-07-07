@@ -2,6 +2,7 @@ import { RCLParser } from '@rcl/parser';
 import { ImportResolver } from '../import-resolver';
 import { WorkspaceIndex } from '../workspace-index';
 import { SymbolType } from '../import-resolver/types';
+import fs from 'node:fs';
 
 /**
  * Represents a reference location
@@ -186,7 +187,7 @@ export class ReferencesProvider {
    */
   private async findReferencesInFile(fileUri: string, symbol: string): Promise<Reference[]> {
     try {
-      const content = require('fs').readFileSync(fileUri, 'utf-8');
+      const content = fs.readFileSync(fileUri, 'utf-8');
       const rclDocument = this.parser.parseDocument(content, fileUri);
       const references: Reference[] = [];
 

@@ -471,3 +471,153 @@ body {
     stroke-width: 3px;
   }
 }
+
+/* RCL-specific Node Styles */
+.rcl-node {
+  transition: all 0.2s ease;
+}
+
+.rcl-node.hover {
+  transform: scale(1.05);
+}
+
+.rcl-node-start ellipse,
+.rcl-node-end ellipse {
+  transition: all 0.2s ease;
+}
+
+.rcl-node-message rect,
+.rcl-node-rich_card rect {
+  transition: all 0.2s ease;
+}
+
+/* RCL Edge Styles */
+.rcl-edge {
+  transition: all 0.2s ease;
+}
+
+.rcl-edge path {
+  transition: stroke-width 0.2s ease;
+}
+
+.rcl-edge:hover path {
+  stroke: var(--vscode-focusBorder);
+}
+
+/* Node Indicators */
+.suggestion-indicator,
+.richcard-indicator {
+  pointer-events: none;
+}
+
+.node-label-group text {
+  user-select: none;
+}
+
+/* Edge Labels */
+.edge-label rect {
+  opacity: 0.9;
+}
+
+.edge-label text {
+  user-select: none;
+  font-family: var(--vscode-font-family);
+}
+
+/* Diagram Selection */
+.diagram-node.selected rect,
+.diagram-node.selected ellipse {
+  stroke: var(--vscode-focusBorder, #007acc) !important;
+  stroke-width: 3px !important;
+}
+
+.diagram-edge.selected {
+  stroke: var(--vscode-focusBorder, #007acc) !important;
+  stroke-width: 3px !important;
+}
+
+/* Connection Mode */
+.connection-start rect,
+.connection-start ellipse {
+  stroke: #00ff00 !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 5px #00ff00);
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 300px;
+  z-index: 2000;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-success {
+  background: var(--vscode-statusBarItem-remoteBackground, #16825D);
+  border: 1px solid var(--vscode-statusBarItem-remoteForeground, #ffffff);
+}
+
+.notification-error {
+  background: var(--vscode-statusBarItem-errorBackground, #f44336);
+  border: 1px solid var(--vscode-statusBarItem-errorForeground, #ffffff);
+}
+
+.notification-warning {
+  background: var(--vscode-statusBarItem-warningBackground, #ff9800);
+  border: 1px solid var(--vscode-statusBarItem-warningForeground, #ffffff);
+}
+
+.notification-info {
+  background: var(--vscode-statusBar-background, #007acc);
+  border: 1px solid var(--vscode-statusBar-foreground, #ffffff);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--vscode-statusBar-foreground, #ffffff);
+}
+
+.notification-message {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

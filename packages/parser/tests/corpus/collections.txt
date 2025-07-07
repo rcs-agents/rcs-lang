@@ -1,0 +1,221 @@
+================================================================================
+Inline list with parentheses
+================================================================================
+
+agent ListTest
+  displayName: "Lists"
+  messages Messages
+    agentMessage Test
+      contentMessage
+        text: "Colors: (\"red\", \"green\", \"blue\")"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Inline list without parentheses
+================================================================================
+
+agent ListTest2
+  displayName: "Lists"
+  agentDefaults Defaults
+    fallbackMessage: "Error"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (defaults_section
+      (default_property
+        (enhanced_simple_value
+          (simple_value
+            (string)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Indented list
+================================================================================
+
+agent ListTest3
+  displayName: "Lists"
+  messages Messages
+    agentMessage Options
+      contentMessage
+        text: "Choose:"
+        suggestion
+          reply
+            text: "Option 1"
+            postbackData: "opt1"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (simple_value
+              (string)))
+          (suggestion
+            (suggested_reply
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string)))
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string)))))))))))
+
+================================================================================
+Nested lists
+================================================================================
+
+agent NestedListTest
+  displayName: "Nested"
+  messages Messages
+    text Welcome "Nested list test"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Dictionary with braces
+================================================================================
+
+agent DictTest
+  displayName: "Dictionary"
+  messages Messages
+    agentMessage Test
+      contentMessage
+        text: "{name: \"John\", age: 30}"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Indented dictionary
+================================================================================
+
+agent DictTest2
+  displayName: "Dictionary"
+  agentConfig Config
+    description: "Test agent"
+    color: "#FF0000"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (config_property
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (config_property
+        (string)))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Mapped type
+================================================================================
+
+agent MappedTypeTest
+  displayName: "Mapped Types"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Empty collections
+================================================================================
+
+agent EmptyTest
+  displayName: "Empty"
+  messages Messages
+    text Welcome "Empty: ()"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

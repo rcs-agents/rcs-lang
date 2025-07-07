@@ -1,10 +1,10 @@
-import { RCLNode } from '@rcl/parser';
+import { RCLNode } from '../utils/parserWrapper';
 
 export interface XStateConfig {
   id: string;
   initial: string;
   states: Record<string, XStateState>;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface XStateState {
@@ -12,7 +12,7 @@ export interface XStateState {
   entry?: string | string[];
   exit?: string | string[];
   always?: XStateTransition | XStateTransition[];
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 export interface XStateTransition {
@@ -24,25 +24,25 @@ export interface XStateTransition {
 export class FlowCompiler {
   compileFlows(ast: RCLNode): Record<string, XStateConfig> {
     const flows: Record<string, XStateConfig> = {};
-    
+
     this.traverseAST(ast, (node) => {
       if (node.type === 'flow_section') {
         const flowId = this.extractFlowId(node);
         const flowConfig = this.compileFlow(node);
-        
+
         if (flowId && flowConfig) {
           flows[flowId] = flowConfig;
         }
       }
     });
-    
+
     return flows;
   }
 
   private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
     callback(node);
     if (node.children) {
-      node.children.forEach(child => this.traverseAST(child, callback));
+      node.children.forEach((child) => this.traverseAST(child, callback));
     }
   }
 
@@ -69,20 +69,20 @@ export class FlowCompiler {
       id: flowId,
       initial: initial || 'start',
       states,
-      context: this.extractFlowContext(node)
+      context: this.extractFlowContext(node),
     };
   }
 
   private extractTransitions(node: RCLNode): FlowTransition[] {
     const transitions: FlowTransition[] = [];
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'flow_rule') {
         const ruleTransitions = this.parseFlowRule(child);
         transitions.push(...ruleTransitions);
       }
     });
-    
+
     return transitions;
   }
 
@@ -91,7 +91,7 @@ export class FlowCompiler {
     const operands: string[] = [];
     let conditions: string[] = [];
     let actions: string[] = [];
-    
+
     // Extract operands (states/actions)
     this.traverseAST(node, (child) => {
       if (child.type === 'flow_operand_or_expression') {
@@ -100,14 +100,14 @@ export class FlowCompiler {
           operands.push(operand);
         }
       }
-      
+
       if (child.type === 'when_clause') {
         const condition = this.extractCondition(child);
         if (condition) {
           conditions.push(condition);
         }
       }
-      
+
       if (child.type === 'with_clause') {
         const action = this.extractWithClause(child);
         if (action) {
@@ -115,20 +115,20 @@ export class FlowCompiler {
         }
       }
     });
-    
+
     // Create transitions between consecutive operands
     for (let i = 0; i < operands.length - 1; i++) {
       const from = operands[i];
       const to = operands[i + 1];
-      
+
       transitions.push({
         from,
         to,
         conditions: conditions.length > 0 ? conditions : undefined,
-        actions: actions.length > 0 ? actions : undefined
+        actions: actions.length > 0 ? actions : undefined,
       });
     }
-    
+
     return transitions;
   }
 
@@ -136,15 +136,15 @@ export class FlowCompiler {
     // Handle different types of operands
     if (node.children && node.children.length > 0) {
       const firstChild = node.children[0];
-      
+
       if (firstChild.type === 'identifier' || firstChild.type === 'atom') {
         return this.cleanValue(firstChild.text || '');
       }
-      
+
       if (firstChild.type === 'string') {
         return this.cleanStringValue(firstChild.text || '');
       }
-      
+
       // Handle "start" keyword
       if (firstChild.text === 'start' && node.children.length > 1) {
         const secondChild = node.children[1];
@@ -152,13 +152,13 @@ export class FlowCompiler {
           return `start_${this.cleanValue(secondChild.text || '')}`;
         }
       }
-      
+
       // Handle "text" actions
       if (firstChild.text === 'text') {
         return 'send_text_message';
       }
     }
-    
+
     return null;
   }
 
@@ -175,7 +175,7 @@ export class FlowCompiler {
   private extractWithClause(node: RCLNode): string | null {
     // Extract action parameters from with clause
     const params: Record<string, any> = {};
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'attribute_key' && child.parent) {
         const key = child.text || '';
@@ -185,11 +185,11 @@ export class FlowCompiler {
         }
       }
     });
-    
+
     return Object.keys(params).length > 0 ? JSON.stringify(params) : null;
   }
 
-  private extractAttributeValue(node: RCLNode): any {
+  private extractAttributeValue(node: RCLNode): unknown {
     for (const child of node.children || []) {
       if (child.type === 'string') {
         return this.cleanStringValue(child.text || '');
@@ -211,7 +211,10 @@ export class FlowCompiler {
     // Extract JavaScript/TypeScript code from embedded code blocks
     if (node.children) {
       for (const child of node.children) {
-        if (child.type === 'single_line_embedded_code' || child.type === 'multi_line_embedded_code') {
+        if (
+          child.type === 'single_line_embedded_code' ||
+          child.type === 'multi_line_embedded_code'
+        ) {
           return this.cleanEmbeddedCode(child.text || '');
         }
       }
@@ -230,47 +233,49 @@ export class FlowCompiler {
   private generateStates(transitions: FlowTransition[]): Record<string, XStateState> {
     const states: Record<string, XStateState> = {};
     const stateNames = new Set<string>();
-    
+
     // Collect all state names
-    transitions.forEach(t => {
+    transitions.forEach((t) => {
       stateNames.add(t.from);
       stateNames.add(t.to);
     });
-    
+
     // Generate state configurations
-    stateNames.forEach(stateName => {
-      const stateTransitions = transitions.filter(t => t.from === stateName);
+    stateNames.forEach((stateName) => {
+      const stateTransitions = transitions.filter((t) => t.from === stateName);
       const state: XStateState = {};
-      
+
       if (stateTransitions.length > 0) {
         state.on = {};
-        
-        stateTransitions.forEach(transition => {
+
+        stateTransitions.forEach((transition) => {
           const event = this.generateEventName(transition);
-          
+
           if (transition.conditions && transition.conditions.length > 0) {
             state.on![event] = {
               target: transition.to,
               cond: transition.conditions[0], // Use first condition
-              actions: transition.actions
+              actions: transition.actions,
             };
           } else {
-            state.on![event] = transition.actions ? {
-              target: transition.to,
-              actions: transition.actions
-            } : transition.to;
+            state.on![event] = transition.actions
+              ? {
+                  target: transition.to,
+                  actions: transition.actions,
+                }
+              : transition.to;
           }
         });
       }
-      
+
       // Add entry/exit actions based on state name
       if (stateName.includes('send_') || stateName.includes('message')) {
         state.entry = [`send_message_${stateName}`];
       }
-      
+
       states[stateName] = state;
     });
-    
+
     return states;
   }
 
@@ -279,38 +284,38 @@ export class FlowCompiler {
     if (transition.conditions && transition.conditions.length > 0) {
       return 'CONDITIONAL_NEXT';
     }
-    
+
     if (transition.actions && transition.actions.length > 0) {
       return 'ACTION_COMPLETE';
     }
-    
+
     return 'NEXT';
   }
 
   private findInitialState(transitions: FlowTransition[]): string | null {
     // Find the state that is never a target (initial state)
-    const targets = new Set(transitions.map(t => t.to));
-    const sources = new Set(transitions.map(t => t.from));
-    
+    const targets = new Set(transitions.map((t) => t.to));
+    const sources = new Set(transitions.map((t) => t.from));
+
     for (const source of sources) {
       if (!targets.has(source)) {
         return source;
       }
     }
-    
+
     // Fallback to "start" if no clear initial state
     for (const source of sources) {
       if (source.includes('start')) {
         return source;
       }
     }
-    
+
     return transitions.length > 0 ? transitions[0].from : null;
   }
 
-  private extractFlowContext(node: RCLNode): Record<string, any> {
-    const context: Record<string, any> = {};
-    
+  private extractFlowContext(node: RCLNode): Record<string, unknown> {
+    const context: Record<string, unknown> = {};
+
     // Extract default values and configuration from the flow
     this.traverseAST(node, (child) => {
       if (child.type === 'with_clause') {
@@ -324,7 +329,7 @@ export class FlowCompiler {
         }
       }
     });
-    
+
     return context;
   }
 

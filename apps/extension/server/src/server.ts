@@ -29,7 +29,7 @@ import {
   SemanticTokensParams,
   SemanticTokens,
   CodeActionParams,
-  CodeAction
+  CodeAction,
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -71,13 +71,11 @@ let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
   console.log('Initializing RCL Language Server');
-  
+
   const capabilities = params.capabilities;
 
   // Check client capabilities
-  hasConfigurationCapability = !!(
-    capabilities.workspace && !!capabilities.workspace.configuration
-  );
+  hasConfigurationCapability = !!(capabilities.workspace && !!capabilities.workspace.configuration);
   hasWorkspaceFolderCapability = !!(
     capabilities.workspace && !!capabilities.workspace.workspaceFolders
   );
@@ -93,7 +91,7 @@ connection.onInitialize((params: InitializeParams) => {
       // Code completion
       completionProvider: {
         resolveProvider: true,
-        triggerCharacters: [' ', ':', '.', '$', '<', '|']
+        triggerCharacters: [' ', ':', '.', '$', '<', '|'],
       },
       // Hover information
       hoverProvider: true,
@@ -107,7 +105,7 @@ connection.onInitialize((params: InitializeParams) => {
       workspaceSymbolProvider: true,
       // Code actions
       codeActionProvider: {
-        codeActionKinds: ['quickfix', 'refactor']
+        codeActionKinds: ['quickfix', 'refactor'],
       },
       // Document formatting
       documentFormattingProvider: true,
@@ -119,22 +117,22 @@ connection.onInitialize((params: InitializeParams) => {
         legend: semanticTokensProvider.getLegend(),
         range: false,
         full: {
-          delta: false
-        }
+          delta: false,
+        },
       },
       // Diagnostics
       diagnosticProvider: {
         interFileDependencies: false,
-        workspaceDiagnostics: false
-      }
-    }
+        workspaceDiagnostics: false,
+      },
+    },
   };
 
   if (hasWorkspaceFolderCapability) {
     result.capabilities.workspace = {
       workspaceFolders: {
-        supported: true
-      }
+        supported: true,
+      },
     };
   }
 
@@ -143,13 +141,13 @@ connection.onInitialize((params: InitializeParams) => {
 
 connection.onInitialized(() => {
   console.log('RCL Language Server initialized');
-  
+
   if (hasConfigurationCapability) {
     connection.client.register(DidChangeConfigurationNotification.type, undefined);
   }
-  
+
   if (hasWorkspaceFolderCapability) {
-    connection.workspace.onDidChangeWorkspaceFolders(_event => {
+    connection.workspace.onDidChangeWorkspaceFolders((_event) => {
       connection.console.log('Workspace folder change event received.');
     });
   }
@@ -159,14 +157,14 @@ connection.onInitialized(() => {
 const defaultSettings: RCLSettings = {
   maxNumberOfProblems: 1000,
   validation: {
-    enabled: true
+    enabled: true,
   },
   completion: {
-    enabled: true
+    enabled: true,
   },
   formatting: {
-    enabled: true
-  }
+    enabled: true,
+  },
 };
 
 let globalSettings: RCLSettings = defaultSettings;
@@ -174,12 +172,12 @@ let globalSettings: RCLSettings = defaultSettings;
 // Cache settings of all open documents
 const documentSettings: Map<string, Thenable<RCLSettings>> = new Map();
 
-connection.onDidChangeConfiguration(change => {
+connection.onDidChangeConfiguration((change) => {
   if (hasConfigurationCapability) {
     // Reset all cached document settings
     documentSettings.clear();
   } else {
-    globalSettings = ((change.settings.rcl || defaultSettings) as RCLSettings);
+    globalSettings = (change.settings.rcl || defaultSettings) as RCLSettings;
   }
 
   // Revalidate all open documents
@@ -190,30 +188,30 @@ function getDocumentSettings(resource: string): Thenable<RCLSettings> {
   if (!hasConfigurationCapability) {
     return Promise.resolve(globalSettings);
   }
-  
+
   let result = documentSettings.get(resource);
   if (!result) {
     result = connection.workspace.getConfiguration({
       scopeUri: resource,
-      section: 'rcl'
+      section: 'rcl',
     });
     documentSettings.set(resource, result);
   }
-  
+
   return result;
 }
 
 // Only keep settings for open documents
-documents.onDidClose(e => {
+documents.onDidClose((e) => {
   documentSettings.delete(e.document.uri);
   parser.clearCache(e.document.uri);
 });
 
 // Handle document content changes
-documents.onDidChangeContent(change => {
+documents.onDidChangeContent((change) => {
   // Clear cache for changed document
   parser.clearCache(change.document.uri);
-  
+
   // Trigger validation
   validateTextDocument(change.document);
 });
@@ -224,37 +222,43 @@ connection.languages.diagnostics.on(async (params) => {
   if (document !== undefined) {
     return {
       kind: DocumentDiagnosticReportKind.Full,
-      items: await validateTextDocument(document)
+      items: await validateTextDocument(document),
     } satisfies DocumentDiagnosticReport;
   } else {
     return {
       kind: DocumentDiagnosticReportKind.Full,
-      items: []
+      items: [],
     } satisfies DocumentDiagnosticReport;
   }
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
   const settings = await getDocumentSettings(textDocument.uri);
-  
+
   if (!settings.validation.enabled) {
     return [];
   }
-  
+
   try {
-    const rclDocument = parser.parseDocument(textDocument.getText(), textDocument.uri, textDocument.version);
+    const rclDocument = await parser.parseDocument(
+      textDocument.getText(),
+      textDocument.uri,
+      textDocument.version,
+    );
     const diagnostics = await diagnosticsProvider.getDiagnostics(rclDocument, settings);
-    
+
     // Limit the number of problems reported
     return diagnostics.slice(0, settings.maxNumberOfProblems);
   } catch (error) {
     console.error('Error validating document:', error);
-    return [{
-      severity: DiagnosticSeverity.Error,
-      range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
-      message: 'Internal validation error: ' + (error as Error).message,
-      source: 'rcl'
-    }];
+    return [
+      {
+        severity: DiagnosticSeverity.Error,
+        range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
+        message: 'Internal validation error: ' + (error as Error).message,
+        source: 'rcl',
+      },
+    ];
   }
 }
 
@@ -264,12 +268,12 @@ connection.onCompletion(async (params: TextDocumentPositionParams): Promise<Comp
   if (!document) {
     return [];
   }
-  
+
   const settings = await getDocumentSettings(document.uri);
   if (!settings.completionEnabled) {
     return [];
   }
-  
+
   try {
     return await completionProvider.getCompletions(document, params.position);
   } catch (error) {
@@ -288,7 +292,7 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
   if (!document) {
     return null;
   }
-  
+
   try {
     return await hoverProvider.getHover(document, params.position);
   } catch (error) {
@@ -303,7 +307,7 @@ connection.onDefinition(async (params: DefinitionParams): Promise<Definition | n
   if (!document) {
     return null;
   }
-  
+
   try {
     return await definitionProvider.getDefinition(document, params.position);
   } catch (error) {
@@ -318,7 +322,7 @@ connection.onReferences(async (params: ReferenceParams): Promise<Location[]> => 
   if (!document) {
     return [];
   }
-  
+
   try {
     return await referencesProvider.getReferences(document, params.position, params.context);
   } catch (error) {
@@ -333,7 +337,7 @@ connection.onDocumentSymbol(async (params: DocumentSymbolParams): Promise<Docume
   if (!document) {
     return [];
   }
-  
+
   try {
     return await symbolsProvider.getDocumentSymbols(document);
   } catch (error) {
@@ -348,12 +352,12 @@ connection.onDocumentFormatting(async (params: DocumentFormattingParams): Promis
   if (!document) {
     return [];
   }
-  
+
   const settings = await getDocumentSettings(document.uri);
   if (!settings.formattingEnabled) {
     return [];
   }
-  
+
   try {
     return await formattingProvider.formatDocument(document, params.options);
   } catch (error) {
@@ -368,7 +372,7 @@ connection.onFoldingRanges(async (params: FoldingRangeParams): Promise<FoldingRa
   if (!document) {
     return [];
   }
-  
+
   try {
     return await foldingProvider.getFoldingRanges(document);
   } catch (error) {
@@ -378,19 +382,21 @@ connection.onFoldingRanges(async (params: FoldingRangeParams): Promise<FoldingRa
 });
 
 // Semantic tokens
-connection.languages.semanticTokens.on(async (params: SemanticTokensParams): Promise<SemanticTokens> => {
-  const document = documents.get(params.textDocument.uri);
-  if (!document) {
-    return { data: [] };
-  }
-  
-  try {
-    return await semanticTokensProvider.getSemanticTokens(document);
-  } catch (error) {
-    console.error('Error providing semantic tokens:', error);
-    return { data: [] };
-  }
-});
+connection.languages.semanticTokens.on(
+  async (params: SemanticTokensParams): Promise<SemanticTokens> => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+      return { data: [] };
+    }
+
+    try {
+      return await semanticTokensProvider.getSemanticTokens(document);
+    } catch (error) {
+      console.error('Error providing semantic tokens:', error);
+      return { data: [] };
+    }
+  },
+);
 
 // Code actions
 connection.onCodeAction(async (params: CodeActionParams): Promise<CodeAction[]> => {
@@ -398,7 +404,7 @@ connection.onCodeAction(async (params: CodeActionParams): Promise<CodeAction[]> 
   if (!document) {
     return [];
   }
-  
+
   try {
     // Code actions will be implemented in Phase 4
     return [];

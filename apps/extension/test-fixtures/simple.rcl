@@ -1,0 +1,6 @@
+agent TestAgent
+  displayName: "Test Agent"
+  
+  messages Messages
+    text Welcome "Welcome to our service!"
+    text Help "How can I help you?"

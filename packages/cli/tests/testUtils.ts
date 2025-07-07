@@ -1,6 +1,15 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { RCLNode } from '@rcl/parser';
+import fs from 'fs-extra';
+import path from 'node:path';
+
+// Define RCLNode interface locally for tests
+interface RCLNode {
+  type: string;
+  text?: string;
+  startPosition: { row: number; column: number };
+  endPosition: { row: number; column: number };
+  children: RCLNode[];
+  parent: RCLNode | null;
+}
 
 /**
  * Test utilities for CLI testing
@@ -90,7 +99,7 @@ export class TestUtils {
         this.createMockNode('identifier', 'text'),
         this.createMockNode('string', `"${text}"`)
       ]),
-      this.createMockNode('postback_property', undefined, [
+      this.createMockNode('postback_data_property', undefined, [
         this.createMockNode('identifier', 'postbackData'),
         this.createMockNode('string', `"${postbackData}"`)
       ])

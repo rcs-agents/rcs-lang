@@ -1,0 +1,89 @@
+name: Build WASM
+
+on:
+  push:
+    paths:
+      - 'packages/parser/grammar.js'
+      - 'packages/parser/tree-sitter.json'
+      - '.github/workflows/build-wasm.yml'
+  pull_request:
+    paths:
+      - 'packages/parser/grammar.js'
+      - 'packages/parser/tree-sitter.json'
+  workflow_dispatch:
+
+jobs:
+  build-wasm:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 'latest'
+          
+      - name: Build grammar
+        working-directory: packages/parser
+        run: npm run build-grammar
+        
+      - name: Build WASM
+        working-directory: packages/parser
+        run: npx tree-sitter build --wasm
+        
+      - name: Verify WASM file
+        working-directory: packages/parser
+        run: |
+          if [ ! -f "tree-sitter-rcl.wasm" ]; then
+            echo "WASM file was not created!"
+            exit 1
+          fi
+          echo "WASM file created successfully"
+          ls -la tree-sitter-rcl.wasm
+          
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tree-sitter-rcl-wasm
+          path: packages/parser/tree-sitter-rcl.wasm
+          retention-days: 30
+          
+      - name: Run parser tests
+        run: moon run parser:test
+        
+  # Optional: Create a release with the WASM file
+  release:
+    needs: build-wasm
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Download WASM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tree-sitter-rcl-wasm
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: wasm-${{ github.sha }}
+          name: WASM Build ${{ github.sha }}
+          files: tree-sitter-rcl.wasm
+          body: |
+            Automated WASM build from commit ${{ github.sha }}
+            
+            To use this WASM file:
+            1. Download `tree-sitter-rcl.wasm`
+            2. Place it in `packages/parser/` directory
+            3. Run tests with `moon run parser:test`

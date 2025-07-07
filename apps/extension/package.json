@@ -20,9 +20,6 @@
     "chatbot",
     "language server"
   ],
-  "activationEvents": [
-    "onLanguage:rcl"
-  ],
   "main": "./client/out/extension.js",
   "contributes": {
     "languages": [
@@ -124,7 +121,8 @@
           "type": "webview",
           "id": "rclPreview",
           "name": "RCL Preview",
-          "when": "resourceExtname == .rcl"
+          "when": "resourceExtname == .rcl",
+          "icon": "$(eye)"
         }
       ]
     },
@@ -171,21 +169,25 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm compile",
+    "vscode:prepublish": "nr compile",
     "compile": "tsc -b",
+    "build": "tsc -b",
+    "dev": "tsc -b -w",
     "watch": "tsc -b -w",
-    "lint": "eslint client/src server/src --ext ts",
-    "test": "pnpm test:server && pnpm test:client",
-    "test:server": "cd server && pnpm test",
-    "test:client": "cd client && pnpm test"
+    "clean": "rm -rf client/out server/out",
+    "lint": "biome lint client/src server/src",
+    "format": "biome format client/src server/src --write",
+    "typecheck": "tsc -b --noEmit",
+    "test": "nr test:server && nr test:client",
+    "test:server": "cd server && bun test",
+    "test:client": "cd client && bun test",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.75.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@vscode/vsce": "^3.0.0"
   },
   "dependencies": {
     "@rcl/parser": "file:../../packages/parser"

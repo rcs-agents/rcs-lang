@@ -1,5 +1,8 @@
 const { AgentExtractor } = require('../dist/extractors/agentExtractor');
 
+// Note: This test file uses mock AST structures instead of real parser
+// No conditional import needed as it doesn't directly use tree-sitter
+
 describe('AgentExtractor', () => {
   let extractor;
 
@@ -452,7 +455,7 @@ describe('AgentExtractor', () => {
       const config = extractor.extractAgentConfig(malformedAgent);
 
       expect(config).toBeDefined();
-      expect(config.name).toBeNull();
+      expect(config.name).toBeUndefined();
       expect(config.displayName).toBe('UnknownAgent'); // Fallback
     });
 

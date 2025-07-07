@@ -66,23 +66,23 @@ export interface MessageNode extends RCLNode {
   name: string;
   messageType: 'text' | 'rich_card' | 'carousel' | 'suggestion';
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
 }
 
 export interface ActionNode extends RCLNode {
   type: 'action';
   actionType: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, string | number | boolean>;
 }
 
 export interface DefaultsNode extends RCLNode {
   type: 'defaults_section';
-  values: Record<string, any>;
+  values: Record<string, string | number | boolean>;
 }
 
 export interface ConfigurationNode extends RCLNode {
   type: 'configuration_section';
-  settings: Record<string, any>;
+  settings: Record<string, string | number | boolean | Record<string, unknown>>;
 }
 
 export interface ImportNode extends RCLNode {
@@ -114,14 +114,14 @@ export interface MultilineStringNode extends RCLNode {
 export interface ParameterNode extends RCLNode {
   type: 'parameter';
   key: string;
-  value: any;
+  value: string | number | boolean | null;
   valueType: 'string' | 'number' | 'boolean' | 'atom' | 'expression' | 'type_tag';
 }
 
 export interface CollectionNode extends RCLNode {
   type: 'collection';
   collectionType: 'list' | 'dictionary';
-  items: any[];
+  items: (string | number | boolean | Record<string, unknown>)[];
 }
 
 export interface SourceFileNode extends RCLNode {

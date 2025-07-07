@@ -3,6 +3,7 @@ import { ImportResolver } from '../import-resolver';
 import { WorkspaceIndex } from '../workspace-index';
 import { SymbolType } from '../import-resolver/types';
 import { TextDocument, Position } from './types';
+import path from 'node:path';
 
 /**
  * Completion item kinds
@@ -654,7 +655,6 @@ export class CompletionProvider {
    * Get relative file path for display
    */
   private getRelativeFilePath(uri: string): string {
-    const path = require('path');
     return path.basename(uri);
   }
 
@@ -662,7 +662,6 @@ export class CompletionProvider {
    * Get relative import path between two files
    */
   private getRelativeImportPath(fromUri: string, toUri: string): string {
-    const path = require('path');
     let relativePath = path.relative(path.dirname(fromUri), toUri);
     
     // Remove .rcl extension for imports

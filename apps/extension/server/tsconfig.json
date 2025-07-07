@@ -3,11 +3,10 @@
   "compilerOptions": {
     "outDir": "out",
     "rootDir": "src",
-    "strict": false
+    "strict": false,
+    "types": ["node"],
+    "composite": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out"],
-  "references": [
-    { "path": "../../../packages/parser" }
-  ]
+  "exclude": ["node_modules", "out", "src/test/**/*", "vitest.config.ts"],
 }

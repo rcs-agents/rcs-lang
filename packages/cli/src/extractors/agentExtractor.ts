@@ -1,4 +1,7 @@
-import { RCLNode, schemaValidator, ValidationResult, AgentConfig as SchemaAgentConfig } from '@rcl/parser';
+import { RCLNode, schemaValidator, ValidationResult } from '../utils/parserWrapper';
+
+// Import the schema type if available
+type SchemaAgentConfig = any; // Will be properly typed when parser is available
 
 // Main agent configuration following the JSON schema
 export interface AgentConfig {
@@ -53,20 +56,20 @@ export interface PartnerEntry {
   company?: string;
 }
 
-export type AgentUseCase = 
+export type AgentUseCase =
   | 'AGENT_USE_CASE_UNSPECIFIED'
   | 'TRANSACTIONAL'
   | 'PROMOTIONAL'
   | 'OTP'
   | 'MULTI_USE';
 
-export type HostingRegion = 
+export type HostingRegion =
   | 'HOSTING_REGION_UNSPECIFIED'
   | 'NORTH_AMERICA'
   | 'EUROPE'
   | 'ASIA_PACIFIC';
 
-export type BillingCategory = 
+export type BillingCategory =
   | 'BILLING_CATEGORY_UNSPECIFIED'
   | 'CONVERSATIONAL_LEGACY'
   | 'CONVERSATIONAL'
@@ -87,18 +90,27 @@ export interface AgentDefaultsSection {
 export class AgentExtractor {
   extractAgentConfig(ast: RCLNode): AgentConfig | null {
     let agentConfig: AgentConfig | null = null;
-    
+
     this.traverseAST(ast, (node) => {
       if (node.type === 'agent_definition') {
         agentConfig = this.parseAgentDefinition(node);
       }
     });
-    
-    // Validate against schema if config exists
+
+    // If we found an agent config, also scan for messages at the root level
     if (agentConfig) {
+      // Scan the entire AST for messages (not just within agent definition)
+      const rootMessageIds = this.extractMessageIds(ast);
+      for (const messageId of rootMessageIds) {
+        if (!agentConfig.messages!.includes(messageId)) {
+          agentConfig.messages!.push(messageId);
+        }
+      }
+
+      // Validate against schema
       this.validateAndApplyDefaults(agentConfig);
     }
-    
+
     return agentConfig;
   }
 
@@ -112,7 +124,7 @@ export class AgentExtractor {
         displayName: config.displayName,
         ...(config.name && { name: config.name }),
         ...(config.brandName && { brandName: config.brandName }),
-        ...(config.rcsBusinessMessagingAgent && { rcsBusinessMessaging: { rbmAgent: {} } })
+        ...(config.rcsBusinessMessagingAgent && { rcsBusinessMessaging: { rbmAgent: {} } }),
       };
 
       const validationResult = schemaValidator.validateAgentConfig(schemaConfig);
@@ -127,7 +139,7 @@ export class AgentExtractor {
   private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
     callback(node);
     if (node.children) {
-      node.children.forEach(child => this.traverseAST(child, callback));
+      node.children.forEach((child) => this.traverseAST(child, callback));
     }
   }
 
@@ -136,11 +148,11 @@ export class AgentExtractor {
     const config: AgentConfig = {
       displayName: '', // Required field, will be updated below
       flows: [],
-      messages: []
+      messages: [],
     };
 
-    // Set name if available
-    if (agentName) {
+    // Set name (null if not found for consistency)
+    if (agentName !== null) {
       config.name = agentName;
     }
 
@@ -156,7 +168,7 @@ export class AgentExtractor {
           config.displayName = displayName;
         }
       }
-      
+
       // Extract brandName (read-only)
       if (this.isPropertyNode(child, 'brandName')) {
         const brandName = this.extractPropertyValue(child);
@@ -164,7 +176,7 @@ export class AgentExtractor {
           config.brandName = brandName;
         }
       }
-      
+
       // Extract config section -> rcsBusinessMessagingAgent
       if (child.type === 'config_section') {
         const configData = this.parseRcsBusinessMessagingAgent(child);
@@ -173,12 +185,12 @@ export class AgentExtractor {
           hasRcsAgentData = true;
         }
       }
-      
+
       // Extract defaults section (internal RCL feature)
       if (child.type === 'defaults_section') {
         defaults = this.parseDefaultsSection(child);
       }
-      
+
       // Extract flow references
       if (child.type === 'flow_section') {
         const flowName = this.extractFlowName(child);
@@ -186,8 +198,8 @@ export class AgentExtractor {
           config.flows!.push(flowName);
         }
       }
-      
-      // Extract message references
+
+      // Extract message references from messages section
       if (child.type === 'messages_section') {
         const messageIds = this.extractMessageIds(child);
         config.messages!.push(...messageIds);
@@ -209,11 +221,12 @@ export class AgentExtractor {
   }
 
   private extractAgentName(node: RCLNode): string | null {
-    // Agent name should be the second child (identifier)
-    if (node.children && node.children.length >= 2) {
-      const nameNode = node.children[1];
-      if (nameNode.type === 'identifier') {
-        return nameNode.text || undefined;
+    // Look for the first identifier after 'agent' keyword
+    if (node.children) {
+      for (const child of node.children) {
+        if (child.type === 'identifier') {
+          return child.text || null;
+        }
       }
     }
     return null;
@@ -238,9 +251,19 @@ export class AgentExtractor {
   private parseRcsBusinessMessagingAgent(node: RCLNode): RcsBusinessMessagingAgent | null {
     const rcsAgent: RcsBusinessMessagingAgent = {};
     let hasData = false;
-    
+
     this.traverseAST(node, (child) => {
-      if (child.type === 'config_property') {
+      // Check for both config_property and special property types
+      const specialPropertyTypes = [
+        'phone_numbers_property',
+        'emails_property',
+        'websites_property',
+        'privacy_property',
+        'terms_conditions_property',
+        'billing_config_property',
+      ];
+
+      if (child.type === 'config_property' || specialPropertyTypes.includes(child.type)) {
         const parsed = this.parseRcsAgentProperty(child);
         if (parsed) {
           Object.assign(rcsAgent, parsed);
@@ -248,14 +271,14 @@ export class AgentExtractor {
         }
       }
     });
-    
+
     return hasData ? rcsAgent : null;
   }
 
   private parseRcsAgentProperty(node: RCLNode): Partial<RcsBusinessMessagingAgent> | null {
     const text = node.text || '';
     const result: Partial<RcsBusinessMessagingAgent> = {};
-    
+
     if (text.includes('description:')) {
       result.description = this.extractValueFromText(text, 'description:');
     } else if (text.includes('logoUri:')) {
@@ -275,35 +298,61 @@ export class AgentExtractor {
         result.hostingRegion = region as HostingRegion;
       }
     } else if (node.type === 'phone_numbers_property') {
-      result.phoneNumbers = this.parsePhoneNumbers(node);
+      const phoneNumbers = this.parsePhoneNumbers(node);
+      if (phoneNumbers) {
+        result.phoneNumbers = phoneNumbers;
+      }
     } else if (node.type === 'emails_property') {
-      result.emails = this.parseEmails(node);
+      const emails = this.parseEmails(node);
+      if (emails) {
+        result.emails = emails;
+      }
     } else if (node.type === 'websites_property') {
-      result.websites = this.parseWebsites(node);
+      const websites = this.parseWebsites(node);
+      if (websites) {
+        result.websites = websites;
+      }
     } else if (node.type === 'privacy_property') {
-      result.privacy = this.parseWebEntry(node);
+      const privacy = this.parseWebEntry(node);
+      if (privacy) {
+        result.privacy = privacy;
+      }
     } else if (node.type === 'terms_conditions_property') {
-      result.termsConditions = this.parseWebEntry(node);
+      const termsConditions = this.parseWebEntry(node);
+      if (termsConditions) {
+        result.termsConditions = termsConditions;
+      }
     } else if (node.type === 'billing_config_property') {
-      result.billingConfig = this.parseRcsBillingConfig(node);
+      const billingConfig = this.parseRcsBillingConfig(node);
+      if (billingConfig) {
+        result.billingConfig = billingConfig;
+      }
     } else {
       return null;
     }
-    
+
     return Object.keys(result).length > 0 ? result : null;
   }
 
   private isValidAgentUseCase(value: string): boolean {
-    return ['AGENT_USE_CASE_UNSPECIFIED', 'TRANSACTIONAL', 'PROMOTIONAL', 'OTP', 'MULTI_USE'].includes(value);
+    return [
+      'AGENT_USE_CASE_UNSPECIFIED',
+      'TRANSACTIONAL',
+      'PROMOTIONAL',
+      'OTP',
+      'MULTI_USE',
+    ].includes(value);
   }
 
   private isValidHostingRegion(value: string): boolean {
-    return ['HOSTING_REGION_UNSPECIFIED', 'NORTH_AMERICA', 'EUROPE', 'ASIA_PACIFIC'].includes(value);
+    return ['HOSTING_REGION_UNSPECIFIED', 'NORTH_AMERICA', 'EUROPE', 'ASIA_PACIFIC'].includes(
+      value,
+    );
   }
 
   private parsePhoneNumbers(node: RCLNode): PhoneEntry[] | undefined {
     const phoneNumbers: PhoneEntry[] = [];
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'phone_entry') {
         const entry = this.parsePhoneEntry(child);
@@ -312,14 +361,14 @@ export class AgentExtractor {
         }
       }
     });
-    
+
     return phoneNumbers.length > 0 ? phoneNumbers : undefined;
   }
 
   private parsePhoneEntry(node: RCLNode): PhoneEntry | undefined {
     let number = '';
     let label: string | undefined;
-    
+
     this.traverseAST(node, (child) => {
       if (child.text?.includes('number:')) {
         number = this.extractValueFromText(child.text, 'number:') || '';
@@ -328,13 +377,13 @@ export class AgentExtractor {
         label = this.extractValueFromText(child.text, 'label:');
       }
     });
-    
+
     return number ? { number, label } : undefined;
   }
 
   private parseEmails(node: RCLNode): EmailEntry[] | undefined {
     const emails: EmailEntry[] = [];
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'email_entry') {
         const entry = this.parseEmailEntry(child);
@@ -343,14 +392,14 @@ export class AgentExtractor {
         }
       }
     });
-    
+
     return emails.length > 0 ? emails : undefined;
   }
 
   private parseEmailEntry(node: RCLNode): EmailEntry | undefined {
     let address = '';
     let label: string | undefined;
-    
+
     this.traverseAST(node, (child) => {
       if (child.text?.includes('address:')) {
         address = this.extractValueFromText(child.text, 'address:') || '';
@@ -359,13 +408,13 @@ export class AgentExtractor {
         label = this.extractValueFromText(child.text, 'label:');
       }
     });
-    
+
     return address ? { address, label } : undefined;
   }
 
   private parseWebsites(node: RCLNode): WebEntry[] | undefined {
     const websites: WebEntry[] = [];
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'web_entry') {
         const entry = this.parseWebEntry(child);
@@ -374,14 +423,14 @@ export class AgentExtractor {
         }
       }
     });
-    
+
     return websites.length > 0 ? websites : undefined;
   }
 
   private parseWebEntry(node: RCLNode): WebEntry | undefined {
     let url = '';
     let label: string | undefined;
-    
+
     this.traverseAST(node, (child) => {
       if (child.text?.includes('url:')) {
         url = this.extractValueFromText(child.text, 'url:') || '';
@@ -390,23 +439,23 @@ export class AgentExtractor {
         label = this.extractValueFromText(child.text, 'label:');
       }
     });
-    
+
     return url ? { url, label } : undefined;
   }
 
   private parseRcsBillingConfig(node: RCLNode): RcsBusinessMessagingAgentBillingConfig | undefined {
     let billingCategory: string | undefined;
-    
+
     this.traverseAST(node, (child) => {
       if (child.text?.includes('billingCategory:')) {
         billingCategory = this.extractValueFromText(child.text, 'billingCategory:');
       }
     });
-    
+
     if (billingCategory && this.isValidBillingCategory(billingCategory)) {
       return { billingCategory: billingCategory as BillingCategory };
     }
-    
+
     return undefined;
   }
 
@@ -416,25 +465,25 @@ export class AgentExtractor {
       'CONVERSATIONAL_LEGACY',
       'CONVERSATIONAL',
       'SINGLE_MESSAGE',
-      'BASIC_MESSAGE'
+      'BASIC_MESSAGE',
     ].includes(value);
   }
 
   private parseDefaultsSection(node: RCLNode): AgentDefaultsSection {
     const defaults: AgentDefaultsSection = {};
-    
+
     this.traverseAST(node, (child) => {
       if (child.type === 'default_property') {
         this.parseDefaultProperty(child, defaults);
       }
     });
-    
+
     return defaults;
   }
 
   private parseDefaultProperty(node: RCLNode, defaults: AgentDefaultsSection): void {
     const text = node.text || '';
-    
+
     if (text.includes('fallbackMessage:')) {
       defaults.fallbackMessage = this.extractValueFromText(text, 'fallbackMessage:');
     } else if (text.includes('messageTrafficType:')) {
@@ -450,13 +499,13 @@ export class AgentExtractor {
 
   private parseExpressions(node: RCLNode): { language?: string } {
     const expressions: { language?: string } = {};
-    
+
     this.traverseAST(node, (child) => {
       if (child.text?.includes('language:')) {
         expressions.language = this.extractValueFromText(child.text, 'language:');
       }
     });
-    
+
     return expressions;
   }
 
@@ -473,23 +522,36 @@ export class AgentExtractor {
 
   private extractMessageIds(node: RCLNode): string[] {
     const messageIds: string[] = [];
-    
+
     this.traverseAST(node, (child) => {
-      if (child.type === 'text_shortcut') {
+      // Debug logging
+      if (child.type && child.type.includes('shortcut') || child.type === 'agent_message') {
+        console.log(`[DEBUG] Found message node type: ${child.type}`);
+        console.log(`[DEBUG] Node text: ${child.text?.substring(0, 100)}`);
+      }
+
+      // Handle all shortcut types
+      if (child.type === 'text_shortcut' || 
+          child.type === 'rich_card_shortcut' || 
+          child.type === 'carousel_shortcut' ||
+          child.type === 'file_shortcut') {
         const messageId = this.extractMessageIdFromShortcut(child);
+        console.log(`[DEBUG] Extracted message ID from ${child.type}: ${messageId}`);
         if (messageId && !messageIds.includes(messageId)) {
           messageIds.push(messageId);
         }
       }
-      
+
       if (child.type === 'agent_message') {
         const messageId = this.extractMessageIdFromAgentMessage(child);
+        console.log(`[DEBUG] Extracted message ID from agent_message: ${messageId}`);
         if (messageId && !messageIds.includes(messageId)) {
           messageIds.push(messageId);
         }
       }
     });
-    
+
+    console.log(`[DEBUG] Total message IDs found: ${messageIds.length}`, messageIds);
     return messageIds;
   }
 
@@ -505,11 +567,16 @@ export class AgentExtractor {
   }
 
   private extractMessageIdFromAgentMessage(node: RCLNode): string | null {
-    // Look for identifier in agent message
-    if (node.children) {
+    // Agent message ID should be the second identifier (first is 'agentMessage')
+    if (node.children && node.children.length >= 2) {
+      // Skip the first identifier ('agentMessage') and get the second one
+      let identifierCount = 0;
       for (const child of node.children) {
         if (child.type === 'identifier') {
-          return child.text || undefined;
+          identifierCount++;
+          if (identifierCount === 2) {
+            return child.text || undefined;
+          }
         }
       }
     }

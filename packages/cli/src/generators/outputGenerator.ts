@@ -1,8 +1,12 @@
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import { CompiledOutput, CompileOptions } from '../compiler';
 
 export class OutputGenerator {
-  async generate(output: CompiledOutput, outputPath: string, options: CompileOptions): Promise<void> {
+  async generate(
+    output: CompiledOutput,
+    outputPath: string,
+    options: CompileOptions,
+  ): Promise<void> {
     if (options.format === 'js') {
       await this.generateJavaScript(output, outputPath, options);
     } else {
@@ -10,16 +14,22 @@ export class OutputGenerator {
     }
   }
 
-  private async generateJavaScript(output: CompiledOutput, outputPath: string, options: CompileOptions): Promise<void> {
+  private async generateJavaScript(
+    output: CompiledOutput,
+    outputPath: string,
+    options: CompileOptions,
+  ): Promise<void> {
     const jsContent = this.buildJavaScriptContent(output);
     await fs.writeFile(outputPath, jsContent, 'utf-8');
   }
 
-  private async generateJSON(output: CompiledOutput, outputPath: string, options: CompileOptions): Promise<void> {
-    const jsonContent = options.pretty 
-      ? JSON.stringify(output, null, 2)
-      : JSON.stringify(output);
-    
+  private async generateJSON(
+    output: CompiledOutput,
+    outputPath: string,
+    options: CompileOptions,
+  ): Promise<void> {
+    const jsonContent = options.pretty ? JSON.stringify(output, null, 2) : JSON.stringify(output);
+
     await fs.writeFile(outputPath, jsonContent, 'utf-8');
   }
 

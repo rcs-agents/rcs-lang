@@ -1,0 +1,9 @@
+agent GreetingBot
+  messages Messages
+    agentMessage hello
+      contentMessage
+        text: "Hello! How can I help you today?"
+        
+    agentMessage goodbye
+      contentMessage
+        text: "Goodbye! Have a great day!"

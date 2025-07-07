@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
 import { ProjectRootDetector } from '../src/import-resolver/projectRoot';
 
@@ -18,6 +18,9 @@ describe('ImportResolver', () => {
   });
 
   afterEach(() => {
+    if (!tempDir) {
+      return;
+    }
     // Clean up temporary directory
     fs.rmSync(tempDir, { recursive: true, force: true });
     ProjectRootDetector.clearCache();
@@ -94,6 +97,9 @@ describe('ProjectRootDetector', () => {
   });
 
   afterEach(() => {
+    if (!tempDir) {
+      return;
+    }
     fs.rmSync(tempDir, { recursive: true, force: true });
     ProjectRootDetector.clearCache();
   });

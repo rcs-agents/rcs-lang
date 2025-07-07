@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(moon run:*)",
+      "Bash(bun install:*)",
+      "Bash(nr:*)",
+      "Bash(bunx:*)",
+      "Bash(bun test:*)",
+      "Bash(node:*)",
+      "Bash(bun:*)"
+    ],
+    "deny": []
+  }
+}

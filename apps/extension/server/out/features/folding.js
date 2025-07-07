@@ -18,7 +18,10 @@ class FoldingProvider {
                 let endLine = i;
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
-                    if (nextLine.startsWith('agent ') || nextLine.startsWith('flow ') || nextLine.startsWith('messages ') || j === lines.length - 1) {
+                    if (nextLine.startsWith('agent ') ||
+                        nextLine.startsWith('flow ') ||
+                        nextLine.startsWith('messages ') ||
+                        j === lines.length - 1) {
                         endLine = j - 1;
                         break;
                     }
@@ -30,7 +33,7 @@ class FoldingProvider {
                     ranges.push({
                         startLine: i,
                         endLine: endLine,
-                        kind: node_1.FoldingRangeKind.Region
+                        kind: node_1.FoldingRangeKind.Region,
                     });
                 }
             }

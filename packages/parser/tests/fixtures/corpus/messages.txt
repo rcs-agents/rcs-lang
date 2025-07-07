@@ -1,0 +1,310 @@
+================================================================================
+Text message shortcut
+================================================================================
+
+agent MessageTest
+  displayName: "Messages"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Hello world!"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Transactional text message
+================================================================================
+
+agent TransactionalTest
+  displayName: "Transactional"
+  flow Main
+    :start -> :end
+  messages Messages
+    transactional text OrderConfirm "Your order is confirmed"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Full agent message
+================================================================================
+
+agent FullMessageTest
+  displayName: "Full Message"
+  flow Main
+    :start -> :end
+  messages Messages
+    agentMessage CompleteMessage
+      messageTrafficType: :promotional
+      ttl: "P7D"
+      contentMessage
+        text: "Check out our latest offers!"
+        suggestion
+          reply
+            text: "Tell me more"
+            postbackData: "more_info"
+        suggestion
+          action
+            text: "Visit website"
+            openUrlAction
+              url: <url "https://example.com">
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (agent_message
+        (identifier)
+        (atom)
+        (string)
+        (content_message
+          (enhanced_simple_value
+            (simple_value
+              (string)))
+          (suggestion
+            (suggested_reply
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string)))
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string))))))
+          (suggestion
+            (suggested_action
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string))))
+              (open_url_action
+                (typed_value
+                  (type_tag
+                    (string)))))))))))
+
+================================================================================
+Message with file content
+================================================================================
+
+agent FileMessageTest
+  displayName: "File Message"
+  flow Main
+    :start -> :end
+  messages Messages
+    agentMessage PDFMessage
+      contentMessage
+        fileName: "document.pdf"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (string))))))
+
+================================================================================
+Message with rich card
+================================================================================
+
+agent RichCardTest
+  displayName: "Rich Card"
+  flow Main
+    :start -> :end
+  messages Messages
+    agentMessage ProductCard
+      contentMessage
+        richCard
+          standaloneCard
+            cardOrientation: :VERTICAL
+            cardContent
+              title: "New Product"
+              description: "Check out our latest product"
+              media
+                height: :MEDIUM
+                contentInfo
+                  fileUrl: "https://example.com/product.jpg"
+                  altText: "Product image"
+              suggestion
+                reply
+                  text: "Learn more"
+                  postbackData: "learn_more"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (rich_card
+            (standalone_card
+              (atom)
+              (card_content
+                (enhanced_simple_value
+                  (simple_value
+                    (string)))
+                (enhanced_simple_value
+                  (simple_value
+                    (string)))
+                (media
+                  (atom)
+                  (content_info
+                    (inline_parameter_list
+                      (parameter
+                        (attribute_key)
+                        (simple_value
+                          (string)))
+                      (parameter
+                        (attribute_key)
+                        (simple_value
+                          (string))))))
+                (card_suggestion
+                  (suggested_reply
+                    (inline_parameter_list
+                      (parameter
+                        (attribute_key)
+                        (simple_value
+                          (string)))
+                      (parameter
+                        (attribute_key)
+                        (simple_value
+                          (string)))))))))))))
+
+================================================================================
+Message with carousel
+================================================================================
+
+agent CarouselTest
+  displayName: "Carousel"
+  flow Main
+    :start -> :end
+  messages Messages
+    agentMessage ProductCarousel
+      contentMessage
+        richCard
+          carouselCard
+            cardWidth: :MEDIUM
+            cardContent
+              title: "Product 1"
+              description: "First product"
+            cardContent
+              title: "Product 2"
+              description: "Second product"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (rich_card
+            (carousel_card
+              (atom)
+              (card_content
+                (enhanced_simple_value
+                  (simple_value
+                    (string)))
+                (enhanced_simple_value
+                  (simple_value
+                    (string))))
+              (card_content
+                (enhanced_simple_value
+                  (simple_value
+                    (string)))
+                (enhanced_simple_value
+                  (simple_value
+                    (string))))))))))

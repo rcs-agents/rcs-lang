@@ -36,7 +36,14 @@ interface ExtensionToWebviewMessage {
 }
 
 interface WebviewToExtensionMessage {
-  type: 'ready' | 'nodeCreated' | 'nodeDeleted' | 'nodeUpdated' | 'edgeCreated' | 'edgeDeleted' | 'modelChanged';
+  type:
+    | 'ready'
+    | 'nodeCreated'
+    | 'nodeDeleted'
+    | 'nodeUpdated'
+    | 'edgeCreated'
+    | 'edgeDeleted'
+    | 'modelChanged';
   data: any;
 }
 
@@ -48,7 +55,7 @@ export class InteractiveDiagramProvider {
   private _state: InteractiveDiagramState = {
     flows: {},
     messages: {},
-    agent: {}
+    agent: {},
   };
 
   constructor(private readonly _extensionContext: vscode.ExtensionContext) {
@@ -78,8 +85,8 @@ export class InteractiveDiagramProvider {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
-        localResourceRoots: [this._extensionUri]
-      }
+        localResourceRoots: [this._extensionUri],
+      },
     );
 
     // Set the webview's initial html content
@@ -94,7 +101,7 @@ export class InteractiveDiagramProvider {
         this._handleWebviewMessage(message);
       },
       null,
-      this._extensionContext.subscriptions
+      this._extensionContext.subscriptions,
     );
 
     // Load the document if provided
@@ -112,87 +119,94 @@ export class InteractiveDiagramProvider {
     try {
       // Compile the RCL document to extract flow information
       const compiledData = await this._compileRCLDocument(this._currentDocument);
-      
+
       if (compiledData.success && compiledData.data) {
         // Convert compiled data to visual diagram model
         const diagramModels = this._convertToSprottyModel(compiledData.data);
-        
+
         this._state = {
           flows: diagramModels,
           messages: compiledData.data.messages || {},
           agent: compiledData.data.agent || {},
-          activeFlow: Object.keys(diagramModels)[0] // Set first flow as active
+          activeFlow: Object.keys(diagramModels)[0], // Set first flow as active
         };
 
         this._updateWebview();
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`Failed to load diagram model: ${error instanceof Error ? error.message : String(error)}`);
+      vscode.window.showErrorMessage(
+        `Failed to load diagram model: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   private _convertToSprottyModel(compiledData: any): Record<string, RCLFlowModel> {
     const diagramModels: Record<string, RCLFlowModel> = {};
-    
+
     // Convert each flow to a Sprotty-compatible model
-    Object.keys(compiledData.flows || {}).forEach(flowId => {
+    Object.keys(compiledData.flows || {}).forEach((flowId) => {
       const flow = compiledData.flows[flowId];
       const nodes: RCLNode[] = [];
       const edges: RCLEdge[] = [];
-      
-      // Auto-layout positions (simple grid layout for now)
-      let x = 100;
-      let y = 100;
-      const xSpacing = 200;
-      const ySpacing = 100;
 
-      // Add nodes for each state
-      Object.keys(flow.states || {}).forEach((stateId, index) => {
-        const state = flow.states[stateId];
+      // Apply hierarchical layout algorithm
+      const layoutedNodes = this._layoutFlowNodes(flow, compiledData.messages);
+
+      // Create nodes with enhanced RCL data
+      layoutedNodes.forEach((layoutNode) => {
+        const state = flow.states[layoutNode.id];
+        const message = compiledData.messages?.[layoutNode.id];
         
-        // Determine node type
-        let nodeType: RCLNode['type'] = 'message';
-        if (stateId === 'start' || stateId === flow.initial) {
-          nodeType = 'start';
-        } else if (state.type === 'final' || stateId === 'end') {
-          // Skip explicit end nodes - flows should be continuous
-          nodeType = 'message';
-        } else if (compiledData.messages && compiledData.messages[stateId]) {
-          // Check if it's a rich card message
-          const message = compiledData.messages[stateId];
-          if (message.contentMessage?.richCard) {
+        // Determine node type based on RCL semantics
+        let nodeType: RCLNode['type'] = layoutNode.type as RCLNode['type'];
+        
+        // Override type based on message content
+        if (message) {
+          if (message.contentMessage?.richCard?.carouselCard) {
             nodeType = 'rich_card';
+          } else if (message.contentMessage?.richCard?.standaloneCard) {
+            nodeType = 'rich_card';
+          } else if (message.contentMessage?.contentInfo) {
+            nodeType = 'rich_card'; // File messages shown as rich cards
           }
         }
 
         nodes.push({
-          id: stateId,
+          id: layoutNode.id,
           type: nodeType,
-          position: { 
-            x: x + (index % 3) * xSpacing, 
-            y: y + Math.floor(index / 3) * ySpacing 
-          },
+          position: layoutNode.position,
           data: {
-            label: stateId,
-            messageData: compiledData.messages?.[stateId],
-            stateData: state
-          }
+            label: this._extractNodeLabel(layoutNode.id, message, state),
+            messageData: message,
+            stateData: state,
+            // Enhanced RCL metadata
+            rclMetadata: {
+              hasConditions: this._hasConditions(state),
+              hasSuggestions: this._hasSuggestions(message),
+              messageType: this._getMessageType(message),
+              trafficType: message?.messageTrafficType,
+            },
+          },
         });
       });
 
-      // Add edges for transitions
-      Object.keys(flow.states || {}).forEach(stateId => {
+      // Create edges with enhanced transition data
+      Object.keys(flow.states || {}).forEach((stateId) => {
         const state = flow.states[stateId];
         if (state.on) {
-          Object.keys(state.on).forEach(trigger => {
-            const targetState = state.on[trigger];
+          Object.keys(state.on).forEach((trigger) => {
+            const transition = state.on[trigger];
+            const targetState = typeof transition === 'string' ? transition : transition.target;
+            
             edges.push({
-              id: `${stateId}-${targetState}`,
+              id: `${stateId}-${trigger}-${targetState}`,
               source: stateId,
               target: targetState,
               data: {
-                trigger: trigger === 'NEXT' ? '' : trigger
-              }
+                trigger: trigger === 'NEXT' ? '' : trigger,
+                condition: typeof transition === 'object' ? transition.cond : undefined,
+                actions: typeof transition === 'object' ? transition.actions : undefined,
+              },
             });
           });
         }
@@ -201,11 +215,119 @@ export class InteractiveDiagramProvider {
       diagramModels[flowId] = {
         id: flowId,
         nodes,
-        edges
+        edges,
       };
     });
 
     return diagramModels;
+  }
+
+  private _layoutFlowNodes(flow: any, messages: any): Array<{id: string; type: string; position: {x: number; y: number}}> {
+    const nodes: Array<{id: string; type: string; position: {x: number; y: number}}> = [];
+    const visited = new Set<string>();
+    const levels: string[][] = [];
+    
+    // Start from initial state
+    const initial = flow.initial || 'start';
+    if (flow.states[initial]) {
+      this._traverseFlow(initial, flow.states, 0, levels, visited);
+    }
+    
+    // Position nodes hierarchically
+    const xSpacing = 180;
+    const ySpacing = 100;
+    const startX = 100;
+    const startY = 100;
+    
+    levels.forEach((level, levelIndex) => {
+      const levelWidth = level.length * xSpacing;
+      const levelStartX = startX + (levelIndex * xSpacing);
+      
+      level.forEach((nodeId, nodeIndex) => {
+        const state = flow.states[nodeId];
+        let nodeType = 'message';
+        
+        if (nodeId === initial || nodeId === 'start') {
+          nodeType = 'start';
+        } else if (state?.type === 'final' || nodeId === 'end' || nodeId.includes('end')) {
+          nodeType = 'end';
+        }
+        
+        nodes.push({
+          id: nodeId,
+          type: nodeType,
+          position: {
+            x: levelStartX,
+            y: startY + (nodeIndex * ySpacing) - ((level.length - 1) * ySpacing / 2),
+          },
+        });
+      });
+    });
+    
+    return nodes;
+  }
+  
+  private _traverseFlow(nodeId: string, states: any, level: number, levels: string[][], visited: Set<string>) {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
+    
+    // Ensure level array exists
+    if (!levels[level]) {
+      levels[level] = [];
+    }
+    
+    levels[level].push(nodeId);
+    
+    // Traverse transitions
+    const state = states[nodeId];
+    if (state?.on) {
+      Object.values(state.on).forEach((target: any) => {
+        const targetId = typeof target === 'string' ? target : target.target;
+        if (states[targetId]) {
+          this._traverseFlow(targetId, states, level + 1, levels, visited);
+        }
+      });
+    }
+  }
+  
+  private _extractNodeLabel(nodeId: string, message: any, state: any): string {
+    // Priority: message text > state label > node ID
+    if (message?.contentMessage?.text) {
+      const text = message.contentMessage.text;
+      return text.length > 30 ? text.substring(0, 27) + '...' : text;
+    }
+    
+    if (state?.meta?.label) {
+      return state.meta.label;
+    }
+    
+    // Clean up node ID for display
+    return nodeId.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+  }
+  
+  private _hasConditions(state: any): boolean {
+    if (!state?.on) return false;
+    
+    return Object.values(state.on).some((transition: any) => 
+      typeof transition === 'object' && transition.cond
+    );
+  }
+  
+  private _hasSuggestions(message: any): boolean {
+    return !!(message?.contentMessage?.suggestions?.length > 0);
+  }
+  
+  private _getMessageType(message: any): string {
+    if (!message?.contentMessage) return 'unknown';
+    
+    const content = message.contentMessage;
+    if (content.text) return 'text';
+    if (content.richCard?.standaloneCard) return 'standalone_card';
+    if (content.richCard?.carouselCard) return 'carousel_card';
+    if (content.uploadedRbmFile) return 'file';
+    if (content.contentInfo) return 'content_info';
+    
+    return 'unknown';
   }
 
   private async _compileRCLDocument(document: vscode.TextDocument): Promise<{
@@ -227,27 +349,27 @@ export class InteractiveDiagramProvider {
       // Create temporary file for compilation
       const tempPath = path.join(require('os').tmpdir(), `rcl-interactive-${Date.now()}.rcl`);
       const tempOutputPath = tempPath.replace('.rcl', '.json');
-      
+
       await fs.promises.writeFile(tempPath, document.getText(), 'utf-8');
-      
+
       const result = await this._runRclCli(cliPath, tempPath, tempOutputPath, 'json');
-      
+
       if (result.success) {
         const compiledContent = await fs.promises.readFile(tempOutputPath, 'utf-8');
         const compiledData = JSON.parse(compiledContent);
-        
+
         // Clean up temp files
         fs.promises.unlink(tempPath).catch(() => {});
         fs.promises.unlink(tempOutputPath).catch(() => {});
-        
+
         return { success: true, data: compiledData };
       } else {
         return { success: false, errors: [result.error || 'Compilation failed'] };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        errors: [error instanceof Error ? error.message : String(error)] 
+      return {
+        success: false,
+        errors: [error instanceof Error ? error.message : String(error)],
       };
     }
   }
@@ -273,10 +395,15 @@ export class InteractiveDiagramProvider {
     return null;
   }
 
-  private _runRclCli(cliPath: string, inputPath: string, outputPath: string, format: string = 'json'): Promise<{ success: boolean; error?: string }> {
+  private _runRclCli(
+    cliPath: string,
+    inputPath: string,
+    outputPath: string,
+    format: string = 'json',
+  ): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
-      
+
       cp.exec(command, (error, stdout, stderr) => {
         if (error) {
           resolve({ success: false, error: error.message });
@@ -294,27 +421,27 @@ export class InteractiveDiagramProvider {
       case 'ready':
         this._updateWebview();
         break;
-        
+
       case 'nodeCreated':
         this._handleNodeCreated(message.data);
         break;
-        
+
       case 'nodeDeleted':
         this._handleNodeDeleted(message.data);
         break;
-        
+
       case 'nodeUpdated':
         this._handleNodeUpdated(message.data);
         break;
-        
+
       case 'edgeCreated':
         this._handleEdgeCreated(message.data);
         break;
-        
+
       case 'edgeDeleted':
         this._handleEdgeDeleted(message.data);
         break;
-        
+
       case 'modelChanged':
         this._handleModelChanged(message.data);
         break;
@@ -328,7 +455,7 @@ export class InteractiveDiagramProvider {
 
     const flow = this._state.flows[this._state.activeFlow];
     flow.nodes.push(data.node);
-    
+
     this._generateCodeFromModel();
   }
 
@@ -338,9 +465,11 @@ export class InteractiveDiagramProvider {
     }
 
     const flow = this._state.flows[this._state.activeFlow];
-    flow.nodes = flow.nodes.filter(node => node.id !== data.nodeId);
-    flow.edges = flow.edges.filter(edge => edge.source !== data.nodeId && edge.target !== data.nodeId);
-    
+    flow.nodes = flow.nodes.filter((node) => node.id !== data.nodeId);
+    flow.edges = flow.edges.filter(
+      (edge) => edge.source !== data.nodeId && edge.target !== data.nodeId,
+    );
+
     this._generateCodeFromModel();
   }
 
@@ -350,11 +479,11 @@ export class InteractiveDiagramProvider {
     }
 
     const flow = this._state.flows[this._state.activeFlow];
-    const nodeIndex = flow.nodes.findIndex(node => node.id === data.node.id);
+    const nodeIndex = flow.nodes.findIndex((node) => node.id === data.node.id);
     if (nodeIndex !== -1) {
       flow.nodes[nodeIndex] = { ...flow.nodes[nodeIndex], ...data.node };
     }
-    
+
     this._generateCodeFromModel();
   }
 
@@ -365,7 +494,7 @@ export class InteractiveDiagramProvider {
 
     const flow = this._state.flows[this._state.activeFlow];
     flow.edges.push(data.edge);
-    
+
     this._generateCodeFromModel();
   }
 
@@ -375,8 +504,8 @@ export class InteractiveDiagramProvider {
     }
 
     const flow = this._state.flows[this._state.activeFlow];
-    flow.edges = flow.edges.filter(edge => edge.id !== data.edgeId);
-    
+    flow.edges = flow.edges.filter((edge) => edge.id !== data.edgeId);
+
     this._generateCodeFromModel();
   }
 
@@ -388,7 +517,7 @@ export class InteractiveDiagramProvider {
     if (data.activeFlow) {
       this._state.activeFlow = data.activeFlow;
     }
-    
+
     this._generateCodeFromModel();
   }
 
@@ -400,62 +529,123 @@ export class InteractiveDiagramProvider {
     try {
       // Convert diagram model back to RCL code
       const rclCode = this._convertModelToRCL();
-      
+
       // Update the document
       const edit = new vscode.WorkspaceEdit();
       const fullRange = new vscode.Range(
         this._currentDocument.positionAt(0),
-        this._currentDocument.positionAt(this._currentDocument.getText().length)
+        this._currentDocument.positionAt(this._currentDocument.getText().length),
       );
-      
+
       edit.replace(this._currentDocument.uri, fullRange, rclCode);
       await vscode.workspace.applyEdit(edit);
-      
     } catch (error) {
-      vscode.window.showErrorMessage(`Failed to generate code: ${error instanceof Error ? error.message : String(error)}`);
+      vscode.window.showErrorMessage(
+        `Failed to generate code: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   private _convertModelToRCL(): string {
     let rclCode = '';
-    
-    // Generate agent section
+
+    // Generate agent section with proper indentation
     if (this._state.agent) {
       rclCode += `agent ${this._state.agent.name || 'GeneratedAgent'}\n`;
-      if (this._state.agent.displayName) {
-        rclCode += `display-name: "${this._state.agent.displayName}"\n`;
-      }
+      rclCode += `  displayName: "${this._state.agent.displayName || 'Generated Agent'}"\n`;
       if (this._state.agent.brandName) {
-        rclCode += `brand-name: "${this._state.agent.brandName}"\n`;
+        rclCode += `  brandName: "${this._state.agent.brandName}"\n`;
       }
       rclCode += '\n';
-    }
-    
-    // Generate messages section
-    if (Object.keys(this._state.messages).length > 0) {
-      rclCode += 'messages\n';
-      Object.keys(this._state.messages).forEach(messageId => {
-        const message = this._state.messages[messageId];
-        if (message.contentMessage?.text) {
-          rclCode += `${messageId}: "${message.contentMessage.text}"\n`;
+      
+      // Add config section if present
+      if (this._state.agent.rcsBusinessMessagingAgent) {
+        rclCode += '  agentConfig Config\n';
+        const config = this._state.agent.rcsBusinessMessagingAgent;
+        if (config.description) {
+          rclCode += `    description: "${config.description}"\n`;
         }
-      });
-      rclCode += '\n';
+        if (config.logoUri) {
+          rclCode += `    logoUri: "${config.logoUri}"\n`;
+        }
+        if (config.color) {
+          rclCode += `    color: "${config.color}"\n`;
+        }
+        rclCode += '\n';
+      }
     }
-    
-    // Generate flow sections
-    Object.keys(this._state.flows).forEach(flowId => {
+
+    // Generate flow sections with proper structure
+    Object.keys(this._state.flows).forEach((flowId) => {
       const flow = this._state.flows[flowId];
-      rclCode += `flow ${flowId}\n`;
-      
-      // Generate transitions from edges
-      flow.edges.forEach(edge => {
-        rclCode += `  ${edge.source} -> ${edge.target}\n`;
+      rclCode += `  flow ${flowId}\n`;
+
+      // Group edges by source for better readability
+      const edgesBySource: Record<string, typeof flow.edges> = {};
+      flow.edges.forEach((edge) => {
+        if (!edgesBySource[edge.source]) {
+          edgesBySource[edge.source] = [];
+        }
+        edgesBySource[edge.source].push(edge);
       });
-      
+
+      // Generate transitions with conditions
+      Object.keys(edgesBySource).forEach((source) => {
+        edgesBySource[source].forEach((edge) => {
+          rclCode += `    ${edge.source} -> ${edge.target}`;
+          if (edge.data?.condition) {
+            rclCode += ` when ${edge.data.condition}`;
+          }
+          rclCode += '\n';
+        });
+      });
+
       rclCode += '\n';
     });
-    
+
+    // Generate messages section with enhanced formatting
+    if (Object.keys(this._state.messages).length > 0) {
+      rclCode += '  messages Messages\n';
+      
+      Object.keys(this._state.messages).forEach((messageId) => {
+        const message = this._state.messages[messageId];
+        const content = message.contentMessage;
+        
+        if (content?.text) {
+          // Simple text message
+          rclCode += `    text ${messageId} "${content.text}"\n`;
+          
+          // Add suggestions if present
+          if (content.suggestions?.length > 0) {
+            content.suggestions.forEach((suggestion: any) => {
+              if (suggestion.reply) {
+                rclCode += `      reply "${suggestion.reply.text}" "${suggestion.reply.postbackData}"\n`;
+              } else if (suggestion.action?.openUrlAction) {
+                rclCode += `      openUrl "${suggestion.action.text}" <url>"${suggestion.action.openUrlAction.url}"\n`;
+              }
+            });
+          }
+        } else if (content?.richCard?.standaloneCard) {
+          // Rich card message
+          const card = content.richCard.standaloneCard;
+          rclCode += `    richCard ${messageId} "${card.cardContent?.title || messageId}"\n`;
+          if (card.cardContent?.description) {
+            rclCode += `      description: "${card.cardContent.description}"\n`;
+          }
+        } else if (content?.richCard?.carouselCard) {
+          // Carousel message
+          rclCode += `    carousel ${messageId}\n`;
+          const carousel = content.richCard.carouselCard;
+          carousel.cardContents?.forEach((card: any, index: number) => {
+            rclCode += `      richCard card${index + 1} "${card.title || `Card ${index + 1}`}"\n`;
+            if (card.description) {
+              rclCode += `        description: "${card.description}"\n`;
+            }
+          });
+        }
+      });
+    }
+
     return rclCode;
   }
 
@@ -463,7 +653,7 @@ export class InteractiveDiagramProvider {
     if (this._panel) {
       const message: ExtensionToWebviewMessage = {
         type: 'updateModel',
-        data: this._state
+        data: this._state,
       };
       this._panel.webview.postMessage(message);
     }
@@ -471,8 +661,12 @@ export class InteractiveDiagramProvider {
 
   private _getHtmlForWebview(webview: vscode.Webview): string {
     // Get URIs for resources
-    const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.css'));
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.js'));
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.css'),
+    );
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.js'),
+    );
 
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();

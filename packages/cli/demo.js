@@ -266,6 +266,7 @@ function main() {
     console.log(`  Format: ${format.toUpperCase()}`);
     console.log(`  Agent:  ${parsed.agent.name}`);
     console.log(`  Messages: ${Object.keys(parsed.messages).length}`);
+    console.log(`  Message IDs: ${Object.keys(parsed.messages).join(', ')}`);
     console.log(`  Flows: ${Object.keys(parsed.flows).length}`);
     
   } catch (error) {
