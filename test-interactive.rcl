@@ -1,0 +1,14 @@
+agent InteractiveTestAgent
+display-name: "Interactive Test Agent"
+brand-name: "Test Brand"
+
+messages
+MsgWelcome: "Welcome! Let's test the interactive diagram."
+MsgOptions: "Choose an option to continue."
+MsgGoodbye: "Thank you for testing!"
+
+flow MainFlow
+  start -> MsgWelcome
+  MsgWelcome -> MsgOptions
+  MsgOptions -> MsgGoodbye
+  MsgGoodbye -> end

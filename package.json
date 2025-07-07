@@ -62,5 +62,7 @@
     "lint": "moon run :lint",
     "typecheck": "moon run :typecheck"
   },
-  "packageManager": "pnpm@9.14.2"
+  "engines": {
+    "node": "20.18.0"
+  }
 }

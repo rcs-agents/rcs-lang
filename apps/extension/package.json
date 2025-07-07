@@ -28,8 +28,13 @@
     "languages": [
       {
         "id": "rcl",
-        "aliases": ["RCL", "Rich Communication Language"],
-        "extensions": [".rcl"],
+        "aliases": [
+          "RCL",
+          "Rich Communication Language"
+        ],
+        "extensions": [
+          ".rcl"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -154,7 +159,11 @@
         "rcl.trace.server": {
           "scope": "window",
           "type": "string",
-          "enum": ["off", "messages", "verbose"],
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
         }
@@ -177,5 +186,8 @@
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@rcl/parser": "file:../../packages/parser"
   }
 }

@@ -155,7 +155,8 @@ export class InteractiveDiagramProvider {
         if (stateId === 'start' || stateId === flow.initial) {
           nodeType = 'start';
         } else if (state.type === 'final' || stateId === 'end') {
-          nodeType = 'end';
+          // Skip explicit end nodes - flows should be continuous
+          nodeType = 'message';
         } else if (compiledData.messages && compiledData.messages[stateId]) {
           // Check if it's a rich card message
           const message = compiledData.messages[stateId];
