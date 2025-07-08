@@ -1,8 +1,81 @@
 {
   "messages": {
+    "Welcome": {
+      "contentMessage": {
+        "richCard": {
+          "standaloneCard": {
+            "cardContent": {
+              "title": "Welcome to Adventure Travel!",
+              "description": ""
+            }
+          }
+        }
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
     "Planning": {
       "contentMessage": {
         "text": "What kind of trip are you planning?"
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Packages": {
+      "contentMessage": {
+        "richCard": {
+          "carouselCard": {
+            "cardWidth": "MEDIUM",
+            "cardContents": []
+          }
+        }
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "BeachPackage": {
+      "contentMessage": {
+        "richCard": {
+          "standaloneCard": {
+            "cardContent": {
+              "title": "Tropical Paradise",
+              "description": ""
+            }
+          }
+        }
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "MountainPackage": {
+      "contentMessage": {
+        "richCard": {
+          "standaloneCard": {
+            "cardContent": {
+              "title": "Alpine Adventure",
+              "description": ""
+            }
+          }
+        }
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "CityPackage": {
+      "contentMessage": {
+        "richCard": {
+          "standaloneCard": {
+            "cardContent": {
+              "title": "European Cities",
+              "description": ""
+            }
+          }
+        }
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Confirmation": {
+      "contentMessage": {
+        "uploadedRbmFile": {
+          "fileName": "Booking Confirmation",
+          "fileUri": "https://travel.example.com/confirmation.pdf",
+          "thumbnailUri": "https://travel.example.com/confirmation.pdf"
+        }
       },
       "messageTrafficType": "TRANSACTION"
     }

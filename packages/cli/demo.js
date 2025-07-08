@@ -13,29 +13,49 @@ function parseRCLDemo(content) {
 
   let currentSection = '';
   let currentFlow = null;
+  let inAgentBlock = false;
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
+
+    // Check if we're leaving the agent block (new top-level section)
+    if (!line.startsWith(' ') && !line.startsWith('\t')) {
+      if (trimmed.startsWith('flow ') || trimmed === 'messages') {
+        inAgentBlock = false;
+      }
+    }
 
     // Agent definition
     if (trimmed.startsWith('agent ')) {
       const agentName = trimmed.replace('agent ', '');
       result.agent.name = agentName;
       currentSection = 'agent';
+      inAgentBlock = true;
       continue;
     }
 
-    // Display name
-    if (trimmed.startsWith('display-name:')) {
-      result.agent.displayName = trimmed.replace('display-name:', '').trim().replace(/['"]/g, '');
-      continue;
-    }
+    // Parse agent properties when inside agent block
+    if (inAgentBlock) {
+      // Display name (both formats: displayName: and display-name:)
+      if (trimmed.startsWith('displayName:') || trimmed.startsWith('display-name:')) {
+        const value = trimmed.replace(/display-?Name:/i, '').trim().replace(/['"]/g, '');
+        result.agent.displayName = value;
+        continue;
+      }
 
-    // Brand name
-    if (trimmed.startsWith('brand-name:')) {
-      result.agent.brandName = trimmed.replace('brand-name:', '').trim().replace(/['"]/g, '');
-      continue;
+      // Brand name (both formats: brandName: and brand-name:)
+      if (trimmed.startsWith('brandName:') || trimmed.startsWith('brand-name:')) {
+        const value = trimmed.replace(/brand-?Name:/i, '').trim().replace(/['"]/g, '');
+        result.agent.brandName = value;
+        continue;
+      }
+
+      // Skip nested agent config sections for now (agentConfig, agentDefaults)
+      if (trimmed.startsWith('agentConfig ') || trimmed.startsWith('agentDefaults ')) {
+        continue;
+      }
     }
 
     // Flow section
