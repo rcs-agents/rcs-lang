@@ -37,21 +37,21 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const path = __importStar(require("node:path"));
 const fs = __importStar(require("node:fs"));
-const cp = __importStar(require("node:child_process"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
 const previewProvider_1 = require("./previewProvider");
 const previewPanelProvider_1 = require("./previewPanelProvider");
 const interactiveDiagramProvider_1 = require("./interactiveDiagramProvider");
 const compilationService_1 = require("./compilationService");
+const utils_1 = require("./utils");
 let client;
 let statusBarItem;
 let compilationService;
 function activate(context) {
     console.log('RCL Language Server extension is now active!');
     // Get build hash from environment or generate a default
-    const buildHash = getBuildHash();
-    const version = getExtensionVersion(context);
+    const buildHash = (0, utils_1.getBuildHash)();
+    const version = (0, utils_1.getExtensionVersion)(context);
     // Create and show status bar item with version info
     statusBarItem = vscode_1.window.createStatusBarItem(vscode_1.StatusBarAlignment.Right, 100);
     statusBarItem.text = `RCL ${version} (${buildHash})`;
@@ -417,27 +417,6 @@ export default {
   getFlow
 };
 `;
-}
-function getBuildHash() {
-    try {
-        // Try to get git commit hash
-        const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
-        return result;
-    }
-    catch {
-        // Fallback to a timestamp-based hash if git is not available
-        const timestamp = Date.now().toString(36);
-        return timestamp.substring(timestamp.length - 4);
-    }
-}
-function getExtensionVersion(context) {
-    try {
-        const packageJson = JSON.parse(fs.readFileSync(path.join(context.extensionPath, 'package.json'), 'utf8'));
-        return packageJson.version || '0.0.0';
-    }
-    catch {
-        return '0.0.0';
-    }
 }
 async function showPreviewInPanel(context, uri) {
     let targetUri;
