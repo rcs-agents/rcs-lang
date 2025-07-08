@@ -227,10 +227,40 @@ export class InteractiveDiagramProvider {
     const visited = new Set<string>();
     const levels: string[][] = [];
     
-    // Start from initial state
-    const initial = flow.initial || 'start';
-    if (flow.states[initial]) {
-      this._traverseFlow(initial, flow.states, 0, levels, visited);
+    // Find the actual starting state - prefer :start over start if it has transitions
+    let startingState = flow.initial || 'start';
+    if (flow.states[':start'] && flow.states[':start'].on && Object.keys(flow.states[':start'].on).length > 0) {
+      startingState = ':start';
+    } else if (flow.states['start'] && flow.states['start'].on && Object.keys(flow.states['start'].on).length > 0) {
+      startingState = 'start';
+    } else {
+      // Find any state with transitions as fallback
+      for (const [stateId, state] of Object.entries(flow.states)) {
+        if ((state as any)?.on && Object.keys((state as any).on).length > 0) {
+          startingState = stateId;
+          break;
+        }
+      }
+    }
+    
+    if (flow.states[startingState]) {
+      this._traverseFlow(startingState, flow.states, 0, levels, visited);
+    }
+    
+    // Add any disconnected states that have transitions (to ensure all referenced states are included)
+    const allStates = Object.keys(flow.states);
+    const unvisitedStates = allStates.filter(stateId => !visited.has(stateId));
+    
+    for (const stateId of unvisitedStates) {
+      const state = flow.states[stateId];
+      // Include states that have outgoing transitions or are referenced by other states
+      if (state?.on && Object.keys(state.on).length > 0) {
+        if (!levels[levels.length]) {
+          levels[levels.length] = [];
+        }
+        levels[levels.length - 1].push(stateId);
+        visited.add(stateId);
+      }
     }
     
     // Position nodes hierarchically
@@ -247,9 +277,9 @@ export class InteractiveDiagramProvider {
         const state = flow.states[nodeId];
         let nodeType = 'message';
         
-        if (nodeId === initial || nodeId === 'start') {
+        if (nodeId === startingState || nodeId === 'start' || nodeId === ':start') {
           nodeType = 'start';
-        } else if (state?.type === 'final' || nodeId === 'end' || nodeId.includes('end')) {
+        } else if (state?.type === 'final' || nodeId === 'end' || nodeId === ':end' || nodeId.includes('end')) {
           nodeType = 'end';
         }
         
