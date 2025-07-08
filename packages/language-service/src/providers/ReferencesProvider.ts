@@ -133,7 +133,7 @@ export class ReferencesProvider {
    */
   private async findLocalReferences(document: TextDocument, symbol: string): Promise<Reference[]> {
     const content = document.getText();
-    const rclDocument = this.parser.parseDocument(content, document.uri);
+    const rclDocument = await this.parser.parseDocument(content, document.uri);
     const references: Reference[] = [];
 
     // Walk the AST to find all occurrences of the symbol
@@ -188,7 +188,7 @@ export class ReferencesProvider {
   private async findReferencesInFile(fileUri: string, symbol: string): Promise<Reference[]> {
     try {
       const content = fs.readFileSync(fileUri, 'utf-8');
-      const rclDocument = this.parser.parseDocument(content, fileUri);
+      const rclDocument = await this.parser.parseDocument(content, fileUri);
       const references: Reference[] = [];
 
       this.walkAST(rclDocument.ast, (node) => {

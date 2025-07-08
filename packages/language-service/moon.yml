@@ -1,0 +1,49 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+language: typescript
+
+tasks:
+  build:
+    command: npm run build
+    inputs:
+      - src/**/*
+      - tsconfig.json
+      - package.json
+    outputs:
+      - dist
+
+  dev:
+    command: npm run dev
+    inputs:
+      - src/**/*
+      - tsconfig.json
+
+  test:
+    command: npm test
+    inputs:
+      - src/**/*
+      - tests/**/*
+      - tsconfig.json
+      - package.json
+
+  typecheck:
+    command: npm run typecheck
+    inputs:
+      - src/**/*
+      - tsconfig.json
+
+  lint:
+    command: npm run lint
+    inputs:
+      - src/**/*
+
+  format:
+    command: npm run format
+    inputs:
+      - src/**/*
+
+  clean:
+    command: npm run clean
+
+dependsOn:
+  - parser

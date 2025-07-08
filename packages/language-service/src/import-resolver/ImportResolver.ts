@@ -61,7 +61,7 @@ export class ImportResolver {
   async extractImports(filePath: string): Promise<ImportStatement[]> {
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const document = this.parser.parseDocument(content, filePath);
+      const document = await this.parser.parseDocument(content, filePath);
       
       const imports: ImportStatement[] = [];
       
@@ -95,7 +95,7 @@ export class ImportResolver {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const document = this.parser.parseDocument(content, filePath);
+      const document = await this.parser.parseDocument(content, filePath);
       
       const exports: ExportedSymbol[] = [];
       

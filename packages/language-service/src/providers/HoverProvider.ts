@@ -176,7 +176,7 @@ export class HoverProvider {
     position: Position
   ): Promise<MarkupContent | null> {
     const content = document.getText();
-    const rclDocument = this.parser.parseDocument(content, document.uri);
+    const rclDocument = await this.parser.parseDocument(content, document.uri);
 
     // Find the symbol definition in the AST
     const definition = this.findSymbolDefinitionInAST(rclDocument.ast, symbol);
@@ -208,7 +208,7 @@ export class HoverProvider {
     try {
       // Parse the external file to get full definition context
       const externalContent = fs.readFileSync(symbolLoc.uri, 'utf-8');
-      const externalDocument = this.parser.parseDocument(externalContent, symbolLoc.uri);
+      const externalDocument = await this.parser.parseDocument(externalContent, symbolLoc.uri);
       
       const definition = this.findSymbolDefinitionInAST(externalDocument.ast, symbol);
       if (definition) {
