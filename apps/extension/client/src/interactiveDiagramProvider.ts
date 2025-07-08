@@ -58,9 +58,14 @@ export class InteractiveDiagramProvider {
     messages: {},
     agent: {},
   };
+  private _compilationService?: any;
 
   constructor(private readonly _extensionContext: vscode.ExtensionContext) {
     this._extensionUri = _extensionContext.extensionUri;
+  }
+
+  public setCompilationService(compilationService: any) {
+    this._compilationService = compilationService;
   }
 
   public async openInteractiveDiagram(document?: vscode.TextDocument) {
@@ -366,36 +371,20 @@ export class InteractiveDiagramProvider {
     data?: any;
     errors?: string[];
   }> {
-    const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
-    if (!workspaceFolder) {
-      return { success: false, errors: ['File must be within a workspace folder'] };
-    }
-
-    const cliPath = this._findRclCli(workspaceFolder.uri.fsPath);
-    if (!cliPath) {
-      return { success: false, errors: ['RCL CLI tool not found'] };
+    if (!this._compilationService) {
+      return { success: false, errors: ['Compilation service not initialized'] };
     }
 
     try {
-      // Create temporary file for compilation
-      const tempPath = path.join(require('os').tmpdir(), `rcl-interactive-${Date.now()}.rcl`);
-      const tempOutputPath = tempPath.replace('.rcl', '.json');
-
-      await fs.promises.writeFile(tempPath, document.getText(), 'utf-8');
-
-      const result = await this._runRclCli(cliPath, tempPath, tempOutputPath, 'json');
-
-      if (result.success) {
-        const compiledContent = await fs.promises.readFile(tempOutputPath, 'utf-8');
-        const compiledData = JSON.parse(compiledContent);
-
-        // Clean up temp files
-        fs.promises.unlink(tempPath).catch(() => {});
-        fs.promises.unlink(tempOutputPath).catch(() => {});
-
-        return { success: true, data: compiledData };
+      const result = await this._compilationService.compileFile(document.uri);
+      
+      if (result.success && result.data) {
+        return { success: true, data: result.data };
       } else {
-        return { success: false, errors: [result.error || 'Compilation failed'] };
+        return { 
+          success: false, 
+          errors: result.diagnostics.map((d: any) => d.message) 
+        };
       }
     } catch (error) {
       return {
@@ -405,47 +394,6 @@ export class InteractiveDiagramProvider {
     }
   }
 
-  private _findRclCli(workspacePath: string): string | null {
-    const possiblePaths = [
-      path.join(workspacePath, 'packages', 'cli', 'demo.js'),
-      path.join(workspacePath, '..', 'packages', 'cli', 'demo.js'),
-      path.join(workspacePath, '..', '..', 'packages', 'cli', 'demo.js'),
-      path.join(workspacePath, 'cli', 'demo.js'),
-      path.join(workspacePath, 'node_modules', '.bin', 'rcl-cli'),
-      path.join(workspacePath, 'node_modules', 'rcl-cli', 'cli', 'demo.js'),
-      path.join(workspacePath, '..', 'cli', 'demo.js'),
-      path.join(workspacePath, '..', '..', 'cli', 'demo.js'),
-    ];
-
-    for (const cliPath of possiblePaths) {
-      if (fs.existsSync(cliPath)) {
-        return cliPath;
-      }
-    }
-
-    return null;
-  }
-
-  private _runRclCli(
-    cliPath: string,
-    inputPath: string,
-    outputPath: string,
-    format: string = 'json',
-  ): Promise<{ success: boolean; error?: string }> {
-    return new Promise((resolve) => {
-      const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
-
-      cp.exec(command, (error, stdout, stderr) => {
-        if (error) {
-          resolve({ success: false, error: error.message });
-        } else if (stderr) {
-          resolve({ success: false, error: stderr });
-        } else {
-          resolve({ success: true });
-        }
-      });
-    });
-  }
 
   private _handleWebviewMessage(message: WebviewToExtensionMessage) {
     switch (message.type) {

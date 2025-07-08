@@ -38,6 +38,7 @@ export function activate(context: ExtensionContext) {
   // Create preview provider
   const previewProvider = new RCLPreviewProvider(context, compilationService);
   const interactiveDiagramProvider = new InteractiveDiagramProvider(context);
+  interactiveDiagramProvider.setCompilationService(compilationService);
 
   // Register webview view provider
   context.subscriptions.push(
