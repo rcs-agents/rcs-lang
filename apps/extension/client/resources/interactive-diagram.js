@@ -222,6 +222,13 @@
     }
 
     function handleModelUpdate(data) {
+        console.log('handleModelUpdate called with:', {
+            flows: Object.keys(data.flows || {}),
+            activeFlow: data.activeFlow,
+            messages: Object.keys(data.messages || {}),
+            agent: data.agent?.name
+        });
+        
         currentState = { ...currentState, ...data };
         
         updateFlowSelect();
@@ -255,12 +262,22 @@
     }
 
     function renderDiagram() {
+        console.log('renderDiagram called:', {
+            hasSvg: !!currentState.svg,
+            activeFlow: currentState.activeFlow,
+            flowExists: currentState.activeFlow && !!currentState.flows[currentState.activeFlow],
+            availableFlows: Object.keys(currentState.flows || {})
+        });
+        
         if (!currentState.svg || !currentState.activeFlow || !currentState.flows[currentState.activeFlow]) {
+            console.log('Skipping render: missing requirements');
             return;
         }
 
         const flow = currentState.flows[currentState.activeFlow];
         const svg = currentState.svg;
+        
+        console.log(`Rendering flow "${currentState.activeFlow}" with ${flow.nodes?.length || 0} nodes and ${flow.edges?.length || 0} edges`);
         
         // Clear existing content (except defs)
         const defs = svg.querySelector('defs');
