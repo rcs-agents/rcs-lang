@@ -621,3 +621,10 @@ body {
 .notification-close:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+/* Version Info */
+.version-info {
+  font-size: 11px;
+  opacity: 0.7;
+  margin: 0 8px;
+  font-family: monospace;
+}

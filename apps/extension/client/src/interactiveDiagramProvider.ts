@@ -698,6 +698,10 @@ export class InteractiveDiagramProvider {
       vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.js'),
     );
 
+    // Get version info
+    const version = this._getExtensionVersion();
+    const buildHash = this._getBuildHash();
+
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();
 
@@ -722,6 +726,7 @@ export class InteractiveDiagramProvider {
                     <select id="flowSelect" class="flow-select">
                         <option value="">Select Flow...</option>
                     </select>
+                    <span class="version-info">v${version} (${buildHash})</span>
                 </div>
                 <div class="toolbar-right">
                     <button id="addNodeBtn" class="toolbar-btn" title="Add Node">➕</button>
@@ -768,6 +773,29 @@ export class InteractiveDiagramProvider {
 
   public dispose() {
     this._dispose();
+  }
+
+  private _getExtensionVersion(): string {
+    try {
+      const packageJson = JSON.parse(
+        fs.readFileSync(path.join(this._extensionContext.extensionPath, 'package.json'), 'utf8')
+      );
+      return packageJson.version || '0.0.0';
+    } catch {
+      return '0.0.0';
+    }
+  }
+
+  private _getBuildHash(): string {
+    try {
+      // Try to get git commit hash
+      const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
+      return result;
+    } catch {
+      // Fallback to a timestamp-based hash if git is not available
+      const timestamp = Date.now().toString(36);
+      return timestamp.substring(timestamp.length - 4);
+    }
   }
 }
 

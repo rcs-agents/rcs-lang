@@ -43,8 +43,18 @@ const node_1 = require("vscode-languageclient/node");
 const previewProvider_1 = require("./previewProvider");
 const interactiveDiagramProvider_1 = require("./interactiveDiagramProvider");
 let client;
+let statusBarItem;
 function activate(context) {
     console.log('RCL Language Server extension is now active!');
+    // Get build hash from environment or generate a default
+    const buildHash = getBuildHash();
+    const version = getExtensionVersion(context);
+    // Create and show status bar item with version info
+    statusBarItem = vscode_1.window.createStatusBarItem(vscode_1.StatusBarAlignment.Right, 100);
+    statusBarItem.text = `RCL ${version} (${buildHash})`;
+    statusBarItem.tooltip = 'RCL Language Support version';
+    statusBarItem.show();
+    context.subscriptions.push(statusBarItem);
     // Create preview provider
     const previewProvider = new previewProvider_1.RCLPreviewProvider(context);
     const interactiveDiagramProvider = new interactiveDiagramProvider_1.InteractiveDiagramProvider(context);
@@ -373,5 +383,26 @@ function runRclCli(cliPath, inputPath, outputPath, format = 'js') {
             }
         });
     });
+}
+function getBuildHash() {
+    try {
+        // Try to get git commit hash
+        const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
+        return result;
+    }
+    catch {
+        // Fallback to a timestamp-based hash if git is not available
+        const timestamp = Date.now().toString(36);
+        return timestamp.substring(timestamp.length - 4);
+    }
+}
+function getExtensionVersion(context) {
+    try {
+        const packageJson = JSON.parse(fs.readFileSync(path.join(context.extensionPath, 'package.json'), 'utf8'));
+        return packageJson.version || '0.0.0';
+    }
+    catch {
+        return '0.0.0';
+    }
 }
 //# sourceMappingURL=extension.js.map
