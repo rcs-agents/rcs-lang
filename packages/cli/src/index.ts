@@ -16,7 +16,7 @@ program
   .description('Compile an RCL file to JavaScript/JSON')
   .option('-o, --output <file>', 'Output file path')
   .option('-f, --format <format>', 'Output format (js|json)', 'js')
-  .option('--pretty', 'Pretty print JSON output', false)
+  .option('--pretty', 'Pretty print JSON output', true)
   .action(async (input: string, options: any) => {
     try {
       await compileRCL(input, options);
