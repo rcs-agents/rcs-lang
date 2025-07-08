@@ -1,32 +1,37 @@
-agent "Customer Service Bot"
+agent CustomerServiceBot
   displayName: "Customer Service"
   brandName: "Your Company"
 
   agentConfig Config
     description: "I can help with your questions and orders."
-    logoUri: "<url>https://example.com/logo.png"
+    logoUri: <url https://example.com/logo.png>
     color: "#2563eb"
 
   flow MainFlow
-    :start -> welcome
-    welcome -> menu
-    menu -> help when $js> input.includes("help")
-    menu -> orders when $js> input.includes("order")
-    menu -> goodbye when $js> input.includes("bye")
-    help -> menu
-    orders -> menu
-    goodbye -> :end
+    :start -> Welcome
+    Welcome -> Menu
+    Menu -> Help
+    Menu -> Orders  
+    Menu -> Goodbye
+    Help -> Menu
+    Orders -> Menu
+    Goodbye -> :end
 
   messages Messages
-    text welcome "Hello! How can I help you today?"
+    text Welcome "Hello! How can I help you today?"
       reply "View Orders" "orders"
       reply "Get Help" "help"
       reply "End Chat" "bye"
 
-    text help "I can assist with orders, returns, and general questions."
+    text Menu "What would you like to do?"
+      reply "View Orders" "orders"
+      reply "Get Help" "help"
+      reply "End Chat" "bye"
+
+    text Help "I can assist with orders, returns, and general questions."
       reply "Back to Menu" "menu"
 
-    text orders "Here are your recent orders..."
+    text Orders "Here are your recent orders..."
       reply "Back to Menu" "menu"
 
-    text goodbye "Thank you for contacting us!"
+    text Goodbye "Thank you for contacting us!"
