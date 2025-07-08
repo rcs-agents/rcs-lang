@@ -221,11 +221,19 @@ export class AgentExtractor {
   }
 
   private extractAgentName(node: RCLNode): string | null {
-    // Look for the first identifier after 'agent' keyword
+    // Look for identifiers in order - skip the first one if it's 'agent'
     if (node.children) {
-      for (const child of node.children) {
-        if (child.type === 'identifier') {
-          return child.text || null;
+      const identifiers = node.children.filter(child => child.type === 'identifier');
+      
+      // If we have at least 2 identifiers and the first is 'agent', use the second
+      if (identifiers.length >= 2 && identifiers[0].text === 'agent') {
+        return identifiers[1].text || null;
+      }
+      
+      // Otherwise, if we have any identifier that's not 'agent', use it
+      for (const identifier of identifiers) {
+        if (identifier.text && identifier.text !== 'agent') {
+          return identifier.text;
         }
       }
     }
