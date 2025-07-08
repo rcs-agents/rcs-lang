@@ -198,7 +198,7 @@ export default {
 `;
 }
 
-function generateJSON(output, pretty = false) {
+function generateJSON(output, pretty = true) {
   return pretty ? JSON.stringify(output, null, 2) : JSON.stringify(output);
 }
 
@@ -226,7 +226,7 @@ function main() {
   const inputPath = args[0];
   let outputPath = null;
   let format = 'js';
-  let pretty = false;
+  let pretty = true;
 
   // Parse arguments
   for (let i = 1; i < args.length; i++) {
