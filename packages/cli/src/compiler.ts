@@ -64,6 +64,7 @@ export async function compileRCL(inputPath: string, options: CompileOptions): Pr
     for (const file of emitResult.emittedFiles) {
       console.log(chalk.gray(`  → ${path.relative(process.cwd(), file)}`));
     }
+    console.log(chalk.green('✓ Compilation successful'));
   }
 }
 
@@ -93,6 +94,9 @@ async function emitManual(
     await fs.promises.writeFile(jsPath, jsContent, 'utf-8');
     console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsPath)}`));
   }
+  
+  // Add the expected success message for tests
+  console.log(chalk.green('✓ Compilation successful'));
 }
 
 function generateJavaScript(data: any, baseName: string): string {

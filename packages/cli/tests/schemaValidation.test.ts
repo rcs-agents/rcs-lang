@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { MessageNormalizer } from '../src/normalizers/messageNormalizer';
+import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';
 import { TestUtils } from './testUtils';
 import { schemaValidator } from '../src/utils/parserWrapper';
 

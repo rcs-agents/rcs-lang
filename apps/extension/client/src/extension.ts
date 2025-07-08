@@ -182,12 +182,7 @@ async function showPreview(uri?: Uri, previewProvider?: RCLPreviewProvider): Pro
     try {
       await commands.executeCommand('rclPreview.focus');
     } catch {
-      // If the command doesn't exist, try to reveal the view
-      try {
-        await commands.executeCommand('workbench.view.extension.rclPreview');
-      } catch {
-        // Ignore if view cannot be focused
-      }
+      // Ignore if view cannot be focused
     }
 
     window.showInformationMessage('RCL Preview opened in Explorer sidebar');
