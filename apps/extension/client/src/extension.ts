@@ -11,9 +11,11 @@ import {
 import { RCLPreviewProvider } from './previewProvider';
 import { RCLPreviewPanelProvider } from './previewPanelProvider';
 import { InteractiveDiagramProvider } from './interactiveDiagramProvider';
+import { CompilationService } from './compilationService';
 
 let client: LanguageClient;
 let statusBarItem: StatusBarItem;
+let compilationService: CompilationService;
 
 export function activate(context: ExtensionContext) {
   console.log('RCL Language Server extension is now active!');
@@ -29,8 +31,12 @@ export function activate(context: ExtensionContext) {
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
+  // Create compilation service
+  compilationService = new CompilationService();
+  context.subscriptions.push(compilationService);
+
   // Create preview provider
-  const previewProvider = new RCLPreviewProvider(context);
+  const previewProvider = new RCLPreviewProvider(context, compilationService);
   const interactiveDiagramProvider = new InteractiveDiagramProvider(context);
 
   // Register webview view provider
@@ -210,19 +216,7 @@ async function showJSONOutput(uri?: Uri): Promise<void> {
     return;
   }
 
-  const workspaceFolder = workspace.getWorkspaceFolder(targetUri);
-  if (!workspaceFolder) {
-    window.showErrorMessage('File must be within a workspace folder');
-    return;
-  }
-
   try {
-    const cliPath = findRclCli(workspaceFolder.uri.fsPath);
-    if (!cliPath) {
-      window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
-      return;
-    }
-
     await window.withProgress(
       {
         location: { viewId: 'workbench.view.explorer' },
@@ -230,12 +224,17 @@ async function showJSONOutput(uri?: Uri): Promise<void> {
         cancellable: false,
       },
       async () => {
-        const rclFilePath = targetUri.fsPath;
-        const outputPath = rclFilePath.replace('.rcl', '.json');
+        // Compile using language service
+        const result = await compilationService.compileFile(targetUri);
 
-        const result = await runRclCli(cliPath, rclFilePath, outputPath, 'json');
+        if (result.success && result.data) {
+          const rclFilePath = targetUri.fsPath;
+          const outputPath = rclFilePath.replace('.rcl', '.json');
 
-        if (result.success) {
+          // Write JSON file
+          await fs.promises.writeFile(outputPath, JSON.stringify(result.data, null, 2), 'utf-8');
+
+          // Open the generated file
           const outputUri = Uri.file(outputPath);
           const document = await workspace.openTextDocument(outputUri);
           await window.showTextDocument(document, ViewColumn.Beside);
@@ -244,7 +243,8 @@ async function showJSONOutput(uri?: Uri): Promise<void> {
             `JSON output generated successfully: ${path.basename(outputPath)}`,
           );
         } else {
-          window.showErrorMessage(`Failed to compile RCL file: ${result.error}`);
+          const errors = result.diagnostics.filter(d => d.severity === 'error');
+          window.showErrorMessage(`Failed to compile RCL file: ${errors[0]?.message || 'Unknown error'}`);
         }
       },
     );
@@ -285,32 +285,50 @@ async function exportCompiled(uri?: Uri): Promise<void> {
     return; // User cancelled
   }
 
-  const workspaceFolder = workspace.getWorkspaceFolder(targetUri);
-  if (!workspaceFolder) {
-    window.showErrorMessage('File must be within a workspace folder');
-    return;
-  }
-
   try {
-    const cliPath = findRclCli(workspaceFolder.uri.fsPath);
-    if (!cliPath) {
-      window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
-      return;
-    }
+    await window.withProgress(
+      {
+        location: { viewId: 'workbench.view.explorer' },
+        title: `Exporting RCL to ${format.value.toUpperCase()}...`,
+        cancellable: false,
+      },
+      async () => {
+        // Compile using language service
+        const result = await compilationService.compileFile(targetUri);
 
-    const rclFilePath = targetUri.fsPath;
-    const extension = format.value === 'js' ? '.js' : '.json';
-    const outputPath = rclFilePath.replace('.rcl', extension);
-
-    const result = await runRclCli(cliPath, rclFilePath, outputPath, format.value);
-
-    if (result.success) {
-      window.showInformationMessage(
-        `Compiled output exported successfully: ${path.basename(outputPath)}`,
-      );
-    } else {
-      window.showErrorMessage(`Failed to export compiled output: ${result.error}`);
-    }
+        if (result.success && result.data) {
+          const rclFilePath = targetUri.fsPath;
+          const baseName = path.basename(rclFilePath, '.rcl');
+          
+          if (format.value === 'json') {
+            const outputPath = rclFilePath.replace('.rcl', '.json');
+            await fs.promises.writeFile(outputPath, JSON.stringify(result.data, null, 2), 'utf-8');
+            
+            window.showInformationMessage(
+              `JSON output exported successfully: ${path.basename(outputPath)}`,
+            );
+          } else {
+            // JavaScript format - write both JS and JSON
+            const jsPath = rclFilePath.replace('.rcl', '.js');
+            const jsonPath = rclFilePath.replace('.rcl', '.json');
+            
+            // Generate JavaScript content
+            const jsContent = generateJavaScript(result.data, baseName);
+            await fs.promises.writeFile(jsPath, jsContent, 'utf-8');
+            
+            // Also write JSON file
+            await fs.promises.writeFile(jsonPath, JSON.stringify(result.data, null, 2), 'utf-8');
+            
+            window.showInformationMessage(
+              `JavaScript output exported successfully: ${path.basename(jsPath)}`,
+            );
+          }
+        } else {
+          const errors = result.diagnostics.filter(d => d.severity === 'error');
+          window.showErrorMessage(`Failed to compile RCL file: ${errors[0]?.message || 'Unknown error'}`);
+        }
+      },
+    );
   } catch (error) {
     window.showErrorMessage(
       `Export failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -370,20 +388,7 @@ async function showAgentOutput(uri?: Uri): Promise<void> {
     return;
   }
 
-  const workspaceFolder = workspace.getWorkspaceFolder(targetUri);
-  if (!workspaceFolder) {
-    window.showErrorMessage('File must be within a workspace folder');
-    return;
-  }
-
   try {
-    // Find the CLI demo tool
-    const cliPath = findRclCli(workspaceFolder.uri.fsPath);
-    if (!cliPath) {
-      window.showErrorMessage('RCL CLI tool not found. Please ensure the RCL CLI is installed.');
-      return;
-    }
-
     // Show progress indicator
     await window.withProgress(
       {
@@ -392,13 +397,22 @@ async function showAgentOutput(uri?: Uri): Promise<void> {
         cancellable: false,
       },
       async () => {
-        const rclFilePath = targetUri.fsPath;
-        const outputPath = rclFilePath.replace('.rcl', '.js');
+        // Compile using language service
+        const result = await compilationService.compileFile(targetUri);
 
-        // Run the CLI tool
-        const result = await runRclCli(cliPath, rclFilePath, outputPath);
+        if (result.success && result.data) {
+          const rclFilePath = targetUri.fsPath;
+          const outputPath = rclFilePath.replace('.rcl', '.js');
+          const baseName = path.basename(outputPath, '.js');
 
-        if (result.success) {
+          // Generate JavaScript content
+          const jsContent = generateJavaScript(result.data, baseName);
+          await fs.promises.writeFile(outputPath, jsContent, 'utf-8');
+
+          // Also write JSON file
+          const jsonPath = outputPath.replace('.js', '.json');
+          await fs.promises.writeFile(jsonPath, JSON.stringify(result.data, null, 2), 'utf-8');
+
           // Open the generated file
           const outputUri = Uri.file(outputPath);
           const document = await workspace.openTextDocument(outputUri);
@@ -408,7 +422,8 @@ async function showAgentOutput(uri?: Uri): Promise<void> {
             `Agent output generated successfully: ${path.basename(outputPath)}`,
           );
         } else {
-          window.showErrorMessage(`Failed to compile RCL file: ${result.error}`);
+          const errors = result.diagnostics.filter(d => d.severity === 'error');
+          window.showErrorMessage(`Failed to compile RCL file: ${errors[0]?.message || 'Unknown error'}`);
         }
       },
     );
@@ -417,64 +432,50 @@ async function showAgentOutput(uri?: Uri): Promise<void> {
   }
 }
 
-function findRclCli(workspacePath: string): string | null {
-  // Look for the CLI tool in common locations
-  const possiblePaths = [
-    // Prefer the built TypeScript CLI
-    path.join(workspacePath, 'packages', 'cli', 'dist', 'index.js'),
-    path.join(workspacePath, '..', 'packages', 'cli', 'dist', 'index.js'),
-    path.join(workspacePath, '..', '..', 'packages', 'cli', 'dist', 'index.js'),
-    // Fallback to demo.js
-    path.join(workspacePath, 'packages', 'cli', 'demo.js'),
-    path.join(workspacePath, '..', 'packages', 'cli', 'demo.js'),
-    path.join(workspacePath, '..', '..', 'packages', 'cli', 'demo.js'),
-    // Legacy paths for backwards compatibility
-    path.join(workspacePath, 'cli', 'demo.js'),
-    path.join(workspacePath, 'node_modules', '.bin', 'rcl-cli'),
-    path.join(workspacePath, 'node_modules', 'rcl-cli', 'cli', 'demo.js'),
-    // Look in parent directories for mono-repo setups
-    path.join(workspacePath, '..', 'cli', 'demo.js'),
-    path.join(workspacePath, '..', '..', 'cli', 'demo.js'),
-  ];
 
-  for (const cliPath of possiblePaths) {
-    if (fs.existsSync(cliPath)) {
-      return cliPath;
-    }
-  }
+function generateJavaScript(data: any, baseName: string): string {
+  return `// Generated by RCL Extension
+// This file contains the compiled output from your RCL agent definition
 
-  return null;
+import agentData from './${baseName}.json' assert { type: 'json' };
+
+/**
+ * Messages dictionary - Maps message IDs to normalized AgentMessage objects
+ */
+export const messages = agentData.messages;
+
+/**
+ * Flow configurations - XState machine definitions for each flow
+ */
+export const flows = agentData.flows;
+
+/**
+ * Agent configuration
+ */
+export const agent = agentData.agent;
+
+/**
+ * Get a message by ID
+ */
+export function getMessage(messageId) {
+  return messages[messageId] || null;
 }
 
-function runRclCli(
-  cliPath: string,
-  inputPath: string,
-  outputPath: string,
-  format: string = 'js',
-): Promise<{ success: boolean; error?: string }> {
-  return new Promise((resolve) => {
-    let command: string;
-    
-    // Check if this is the TypeScript CLI or demo.js
-    if (cliPath.endsWith('dist/index.js')) {
-      // TypeScript CLI uses 'compile' command
-      command = `node "${cliPath}" compile "${inputPath}" -o "${outputPath}" --format ${format}`;
-    } else {
-      // demo.js uses direct arguments
-      command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
-    }
+/**
+ * Get a flow configuration by ID
+ */
+export function getFlow(flowId) {
+  return flows[flowId] || null;
+}
 
-    cp.exec(command, (error, _stdout, stderr) => {
-      if (error) {
-        resolve({ success: false, error: error.message });
-      } else if (stderr && !stderr.includes('Successfully loaded')) {
-        // Ignore the "Successfully loaded" message from the native parser
-        resolve({ success: false, error: stderr });
-      } else {
-        resolve({ success: true });
-      }
-    });
-  });
+export default {
+  messages,
+  flows,
+  agent,
+  getMessage,
+  getFlow
+};
+`;
 }
 
 function getBuildHash(): string {

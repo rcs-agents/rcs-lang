@@ -195,6 +195,7 @@
     "@vscode/vsce": "^3.0.0"
   },
   "dependencies": {
-    "@rcl/parser": "file:../../packages/parser"
+    "@rcl/parser": "file:../../packages/parser",
+    "@rcl/language-service": "file:../../packages/language-service"
   }
 }
