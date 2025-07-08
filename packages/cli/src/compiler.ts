@@ -1,80 +1,141 @@
-import fs from 'fs-extra';
-import path from 'node:path';
-import { RCLParser } from './utils/parserWrapper';
-import { MessageNormalizer } from './normalizers/messageNormalizer';
-import { FlowCompiler } from './compilers/flowCompiler';
-import { AgentExtractor } from './extractors/agentExtractor';
-import { OutputGenerator } from './generators/outputGenerator';
+import * as fs from 'fs';
+import * as path from 'path';
+import chalk from 'chalk';
+import { RclProgram } from '@rcl/language-service';
 
 export interface CompileOptions {
   output?: string;
-  format: 'js' | 'json';
+  format?: 'js' | 'json' | 'both';
   pretty?: boolean;
-}
-
-export interface CompiledOutput {
-  messages: Record<string, unknown>;
-  flows: Record<string, unknown>;
-  agent: unknown;
+  watch?: boolean;
+  configPath?: string;
 }
 
 export async function compileRCL(inputPath: string, options: CompileOptions): Promise<void> {
-  // Read the RCL file
-  const content = await fs.readFile(inputPath, 'utf-8');
-
-  // Parse the RCL file
-  const parser = new RCLParser();
-  const document = await parser.parseDocument(content, inputPath);
-
-  if (!document.ast) {
-    throw new Error('Failed to parse RCL file - no AST generated');
+  // Resolve input path
+  const resolvedInput = path.resolve(inputPath);
+  
+  if (!fs.existsSync(resolvedInput)) {
+    throw new Error(`Input file not found: ${inputPath}`);
   }
 
-  // Extract components
-  const messageNormalizer = new MessageNormalizer();
-  const flowCompiler = new FlowCompiler();
-  const agentExtractor = new AgentExtractor();
+  // Create RclProgram with optional config path
+  const program = new RclProgram(options.configPath || path.dirname(resolvedInput));
+  const config = program.getConfiguration();
 
-  // Process the AST
-  console.log('[DEBUG] Processing AST...');
-  console.log('[DEBUG] AST root type:', document.ast.type);
-  console.log('[DEBUG] AST children count:', document.ast.children?.length || 0);
+  console.log(chalk.blue('📋 Configuration:'));
+  console.log(chalk.gray(`  Root: ${config.rootDir || 'current directory'}`));
+  console.log(chalk.gray(`  Output: ${config.outDir || 'next to source files'}`));
+
+  // Compile the file
+  console.log(chalk.blue(`🔨 Compiling ${path.basename(inputPath)}...`));
   
-  // Add more detailed AST debugging
-  if (document.ast.children) {
-    console.log('[DEBUG] AST children types:', document.ast.children.map(c => c.type));
-    document.ast.children.forEach((child, idx) => {
-      console.log(`[DEBUG] Child ${idx}: type=${child.type}, text=${child.text?.substring(0, 50)}...`);
-      if (child.children) {
-        console.log(`[DEBUG]   - has ${child.children.length} children`);
+  const result = await program.compileFile(resolvedInput);
+  
+  if (!result.success) {
+    console.error(chalk.red('❌ Compilation failed:'));
+    for (const diagnostic of result.diagnostics) {
+      const prefix = diagnostic.severity === 'error' ? chalk.red('ERROR:') : chalk.yellow('WARNING:');
+      console.error(`  ${prefix} ${diagnostic.message}`);
+      if (diagnostic.file && diagnostic.line) {
+        console.error(chalk.gray(`    at ${diagnostic.file}:${diagnostic.line}:${diagnostic.column || 0}`));
       }
-    });
+    }
+    throw new Error('Compilation failed');
   }
-  
-  const messages = messageNormalizer.extractAndNormalize(document.ast);
-  console.log('[DEBUG] Extracted messages:', Object.keys(messages).length);
-  
-  const flows = flowCompiler.compileFlows(document.ast);
-  console.log('[DEBUG] Compiled flows:', Object.keys(flows).length);
-  
-  const agent = agentExtractor.extractAgentConfig(document.ast);
-  console.log('[DEBUG] Extracted agent:', agent?.name || 'none');
 
-  const output: CompiledOutput = {
-    messages,
-    flows,
-    agent,
-  };
+  // Check if we should override the output settings
+  if (options.output || options.format) {
+    // Manual output mode - emit to specific location
+    await emitManual(result.data!, resolvedInput, options);
+  } else {
+    // Use RclProgram's emit
+    const emitResult = await program.emit();
+    
+    if (!emitResult.success) {
+      console.error(chalk.red('❌ Emit failed:'));
+      for (const diagnostic of emitResult.diagnostics) {
+        console.error(`  ${diagnostic.message}`);
+      }
+      throw new Error('Emit failed');
+    }
 
-  // Generate output
-  const outputGenerator = new OutputGenerator();
-  const outputPath = options.output || generateOutputPath(inputPath, options.format);
-
-  await outputGenerator.generate(output, outputPath, options);
+    console.log(chalk.green('✅ Successfully compiled:'));
+    for (const file of emitResult.emittedFiles) {
+      console.log(chalk.gray(`  → ${path.relative(process.cwd(), file)}`));
+    }
+  }
 }
 
-function generateOutputPath(inputPath: string, format: string): string {
+async function emitManual(
+  compiledData: any,
+  inputPath: string,
+  options: CompileOptions
+): Promise<void> {
   const parsed = path.parse(inputPath);
-  const extension = format === 'js' ? '.js' : '.json';
-  return path.join(parsed.dir, `${parsed.name}${extension}`);
+  
+  if (options.format === 'both' || options.format === 'json' || !options.format) {
+    const jsonPath = options.output 
+      ? (options.output.endsWith('.json') ? options.output : `${options.output}.json`)
+      : path.join(parsed.dir, `${parsed.name}.json`);
+    
+    const jsonContent = JSON.stringify(compiledData, null, options.pretty ? 2 : 0);
+    await fs.promises.writeFile(jsonPath, jsonContent, 'utf-8');
+    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsonPath)}`));
+  }
+
+  if (options.format === 'both' || options.format === 'js') {
+    const jsPath = options.output 
+      ? (options.output.endsWith('.js') ? options.output : `${options.output}.js`)
+      : path.join(parsed.dir, `${parsed.name}.js`);
+    
+    const jsContent = generateJavaScript(compiledData, parsed.name);
+    await fs.promises.writeFile(jsPath, jsContent, 'utf-8');
+    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsPath)}`));
+  }
+}
+
+function generateJavaScript(data: any, baseName: string): string {
+  return `// Generated by RCL CLI
+// This file contains the compiled output from your RCL agent definition
+
+import agentData from './${baseName}.json' assert { type: 'json' };
+
+/**
+ * Messages dictionary - Maps message IDs to normalized AgentMessage objects
+ */
+export const messages = agentData.messages;
+
+/**
+ * Flow configurations - XState machine definitions for each flow
+ */
+export const flows = agentData.flows;
+
+/**
+ * Agent configuration
+ */
+export const agent = agentData.agent;
+
+/**
+ * Get a message by ID
+ */
+export function getMessage(messageId) {
+  return messages[messageId] || null;
+}
+
+/**
+ * Get a flow configuration by ID
+ */
+export function getFlow(flowId) {
+  return flows[flowId] || null;
+}
+
+export default {
+  messages,
+  flows,
+  agent,
+  getMessage,
+  getFlow
+};
+`;
 }
