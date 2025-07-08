@@ -1,1 +1,113 @@
-{"messages":{"Planning":{"contentMessage":{"text":"What kind of trip are you planning?"},"messageTrafficType":"TRANSACTION"}},"flows":{"MainFlow":{"id":"MainFlow","initial":"start","states":{"start":{"on":{}},"end":{"type":"final"},":start":{"on":{"NEXT":"Welcome"}},"Welcome":{"on":{"NEXT":"Planning"}},"Planning":{"on":{"NEXT":"Packages"}},"Destinations":{"on":{"NEXT":"Planning"}},"Booking":{"on":{"NEXT":"Payment"}},"Packages":{"on":{"NEXT":"Details"}},"Payment":{"on":{"NEXT":"Confirmation"}},"Confirmation":{"on":{"NEXT":":end"}},"Details":{"on":{"NEXT":"Booking"}},":end":{"on":{}}}},"SupportFlow":{"id":"SupportFlow","initial":"start","states":{"start":{"on":{}},"end":{"type":"final"},":start":{"on":{"NEXT":"SupportWelcome"}},"SupportWelcome":{"on":{"NEXT":"FAQ"}},"FAQ":{"on":{"NEXT":"AgentTransfer when $js> !faq_resolved"}},"AgentTransfer when $js> !faq_resolved":{"on":{}},"AgentTransfer":{"on":{"NEXT":":end"}},":end":{"on":{}}}}},"agent":{"name":"TravelAssistant"}}
+{
+  "messages": {
+    "Planning": {
+      "contentMessage": {
+        "text": "What kind of trip are you planning?"
+      },
+      "messageTrafficType": "TRANSACTION"
+    }
+  },
+  "flows": {
+    "MainFlow": {
+      "id": "MainFlow",
+      "initial": "start",
+      "states": {
+        "start": {
+          "on": {}
+        },
+        "end": {
+          "type": "final"
+        },
+        ":start": {
+          "on": {
+            "NEXT": "Welcome"
+          }
+        },
+        "Welcome": {
+          "on": {
+            "NEXT": "Planning"
+          }
+        },
+        "Planning": {
+          "on": {
+            "NEXT": "Packages"
+          }
+        },
+        "Destinations": {
+          "on": {
+            "NEXT": "Planning"
+          }
+        },
+        "Booking": {
+          "on": {
+            "NEXT": "Payment"
+          }
+        },
+        "Packages": {
+          "on": {
+            "NEXT": "Details"
+          }
+        },
+        "Payment": {
+          "on": {
+            "NEXT": "Confirmation"
+          }
+        },
+        "Confirmation": {
+          "on": {
+            "NEXT": ":end"
+          }
+        },
+        "Details": {
+          "on": {
+            "NEXT": "Booking"
+          }
+        },
+        ":end": {
+          "on": {}
+        }
+      }
+    },
+    "SupportFlow": {
+      "id": "SupportFlow",
+      "initial": "start",
+      "states": {
+        "start": {
+          "on": {}
+        },
+        "end": {
+          "type": "final"
+        },
+        ":start": {
+          "on": {
+            "NEXT": "SupportWelcome"
+          }
+        },
+        "SupportWelcome": {
+          "on": {
+            "NEXT": "FAQ"
+          }
+        },
+        "FAQ": {
+          "on": {
+            "NEXT": "AgentTransfer when $js> !faq_resolved"
+          }
+        },
+        "AgentTransfer when $js> !faq_resolved": {
+          "on": {}
+        },
+        "AgentTransfer": {
+          "on": {
+            "NEXT": ":end"
+          }
+        },
+        ":end": {
+          "on": {}
+        }
+      }
+    }
+  },
+  "agent": {
+    "name": "TravelAssistant"
+  }
+}

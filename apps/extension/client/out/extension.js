@@ -349,7 +349,11 @@ async function showAgentOutput(uri) {
 function findRclCli(workspacePath) {
     // Look for the CLI tool in common locations
     const possiblePaths = [
-        // New monorepo structure
+        // Prefer the built TypeScript CLI
+        path.join(workspacePath, 'packages', 'cli', 'dist', 'index.js'),
+        path.join(workspacePath, '..', 'packages', 'cli', 'dist', 'index.js'),
+        path.join(workspacePath, '..', '..', 'packages', 'cli', 'dist', 'index.js'),
+        // Fallback to demo.js
         path.join(workspacePath, 'packages', 'cli', 'demo.js'),
         path.join(workspacePath, '..', 'packages', 'cli', 'demo.js'),
         path.join(workspacePath, '..', '..', 'packages', 'cli', 'demo.js'),
@@ -370,12 +374,22 @@ function findRclCli(workspacePath) {
 }
 function runRclCli(cliPath, inputPath, outputPath, format = 'js') {
     return new Promise((resolve) => {
-        const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
+        let command;
+        // Check if this is the TypeScript CLI or demo.js
+        if (cliPath.endsWith('dist/index.js')) {
+            // TypeScript CLI uses 'compile' command
+            command = `node "${cliPath}" compile "${inputPath}" -o "${outputPath}" --format ${format}`;
+        }
+        else {
+            // demo.js uses direct arguments
+            command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
+        }
         cp.exec(command, (error, _stdout, stderr) => {
             if (error) {
                 resolve({ success: false, error: error.message });
             }
-            else if (stderr) {
+            else if (stderr && !stderr.includes('Successfully loaded')) {
+                // Ignore the "Successfully loaded" message from the native parser
                 resolve({ success: false, error: stderr });
             }
             else {
