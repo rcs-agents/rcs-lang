@@ -9,6 +9,9 @@ export * from './rclTypes';
 // Validation exports
 export * from './validation';
 
+// AST helper exports
+export * from './ast';
+
 // Legacy parse function for backward compatibility
 import { MockParser } from './mockParser';
 
