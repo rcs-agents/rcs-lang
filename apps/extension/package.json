@@ -54,6 +54,11 @@
         "category": "RCL"
       },
       {
+        "command": "rcl.showPreviewPanel",
+        "title": "Show Preview in Panel",
+        "category": "RCL"
+      },
+      {
         "command": "rcl.showJSONOutput",
         "title": "Show JSON Output",
         "category": "RCL"
