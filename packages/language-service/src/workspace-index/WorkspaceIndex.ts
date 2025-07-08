@@ -245,7 +245,7 @@ export class WorkspaceIndex {
    * Parse a document and extract symbols
    */
   private async parseDocument(uri: string, content: string): Promise<RCLDocument> {
-    const document = this.parser.parseDocument(content, uri);
+    const document = await this.parser.parseDocument(content, uri);
     const symbols = await this.importResolver.getExports(uri);
     const imports = await this.importResolver.extractImports(uri);
     

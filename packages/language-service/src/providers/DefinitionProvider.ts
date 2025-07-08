@@ -124,7 +124,7 @@ export class DefinitionProvider {
     position: Position
   ): Promise<Definition | null> {
     const content = document.getText();
-    const rclDocument = this.parser.parseDocument(content, document.uri);
+    const rclDocument = await this.parser.parseDocument(content, document.uri);
 
     // Look for symbol definitions in the AST
     const definition = this.findSymbolDefinitionInAST(rclDocument.ast, symbol);
