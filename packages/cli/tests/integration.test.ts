@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { MessageNormalizer } from '../src/normalizers/messageNormalizer';
-import { AgentExtractor } from '../src/extractors/agentExtractor';
-import { FlowCompiler } from '../src/compilers/flowCompiler';
+import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';
+import { AgentExtractor } from '../src/legacy/extractors/agentExtractor';
+import { FlowCompiler } from '../src/legacy/compilers/flowCompiler';
 
 // Note: This test file uses mock AST structures instead of real parser
 // No conditional import needed as it doesn't directly use tree-sitter

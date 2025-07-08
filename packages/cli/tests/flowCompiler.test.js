@@ -1,4 +1,4 @@
-const { FlowCompiler } = require('../dist/compilers/flowCompiler');
+const { FlowCompiler } = require('../src/legacy/compilers/flowCompiler');
 
 describe('FlowCompiler', () => {
   let compiler;

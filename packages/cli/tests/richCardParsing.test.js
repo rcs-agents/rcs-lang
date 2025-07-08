@@ -3,7 +3,7 @@ let MessageNormalizer;
 let parserAvailable = true;
 
 try {
-  MessageNormalizer = require('../dist/normalizers/messageNormalizer').MessageNormalizer;
+  MessageNormalizer = require('../src/legacy/normalizers/messageNormalizer').MessageNormalizer;
 } catch (error) {
   console.warn('Skipping Rich Card Parsing tests due to missing tree-sitter dependencies:', error);
   parserAvailable = false;

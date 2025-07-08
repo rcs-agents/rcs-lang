@@ -1,4 +1,4 @@
-import { MessageNormalizer, AgentMessage, MessageTrafficType } from '../../src/normalizers/messageNormalizer';
+import { MessageNormalizer, AgentMessage, MessageTrafficType } from '../../src/legacy/normalizers/messageNormalizer';
 import { TestUtils } from '../testUtils';
 
 // Conditional import for tree-sitter dependency
