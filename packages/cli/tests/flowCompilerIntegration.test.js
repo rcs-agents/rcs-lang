@@ -1,4 +1,4 @@
-const { FlowCompiler } = require('../dist/compilers/flowCompiler');
+const { FlowCompiler } = require('../src/legacy/compilers/flowCompiler');
 
 // Conditional import for tree-sitter dependency
 let parse;
