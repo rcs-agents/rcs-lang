@@ -1,5 +1,0 @@
-agent GreetingBot
-  displayName: "Greeting Bot"
-  messages Messages
-    text hello: "Hello! How can I help you today?"
-    text goodbye: "Goodbye! Have a great day!"
