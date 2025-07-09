@@ -1,0 +1,19 @@
+{
+  "name": "@rcl/core-interfaces",
+  "version": "1.0.0",
+  "description": "Core interfaces for RCL language infrastructure",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rcl/core-types": "file:../core-types"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
