@@ -16,6 +16,9 @@ export * from './ast';
 // Parse result helpers
 export * from './parseResult';
 
+// Parser factory
+export * from './factory';
+
 // Legacy parse function - now uses the real parser with proper error handling
 import { RCLParser } from './rclParser';
 import { DiagnosticCollectionImpl } from '@rcl/core-types';
