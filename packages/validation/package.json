@@ -1,0 +1,23 @@
+{
+  "name": "@rcl/validation",
+  "version": "1.0.0",
+  "description": "Validation pipeline for RCL language",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@rcl/core-types": "file:../core-types",
+    "@rcl/core-interfaces": "file:../core-interfaces"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
+  }
+}
