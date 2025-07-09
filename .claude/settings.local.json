@@ -16,7 +16,11 @@
       "Bash(mv:*)",
       "Bash(grep:*)",
       "Bash(npm test)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
