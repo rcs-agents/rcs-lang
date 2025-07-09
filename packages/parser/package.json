@@ -50,6 +50,7 @@
     "grammar:validate": "echo 'Validating modular grammar structure...' && node -e 'const modules = [\"lexical\", \"values\", \"collections\", \"agent\", \"flows\", \"messages\", \"rich_cards\"]; modules.forEach(m => require(`./grammar/${m}.js`)); console.log(\"✓ Grammar modules loaded successfully\")'"
   },
   "dependencies": {
+    "@rcl/core-types": "file:../core-types",
     "node-addon-api": "^8.2.1",
     "node-gyp-build": "^4.8.4",
     "tree-sitter": "^0.25.0",
