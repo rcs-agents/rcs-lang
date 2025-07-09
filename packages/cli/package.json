@@ -28,8 +28,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/parser": "file:../parser",
-    "@rcl/language-service": "file:../language-service",
+    "@rcl/core-types": "file:../core-types",
+    "@rcl/core-interfaces": "file:../core-interfaces",
+    "@rcl/compiler": "file:../compiler",
+    "@rcl/file-system": "file:../file-system",
     "commander": "^12.0.0",
     "chalk": "^4.1.2",
     "fs-extra": "^11.0.0",
