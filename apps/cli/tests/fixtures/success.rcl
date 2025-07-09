@@ -1,0 +1,13 @@
+
+agent SuccessAgent
+  displayName: "Success Test"
+  
+  flow MainFlow
+    start: Start
+    
+    on Start
+      match @reply.text
+        :default -> Start
+  
+  messages Messages
+    text Start "Ready to help!"

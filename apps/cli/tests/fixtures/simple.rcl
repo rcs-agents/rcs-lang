@@ -1,0 +1,28 @@
+agent TestAgent
+  displayName: "Test Agent"
+  brandName: "Test Brand"
+  start: MainFlow
+
+config
+  description: "A test agent for unit testing"
+  logoUri: <url https://example.com/logo.png>
+  color: "#0066B1"
+
+flow MainFlow
+  start: Welcome
+
+  on Welcome
+    message Welcome
+    match @reply.text
+      "confirm" -> Confirm
+      :default -> Welcome
+
+  on Confirm
+    message Confirm
+
+messages Messages
+  text Welcome "Welcome to our service!"
+    suggestions
+      reply "confirm"
+
+  text Confirm "Please confirm your action"

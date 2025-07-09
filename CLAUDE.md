@@ -9,16 +9,19 @@ This is a TypeScript monorepo for RCL (Rich Communication Language) - a domain-s
 ## Architecture
 
 ### Monorepo Structure
-- **packages/parser** - Tree-sitter grammar and parser with TypeScript AST utilities
+- **packages/parser** - ANTLR4-based grammar and parser for RCL (PRIMARY PARSER)
+- **packages/parser** - Legacy Tree-sitter parser (DEPRECATED - DO NOT USE)
+- **packages/compiler** - Modern compilation pipeline using ANTLR AST
 - **packages/cli** - Command-line compiler for RCL files
 - **packages/language-service** - Advanced language service providers
 - **apps/extension** - VSCode extension with full language support
+- **apps/ide** - Web-based RCS Agent Studio for non-technical users
 
 ### Build System
 - **Moon** - Task orchestration across the monorepo
 - **Npm** - Package manager
 - **Node** AND **Web** - Runtime
-- **Tree-sitter** - Parser generator for the RCL grammar
+- **ANTLR4** - Parser generator for the RCL grammar (replaced Tree-sitter)
 
 ## Essential Commands
 
@@ -33,7 +36,13 @@ moon run parser:build
 moon run cli:build
 moon run extension:build
 
-# Parser-specific builds
+# ANTLR Parser builds (requires Java 17+)
+cd packages/parser
+nr check-generated  # Check if parser is already generated
+nr build           # Full build (requires Java)
+nr build:ts-only   # Build TypeScript only (if generated files exist)
+
+# Legacy Tree-sitter Parser (DEPRECATED)
 cd packages/parser
 nr build-grammar    # Generate tree-sitter parser
 nr build-wasm      # Build WebAssembly version
@@ -86,12 +95,21 @@ moon run :clean
 
 ## Key Technical Details
 
-### Parser Package
-- Uses Tree-sitter for parsing RCL syntax
-- Generates both WASM and native bindings
-- Grammar defined in `packages/parser/grammar.js`
-- TypeScript AST utilities in `packages/parser/src/ast/`
+### Parser Package (ANTLR - Current)
+- Uses ANTLR4 for parsing RCL syntax
+- Grammar defined in `packages/parser/src/RclParser.g4` and `packages/parser/src/RclLexer.g4`
+- **REQUIRES JAVA 17+** to build parser from grammar files
+- Generated parser in `packages/parser/src/generated/`
+- AST wrapper and adapter in `packages/parser/src/`
 - Test files use `.rcl` extension for RCL code samples
+- Build check: `cd packages/parser && bun run check-generated`
+- Java install help: `cd packages/parser && ./install-java.sh`
+
+### Compiler Package
+- Modern compilation pipeline using ANTLR AST
+- Stages: Parse → Validate → Transform → Generate
+- JavaScript generator for XState output
+- Located in `packages/compiler/`
 
 ### CLI Package
 - Executable: `rcl` or `rcl-cli`
@@ -184,9 +202,10 @@ to ensure there are no integration issues. If there are issues, run plan-code-te
 - **Required Elements**: `displayName`, at least one `flow`, `messages Messages`
 
 ### Parser Architecture & Grammar
-- **Modular Grammar**: Split into feature files (`agent.js`, `flows.js`, `messages.js`, etc.)
-- **Tree-sitter**: External scanner handles Python-like indentation (INDENT/DEDENT tokens)
-- **Build Process**: `npm run build-grammar` → `npm run build-ts` for full rebuild
+- **ANTLR4 Grammar**: Defined in `RclParser.g4` and `RclLexer.g4`
+- **Lexer Modes**: Handles indentation via lexer modes and custom base class
+- **AST Generation**: ANTLR generates typed AST nodes with visitor/listener patterns
+- **Build Process**: ANTLR4 generates TypeScript parser code
 - **Testing**: Use simple examples first, complex features need advanced grammar work
 
 ### Extension Output Generation

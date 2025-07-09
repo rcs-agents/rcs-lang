@@ -1,7 +1,7 @@
-import { RCLParser } from '@rcl/parser';
-import { ImportResolver } from '../import-resolver';
-import { WorkspaceIndex } from '../workspace-index';
+import type { IParser } from '@rcl/core';
+import type { ImportResolver } from '../import-resolver';
 import { SymbolType } from '../import-resolver/types';
+import type { WorkspaceIndex } from '../workspace-index';
 
 /**
  * Represents a definition location
@@ -20,21 +20,17 @@ export interface Definition {
   symbolName?: string;
 }
 
-import { TextDocument, Position } from './types';
+import type { Position, TextDocument } from './types';
 
 /**
  * Provides "Go to Definition" functionality for RCL files
  */
 export class DefinitionProvider {
-  private parser: RCLParser;
+  private parser: IParser;
   private importResolver: ImportResolver;
   private workspaceIndex: WorkspaceIndex;
 
-  constructor(
-    parser: RCLParser,
-    importResolver: ImportResolver,
-    workspaceIndex: WorkspaceIndex
-  ) {
+  constructor(parser: IParser, importResolver: ImportResolver, workspaceIndex: WorkspaceIndex) {
     this.parser = parser;
     this.importResolver = importResolver;
     this.workspaceIndex = workspaceIndex;
@@ -43,10 +39,7 @@ export class DefinitionProvider {
   /**
    * Provide definition for a symbol at the given position
    */
-  async provideDefinition(
-    document: TextDocument,
-    position: Position
-  ): Promise<Definition | null> {
+  async provideDefinition(document: TextDocument, position: Position): Promise<Definition | null> {
     try {
       const symbol = this.getSymbolAtPosition(document, position);
       if (!symbol) {
@@ -74,7 +67,7 @@ export class DefinitionProvider {
   private getSymbolAtPosition(document: TextDocument, position: Position): string | null {
     const content = document.getText();
     const lines = content.split('\n');
-    
+
     // Validate position
     if (position.line < 0 || position.line >= lines.length) {
       return null;
@@ -121,10 +114,14 @@ export class DefinitionProvider {
   private async findLocalDefinition(
     document: TextDocument,
     symbol: string,
-    position: Position
+    position: Position,
   ): Promise<Definition | null> {
     const content = document.getText();
-    const rclDocument = await this.parser.parseDocument(content, document.uri);
+    const parseResult = await this.parser.parse(content, document.uri);
+    if (!parseResult.success) {
+      return null;
+    }
+    const rclDocument = parseResult.value;
 
     // Look for symbol definitions in the AST
     const definition = this.findSymbolDefinitionInAST(rclDocument.ast, symbol);
@@ -133,7 +130,7 @@ export class DefinitionProvider {
         uri: document.uri,
         range: definition.range,
         symbolType: definition.symbolType,
-        symbolName: symbol
+        symbolName: symbol,
       };
     }
 
@@ -149,7 +146,10 @@ export class DefinitionProvider {
   /**
    * Find symbol definition in AST
    */
-  private findSymbolDefinitionInAST(ast: any, symbol: string): { range: any; symbolType: SymbolType } | null {
+  private findSymbolDefinitionInAST(
+    ast: any,
+    symbol: string,
+  ): { range: any; symbolType: SymbolType } | null {
     if (!ast) return null;
 
     const definitions: { range: any; symbolType: SymbolType }[] = [];
@@ -160,7 +160,7 @@ export class DefinitionProvider {
         if (nodeName === symbol) {
           definitions.push({
             range: this.nodeToRange(node),
-            symbolType: this.nodeTypeToSymbolType(node.type)
+            symbolType: this.nodeTypeToSymbolType(node.type),
           });
         }
       }
@@ -193,8 +193,11 @@ export class DefinitionProvider {
 
     // Look for state definitions within the flow
     this.walkAST(flowContext, (node) => {
-      if (node.type === 'property' && node.name && 
-          (node.name === symbol || node.name.trim() === symbol)) {
+      if (
+        node.type === 'property' &&
+        node.name &&
+        (node.name === symbol || node.name.trim() === symbol)
+      ) {
         targetStateDefinition = node;
       }
     });
@@ -204,7 +207,7 @@ export class DefinitionProvider {
         uri: '', // Will be filled by caller
         range: this.nodeToRange(targetStateDefinition),
         symbolType: SymbolType.Property,
-        symbolName: symbol
+        symbolName: symbol,
       };
     }
 
@@ -216,14 +219,14 @@ export class DefinitionProvider {
    */
   private async findImportedDefinition(
     document: TextDocument,
-    symbol: string
+    symbol: string,
   ): Promise<Definition | null> {
     // Get all symbols from workspace index
     const symbolLocations = this.workspaceIndex.findSymbol(symbol);
-    
+
     // Filter out the current file
-    const externalSymbols = symbolLocations.filter(loc => loc.uri !== document.uri);
-    
+    const externalSymbols = symbolLocations.filter((loc) => loc.uri !== document.uri);
+
     if (externalSymbols.length > 0) {
       // Return the first external definition found
       const symbolLoc = externalSymbols[0];
@@ -231,7 +234,7 @@ export class DefinitionProvider {
         uri: symbolLoc.uri,
         range: symbolLoc.symbol.range,
         symbolType: symbolLoc.symbol.type,
-        symbolName: symbol
+        symbolName: symbol,
       };
     }
 
@@ -242,12 +245,9 @@ export class DefinitionProvider {
    * Check if a node represents a definition
    */
   private isDefinitionNode(node: any): boolean {
-    return [
-      'agent_definition',
-      'flow_definition', 
-      'message_definition',
-      'property'
-    ].includes(node.type);
+    return ['agent_definition', 'flow_definition', 'message_definition', 'property'].includes(
+      node.type,
+    );
   }
 
   /**
@@ -274,11 +274,16 @@ export class DefinitionProvider {
    */
   private nodeTypeToSymbolType(nodeType: string): SymbolType {
     switch (nodeType) {
-      case 'agent_definition': return SymbolType.Agent;
-      case 'flow_definition': return SymbolType.Flow;
-      case 'message_definition': return SymbolType.Message;
-      case 'property': return SymbolType.Property;
-      default: return SymbolType.Property;
+      case 'agent_definition':
+        return SymbolType.Agent;
+      case 'flow_definition':
+        return SymbolType.Flow;
+      case 'message_definition':
+        return SymbolType.Message;
+      case 'property':
+        return SymbolType.Property;
+      default:
+        return SymbolType.Property;
     }
   }
 
@@ -289,12 +294,12 @@ export class DefinitionProvider {
     return {
       start: {
         line: node.startPosition?.row || 0,
-        character: node.startPosition?.column || 0
+        character: node.startPosition?.column || 0,
       },
       end: {
         line: node.endPosition?.row || 0,
-        character: node.endPosition?.column || 0
-      }
+        character: node.endPosition?.column || 0,
+      },
     };
   }
 
@@ -305,15 +310,15 @@ export class DefinitionProvider {
     if (position.line < range.start.line || position.line > range.end.line) {
       return false;
     }
-    
+
     if (position.line === range.start.line && position.character < range.start.character) {
       return false;
     }
-    
+
     if (position.line === range.end.line && position.character > range.end.character) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -322,9 +327,9 @@ export class DefinitionProvider {
    */
   private walkAST(node: any, callback: (node: any) => void): void {
     if (!node) return;
-    
+
     callback(node);
-    
+
     if (node.children && Array.isArray(node.children)) {
       for (const child of node.children) {
         this.walkAST(child, callback);

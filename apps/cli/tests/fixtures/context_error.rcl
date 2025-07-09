@@ -1,0 +1,10 @@
+
+agent TestAgent
+  displayName: "Test"
+  
+  flow BadFlow
+    start: Start
+    
+    on Start
+      # Missing match section - should provide helpful error
+      "hello" -> Start

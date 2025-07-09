@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run build:ts",
+    "build": "nr build:ts",
     "build:ts": "tsc",
     "compile": "tsc",
     "dev": "tsc --watch",
@@ -17,9 +17,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/cli": "file:packages/cli",
-    "@rcl/parser": "file:../parser",
-    "tree-sitter": "^0.21.1"
+    "@rcl/parser": "workspace:*",
+    "@rcl/compiler": "workspace:*",
+    "@rcl/core": "workspace:*",
+    "@rcl/validation": "workspace:*",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "tree-sitter": "^0.21.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11",
+    "vscode-uri": "^3.0.8"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -27,7 +34,5 @@
     "typescript": "^5.0.0",
     "vitest": "^3.2.4"
   },
-  "files": [
-    "dist/**/*"
-  ]
+  "files": ["dist/**/*"]
 }

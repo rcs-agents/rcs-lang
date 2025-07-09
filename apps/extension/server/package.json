@@ -17,7 +17,9 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
-    "@rcl/parser": "file:../../../packages/parser",
+    "@rcl/core": "workspace:*",
+    "@rcl/parser": "workspace:*",
+    "@rcl/language-service": "workspace:*",
     "vscode-languageserver": "^8.0.0",
     "vscode-languageserver-textdocument": "^1.0.0"
   },

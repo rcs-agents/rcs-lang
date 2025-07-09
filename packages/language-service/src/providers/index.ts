@@ -4,3 +4,4 @@ export * from './CompletionProvider';
 export * from './DefinitionProvider';
 export * from './ReferencesProvider';
 export * from './HoverProvider';
+export * from './RenameProvider';

@@ -1,30 +1,30 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { RCLParser } from '@rcl/parser';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { IParser } from '@rcl/core';
 import { ProjectRootDetector } from './projectRoot';
-import { 
-  ResolvedImport, 
-  ExportedSymbol, 
-  SymbolType, 
-  ImportStatement, 
-  ImportResolverConfig 
+import {
+  type ExportedSymbol,
+  type ImportResolverConfig,
+  type ImportStatement,
+  type ResolvedImport,
+  SymbolType,
 } from './types';
 
 /**
  * Handles import resolution for RCL files
  */
 export class ImportResolver {
-  private parser: RCLParser;
+  private parser: IParser;
   private config: ImportResolverConfig;
   private symbolCache = new Map<string, ExportedSymbol[]>();
 
-  constructor(config?: Partial<ImportResolverConfig>) {
-    this.parser = new RCLParser();
+  constructor(parser: IParser, config?: Partial<ImportResolverConfig>) {
+    this.parser = parser;
     this.config = {
       projectRoot: '',
       extensions: ['.rcl'],
       caseInsensitive: true,
-      ...config
+      ...config,
     };
   }
 
@@ -37,11 +37,11 @@ export class ImportResolver {
   async resolveImport(importPath: string, fromFile: string): Promise<ResolvedImport> {
     const projectRoot = this.config.projectRoot || ProjectRootDetector.getProjectRoot(fromFile);
     const resolvedPath = this.resolveImportPath(importPath, fromFile, projectRoot);
-    
+
     const result: ResolvedImport = {
       resolvedPath,
       exports: [],
-      exists: false
+      exists: false,
     };
 
     // Check if the resolved file exists
@@ -61,10 +61,15 @@ export class ImportResolver {
   async extractImports(filePath: string): Promise<ImportStatement[]> {
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const document = await this.parser.parseDocument(content, filePath);
-      
+      const parseResult = await this.parser.parse(content, filePath);
+      if (!parseResult.success) {
+        console.error(`Failed to parse ${filePath}:`, parseResult.error);
+        return [];
+      }
+      const document = parseResult.value;
+
       const imports: ImportStatement[] = [];
-      
+
       // Walk the AST to find import statements
       this.walkAST(document.ast, (node) => {
         if (node.type === 'import_statement') {
@@ -95,10 +100,15 @@ export class ImportResolver {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const document = await this.parser.parseDocument(content, filePath);
-      
+      const parseResult = await this.parser.parse(content, filePath);
+      if (!parseResult.success) {
+        console.error(`Failed to parse ${filePath}:`, parseResult.error);
+        return [];
+      }
+      const document = parseResult.value;
+
       const exports: ExportedSymbol[] = [];
-      
+
       // Walk the AST to find exportable symbols
       this.walkAST(document.ast, (node) => {
         const symbol = this.extractSymbol(node, content);
@@ -128,9 +138,9 @@ export class ImportResolver {
    */
   private walkAST(node: any, callback: (node: any) => void): void {
     if (!node) return;
-    
+
     callback(node);
-    
+
     if (node.children && Array.isArray(node.children)) {
       for (const child of node.children) {
         this.walkAST(child, callback);
@@ -172,7 +182,7 @@ export class ImportResolver {
     }
 
     // Default to .rcl extension
-    return filePath + '.rcl';
+    return `${filePath}.rcl`;
   }
 
   /**
@@ -184,21 +194,21 @@ export class ImportResolver {
       // This is a simplified implementation - would need to be adapted based on actual AST structure
       const text = content.slice(node.startIndex, node.endIndex);
       const importMatch = text.match(/import\s+([^\\s]+)(?:\s+as\s+([^\\s]+))?/);
-      
+
       if (importMatch) {
         return {
           path: importMatch[1],
           alias: importMatch[2],
           range: {
             start: { line: node.startPosition.row, character: node.startPosition.column },
-            end: { line: node.endPosition.row, character: node.endPosition.column }
-          }
+            end: { line: node.endPosition.row, character: node.endPosition.column },
+          },
         };
       }
     } catch (error) {
       console.error('Error parsing import statement:', error);
     }
-    
+
     return null;
   }
 
@@ -216,41 +226,41 @@ export class ImportResolver {
             type: SymbolType.Agent,
             range: {
               start: { line: node.startPosition.row, character: node.startPosition.column },
-              end: { line: node.endPosition.row, character: node.endPosition.column }
-            }
+              end: { line: node.endPosition.row, character: node.endPosition.column },
+            },
           };
-        
+
         case 'flow_definition':
           return {
             name: this.extractSymbolName(node, content),
             type: SymbolType.Flow,
             range: {
               start: { line: node.startPosition.row, character: node.startPosition.column },
-              end: { line: node.endPosition.row, character: node.endPosition.column }
-            }
+              end: { line: node.endPosition.row, character: node.endPosition.column },
+            },
           };
-        
+
         case 'message_definition':
           return {
             name: this.extractSymbolName(node, content),
             type: SymbolType.Message,
             range: {
               start: { line: node.startPosition.row, character: node.startPosition.column },
-              end: { line: node.endPosition.row, character: node.endPosition.column }
-            }
+              end: { line: node.endPosition.row, character: node.endPosition.column },
+            },
           };
       }
     } catch (error) {
       console.error('Error extracting symbol:', error);
     }
-    
+
     return null;
   }
 
   /**
    * Extract symbol name from AST node
    */
-  private extractSymbolName(node: any, content: string): string {
+  private extractSymbolName(_node: any, _content: string): string {
     // This would need to be implemented based on the actual AST structure
     // For now, return a placeholder
     return 'UnknownSymbol';

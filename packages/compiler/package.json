@@ -4,6 +4,14 @@
   "description": "Compilation pipeline for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
@@ -12,11 +20,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@rcl/core-types": "file:../core-types",
-    "@rcl/core-interfaces": "file:../core-interfaces",
-    "@rcl/parser": "file:../parser",
-    "@rcl/validation": "file:../validation",
-    "@rcl/file-system": "file:../file-system"
+    "@rcl/core": "workspace:*",
+    "@rcl/ast": "workspace:*",
+    "@rcl/parser": "workspace:*",
+    "@rcl/validation": "workspace:*",
+    "@rcl/file-system": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

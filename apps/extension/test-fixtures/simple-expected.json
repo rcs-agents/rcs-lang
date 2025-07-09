@@ -17,10 +17,7 @@
   "agent": {
     "displayName": "TestAgent",
     "flows": [],
-    "messages": [
-      "Welcome",
-      "Help"
-    ],
+    "messages": ["Welcome", "Help"],
     "name": "TestAgent"
   }
 }

@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
-import * as path from 'node:path';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 describe('RCL Extension Client Tests', () => {
   it('should pass basic functionality test', () => {
@@ -68,14 +68,13 @@ describe('RCL Extension Client Tests', () => {
 
       if (fs.existsSync(packagePath)) {
         const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-        const views = packageJson.contributes?.views?.explorer || [];
+        const commands = packageJson.contributes?.commands || [];
 
-        const previewView = views.find((view: any) => view.id === 'rclPreview');
-        assert.ok(previewView, 'RCL Preview view should be registered');
-        if (previewView) {
-          assert.equal(previewView.type, 'webview', 'Preview view should be webview type');
-          assert.equal(previewView.name, 'RCL Preview', 'Preview view should have correct name');
-        }
+        // Interactive diagram is registered as a command that opens a webview panel
+        const hasInteractiveDiagram = commands.some(
+          (cmd: any) => cmd.command === 'rcl.openInteractiveDiagram',
+        );
+        assert.ok(hasInteractiveDiagram, 'Interactive Diagram command should be registered');
       } else {
         assert.ok(true, 'Package.json not found, skipping webview view test');
       }

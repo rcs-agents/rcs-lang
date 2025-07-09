@@ -1,10 +1,10 @@
-import { CompletionItem, Position } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import { type CompletionItem, type Position } from 'vscode-languageserver/node';
 export declare class CompletionProvider {
     private parser;
     constructor(parser: RCLParser);
-    getCompletions(document: TextDocument, position: Position): Promise<CompletionItem[]>;
+    getCompletions(_document: TextDocument, _position: Position): Promise<CompletionItem[]>;
     resolveCompletion(item: CompletionItem): CompletionItem;
 }
 //# sourceMappingURL=completion.d.ts.map

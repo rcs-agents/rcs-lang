@@ -1,6 +1,6 @@
-import { SemanticTokens, SemanticTokensLegend } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import type { SemanticTokens, SemanticTokensLegend } from 'vscode-languageserver/node';
 
 export class SemanticTokensProvider {
   private legend: SemanticTokensLegend;
@@ -50,7 +50,7 @@ export class SemanticTokensProvider {
     return this.legend;
   }
 
-  public async getSemanticTokens(document: TextDocument): Promise<SemanticTokens> {
+  public async getSemanticTokens(_document: TextDocument): Promise<SemanticTokens> {
     // Basic semantic tokens - return empty for now
     return { data: [] };
   }

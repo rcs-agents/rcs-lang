@@ -1,0 +1,175 @@
+agent Coffee Shop
+  displayName: "Quick Coffee"
+  brandName: "Quick Coffee Co."
+
+  config
+    description: "Order your favorite coffee for pickup"
+    logoUri: <url https://quickcoffee.com/logo.png>
+    color: "#6F4E37"
+    phoneNumber: <phone +1-555-0123>
+    phoneLabel: "Call Store"
+
+  defaults
+    fallbackMessage: "I didn't understand that. Please choose from the available options."
+    messageTrafficType: :transactional
+    postbackData: $js> context.reply?.text?.toLowerCase().replace(/[^a-z0-9]/g, '_')
+
+  flow Order Flow
+    start: Welcome
+
+    on Welcome
+      match @reply.text
+        "Order Coffee" -> Choose Size
+        "View Menu" -> Show Menu
+        "Store Hours" -> StoreInfo
+        :default -> Welcome
+
+    on Choose Size
+      match @reply.text
+        "Small" -> Choose Drink with size: "small", price: 3.50
+        "Medium" -> Choose Drink with size: "medium", price: 4.50
+        "Large" -> Choose Drink with size: "large", price: 5.50
+        :default -> Invalid Size
+
+    on Invalid Size
+      -> Choose Size
+
+    on Choose Drink
+      match @reply.text
+        "Espresso" -> Customize with drink: "espresso"
+        "Cappuccino" -> Customize with drink: "cappuccino"
+        "Latte" -> Customize with drink: "latte"
+        "Americano" -> Customize with drink: "americano"
+        :default -> Invalid Drink
+
+    on Invalid Drink
+      -> Choose Drink
+
+    on Customize
+      match @reply.text
+        "Regular" -> Confirm Order with milk: "regular"
+        "Skim" -> Confirm Order with milk: "skim"
+        "Soy" -> Confirm Order with milk: "soy", extraCharge: 0.60
+        "Oat" -> Confirm Order with milk: "oat", extraCharge: 0.60
+        "No Milk" -> Confirm Order with milk: "none"
+        :default -> Invalid Milk
+
+    on Invalid Milk
+      -> Customize
+
+    on Confirm Order
+      match @reply.text
+        "Confirm" -> Process Payment
+        "Cancel" -> Order Cancelled
+        :default -> Confirm Order
+
+    on Process Payment
+      -> Order Complete
+
+    on Order Cancelled
+      -> Show Menu
+
+    on Order Complete
+      -> ThankYou
+
+    on ThankYou
+      -> Show Menu
+
+    on Show Menu
+      -> Welcome
+
+    on StoreInfo
+      -> Welcome
+
+  messages Messages
+    richCard Welcome "Welcome to Quick Coffee!" :large
+      description: "Get your favorite coffee ready for pickup in minutes!"
+      suggestions
+        reply "Order Coffee"
+        reply "View Menu"
+        reply "Store Hours"
+
+    text Choose Size "What size would you like?"
+      suggestions
+        reply "Small" "$3.50"
+        reply "Medium" "$4.50"
+        reply "Large" "$5.50"
+
+    text Invalid Size "Please choose a valid size."
+      suggestions
+        reply "Small" "$3.50"
+        reply "Medium" "$4.50"
+        reply "Large" "$5.50"
+
+    text Choose Drink """Great! A #{@size} coffee. What type would you like?"""
+      suggestions
+        reply "Espresso"
+        reply "Cappuccino"
+        reply "Latte"
+        reply "Americano"
+
+    text Invalid Drink "Please choose from our available drinks."
+      suggestions
+        reply "Espresso"
+        reply "Cappuccino"
+        reply "Latte"
+        reply "Americano"
+
+    text Customize """Perfect! A #{@size} #{@drink}. How would you like your milk?"""
+      suggestions
+        reply "Regular"
+        reply "Skim"
+        reply "Soy" "+$0.60"
+        reply "Oat" "+$0.60"
+        reply "No Milk"
+
+    text Invalid Milk "Please choose a valid milk option."
+      suggestions
+        reply "Regular"
+        reply "Skim"
+        reply "Soy" "+$0.60"
+        reply "Oat" "+$0.60"
+        reply "No Milk"
+
+    richCard Confirm Order "Confirm Your Order" :medium
+      description: $js> `${context.size} ${context.drink} with ${context.milk} milk\nTotal: $${(context.price + (context.extraCharge || 0)).toFixed(2)}`
+      suggestions
+        reply "Confirm"
+        reply "Cancel"
+
+    text Process Payment "Processing your payment..."
+
+    richCard Order Complete "Order Confirmed!" :large
+      description: """
+        Your order will be ready for pickup in 5-7 minutes.
+        Show this confirmation at the counter.
+      """
+      suggestions
+        saveEvent "Add to Calendar"
+          title: "Coffee Pickup"
+          startTime: <datetime +5m>
+          endTime: <datetime +15m>
+          description: """Pick up #{@size} #{@drink}"""
+
+    text Order Cancelled "Your order has been cancelled. Thank you!"
+
+    text ThankYou """
+      Thank you for your order!
+      Your order will be ready for pickup in 5-7 minutes.
+      Show this confirmation at the counter.
+    """
+
+    carousel Show Menu "Our Coffee Menu" :medium
+      richCard EspressoCard "Espresso" :compact
+        description: "Rich, bold shot of coffee"
+
+      richCard CappuccinoCard "Cappuccino" :compact
+        description: "Espresso with steamed milk foam"
+
+      richCard LatteCard "Latte" :compact
+        description: "Espresso with steamed milk"
+
+      richCard AmericanoCard "Americano" :compact
+        description: "Espresso with hot water"
+
+    text StoreInfo "We're open Monday-Friday 6am-7pm, weekends 7am-6pm."

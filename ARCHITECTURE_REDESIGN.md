@@ -1,8 +1,8 @@
-# RCL Language Monorepo Architecture Redesign
+# RCL Language Monorepo Architecture - Implemented Design
 
 ## Executive Summary
 
-After analyzing the current codebase, I've identified several architectural issues that are causing bugs and making the system unreliable. This document proposes a clean, well-structured architecture following SOLID principles and best practices for programming language implementations.
+This document describes the actual implemented architecture for the RCL language monorepo, following a refactoring effort to improve code organization, reliability, and maintainability using SOLID principles.
 
 ## Core Principles
 
@@ -14,234 +14,184 @@ After analyzing the current codebase, I've identified several architectural issu
 6. **Separation of Concerns**: Clear boundaries between layers
 7. **Immutability**: Parser outputs immutable ASTs
 8. **Pure Functions**: No side effects in core logic
-9. **Explicit Error Handling**: No silent failures
+9. **Explicit Error Handling**: Result<T,E> pattern for no silent failures
 
-## Proposed Architecture
+## Implemented Architecture
 
-### 1. Core Language Infrastructure
-
-```
-packages/
-├── ast/                    # AST definitions and utilities
-│   ├── src/
-│   │   ├── nodes.ts       # AST node type definitions
-│   │   ├── visitors.ts    # Visitor pattern implementation
-│   │   ├── builders.ts    # AST construction helpers
-│   │   └── validators.ts  # AST validation rules
-│   └── tests/
-│
-├── lexer/                  # Tokenization (if needed separately)
-│   ├── src/
-│   │   ├── tokens.ts      # Token type definitions
-│   │   ├── lexer.ts       # Tokenization logic
-│   │   └── scanner.ts     # Character scanning
-│   └── tests/
-│
-├── parser/                 # Parsing only - no compilation logic
-│   ├── src/
-│   │   ├── parser.ts      # Parser interface
-│   │   ├── tree-sitter/   # Tree-sitter implementation
-│   │   │   ├── grammar.js # Grammar definition
-│   │   │   ├── adapter.ts # Adapts tree-sitter to parser interface
-│   │   │   └── index.ts
-│   │   └── errors.ts      # Parse error types
-│   └── tests/
-│
-├── semantic/               # Semantic analysis
-│   ├── src/
-│   │   ├── analyzer.ts    # Semantic analyzer interface
-│   │   ├── symbol-table.ts # Symbol resolution
-│   │   ├── type-checker.ts # Type checking (if applicable)
-│   │   ├── validators/    # Semantic validation rules
-│   │   │   ├── agent.ts
-│   │   │   ├── flow.ts
-│   │   │   └── message.ts
-│   │   └── errors.ts      # Semantic error types
-│   └── tests/
-│
-├── ir/                     # Intermediate representation
-│   ├── src/
-│   │   ├── ir-nodes.ts    # IR node definitions
-│   │   ├── transformer.ts # AST to IR transformation
-│   │   └── optimizer.ts   # IR optimizations
-│   └── tests/
-│
-├── codegen/                # Code generation
-│   ├── src/
-│   │   ├── generator.ts   # Generator interface
-│   │   ├── json/          # JSON output generator
-│   │   ├── javascript/    # JS output generator
-│   │   └── emitter.ts     # File emission logic
-│   └── tests/
-│
-└── diagnostics/            # Unified diagnostics system
-    ├── src/
-    │   ├── diagnostic.ts  # Diagnostic types
-    │   ├── reporter.ts    # Error reporting
-    │   └── formatter.ts   # Error formatting
-    └── tests/
-```
-
-### 2. Language Services
+### Directory Structure
 
 ```
-packages/
-├── language-server/        # LSP implementation
-│   ├── src/
-│   │   ├── server.ts      # LSP server
-│   │   ├── handlers/      # LSP method handlers
-│   │   ├── services/      # Language services
-│   │   │   ├── completion.ts
-│   │   │   ├── hover.ts
-│   │   │   ├── diagnostics.ts
-│   │   │   └── symbols.ts
-│   │   └── workspace.ts   # Workspace management
-│   └── tests/
+rcl-tree-sitter/
+├── apps/                    # Applications
+│   ├── cli/                # Command-line interface
+│   └── extension/          # VSCode extension
 │
-├── compiler-api/           # High-level compiler API
-│   ├── src/
-│   │   ├── compiler.ts    # Compiler facade
-│   │   ├── pipeline.ts    # Compilation pipeline
-│   │   ├── config.ts      # Configuration types
-│   │   └── program.ts     # Program abstraction
-│   └── tests/
+├── packages/               # Published packages
+│   ├── parser/            # Tree-sitter parser and AST utilities
+│   ├── compiler/          # Compilation pipeline and API
+│   └── language-service/  # Advanced language services
 │
-└── language-api/           # Public API for embedders
-    ├── src/
-    │   ├── api.ts         # Main API surface
-    │   ├── types.ts       # Public types
-    │   └── index.ts       # Exports
-    └── tests/
+└── libs/                   # Internal libraries
+    ├── core/              # Core types and interfaces
+    ├── validation/        # Validation pipeline
+    └── file-system/       # File system abstraction
 ```
 
-### 3. Tools and Applications
+### Package Descriptions
+
+#### Published Packages (in `packages/`)
+
+1. **@rcl/parser**
+   - Tree-sitter grammar and parser
+   - AST type definitions and utilities
+   - Platform-agnostic parser factory (Node.js/WASM)
+   - No business logic, just parsing
+
+2. **@rcl/compiler**
+   - High-level compilation API
+   - Compilation pipeline with stages
+   - Integrates parser, validation, and code generation
+   - Main entry point for programmatic compilation
+
+3. **@rcl/language-service**
+   - Advanced language service providers
+   - Hover, completion, diagnostics, etc.
+   - Workspace indexing and management
+   - Used by VSCode extension
+
+#### Internal Libraries (in `libs/`)
+
+1. **@rcl/core**
+   - Core types: `Result<T,E>`, `Diagnostic`
+   - All interfaces: `IParser`, `ICompiler`, `IValidator`, etc.
+   - Platform-agnostic abstractions
+   - No implementation, only contracts
+
+2. **@rcl/validation**
+   - Validation pipeline implementation
+   - Pluggable validators: syntax, semantic, naming
+   - Extensible validation framework
+   - Returns detailed diagnostics
+
+3. **@rcl/file-system**
+   - File system abstraction layer
+   - `NodeFileSystem` for Node.js
+   - `MemoryFileSystem` for testing/browser
+   - Factory pattern for platform detection
+
+### Key Design Patterns
+
+#### 1. Result Type for Error Handling
+```typescript
+export type Result<T, E = Error> = 
+  | { success: true; value: T }
+  | { success: false; error: E };
+```
+
+#### 2. Interface-Based Architecture
+All major components are defined as interfaces in `@rcl/core`:
+- `IParser`: Parser abstraction
+- `ICompiler`: Compiler abstraction
+- `IFileSystem`: File system abstraction
+- `IValidator`: Validation abstraction
+
+#### 3. Factory Pattern
+- `ParserFactory`: Creates appropriate parser (Node/WASM)
+- `FileSystemFactory`: Creates appropriate file system
+
+#### 4. Pipeline Pattern
+- `CompilationPipeline`: Stages for parse → validate → transform
+- `ValidationPipeline`: Pluggable validators
+
+### Dependency Flow
 
 ```
-apps/
-├── cli/                    # Command-line interface
-│   ├── src/
-│   │   ├── cli.ts         # CLI entry point
-│   │   ├── commands/      # CLI commands
-│   │   │   ├── compile.ts
-│   │   │   ├── check.ts
-│   │   │   └── format.ts
-│   │   └── utils/         # CLI utilities
-│   └── tests/
-│
-├── vscode-extension/       # VSCode extension
-│   ├── client/            # Extension client
-│   │   ├── src/
-│   │   │   ├── extension.ts
-│   │   │   └── commands/
-│   │   └── tests/
-│   └── server/            # Embedded language server
-│       └── src/
-│           └── server.ts
-│
-└── playground/             # Web playground
-    ├── src/
-    │   ├── editor.ts
-    │   ├── compiler.ts
-    │   └── ui/
-    └── tests/
+@rcl/core (types & interfaces)
+    ↓
+@rcl/validation, @rcl/file-system (implementations)
+    ↓
+@rcl/parser (uses core types)
+    ↓
+@rcl/compiler (orchestrates everything)
+    ↓
+@rcl/language-service (builds on compiler)
+    ↓
+apps (CLI, VSCode extension)
 ```
 
-## Key Design Decisions
+## Implementation Highlights
 
-### 1. Parser Package
-- **Single Responsibility**: ONLY parsing, no compilation or semantic analysis
-- **Interface-based**: Define a `Parser` interface, tree-sitter is just one implementation
-- **Immutable AST**: Parser returns immutable AST nodes
-- **Explicit Errors**: Parse errors are explicit, never silent
+### 1. Parser Package Improvements
+- **Before**: Mixed concerns, silent failures, tight coupling
+- **After**: Pure parsing, explicit errors, platform abstraction
+- **Key Change**: ERROR nodes are now properly reported
 
-### 2. Semantic Analysis
-- **Separate Package**: Decoupled from parser
-- **Phase-based**: Clear phases (symbol resolution → type checking → validation)
-- **Pluggable Validators**: Easy to add new validation rules
-- **Rich Error Information**: Errors include context and suggestions
+### 2. Explicit Error Handling
+- **Before**: Errors silently ignored or thrown
+- **After**: Result<T,E> pattern throughout
+- **Benefits**: No surprises, clear error propagation
 
-### 3. Code Generation
-- **Strategy Pattern**: Different generators for different outputs
-- **IR-based**: Transform AST → IR → Output for optimization opportunities
-- **Streaming**: Support streaming output for large files
+### 3. Modular Validation
+- **Before**: Validation mixed with compilation
+- **After**: Separate validation pipeline with pluggable validators
+- **Benefits**: Easy to add new rules, test in isolation
 
-### 4. Language Server
-- **Service-oriented**: Each LSP feature is a separate service
-- **Incremental**: Support incremental parsing and analysis
-- **Cancellable**: All operations can be cancelled
-- **Memory-efficient**: Use weak references for caching
+### 4. Platform Abstraction
+- **Before**: Node.js specific code everywhere
+- **After**: Abstractions for file system, parser
+- **Benefits**: Can run in browser, easier testing
 
-### 5. CLI
-- **Thin Layer**: CLI is just a thin wrapper around compiler-api
-- **No Business Logic**: All logic lives in packages, not in CLI
-- **Testable**: Commands are testable units
+### 5. Clean Separation
+- **Before**: Business logic in CLI, circular dependencies
+- **After**: CLI is thin wrapper, clear dependency hierarchy
+- **Benefits**: Testable, maintainable, no circular deps
 
-## Migration Strategy
+## Testing Strategy
 
-### Phase 1: Core Infrastructure (Week 1-2)
-1. Create new package structure
-2. Define interfaces and types
-3. Implement AST package with proper node types
-4. Create parser interface and adapt tree-sitter
+Each package has its own test suite:
+- Unit tests with Vitest
+- Integration tests for package interactions
+- Mock implementations for testing
+- Test utilities in each package
 
-### Phase 2: Semantic Analysis (Week 2-3)
-1. Extract semantic validation from compiler
-2. Implement symbol table
-3. Create validation pipeline
-4. Add comprehensive error reporting
+## Build System
 
-### Phase 3: Code Generation (Week 3-4)
-1. Define IR if needed
-2. Implement JSON generator
-3. Implement JavaScript generator
-4. Add source maps support
+- **Moon**: Task orchestration and dependency management
+- **TypeScript**: Strict mode, project references
+- **npm workspaces**: Package linking
 
-### Phase 4: Language Services (Week 4-5)
-1. Refactor language server to use new packages
-2. Implement incremental parsing
-3. Add proper cancellation support
-4. Optimize memory usage
+## Migration from Original Design
 
-### Phase 5: Tools (Week 5-6)
-1. Refactor CLI to use compiler-api
-2. Update VSCode extension
-3. Add comprehensive tests
-4. Update documentation
+The implemented architecture differs from the original proposal in several practical ways:
 
-## Quality Assurance
+1. **Consolidated packages**: Instead of 7 separate packages (ast, lexer, parser, semantic, ir, codegen, diagnostics), we have 6 focused packages
+2. **No separate IR**: Direct AST → Output transformation (can add IR later if needed)
+3. **Unified core**: Single `@rcl/core` instead of separate type packages
+4. **Libs folder**: Internal packages in `libs/` to distinguish from published packages
 
-### Testing Strategy
-- **Unit Tests**: Each package has comprehensive unit tests
-- **Integration Tests**: Test package interactions
-- **E2E Tests**: Test complete compilation pipeline
-- **Property-based Tests**: For parser and generators
-- **Fuzzing**: For finding edge cases
+These changes were made to:
+- Reduce complexity while maintaining separation of concerns
+- Avoid premature abstraction (IR layer)
+- Make dependency management clearer
+- Simplify the mental model
 
-### Performance Requirements
-- Parse 1000 lines in < 100ms
-- Generate output in < 50ms
-- Language server response < 100ms
-- Memory usage < 100MB for typical projects
+## Benefits Achieved
 
-### Error Handling
-- No silent failures
-- All errors have error codes
-- Errors include recovery suggestions
-- Stack traces in development mode only
+1. **Reliability**: No more silent failures, explicit error handling
+2. **Maintainability**: Clear package boundaries, single responsibilities
+3. **Testability**: Pure functions, dependency injection
+4. **Extensibility**: Interface-based, pluggable components
+5. **Performance**: Platform-specific optimizations possible
+6. **Developer Experience**: Better error messages, clear APIs
 
-## Benefits of This Architecture
+## Future Enhancements
 
-1. **Reliability**: Clear boundaries prevent cascading failures
-2. **Maintainability**: Each package has a single, clear purpose
-3. **Testability**: Small, focused units are easy to test
-4. **Performance**: Incremental and streaming support
-5. **Extensibility**: Easy to add new features without breaking existing code
-6. **Developer Experience**: Clear APIs and good error messages
+1. **Intermediate Representation**: Add IR layer if optimization needs arise
+2. **More Code Generators**: Add generators for other formats
+3. **Incremental Parsing**: For better IDE performance
+4. **Schema Evolution**: Versioned schemas for backward compatibility
+5. **Plugin System**: Allow external validators/generators
 
-## Next Steps
+## Conclusion
 
-1. Review and approve this architecture
-2. Create detailed interface definitions
-3. Set up new package structure
-4. Begin migration phase by phase
-5. Maintain backward compatibility during migration
+The implemented architecture successfully addresses the original issues while maintaining pragmatism. It provides a solid foundation for the RCL language toolchain with clear extension points for future enhancements.

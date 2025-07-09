@@ -1,0 +1,1700 @@
+{
+  "type": "RclFile",
+  "imports": [],
+  "sections": [
+    {
+      "type": "Section",
+      "sectionType": "agent",
+      "identifier": "CoffeeShop",
+      "body": [
+        {
+          "type": "Attribute",
+          "key": "displayName",
+          "value": {
+            "type": "StringLiteral",
+            "value": "Quick Coffee"
+          }
+        },
+        {
+          "type": "Attribute",
+          "key": "start",
+          "value": "OrderFlow"
+        },
+        {
+          "type": "Section",
+          "sectionType": "config",
+          "body": [
+            {
+              "type": "Attribute",
+              "key": "description",
+              "value": {
+                "type": "StringLiteral",
+                "value": "Order your favorite coffee for pickup"
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "logoUri",
+              "value": {
+                "type": "TypeTag",
+                "tagName": "url",
+                "value": "https://quickcoffee.com/logo.png"
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "color",
+              "value": {
+                "type": "StringLiteral",
+                "value": "#6F4E37"
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "phoneNumber",
+              "value": {
+                "type": "TypeTag",
+                "tagName": "phone",
+                "value": "+1-555-0123"
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "phoneLabel",
+              "value": {
+                "type": "StringLiteral",
+                "value": "Call Store"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "defaults",
+          "body": [
+            {
+              "type": "Attribute",
+              "key": "fallbackMessage",
+              "value": {
+                "type": "StringLiteral",
+                "value": "I didn't understand that. Please choose from the available options."
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "messageTrafficType",
+              "value": {
+                "type": "Atom",
+                "value": ":promotion"
+              }
+            },
+            {
+              "type": "Attribute",
+              "key": "postbackData",
+              "value": {
+                "type": "SingleLineCode",
+                "language": "js",
+                "code": "(suggestion) => suggestion?.text?.toLowerCase().replace(/[^a-z0-9]/g, '_')"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "flow",
+          "identifier": "OrderFlow",
+          "body": [
+            {
+              "type": "Attribute",
+              "key": "start",
+              "value": "Welcome"
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "InvalidOption",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "Welcome",
+              "body": [
+                {
+                  "type": "MatchBlock",
+                  "discriminant": {
+                    "type": "PropertyAccess",
+                    "object": {
+                      "type": "Variable",
+                      "name": "@reply"
+                    },
+                    "properties": ["text"]
+                  },
+                  "cases": [
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Order Coffee"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ChooseSize"
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "View Menu"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ShowMenu"
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Store Hours"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "StoreInfo"
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "Atom",
+                        "value": ":default"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "Welcome"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ChooseSize",
+              "body": [
+                {
+                  "type": "MatchBlock",
+                  "discriminant": {
+                    "type": "PropertyAccess",
+                    "object": {
+                      "type": "Variable",
+                      "name": "@reply"
+                    },
+                    "properties": ["text"]
+                  },
+                  "cases": [
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Small"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ChooseDrink",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "size",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "small"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "price",
+                            "value": {
+                              "type": "TypeTag",
+                              "tagName": "money",
+                              "value": "3.50"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Medium"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ChooseDrink",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "size",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "medium"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "price",
+                            "value": {
+                              "type": "TypeTag",
+                              "tagName": "money",
+                              "value": "4.50"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Large"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ChooseDrink",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "size",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "large"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "price",
+                            "value": {
+                              "type": "TypeTag",
+                              "tagName": "money",
+                              "value": "5.50"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "Atom",
+                        "value": ":default"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "InvalidOption",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "property",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "size"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "next",
+                            "value": "ChooseSize"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ChooseDrink",
+              "body": [
+                {
+                  "type": "MatchBlock",
+                  "discriminant": {
+                    "type": "PropertyAccess",
+                    "object": {
+                      "type": "Variable",
+                      "name": "@reply"
+                    },
+                    "properties": ["text"]
+                  },
+                  "cases": [
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Espresso"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "Customize",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "drink",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "espresso"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Cappuccino"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "Customize",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "drink",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "cappuccino"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Latte"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "Customize",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "drink",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "latte"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Americano"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "Customize",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "drink",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "americano"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "Atom",
+                        "value": ":default"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "InvalidOption",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "property",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "drink"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "next",
+                            "value": "ChooseDrink"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "Customize",
+              "body": [
+                {
+                  "type": "MatchBlock",
+                  "discriminant": {
+                    "type": "PropertyAccess",
+                    "object": {
+                      "type": "Variable",
+                      "name": "@reply"
+                    },
+                    "properties": ["text"]
+                  },
+                  "cases": [
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Regular"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "milk",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "regular"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Skim"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "milk",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "skim"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Soy"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "milk",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "soy"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "extraCharge",
+                            "value": {
+                              "type": "NumericLiteral",
+                              "value": 0.6
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Oat"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "milk",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "oat"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "extraCharge",
+                            "value": {
+                              "type": "NumericLiteral",
+                              "value": 0.6
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "No Milk"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "milk",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "none"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "Atom",
+                        "value": ":default"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "InvalidOption",
+                        "parameters": [
+                          {
+                            "type": "Parameter",
+                            "key": "property",
+                            "value": {
+                              "type": "StringLiteral",
+                              "value": "milk"
+                            }
+                          },
+                          {
+                            "type": "Parameter",
+                            "key": "next",
+                            "value": "Customize"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ConfirmOrder",
+              "body": [
+                {
+                  "type": "MatchBlock",
+                  "discriminant": {
+                    "type": "PropertyAccess",
+                    "object": {
+                      "type": "Variable",
+                      "name": "@reply"
+                    },
+                    "properties": ["text"]
+                  },
+                  "cases": [
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Confirm"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ProcessPayment"
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Cancel"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "OrderCancelled"
+                      }
+                    },
+                    {
+                      "type": "MatchCase",
+                      "value": {
+                        "type": "Atom",
+                        "value": ":default"
+                      },
+                      "consequence": {
+                        "type": "ContextualizedValue",
+                        "value": "ConfirmOrder"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ProcessPayment",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "OrderCancelled",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "OrderComplete",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ThankYou",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "ShowMenu",
+              "body": []
+            },
+            {
+              "type": "Section",
+              "sectionType": "on",
+              "identifier": "StoreInfo",
+              "body": []
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "messages",
+          "identifier": "Messages",
+          "body": [
+            {
+              "type": "Section",
+              "sectionType": "richCard",
+              "identifier": "Welcome",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_values",
+                  "value": {
+                    "type": "List",
+                    "items": [
+                      {
+                        "type": "StringLiteral",
+                        "value": "Welcome to Quick Coffee!"
+                      },
+                      {
+                        "type": "Atom",
+                        "value": ":large"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "description",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Get your favorite coffee ready for pickup in minutes!"
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "media",
+                  "value": {
+                    "type": "TypeTag",
+                    "tagName": "url",
+                    "value": "https://quickcoffee.com/welcome.jpg"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Order Coffee"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "View Menu"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Store Hours"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "ChooseSize",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "What size would you like?"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Small $3.50"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Medium $4.50"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Large $5.50"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "Invalid Size",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Please choose a valid size."
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Small $3.50"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Medium $4.50"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Large $5.50"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "ChooseDrink",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Great! A #{@size} coffee. What type would you like?"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Espresso"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Cappuccino"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Latte"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Americano"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "Invalid Drink",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Please choose from our available drinks."
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Espresso"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Cappuccino"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Latte"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Americano"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "Customize",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Perfect! A #{context.size} #{context.drink}. How would you like your milk?"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Regular"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Skim"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Soy +$0.60"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Oat +$0.60"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "No Milk"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "Invalid Milk",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Please choose a valid milk option."
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Regular"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Skim"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Soy +$0.60"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Oat +$0.60"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "No Milk"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "richCard",
+              "identifier": "ConfirmOrder",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_values",
+                  "value": {
+                    "type": "List",
+                    "items": [
+                      {
+                        "type": "StringLiteral",
+                        "value": "Confirm Your Order"
+                      },
+                      {
+                        "type": "Atom",
+                        "value": ":medium"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "description",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "#{context.size} #{context.drink} with #{context.milk} milknTotal: $#{(context.price + (context.extraCharge || 0)).toFixed(2)}"
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "media",
+                  "value": {
+                    "type": "TypeTag",
+                    "tagName": "url",
+                    "value": "https://quickcoffee.com/coffee.jpg"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Confirm"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Section",
+                      "sectionType": "reply",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Cancel"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "ProcessPayment",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Processing your payment..."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "richCard",
+              "identifier": "OrderComplete",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_values",
+                  "value": {
+                    "type": "List",
+                    "items": [
+                      {
+                        "type": "StringLiteral",
+                        "value": "Order Confirmed!"
+                      },
+                      {
+                        "type": "Atom",
+                        "value": ":large"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "description",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": ""
+                  }
+                },
+                {
+                  "type": "Attribute",
+                  "key": "media",
+                  "value": {
+                    "type": "TypeTag",
+                    "tagName": "url",
+                    "value": "https://quickcoffee.com/confirmed.jpg"
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "suggestions",
+                  "body": [
+                    {
+                      "type": "Section",
+                      "sectionType": "saveEvent",
+                      "body": [
+                        {
+                          "type": "Attribute",
+                          "key": "_content",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Add to Calendar"
+                          }
+                        },
+                        {
+                          "type": "Attribute",
+                          "key": "title",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Coffee Pickup"
+                          }
+                        },
+                        {
+                          "type": "Attribute",
+                          "key": "startTime",
+                          "value": {
+                            "type": "TypeTag",
+                            "tagName": "datetime",
+                            "value": "+5m"
+                          }
+                        },
+                        {
+                          "type": "Attribute",
+                          "key": "endTime",
+                          "value": {
+                            "type": "TypeTag",
+                            "tagName": "datetime",
+                            "value": "+15m"
+                          }
+                        },
+                        {
+                          "type": "Attribute",
+                          "key": "description",
+                          "value": {
+                            "type": "StringLiteral",
+                            "value": "Pick up #{@size} #{@drink}"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "OrderCancelled",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Your order has been cancelled. Thank you!"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "ThankYou",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": ""
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "carousel",
+              "identifier": "ShowMenu",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_values",
+                  "value": {
+                    "type": "List",
+                    "items": [
+                      {
+                        "type": "StringLiteral",
+                        "value": "Our Coffee Menu"
+                      },
+                      {
+                        "type": "Atom",
+                        "value": ":medium"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "richCard",
+                  "identifier": "EspressoCard",
+                  "body": [
+                    {
+                      "type": "Attribute",
+                      "key": "_values",
+                      "value": {
+                        "type": "List",
+                        "items": [
+                          {
+                            "type": "StringLiteral",
+                            "value": "Espresso"
+                          },
+                          {
+                            "type": "Atom",
+                            "value": ":compact"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "description",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Rich, bold shot of coffee"
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "media",
+                      "value": {
+                        "type": "TypeTag",
+                        "tagName": "url",
+                        "value": "https://quickcoffee.com/espresso.jpg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "richCard",
+                  "identifier": "CappuccinoCard",
+                  "body": [
+                    {
+                      "type": "Attribute",
+                      "key": "_values",
+                      "value": {
+                        "type": "List",
+                        "items": [
+                          {
+                            "type": "StringLiteral",
+                            "value": "Cappuccino"
+                          },
+                          {
+                            "type": "Atom",
+                            "value": ":compact"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "description",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Espresso with steamed milk foam"
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "media",
+                      "value": {
+                        "type": "TypeTag",
+                        "tagName": "url",
+                        "value": "https://quickcoffee.com/cappuccino.jpg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "richCard",
+                  "identifier": "LatteCard",
+                  "body": [
+                    {
+                      "type": "Attribute",
+                      "key": "_values",
+                      "value": {
+                        "type": "List",
+                        "items": [
+                          {
+                            "type": "StringLiteral",
+                            "value": "Latte"
+                          },
+                          {
+                            "type": "Atom",
+                            "value": ":compact"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "description",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Espresso with steamed milk"
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "media",
+                      "value": {
+                        "type": "TypeTag",
+                        "tagName": "url",
+                        "value": "https://quickcoffee.com/latte.jpg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Section",
+                  "sectionType": "richCard",
+                  "identifier": "AmericanoCard",
+                  "body": [
+                    {
+                      "type": "Attribute",
+                      "key": "_values",
+                      "value": {
+                        "type": "List",
+                        "items": [
+                          {
+                            "type": "StringLiteral",
+                            "value": "Americano"
+                          },
+                          {
+                            "type": "Atom",
+                            "value": ":compact"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "description",
+                      "value": {
+                        "type": "StringLiteral",
+                        "value": "Espresso with hot water"
+                      }
+                    },
+                    {
+                      "type": "Attribute",
+                      "key": "media",
+                      "value": {
+                        "type": "TypeTag",
+                        "tagName": "url",
+                        "value": "https://quickcoffee.com/americano.jpg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "StoreInfo",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "We're open Monday-Friday 6am-7pm, weekends 7am-6pm."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "Section",
+              "sectionType": "text",
+              "identifier": "InvalidOption",
+              "body": [
+                {
+                  "type": "Attribute",
+                  "key": "_content",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": ""
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

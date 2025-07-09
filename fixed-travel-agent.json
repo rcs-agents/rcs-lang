@@ -30,11 +30,7 @@
   "agent": {
     "displayName": "TravelAgent",
     "flows": [],
-    "messages": [
-      "Welcome",
-      "Planning",
-      "Confirmation"
-    ],
+    "messages": ["Welcome", "Planning", "Confirmation"],
     "name": "TravelAgent"
   }
 }

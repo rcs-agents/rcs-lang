@@ -14,7 +14,7 @@
     "watch": "tsc -b -w",
     "test": "node ./out/test/runTest.js",
     "test:integration": "node ./out/test/runIntegrationTest.js",
-    "test:all": "npm run test && npm run test:integration",
+    "test:all": "bun run test && bun run test:integration",
     "test:unit": "NODE_ENV=test vitest run",
     "test:watch": "NODE_ENV=test vitest",
     "clean": "rm -rf out",

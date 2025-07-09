@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcl-lang.org/schemas/flow-section.json",
+  "title": "RCL Flow Section Schema",
+  "description": "Schema for validating flow sections in RCL's generic syntax",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "flow",
+      "description": "Section type must be 'flow'"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9_-]*$",
+      "description": "Flow identifier in Title Case"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "description": "The starting state of the flow"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the flow"
+        }
+      },
+      "patternProperties": {
+        "^[A-Z][A-Za-z0-9_-]*$": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Simple transition to another state"
+            },
+            {
+              "type": "object",
+              "description": "Complex state with actions or conditions"
+            }
+          ]
+        }
+      },
+      "required": ["start"],
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/onSection"
+      }
+    }
+  },
+  "required": ["type", "id", "attributes"],
+  "definitions": {
+    "onSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "on"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_-]*$"
+        },
+        "attributes": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-z][a-zA-Z0-9_]*$": {
+              "type": "string",
+              "description": "Event handler mapping to state"
+            }
+          }
+        }
+      },
+      "required": ["type"]
+    }
+  }
+}

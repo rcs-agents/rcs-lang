@@ -1,8 +1,8 @@
-import { RCLParser } from '@rcl/parser';
-import { ImportResolver } from '../import-resolver';
-import { WorkspaceIndex } from '../workspace-index';
-import { SymbolType } from '../import-resolver/types';
 import fs from 'node:fs';
+import type { IParser } from '@rcl/core';
+import type { ImportResolver } from '../import-resolver';
+import { SymbolType } from '../import-resolver/types';
+import type { WorkspaceIndex } from '../workspace-index';
 
 /**
  * Represents a reference location
@@ -24,21 +24,17 @@ export interface Reference {
   };
 }
 
-import { TextDocument, Position } from './types';
+import type { Position, TextDocument } from './types';
 
 /**
  * Provides "Find All References" functionality for RCL files
  */
 export class ReferencesProvider {
-  private parser: RCLParser;
+  private parser: IParser;
   private importResolver: ImportResolver;
   private workspaceIndex: WorkspaceIndex;
 
-  constructor(
-    parser: RCLParser,
-    importResolver: ImportResolver,
-    workspaceIndex: WorkspaceIndex
-  ) {
+  constructor(parser: IParser, importResolver: ImportResolver, workspaceIndex: WorkspaceIndex) {
     this.parser = parser;
     this.importResolver = importResolver;
     this.workspaceIndex = workspaceIndex;
@@ -50,7 +46,7 @@ export class ReferencesProvider {
   async findAllReferences(
     document: TextDocument,
     position: Position,
-    includeDeclaration = true
+    includeDeclaration = true,
   ): Promise<Reference[]> {
     try {
       const symbol = this.getSymbolAtPosition(document, position);
@@ -70,7 +66,7 @@ export class ReferencesProvider {
 
       // Filter out declaration if not requested
       if (!includeDeclaration) {
-        return references.filter(ref => ref.context?.type !== 'definition');
+        return references.filter((ref) => ref.context?.type !== 'definition');
       }
 
       // Remove duplicates and sort by location
@@ -82,12 +78,23 @@ export class ReferencesProvider {
   }
 
   /**
+   * LSP-compatible method for finding references
+   */
+  async provideReferences(
+    document: TextDocument,
+    position: Position,
+    context: { includeDeclaration: boolean },
+  ): Promise<Reference[]> {
+    return this.findAllReferences(document, position, context.includeDeclaration);
+  }
+
+  /**
    * Get symbol at the given position
    */
   private getSymbolAtPosition(document: TextDocument, position: Position): string | null {
     const content = document.getText();
     const lines = content.split('\n');
-    
+
     // Validate position
     if (position.line < 0 || position.line >= lines.length) {
       return null;
@@ -133,7 +140,11 @@ export class ReferencesProvider {
    */
   private async findLocalReferences(document: TextDocument, symbol: string): Promise<Reference[]> {
     const content = document.getText();
-    const rclDocument = await this.parser.parseDocument(content, document.uri);
+    const parseResult = await this.parser.parse(content, document.uri);
+    if (!parseResult.success) {
+      return [];
+    }
+    const rclDocument = parseResult.value;
     const references: Reference[] = [];
 
     // Walk the AST to find all occurrences of the symbol
@@ -188,7 +199,11 @@ export class ReferencesProvider {
   private async findReferencesInFile(fileUri: string, symbol: string): Promise<Reference[]> {
     try {
       const content = fs.readFileSync(fileUri, 'utf-8');
-      const rclDocument = await this.parser.parseDocument(content, fileUri);
+      const parseResult = await this.parser.parse(content, fileUri);
+      if (!parseResult.success) {
+        return [];
+      }
+      const rclDocument = parseResult.value;
       const references: Reference[] = [];
 
       this.walkAST(rclDocument.ast, (node) => {
@@ -220,8 +235,8 @@ export class ReferencesProvider {
           range: this.nodeToRange(node),
           context: {
             type: 'definition',
-            text: node.text?.trim() || ''
-          }
+            text: node.text?.trim() || '',
+          },
         });
       }
     }
@@ -235,8 +250,8 @@ export class ReferencesProvider {
           range: referenceRange,
           context: {
             type: 'reference',
-            text: node.text?.trim() || ''
-          }
+            text: node.text?.trim() || '',
+          },
         });
       }
     }
@@ -244,14 +259,14 @@ export class ReferencesProvider {
     // Check for import references
     if (node.type === 'import_statement') {
       const importPath = this.extractImportPath(node);
-      if (importPath && importPath.includes(symbol)) {
+      if (importPath?.includes(symbol)) {
         references.push({
           uri,
           range: this.nodeToRange(node),
           context: {
             type: 'import',
-            text: node.text?.trim() || ''
-          }
+            text: node.text?.trim() || '',
+          },
         });
       }
     }
@@ -263,12 +278,9 @@ export class ReferencesProvider {
    * Check if a node represents a definition
    */
   private isDefinitionNode(node: any): boolean {
-    return [
-      'agent_definition',
-      'flow_definition', 
-      'message_definition',
-      'property'
-    ].includes(node.type);
+    return ['agent_definition', 'flow_definition', 'message_definition', 'property'].includes(
+      node.type,
+    );
   }
 
   /**
@@ -284,7 +296,7 @@ export class ReferencesProvider {
 
     // Check for property values that reference symbols
     if (node.type === 'property') {
-      return node.value && node.value.includes(symbol);
+      return node.value?.includes(symbol);
     }
 
     // Check text content for symbol references
@@ -309,12 +321,12 @@ export class ReferencesProvider {
     return {
       start: {
         line: node.startPosition.row + lineOffset,
-        character: (lineOffset === 0 ? node.startPosition.column : 0) + charOffset
+        character: (lineOffset === 0 ? node.startPosition.column : 0) + charOffset,
       },
       end: {
         line: node.startPosition.row + lineOffset,
-        character: (lineOffset === 0 ? node.startPosition.column : 0) + charOffset + symbol.length
-      }
+        character: (lineOffset === 0 ? node.startPosition.column : 0) + charOffset + symbol.length,
+      },
     };
   }
 
@@ -357,12 +369,12 @@ export class ReferencesProvider {
     return {
       start: {
         line: node.startPosition?.row || 0,
-        character: node.startPosition?.column || 0
+        character: node.startPosition?.column || 0,
       },
       end: {
         line: node.endPosition?.row || 0,
-        character: node.endPosition?.column || 0
-      }
+        character: node.endPosition?.column || 0,
+      },
     };
   }
 
@@ -399,9 +411,9 @@ export class ReferencesProvider {
    */
   private walkAST(node: any, callback: (node: any) => void): void {
     if (!node) return;
-    
+
     callback(node);
-    
+
     if (node.children && Array.isArray(node.children)) {
       for (const child of node.children) {
         this.walkAST(child, callback);

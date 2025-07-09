@@ -1,6 +1,6 @@
-import { Hover, Position, MarkupKind } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import { type Hover, MarkupKind, type Position } from 'vscode-languageserver/node';
 
 export class HoverProvider {
   constructor(private parser: RCLParser) {}

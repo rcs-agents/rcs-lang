@@ -1,0 +1,16 @@
+
+agent SimpleAgent
+  displayName: "Simple Test Agent"
+  
+  flow MainFlow
+    start: Welcome
+    
+    on Welcome
+      match @reply.text
+        "hello" -> Welcome
+        :default -> Welcome
+  
+  messages Messages
+    text Welcome "Hello! How can I help you?"
+      suggestions
+        reply "hello"

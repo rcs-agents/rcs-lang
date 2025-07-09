@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { FormattingOptions } from 'vscode-languageserver/node';
+import type { FormattingOptions } from 'vscode-languageserver/node';
 import { FormattingProvider } from '../../features/formatting';
 
 describe('FormattingProvider', () => {
@@ -25,9 +25,9 @@ describe('FormattingProvider', () => {
       const edits = await formattingProvider.formatDocument(document, options);
 
       assert.ok(Array.isArray(edits), 'Should return an array of text edits');
-      
+
       // Each edit should have proper structure
-      edits.forEach(edit => {
+      edits.forEach((edit) => {
         assert.ok(edit.range, 'Edit should have a range');
         assert.ok(typeof edit.newText === 'string', 'Edit should have new text');
         assert.ok(edit.range.start, 'Range should have start');
@@ -40,7 +40,7 @@ describe('FormattingProvider', () => {
 displayName: "Test"
 agentConfig Config
 description: "Test agent"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
       const options: FormattingOptions = {
         tabSize: 2,
@@ -55,7 +55,7 @@ description: "Test agent"`;
     it('should respect formatting options', async () => {
       const text = 'agent TestAgent\n\tdisplayName: "Test"';
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
-      
+
       // Test with tabs
       const tabOptions: FormattingOptions = {
         tabSize: 4,
@@ -98,7 +98,7 @@ text Welcome"Welcome!"
 richCard Planning"What to do?":large
 reply"Option 1""option1"
 reply"Option 2""option2"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
       const options: FormattingOptions = {
         tabSize: 2,
@@ -110,10 +110,13 @@ reply"Option 2""option2"`;
       const edits = await formattingProvider.formatDocument(document, options);
 
       assert.ok(Array.isArray(edits), 'Should format complex documents');
-      
+
       // Should produce meaningful formatting changes
       if (edits.length > 0) {
-        assert.ok(edits.some(edit => edit.newText.length > 0), 'Should include formatting changes');
+        assert.ok(
+          edits.some((edit) => edit.newText.length > 0),
+          'Should include formatting changes',
+        );
       }
     });
 
@@ -126,7 +129,7 @@ reply"Option 2""option2"`;
     
   messages Messages
     text Welcome "Hello"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
       const options: FormattingOptions = {
         tabSize: 2,
@@ -170,7 +173,7 @@ reply"Option 2""option2"`;
     it('should handle malformed formatting options', async () => {
       const text = 'agent TestAgent';
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
-      
+
       // Test with minimal options
       const minimalOptions: FormattingOptions = {
         tabSize: 4,

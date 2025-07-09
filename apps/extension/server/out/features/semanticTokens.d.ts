@@ -1,11 +1,11 @@
-import { SemanticTokens, SemanticTokensLegend } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import type { SemanticTokens, SemanticTokensLegend } from 'vscode-languageserver/node';
 export declare class SemanticTokensProvider {
     private parser;
     private legend;
     constructor(parser: RCLParser);
     getLegend(): SemanticTokensLegend;
-    getSemanticTokens(document: TextDocument): Promise<SemanticTokens>;
+    getSemanticTokens(_document: TextDocument): Promise<SemanticTokens>;
 }
 //# sourceMappingURL=semanticTokens.d.ts.map

@@ -19,12 +19,5 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo"
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "out",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["node_modules", "dist", "build", "out", "**/*.test.ts", "**/*.spec.ts"]
 }

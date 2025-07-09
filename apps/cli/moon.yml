@@ -1,0 +1,69 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+project:
+  name: '@rcl/cli'
+  description: 'RCL command-line interface'
+
+id: cli
+
+type: application
+language: typescript
+platform: node
+
+dependsOn:
+  - '@rcl/core'
+  - '@rcl/compiler'
+  - '@rcl/file-system'
+
+tasks:
+  build:
+    command: nr build
+    deps:
+      - '@rcl/core:build'
+      - '@rcl/compiler:build'
+      - '@rcl/file-system:build'
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"
+    outputs:
+      - "dist"
+    env:
+      NODE_ENV: "production"
+
+  dev:
+    command: nr dev
+    local: true
+
+  test:
+    command: bun test
+    inputs:
+      - "src/**/*"
+      - "tests/**/*"
+    env:
+      NODE_ENV: "test"
+
+  clean:
+    command: nr clean
+    local: true
+
+  demo:
+    command: nr demo
+    local: true
+    inputs:
+      - "demo.js"
+
+  lint:
+    command: nr lint
+    inputs:
+      - "src/**/*"
+
+  format:
+    command: nr format
+    inputs:
+      - "src/**/*"
+
+  typecheck:
+    command: nr typecheck
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"

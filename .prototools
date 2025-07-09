@@ -3,7 +3,7 @@ biome = "1.9.4"
 dprint = "0.50.1"
 act = "0.2.79"
 actionlint = "1.7.7"
-node = "~20"
+bun = "1.2.18"
 
 [plugins]
 dprint = "https://raw.githubusercontent.com/Phault/proto-toml-plugins/main/dprint/plugin.toml"

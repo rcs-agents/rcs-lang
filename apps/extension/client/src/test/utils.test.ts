@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
 import * as vscode from 'vscode';
 import { getBuildHash, getExtensionVersion } from '../utils';
 
@@ -14,15 +14,19 @@ suite('Utils Test Suite', () => {
 
   test('getBuildHash should return valid characters', () => {
     const hash = getBuildHash();
-    
+
     // Should only contain alphanumeric characters (git hash or base36)
-    assert.ok(/^[a-z0-9]{4}$/i.test(hash), 'Build hash should only contain alphanumeric characters');
+    assert.ok(
+      /^[a-z0-9]{4}$/i.test(hash),
+      'Build hash should only contain alphanumeric characters',
+    );
   });
 
   test('getExtensionVersion should return a version string', () => {
     // Mock extension context
     const mockContext = {
-      extensionPath: vscode.extensions.getExtension('rcl-lang.rcl-language-support')?.extensionPath || __dirname,
+      extensionPath:
+        vscode.extensions.getExtension('rcl-lang.rcl-language-support')?.extensionPath || __dirname,
       subscriptions: [],
       globalState: {} as any,
       workspaceState: {} as any,
@@ -70,7 +74,7 @@ suite('Utils Test Suite', () => {
     } as vscode.ExtensionContext;
 
     const version = getExtensionVersion(mockContext);
-    
+
     assert.strictEqual(version, '0.0.0', 'Should return default version on error');
   });
 });

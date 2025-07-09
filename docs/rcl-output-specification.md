@@ -15,17 +15,39 @@ The JSON output contains three main sections:
   "agent": {
     "name": "AgentName",
     "displayName": "Agent Display Name",
-    "flows": ["FlowId"],
-    "messages": ["MessageId"]
+    "rcsBusinessMessagingAgent": {
+      "description": "Agent description",
+      "logoUri": "https://example.com/logo.png",
+      "color": "#RRGGBB",
+      "phoneNumbers": [{
+        "number": "+1234567890",
+        "label": "Phone Label"
+      }]
+    }
   },
   "flows": {
     "FlowId": {
       "id": "FlowId",
-      "initial": "start",
+      "initial": "MessageId",
       "states": {
-        "stateName": {
+        "MessageId": {
+          "entry": {
+            "type": "sendParent",
+            "event": {
+              "type": "DISPLAY_MESSAGE",
+              "messageId": "MessageId"
+            }
+          },
           "on": {
-            "NEXT": "nextState"
+            "postback_data_value": {
+              "target": "NextMessageId",
+              "actions": {
+                "type": "xstate.assign",
+                "assignment": {
+                  "contextVar": "value"
+                }
+              }
+            }
           }
         }
       },
@@ -35,9 +57,15 @@ The JSON output contains three main sections:
   "messages": {
     "MessageId": {
       "contentMessage": {
-        "text": "Message content"
+        "text": "Message content",
+        "suggestions": [{
+          "reply": {
+            "text": "Suggestion Text",
+            "postbackData": "postback_data_value"
+          }
+        }]
       },
-      "messageTrafficType": "TRANSACTION"
+      "messageTrafficType": "PROMOTION"
     }
   }
 }
@@ -74,6 +102,11 @@ export default { messages, flows, agent, getMessage, getFlow, createMachine };
 - Text content limited to 2048 characters
 - Suggestions limited to 11 items
 - Suggestion text limited to 25 characters
+- **postbackData Generation**: 
+  - Generated from suggestion text using the expression in `defaults.postbackData`
+  - Default pattern: lowercase text with non-alphanumeric replaced by underscore
+  - Example: `"Order Coffee"` → `"order_coffee"`
+  - Example: `"Small $3.50"` → `"small__3_50"`
 
 ### Agent Configuration
 - Must conform to `@schemas/agent-config.schema.json`
@@ -84,6 +117,23 @@ export default { messages, flows, agent, getMessage, getFlow, createMachine };
 - XState-compatible machine configurations
 - Must have `id`, `initial`, and `states` properties
 - State transitions follow XState format
+- **Important**: Each message ID corresponds to a state in the flow
+  - When a user receives a message, they are "on" that state
+  - Message suggestions create transitions to other states (messages)
+  - Transitions use the `postbackData` value as the event name
+  - States should have `entry` actions that send `DISPLAY_MESSAGE` events:
+    ```json
+    "entry": {
+      "type": "sendParent",
+      "event": {
+        "type": "DISPLAY_MESSAGE",
+        "messageId": "MessageId"
+      }
+    }
+    ```
+  - Use `xstate.assign` actions to update context variables
+  - Use `after` for automatic delayed transitions
+  - Use `always` for immediate transitions without user input
 
 ## Current Implementation Status
 

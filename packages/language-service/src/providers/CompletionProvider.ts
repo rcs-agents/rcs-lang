@@ -1,9 +1,9 @@
-import { RCLParser } from '@rcl/parser';
-import { ImportResolver } from '../import-resolver';
-import { WorkspaceIndex } from '../workspace-index';
-import { SymbolType } from '../import-resolver/types';
-import { TextDocument, Position } from './types';
 import path from 'node:path';
+import type { IParser } from '@rcl/core';
+import type { ImportResolver } from '../import-resolver';
+import { SymbolType } from '../import-resolver/types';
+import type { WorkspaceIndex } from '../workspace-index';
+import type { Position, TextDocument } from './types';
 
 /**
  * Completion item kinds
@@ -33,7 +33,7 @@ export enum CompletionItemKind {
   Struct = 22,
   Event = 23,
   Operator = 24,
-  TypeParameter = 25
+  TypeParameter = 25,
 }
 
 /**
@@ -110,7 +110,7 @@ interface CompletionContext {
  * Provides context-aware code completion for RCL
  */
 export class CompletionProvider {
-  private parser: RCLParser;
+  private parser: IParser;
   private importResolver: ImportResolver;
   private workspaceIndex: WorkspaceIndex;
 
@@ -120,7 +120,7 @@ export class CompletionProvider {
     agent: ['name', 'brandName', 'displayName', 'timeout', 'enabled'],
     flow: ['start'],
     property: [],
-    transition: ['->']
+    transition: ['->'],
   };
 
   // Built-in property types and values
@@ -129,14 +129,10 @@ export class CompletionProvider {
     timeout: ['30', '60', '120', '300'],
     brandName: [],
     name: [],
-    displayName: []
+    displayName: [],
   };
 
-  constructor(
-    parser: RCLParser,
-    importResolver: ImportResolver,
-    workspaceIndex: WorkspaceIndex
-  ) {
+  constructor(parser: IParser, importResolver: ImportResolver, workspaceIndex: WorkspaceIndex) {
     this.parser = parser;
     this.importResolver = importResolver;
     this.workspaceIndex = workspaceIndex;
@@ -148,7 +144,7 @@ export class CompletionProvider {
   async provideCompletion(
     document: TextDocument,
     position: Position,
-    triggerCharacter?: string
+    triggerCharacter?: string,
   ): Promise<CompletionList> {
     try {
       const context = this.analyzeCompletionContext(document, position, triggerCharacter);
@@ -163,7 +159,7 @@ export class CompletionProvider {
       switch (context.scope) {
         case 'root':
           completions.push(...this.provideRootCompletions(context));
-          completions.push(...await this.provideImportCompletions(document, context));
+          completions.push(...(await this.provideImportCompletions(document, context)));
           break;
 
         case 'agent':
@@ -172,7 +168,7 @@ export class CompletionProvider {
 
         case 'flow':
           completions.push(...this.provideFlowCompletions(context));
-          completions.push(...await this.provideSymbolCompletions(document, context));
+          completions.push(...(await this.provideSymbolCompletions(document, context)));
           break;
 
         case 'property':
@@ -181,7 +177,7 @@ export class CompletionProvider {
 
         case 'transition':
           completions.push(...this.provideTransitionCompletions(context));
-          completions.push(...await this.provideSymbolCompletions(document, context));
+          completions.push(...(await this.provideSymbolCompletions(document, context)));
           break;
       }
 
@@ -190,10 +186,10 @@ export class CompletionProvider {
 
       // Filter and sort completions
       const filteredCompletions = this.filterCompletions(completions, context.prefix);
-      
+
       return {
         isIncomplete: false,
-        items: filteredCompletions
+        items: filteredCompletions,
       };
     } catch (error) {
       console.error('Error providing completion:', error);
@@ -207,13 +203,13 @@ export class CompletionProvider {
   private analyzeCompletionContext(
     document: TextDocument,
     position: Position,
-    triggerCharacter?: string
+    triggerCharacter?: string,
   ): CompletionContext {
     const content = document.getText();
     const lines = content.split('\n');
     const currentLine = lines[position.line] || '';
     const beforeCursor = currentLine.substring(0, position.character);
-    
+
     // Extract prefix (word being typed)
     const prefixMatch = beforeCursor.match(/[\w]*$/);
     const prefix = prefixMatch ? prefixMatch[0] : '';
@@ -224,7 +220,7 @@ export class CompletionProvider {
 
     // Determine scope based on indentation and context
     const scope = this.determineScope(lines, position.line);
-    
+
     // Find available symbols in current document
     const availableSymbols = this.extractAvailableSymbols(content);
 
@@ -236,27 +232,27 @@ export class CompletionProvider {
       inString,
       inComment,
       scope,
-      availableSymbols
+      availableSymbols,
     };
   }
 
   /**
    * Provide completions for root level (agents, flows, imports)
    */
-  private provideRootCompletions(context: CompletionContext): CompletionItem[] {
+  private provideRootCompletions(_context: CompletionContext): CompletionItem[] {
     const completions: CompletionItem[] = [];
 
     // Root level keywords
-    this.keywords.root.forEach(keyword => {
+    for (const keyword of this.keywords.root) {
       completions.push({
         label: keyword,
         kind: CompletionItemKind.Keyword,
         detail: `${keyword} definition`,
         documentation: this.getKeywordDocumentation(keyword),
         insertText: keyword,
-        sortText: `0_${keyword}`
+        sortText: `0_${keyword}`,
       });
-    });
+    }
 
     return completions;
   }
@@ -264,23 +260,23 @@ export class CompletionProvider {
   /**
    * Provide completions for agent context
    */
-  private provideAgentCompletions(context: CompletionContext): CompletionItem[] {
+  private provideAgentCompletions(_context: CompletionContext): CompletionItem[] {
     const completions: CompletionItem[] = [];
 
     // Agent properties
-    this.keywords.agent.forEach(property => {
+    for (const property of this.keywords.agent) {
       const detail = this.getPropertyDetail(property);
       const insertText = this.getPropertyInsertText(property);
-      
+
       completions.push({
         label: property,
         kind: CompletionItemKind.Property,
         detail,
         documentation: this.getPropertyDocumentation(property),
         insertText,
-        sortText: `1_${property}`
+        sortText: `1_${property}`,
       });
-    });
+    }
 
     return completions;
   }
@@ -292,19 +288,19 @@ export class CompletionProvider {
     const completions: CompletionItem[] = [];
 
     // Flow keywords
-    this.keywords.flow.forEach(keyword => {
+    for (const keyword of this.keywords.flow) {
       completions.push({
         label: keyword,
         kind: CompletionItemKind.Keyword,
         detail: `${keyword} state`,
         documentation: this.getKeywordDocumentation(keyword),
         insertText: keyword,
-        sortText: `0_${keyword}`
+        sortText: `0_${keyword}`,
       });
-    });
+    }
 
     // State names from current flow
-    context.availableSymbols.forEach(symbol => {
+    for (const symbol of context.availableSymbols) {
       if (this.isStateSymbol(symbol)) {
         completions.push({
           label: symbol,
@@ -312,10 +308,10 @@ export class CompletionProvider {
           detail: 'Flow state',
           documentation: `Reference to state '${symbol}'`,
           insertText: symbol,
-          sortText: `2_${symbol}`
+          sortText: `2_${symbol}`,
         });
       }
-    });
+    }
 
     return completions;
   }
@@ -331,15 +327,15 @@ export class CompletionProvider {
     const propertyName = propertyMatch ? propertyMatch[1] : '';
 
     if (this.propertyValues[propertyName]) {
-      this.propertyValues[propertyName].forEach(value => {
+      for (const value of this.propertyValues[propertyName]) {
         completions.push({
           label: value,
           kind: CompletionItemKind.Value,
           detail: `${propertyName} value`,
           insertText: `"${value}"`,
-          sortText: `0_${value}`
+          sortText: `0_${value}`,
         });
-      });
+      }
     }
 
     return completions;
@@ -359,7 +355,7 @@ export class CompletionProvider {
         detail: 'Transition operator',
         documentation: 'Creates a transition between states',
         insertText: '-> ',
-        sortText: '0_transition'
+        sortText: '0_transition',
       });
     }
 
@@ -371,21 +367,26 @@ export class CompletionProvider {
    */
   private async provideSymbolCompletions(
     document: TextDocument,
-    context: CompletionContext
+    _context: CompletionContext,
   ): Promise<CompletionItem[]> {
     const completions: CompletionItem[] = [];
 
     try {
       // Get symbols by type from workspace
-      const symbolTypes = [SymbolType.Agent, SymbolType.Flow, SymbolType.Message, SymbolType.Property];
-      
+      const symbolTypes = [
+        SymbolType.Agent,
+        SymbolType.Flow,
+        SymbolType.Message,
+        SymbolType.Property,
+      ];
+
       for (const symbolType of symbolTypes) {
         const symbols = this.workspaceIndex.getSymbolsByType(symbolType);
-        
-        symbols.forEach(symbolLocation => {
+
+        for (const symbolLocation of symbols) {
           // Skip symbols from current document (already handled locally)
           if (symbolLocation.uri === document.uri) {
-            return;
+            continue;
           }
 
           const kind = this.getCompletionKindForSymbolType(symbolLocation.symbol.type);
@@ -395,9 +396,9 @@ export class CompletionProvider {
             detail: `${symbolLocation.symbol.type} from ${this.getRelativeFilePath(symbolLocation.uri)}`,
             documentation: `Reference to ${symbolLocation.symbol.type} '${symbolLocation.symbol.name}'`,
             insertText: symbolLocation.symbol.name,
-            sortText: `3_${symbolLocation.symbol.name}`
+            sortText: `3_${symbolLocation.symbol.name}`,
           });
-        });
+        }
       }
     } catch (error) {
       console.error('Error getting workspace symbols:', error);
@@ -411,7 +412,7 @@ export class CompletionProvider {
    */
   private async provideImportCompletions(
     document: TextDocument,
-    context: CompletionContext
+    context: CompletionContext,
   ): Promise<CompletionItem[]> {
     const completions: CompletionItem[] = [];
 
@@ -423,18 +424,23 @@ export class CompletionProvider {
     try {
       // Get unique file URIs from all symbol types
       const allFiles = new Set<string>();
-      const symbolTypes = [SymbolType.Agent, SymbolType.Flow, SymbolType.Message, SymbolType.Property];
-      
+      const symbolTypes = [
+        SymbolType.Agent,
+        SymbolType.Flow,
+        SymbolType.Message,
+        SymbolType.Property,
+      ];
+
       for (const symbolType of symbolTypes) {
         const symbols = this.workspaceIndex.getSymbolsByType(symbolType);
-        symbols.forEach(symbol => {
+        for (const symbol of symbols) {
           if (symbol.uri !== document.uri && symbol.uri.endsWith('.rcl')) {
             allFiles.add(symbol.uri);
           }
-        });
+        }
       }
 
-      allFiles.forEach(filePath => {
+      for (const filePath of allFiles) {
         const relativePath = this.getRelativeImportPath(document.uri, filePath);
         completions.push({
           label: relativePath,
@@ -442,9 +448,9 @@ export class CompletionProvider {
           detail: 'RCL file',
           documentation: `Import symbols from ${relativePath}`,
           insertText: relativePath,
-          sortText: `1_${relativePath}`
+          sortText: `1_${relativePath}`,
         });
-      });
+      }
     } catch (error) {
       console.error('Error getting import completions:', error);
     }
@@ -466,7 +472,7 @@ export class CompletionProvider {
         detail: 'Agent template',
         documentation: 'Create a new agent definition',
         insertText: `agent \${1:AgentName}\n  name: "\${2:Agent Name}"\n  brandName: "\${3:Brand Name}"\n  displayName: "\${4:Display Name}"`,
-        sortText: '0_agent_snippet'
+        sortText: '0_agent_snippet',
       });
 
       // Flow snippet
@@ -476,7 +482,7 @@ export class CompletionProvider {
         detail: 'Flow template',
         documentation: 'Create a new flow definition',
         insertText: `flow \${1:FlowName}\n  start -> \${2:initialState}\n  \${2:initialState}: "\${3:Initial message}"\n  \${2:initialState} -> end\n  end: "\${4:End message}"`,
-        sortText: '0_flow_snippet'
+        sortText: '0_flow_snippet',
       });
     }
 
@@ -492,9 +498,10 @@ export class CompletionProvider {
     }
 
     const lowerPrefix = prefix.toLowerCase();
-    return completions.filter(item => 
-      item.label.toLowerCase().startsWith(lowerPrefix) ||
-      (item.filterText && item.filterText.toLowerCase().includes(lowerPrefix))
+    return completions.filter(
+      (item) =>
+        item.label.toLowerCase().startsWith(lowerPrefix) ||
+        item.filterText?.toLowerCase().includes(lowerPrefix),
     );
   }
 
@@ -506,16 +513,19 @@ export class CompletionProvider {
     for (let i = lineIndex; i >= 0; i--) {
       const line = lines[i];
       if (!line) continue; // Skip undefined or empty lines
-      
+
       const trimmed = line.trim();
-      
+
       if (trimmed.startsWith('agent ')) {
         return 'agent';
-      } else if (trimmed.startsWith('flow ')) {
+      }
+      if (trimmed.startsWith('flow ')) {
         return 'flow';
-      } else if (trimmed.includes('->')) {
+      }
+      if (trimmed.includes('->')) {
         return 'transition';
-      } else if (trimmed.includes(':') && !trimmed.startsWith('import ')) {
+      }
+      if (trimmed.includes(':') && !trimmed.startsWith('import ')) {
         return 'property';
       }
     }
@@ -545,9 +555,9 @@ export class CompletionProvider {
     const symbols: string[] = [];
     const lines = content.split('\n');
 
-    lines.forEach(line => {
+    for (const line of lines) {
       const trimmed = line.trim();
-      
+
       // Extract agent names
       const agentMatch = trimmed.match(/^agent\s+(\w+)/);
       if (agentMatch) {
@@ -565,7 +575,7 @@ export class CompletionProvider {
       if (stateMatch && !line.includes('agent') && !line.includes('flow')) {
         symbols.push(stateMatch[1]);
       }
-    });
+    }
 
     return symbols;
   }
@@ -604,7 +614,7 @@ export class CompletionProvider {
       agent: 'Defines a conversational agent with properties and configuration',
       flow: 'Defines a conversation flow with states and transitions',
       import: 'Imports symbols from another RCL file',
-      start: 'Initial state of a flow'
+      start: 'Initial state of a flow',
     };
     return docs[keyword] || `${keyword} keyword`;
   }
@@ -618,7 +628,7 @@ export class CompletionProvider {
       brandName: 'The brand name displayed to users',
       displayName: 'The display name shown in conversations',
       timeout: 'Session timeout in seconds',
-      enabled: 'Whether the agent is enabled'
+      enabled: 'Whether the agent is enabled',
     };
     return docs[property] || `${property} property`;
   }
@@ -632,7 +642,7 @@ export class CompletionProvider {
       brandName: 'string',
       displayName: 'string',
       timeout: 'number',
-      enabled: 'boolean'
+      enabled: 'boolean',
     };
     return details[property] || 'property';
   }
@@ -646,7 +656,7 @@ export class CompletionProvider {
       brandName: 'brandName: "${1:Brand Name}"',
       displayName: 'displayName: "${1:Display Name}"',
       timeout: 'timeout: ${1:30}',
-      enabled: 'enabled: ${1:true}'
+      enabled: 'enabled: ${1:true}',
     };
     return templates[property] || `${property}: "\${1:value}"`;
   }
@@ -663,17 +673,17 @@ export class CompletionProvider {
    */
   private getRelativeImportPath(fromUri: string, toUri: string): string {
     let relativePath = path.relative(path.dirname(fromUri), toUri);
-    
+
     // Remove .rcl extension for imports
     if (relativePath.endsWith('.rcl')) {
       relativePath = relativePath.slice(0, -4);
     }
-    
+
     // Ensure relative path starts with ./ for relative imports
     if (!relativePath.startsWith('.')) {
-      relativePath = './' + relativePath;
+      relativePath = `./${relativePath}`;
     }
-    
+
     return relativePath;
   }
 }

@@ -1,19 +1,19 @@
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 import {
-  CompletionItem,
+  type CompletionItem,
   CompletionItemKind,
-  Position,
   InsertTextFormat,
   MarkupKind,
+  type Position,
 } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
 
 export class CompletionProvider {
   constructor(private parser: RCLParser) {}
 
   public async getCompletions(
-    document: TextDocument,
-    position: Position,
+    _document: TextDocument,
+    _position: Position,
   ): Promise<CompletionItem[]> {
     // Basic completion items for RCL
     return [

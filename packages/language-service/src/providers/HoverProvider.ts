@@ -1,10 +1,23 @@
-import { RCLParser } from '@rcl/parser';
-import { ImportResolver } from '../import-resolver';
-import { WorkspaceIndex } from '../workspace-index';
-import { SymbolType } from '../import-resolver/types';
-import { TextDocument, Position } from './types';
 import fs from 'node:fs';
 import path from 'node:path';
+import type { IParseResult, IParser } from '@rcl/core';
+import type {
+  ASTNode,
+  Range as ASTRange,
+  AgentNode,
+  BaseNode,
+  FlowNode,
+  MessageNode,
+  StateNode,
+  StringNode,
+  TransitionNode,
+  ValueNode,
+} from '../ast-compatibility';
+import { walkAST } from '../ast-compatibility';
+import type { ImportResolver } from '../import-resolver';
+import { SymbolType } from '../import-resolver/types';
+import type { WorkspaceIndex } from '../workspace-index';
+import type { Position, TextDocument } from './types';
 
 /**
  * Represents hover information
@@ -30,18 +43,82 @@ export interface MarkupContent {
 }
 
 /**
+ * Represents a symbol range in the document
+ */
+export interface SymbolRange {
+  start: { line: number; character: number };
+  end: { line: number; character: number };
+}
+
+/**
+ * Agent properties extracted from AST
+ */
+interface AgentProperties {
+  name?: string;
+  brandName?: string;
+  displayName?: string;
+  [key: string]: string | undefined;
+}
+
+/**
+ * Flow transition representation
+ */
+interface FlowTransition {
+  from: string;
+  to: string;
+}
+
+/**
+ * Type guard for string nodes
+ */
+function isStringNode(node: ValueNode): node is StringNode {
+  return node.type === 'string';
+}
+
+/**
+ * Type guard for agent nodes
+ */
+function isAgentNode(node: BaseNode): node is AgentNode {
+  return node.type === 'agent_definition';
+}
+
+/**
+ * Type guard for flow nodes
+ */
+function isFlowNode(node: BaseNode): node is FlowNode {
+  return node.type === 'flow_definition';
+}
+
+/**
+ * Type guard for message nodes
+ */
+function isMessageNode(node: BaseNode): node is MessageNode {
+  return node.type === 'message_definition';
+}
+
+/**
+ * Type guard for state nodes
+ */
+function isStateNode(node: BaseNode): node is StateNode {
+  return node.type === 'state_definition';
+}
+
+/**
+ * Type guard for transition nodes
+ */
+function isTransitionNode(node: BaseNode): node is TransitionNode {
+  return node.type === 'transition';
+}
+
+/**
  * Provides hover documentation for RCL symbols
  */
 export class HoverProvider {
-  private parser: RCLParser;
+  private parser: IParser;
   private importResolver: ImportResolver;
   private workspaceIndex: WorkspaceIndex;
 
-  constructor(
-    parser: RCLParser,
-    importResolver: ImportResolver,
-    workspaceIndex: WorkspaceIndex
-  ) {
+  constructor(parser: IParser, importResolver: ImportResolver, workspaceIndex: WorkspaceIndex) {
     this.parser = parser;
     this.importResolver = importResolver;
     this.workspaceIndex = workspaceIndex;
@@ -50,10 +127,7 @@ export class HoverProvider {
   /**
    * Provide hover information for a symbol at the given position
    */
-  async provideHover(
-    document: TextDocument,
-    position: Position
-  ): Promise<Hover | null> {
+  async provideHover(document: TextDocument, position: Position): Promise<Hover | null> {
     try {
       const symbol = this.getSymbolAtPosition(document, position);
       if (!symbol) {
@@ -61,13 +135,16 @@ export class HoverProvider {
       }
 
       const symbolRange = this.getSymbolRange(document, position, symbol);
+      if (!symbolRange) {
+        return null;
+      }
 
       // First try to find local definition
       const localHover = await this.getLocalHover(document, symbol, position);
       if (localHover) {
         return {
           contents: localHover,
-          range: symbolRange
+          range: symbolRange,
         };
       }
 
@@ -76,7 +153,7 @@ export class HoverProvider {
       if (importedHover) {
         return {
           contents: importedHover,
-          range: symbolRange
+          range: symbolRange,
         };
       }
 
@@ -85,7 +162,7 @@ export class HoverProvider {
       if (basicHover) {
         return {
           contents: basicHover,
-          range: symbolRange
+          range: symbolRange,
         };
       }
 
@@ -102,7 +179,7 @@ export class HoverProvider {
   private getSymbolAtPosition(document: TextDocument, position: Position): string | null {
     const content = document.getText();
     const lines = content.split('\n');
-    
+
     // Validate position
     if (position.line < 0 || position.line >= lines.length) {
       return null;
@@ -139,21 +216,25 @@ export class HoverProvider {
   /**
    * Get the range of the symbol at position
    */
-  private getSymbolRange(document: TextDocument, position: Position, symbol: string): any {
+  private getSymbolRange(
+    document: TextDocument,
+    position: Position,
+    symbol: string,
+  ): SymbolRange | null {
     const content = document.getText();
     const lines = content.split('\n');
-    
+
     if (position.line >= lines.length) {
       return null;
     }
 
     const line = lines[position.line];
     const symbolIndex = line.indexOf(symbol, Math.max(0, position.character - symbol.length));
-    
+
     if (symbolIndex !== -1) {
       return {
         start: { line: position.line, character: symbolIndex },
-        end: { line: position.line, character: symbolIndex + symbol.length }
+        end: { line: position.line, character: symbolIndex + symbol.length },
       };
     }
 
@@ -173,12 +254,19 @@ export class HoverProvider {
   private async getLocalHover(
     document: TextDocument,
     symbol: string,
-    position: Position
+    _position: Position,
   ): Promise<MarkupContent | null> {
     const content = document.getText();
-    const rclDocument = await this.parser.parseDocument(content, document.uri);
+    const parseResult = await this.parser.parse(content, document.uri);
+    if (!parseResult.success) {
+      return null;
+    }
+    const rclDocument = parseResult.value;
 
     // Find the symbol definition in the AST
+    if (!rclDocument.ast) {
+      return null;
+    }
     const definition = this.findSymbolDefinitionInAST(rclDocument.ast, symbol);
     if (!definition) {
       return null;
@@ -192,24 +280,31 @@ export class HoverProvider {
    */
   private async getImportedHover(
     document: TextDocument,
-    symbol: string
+    symbol: string,
   ): Promise<MarkupContent | null> {
     // Get symbol from workspace index
     const symbolLocations = this.workspaceIndex.findSymbol(symbol);
-    const externalSymbols = symbolLocations.filter(loc => loc.uri !== document.uri);
-    
+    const externalSymbols = symbolLocations.filter((loc) => loc.uri !== document.uri);
+
     if (externalSymbols.length === 0) {
       return null;
     }
 
     // Use the first external symbol found
     const symbolLoc = externalSymbols[0];
-    
+
     try {
       // Parse the external file to get full definition context
       const externalContent = fs.readFileSync(symbolLoc.uri, 'utf-8');
-      const externalDocument = await this.parser.parseDocument(externalContent, symbolLoc.uri);
-      
+      const parseResult = await this.parser.parse(externalContent, symbolLoc.uri);
+      if (!parseResult.success) {
+        return null;
+      }
+      const externalDocument = parseResult.value;
+
+      if (!externalDocument.ast) {
+        return null;
+      }
       const definition = this.findSymbolDefinitionInAST(externalDocument.ast, symbol);
       if (definition) {
         const hoverContent = this.createHoverContent(definition, symbol);
@@ -230,22 +325,22 @@ export class HoverProvider {
   /**
    * Get basic hover information when no definition is found
    */
-  private getBasicHover(symbol: string): MarkupContent | null {
+  private getBasicHover(symbol: string): MarkupContent {
     return {
       kind: 'markdown',
-      value: `**Symbol:** \`${symbol}\`\n\n*No definition found*`
+      value: `**Symbol:** \`${symbol}\`\n\n*No definition found*`,
     };
   }
 
   /**
    * Find symbol definition in AST
    */
-  private findSymbolDefinitionInAST(ast: any, symbol: string): any | null {
+  private findSymbolDefinitionInAST(ast: BaseNode, symbol: string): BaseNode | null {
     if (!ast) return null;
 
-    let definition: any = null;
+    let definition: BaseNode | null = null;
 
-    this.walkAST(ast, (node) => {
+    walkAST(ast, (node: BaseNode) => {
       if (this.isDefinitionNode(node)) {
         const nodeName = this.extractNodeName(node);
         if (nodeName === symbol) {
@@ -260,20 +355,26 @@ export class HoverProvider {
   /**
    * Create formatted hover content for a definition
    */
-  private createHoverContent(definition: any, symbol: string): MarkupContent {
+  private createHoverContent(definition: BaseNode, symbol: string): MarkupContent {
     const symbolType = this.getSymbolTypeFromNode(definition);
     let content = `**${this.capitalizeSymbolType(symbolType)}:** \`${symbol}\`\n\n`;
 
     // Add type-specific information
     switch (symbolType) {
       case SymbolType.Agent:
-        content += this.createAgentHover(definition);
+        if (isAgentNode(definition)) {
+          content += this.createAgentHover(definition);
+        }
         break;
       case SymbolType.Flow:
-        content += this.createFlowHover(definition);
+        if (isFlowNode(definition)) {
+          content += this.createFlowHover(definition);
+        }
         break;
       case SymbolType.Message:
-        content += this.createMessageHover(definition);
+        if (isMessageNode(definition)) {
+          content += this.createMessageHover(definition);
+        }
         break;
       case SymbolType.Property:
         content += this.createPropertyHover(definition);
@@ -290,31 +391,28 @@ export class HoverProvider {
 
     return {
       kind: 'markdown',
-      value: content
+      value: content,
     };
   }
 
   /**
    * Create hover content for agent definitions
    */
-  private createAgentHover(definition: any): string {
+  private createAgentHover(definition: AgentNode): string {
     let content = '';
-    
-    // Extract agent properties
-    const properties = this.extractAgentProperties(definition);
-    
-    if (properties.name) {
-      content += `**Name:** ${properties.name}\n`;
+
+    if (definition.name) {
+      content += `**Name:** ${definition.name}\n`;
     }
-    if (properties.brandName) {
-      content += `**Brand:** ${properties.brandName}\n`;
+    if (definition.displayName) {
+      content += `**Display Name:** ${definition.displayName}\n`;
     }
-    if (properties.displayName) {
-      content += `**Display Name:** ${properties.displayName}\n`;
+    if (definition.description) {
+      content += `**Description:** ${definition.description}\n`;
     }
 
     // List flows associated with this agent
-    const flows = this.extractAgentFlows(definition);
+    const flows = definition.flows?.map((f) => f.name || 'unnamed') || [];
     if (flows.length > 0) {
       content += `\n**Flows:** ${flows.join(', ')}\n`;
     }
@@ -325,22 +423,32 @@ export class HoverProvider {
   /**
    * Create hover content for flow definitions
    */
-  private createFlowHover(definition: any): string {
+  private createFlowHover(definition: FlowNode): string {
     let content = '';
 
-    // Extract flow states and transitions
-    const states = this.extractFlowStates(definition);
-    const transitions = this.extractFlowTransitions(definition);
+    // Extract flow states
+    const states = definition.states?.map((s) => s.name || 'unnamed') || [];
+    const transitions: FlowTransition[] = [];
+
+    // Extract transitions from states
+    for (const state of definition.states || []) {
+      for (const transition of state.transitions || []) {
+        transitions.push({
+          from: state.name || 'unnamed',
+          to: transition.to,
+        });
+      }
+    }
 
     if (states.length > 0) {
       content += `**States:** ${states.join(', ')}\n`;
     }
 
     if (transitions.length > 0) {
-      content += `**Transitions:**\n`;
-      transitions.forEach(transition => {
+      content += '**Transitions:**\n';
+      for (const transition of transitions) {
         content += `- ${transition.from} → ${transition.to}\n`;
-      });
+      }
     }
 
     return content;
@@ -349,19 +457,17 @@ export class HoverProvider {
   /**
    * Create hover content for message definitions
    */
-  private createMessageHover(definition: any): string {
+  private createMessageHover(definition: MessageNode): string {
     let content = '';
 
     // Extract message content
-    const messageText = this.extractMessageText(definition);
-    if (messageText) {
-      content += `**Content:** "${messageText}"\n`;
+    if (definition.content && isStringNode(definition.content)) {
+      content += `**Content:** "${definition.content.value}"\n`;
     }
 
     // Extract message type
-    const messageType = this.extractMessageType(definition);
-    if (messageType) {
-      content += `**Type:** ${messageType}\n`;
+    if (definition.messageType) {
+      content += `**Type:** ${definition.messageType}\n`;
     }
 
     return content;
@@ -370,18 +476,12 @@ export class HoverProvider {
   /**
    * Create hover content for property definitions
    */
-  private createPropertyHover(definition: any): string {
+  private createPropertyHover(definition: BaseNode): string {
     let content = '';
 
-    const value = this.extractPropertyValue(definition);
-    if (value) {
-      content += `**Value:** ${value}\n`;
-    }
-
-    const propertyType = this.extractPropertyType(definition);
-    if (propertyType) {
-      content += `**Type:** ${propertyType}\n`;
-    }
+    // For properties in the current AST structure, we need to extract value info
+    // This would depend on the specific node structure
+    content += '**Property Definition**\n';
 
     return content;
   }
@@ -389,140 +489,32 @@ export class HoverProvider {
   /**
    * Create generic hover content
    */
-  private createGenericHover(definition: any): string {
-    return `**Definition found**\n\nNo additional information available.`;
+  private createGenericHover(_definition: BaseNode): string {
+    return '**Definition found**\n\nNo additional information available.';
   }
 
   /**
    * Extract documentation comments from around a definition
    */
-  private extractDocumentation(definition: any): string | null {
+  private extractDocumentation(_definition: BaseNode): string | null {
     // For now, return null - documentation extraction would need
     // to look at preceding comment nodes in the AST
     return null;
   }
 
   /**
-   * Extract agent properties from definition
-   */
-  private extractAgentProperties(definition: any): any {
-    const properties: any = {};
-
-    this.walkAST(definition, (node) => {
-      if (node.type === 'property') {
-        const name = node.name?.trim();
-        const value = node.value?.trim();
-        
-        if (name && value) {
-          // Remove quotes from string values
-          const cleanValue = value.replace(/^["']|["']$/g, '');
-          properties[name] = cleanValue;
-        }
-      }
-    });
-
-    return properties;
-  }
-
-  /**
-   * Extract flows associated with an agent
-   */
-  private extractAgentFlows(definition: any): string[] {
-    // This would need to be implemented based on how agent-flow
-    // relationships are represented in the AST
-    return [];
-  }
-
-  /**
-   * Extract states from a flow definition
-   */
-  private extractFlowStates(definition: any): string[] {
-    const states: string[] = [];
-
-    this.walkAST(definition, (node) => {
-      if (node.type === 'property' && node.name) {
-        states.push(node.name.trim());
-      }
-    });
-
-    return [...new Set(states)]; // Remove duplicates
-  }
-
-  /**
-   * Extract transitions from a flow definition
-   */
-  private extractFlowTransitions(definition: any): Array<{from: string, to: string}> {
-    const transitions: Array<{from: string, to: string}> = [];
-
-    this.walkAST(definition, (node) => {
-      if (node.type === 'transition') {
-        transitions.push({
-          from: node.from || 'unknown',
-          to: node.to || 'unknown'
-        });
-      }
-    });
-
-    return transitions;
-  }
-
-  /**
-   * Extract text content from a message
-   */
-  private extractMessageText(definition: any): string | null {
-    // Extract the message text content
-    if (definition.value) {
-      return definition.value.replace(/^["']|["']$/g, '');
-    }
-    return null;
-  }
-
-  /**
-   * Extract message type
-   */
-  private extractMessageType(definition: any): string | null {
-    // This would extract message type information if available
-    return null;
-  }
-
-  /**
-   * Extract property value
-   */
-  private extractPropertyValue(definition: any): string | null {
-    if (definition.value) {
-      return definition.value.replace(/^["']|["']$/g, '');
-    }
-    return null;
-  }
-
-  /**
-   * Extract property type
-   */
-  private extractPropertyType(definition: any): string | null {
-    // This would infer or extract property type information
-    if (definition.value) {
-      const value = definition.value.trim();
-      if (value.match(/^["']/)) {
-        return 'string';
-      } else if (value.match(/^\d+$/)) {
-        return 'number';
-      } else if (value.match(/^(true|false)$/i)) {
-        return 'boolean';
-      }
-    }
-    return null;
-  }
-
-  /**
    * Get symbol type from AST node
    */
-  private getSymbolTypeFromNode(node: any): SymbolType {
+  private getSymbolTypeFromNode(node: BaseNode): SymbolType {
     switch (node.type) {
-      case 'agent_definition': return SymbolType.Agent;
-      case 'flow_definition': return SymbolType.Flow;
-      case 'message_definition': return SymbolType.Message;
-      case 'property': return SymbolType.Property;
-      default: return SymbolType.Property;
+      case 'agent_definition':
+        return SymbolType.Agent;
+      case 'flow_definition':
+        return SymbolType.Flow;
+      case 'message_definition':
+        return SymbolType.Message;
+      default:
+        return SymbolType.Property;
     }
   }
 
@@ -536,24 +528,31 @@ export class HoverProvider {
   /**
    * Check if a node represents a definition
    */
-  private isDefinitionNode(node: any): boolean {
-    return [
-      'agent_definition',
-      'flow_definition', 
-      'message_definition',
-      'property'
-    ].includes(node.type);
+  private isDefinitionNode(node: BaseNode): boolean {
+    return ['agent_definition', 'flow_definition', 'message_definition', 'property'].includes(
+      node.type,
+    );
   }
 
   /**
    * Extract name from a definition node
    */
-  private extractNodeName(node: any): string {
-    if (node.name) {
-      return node.name;
+  private extractNodeName(node: BaseNode): string {
+    // Type-safe name extraction
+    if (isAgentNode(node)) {
+      return node.name || '';
+    }
+    if (isFlowNode(node)) {
+      return node.name || '';
+    }
+    if (isMessageNode(node)) {
+      return node.name || '';
+    }
+    if (isStateNode(node)) {
+      return node.name || '';
     }
 
-    // Try to extract from text
+    // Fallback for other node types that might have text
     if (node.text) {
       const match = node.text.match(/^\s*\w+\s+([^\s]+)/);
       if (match) {
@@ -569,20 +568,5 @@ export class HoverProvider {
    */
   private getRelativePath(fromUri: string, toUri: string): string {
     return path.relative(path.dirname(fromUri), toUri);
-  }
-
-  /**
-   * Walk AST nodes recursively
-   */
-  private walkAST(node: any, callback: (node: any) => void): void {
-    if (!node) return;
-    
-    callback(node);
-    
-    if (node.children && Array.isArray(node.children)) {
-      for (const child of node.children) {
-        this.walkAST(child, callback);
-      }
-    }
   }
 }

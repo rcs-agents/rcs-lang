@@ -1,0 +1,51 @@
+$schema: "https://moonrepo.dev/schemas/workspace.json"
+
+version: 1
+
+workspace:
+  syncing:
+    syncProjectWorkspaceDeps: true
+    syncDependencies: true
+
+projects:
+  - "apps/*"
+  - "packages/*"
+  - "libs/*"
+
+runner:
+  # Use the proto toolchain for package management
+  archivableTargets:
+    - ':build'
+    - ':test'
+
+toolchain:
+  default: bun
+  
+node:
+  packageManager: bun
+  npm:
+    # Disable npm entirely
+    install: false
+
+bun:
+  version: 1.2.18
+  lockfile: bun.lockb
+  install: true
+
+docker:
+  scaffold:
+    include:
+      - "apps/**/*"
+      - "packages/**/*"
+
+vcs:
+  manager: git
+  defaultBranch: main
+
+experiments:
+  - "interactiveTaskRunner"
+
+# TypeScript configuration for the workspace
+typescript:
+  projectReferences: true
+  routeOutDirToCache: true

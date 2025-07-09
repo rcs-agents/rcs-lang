@@ -1,18 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
-const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
 const parser_1 = require("@rcl/parser");
-const syntaxValidator_1 = require("./syntaxValidator");
+const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
+const codeActions_1 = require("./features/codeActions");
 const completion_1 = require("./features/completion");
-const hover_1 = require("./features/hover");
 const definition_1 = require("./features/definition");
-const references_1 = require("./features/references");
-const symbols_1 = require("./features/symbols");
-const formatting_1 = require("./features/formatting");
-const folding_1 = require("./features/folding");
-const semanticTokens_1 = require("./features/semanticTokens");
 const diagnostics_1 = require("./features/diagnostics");
+const folding_1 = require("./features/folding");
+const formatting_1 = require("./features/formatting");
+const hover_1 = require("./features/hover");
+const references_1 = require("./features/references");
+const rename_1 = require("./features/rename");
+const semanticTokens_1 = require("./features/semanticTokens");
+const signatureHelp_1 = require("./features/signatureHelp");
+const symbols_1 = require("./features/symbols");
+const syntaxValidator_1 = require("./syntaxValidator");
 // Create a connection for the server, using Node's IPC as a transport
 const connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
 // Create a simple text document manager
@@ -29,18 +32,20 @@ const formattingProvider = new formatting_1.FormattingProvider(parser);
 const foldingProvider = new folding_1.FoldingProvider(parser);
 const semanticTokensProvider = new semanticTokens_1.SemanticTokensProvider(parser);
 const diagnosticsProvider = new diagnostics_1.DiagnosticsProvider(parser, syntaxValidator);
+const renameProvider = new rename_1.RenameProvider(parser);
+const codeActionProvider = new codeActions_1.CodeActionProvider(parser);
+const signatureHelpProvider = new signatureHelp_1.SignatureHelpProvider(parser);
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
+let _hasDiagnosticRelatedInformationCapability = false;
 connection.onInitialize((params) => {
     console.log('Initializing RCL Language Server');
     const capabilities = params.capabilities;
     // Check client capabilities
     hasConfigurationCapability = !!(capabilities.workspace && !!capabilities.workspace.configuration);
     hasWorkspaceFolderCapability = !!(capabilities.workspace && !!capabilities.workspace.workspaceFolders);
-    hasDiagnosticRelatedInformationCapability = !!(capabilities.textDocument &&
-        capabilities.textDocument.publishDiagnostics &&
-        capabilities.textDocument.publishDiagnostics.relatedInformation);
+    _hasDiagnosticRelatedInformationCapability =
+        !!capabilities.textDocument?.publishDiagnostics?.relatedInformation;
     const result = {
         capabilities: {
             textDocumentSync: node_1.TextDocumentSyncKind.Incremental,
@@ -51,12 +56,21 @@ connection.onInitialize((params) => {
             },
             // Hover information
             hoverProvider: true,
+            // Signature help
+            signatureHelpProvider: {
+                triggerCharacters: [':', ' ', '"'],
+                retriggerCharacters: [','],
+            },
             // Go to definition
             definitionProvider: true,
             // Find references
             referencesProvider: true,
             // Document symbols
             documentSymbolProvider: true,
+            // Rename
+            renameProvider: {
+                prepareProvider: true,
+            },
             // Workspace symbols
             workspaceSymbolProvider: true,
             // Code actions
@@ -165,12 +179,10 @@ connection.languages.diagnostics.on(async (params) => {
             items: await validateTextDocument(document),
         };
     }
-    else {
-        return {
-            kind: node_1.DocumentDiagnosticReportKind.Full,
-            items: [],
-        };
-    }
+    return {
+        kind: node_1.DocumentDiagnosticReportKind.Full,
+        items: [],
+    };
 });
 async function validateTextDocument(textDocument) {
     const settings = await getDocumentSettings(textDocument.uri);
@@ -189,7 +201,7 @@ async function validateTextDocument(textDocument) {
             {
                 severity: node_1.DiagnosticSeverity.Error,
                 range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
-                message: 'Internal validation error: ' + error.message,
+                message: `Internal validation error: ${error.message}`,
                 source: 'rcl',
             },
         ];
@@ -230,6 +242,20 @@ connection.onHover(async (params) => {
         return null;
     }
 });
+// Signature help
+connection.onSignatureHelp(async (params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+    try {
+        return await signatureHelpProvider.getSignatureHelp(document, params.position);
+    }
+    catch (error) {
+        console.error('Error providing signature help:', error);
+        return null;
+    }
+});
 // Go to definition
 connection.onDefinition(async (params) => {
     const document = documents.get(params.textDocument.uri);
@@ -256,6 +282,34 @@ connection.onReferences(async (params) => {
     catch (error) {
         console.error('Error providing references:', error);
         return [];
+    }
+});
+// Prepare rename
+connection.onPrepareRename(async (params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+    try {
+        return await renameProvider.prepareRename(document, params.position);
+    }
+    catch (error) {
+        console.error('Error preparing rename:', error);
+        return null;
+    }
+});
+// Rename
+connection.onRenameRequest(async (params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+    try {
+        return await renameProvider.provideRenameEdits(document, params.position, params.newName);
+    }
+    catch (error) {
+        console.error('Error performing rename:', error);
+        return null;
     }
 });
 // Document symbols
@@ -325,8 +379,7 @@ connection.onCodeAction(async (params) => {
         return [];
     }
     try {
-        // Code actions will be implemented in Phase 4
-        return [];
+        return await codeActionProvider.getCodeActions(document, params);
     }
     catch (error) {
         console.error('Error providing code actions:', error);

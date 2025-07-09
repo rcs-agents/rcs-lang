@@ -1,112 +1,58 @@
-# @rcl/parser
+# ANTLR Parser for RCL
 
-TypeScript parser for the Rich Communication Language (RCL) using tree-sitter.
+This package contains the ANTLR4 grammar and parser for the RCL language.
 
-## Features
+## Building
 
-- **Tree-sitter Grammar**: Comprehensive grammar for RCL syntax
-- **TypeScript API**: Full TypeScript support with type definitions
-- **AST Utilities**: Helper functions for traversing and analyzing RCL ASTs
-- **Mock Fallback**: Graceful fallback when native bindings aren't available
-- **Schema Validation**: Built-in validation for RCL documents
+The ANTLR parser requires Java to generate the TypeScript parser from the grammar files.
 
-## Installation
+### Prerequisites
+
+- Java 17 or later must be installed
+- Run `./install-java.sh` for installation instructions
+
+### Build Process
 
 ```bash
-bun install @rcl/parser
+# Install dependencies
+bun install
+
+# Generate parser and build TypeScript
+bun run build
 ```
 
-## Usage
-
-```typescript
-import { RCLParser } from '@rcl/parser';
-
-const parser = new RCLParser();
-const document = parser.parseDocument(rclContent, fileUri);
-
-// Access parsed AST
-console.log(document.ast);
-
-// Get symbols and imports
-console.log(document.symbols);
-console.log(document.imports);
-```
-
-## API
-
-### `RCLParser`
-
-- `parseDocument(content: string, uri: string, version?: number): RCLDocument`
-- `parseText(text: string): RCLNode`
-- `getNodeAt(document: RCLDocument, line: number, character: number): RCLNode | null`
-
-### `ASTWalker`
-
-- `walkAST(node: RCLNode, callback: (node: RCLNode) => void | boolean): void`
+This will:
+1. Generate TypeScript parser files from the ANTLR grammar
+2. Fix import paths in the generated files
+3. Compile TypeScript to JavaScript
 
 ## Development
 
-### Prerequisites for Testing
+### Grammar Files
 
-The parser tests require a WebAssembly (WASM) build of the tree-sitter grammar. The WASM file needs to be rebuilt whenever `grammar.js` changes.
+- `src/RclLexer.g4` - Lexer grammar (tokenization rules)
+- `src/RclParser.g4` - Parser grammar (syntax rules)
+- `src/RclLexerBase.ts` - Base class for lexer with Python-like indentation support
 
-#### Building WASM
+### Generated Files
 
-**Option 1: With Docker (Simplest)**
-```bash
-npm run build-wasm-docker
-```
+The `src/generated/` directory contains the generated parser files. These are created by ANTLR and should not be edited manually.
 
-**Option 2: With Emscripten (If installed)**
-```bash
-npm run build-wasm
-```
+## Using Pre-built Parser
 
-**Option 3: Install Emscripten first**
-```bash
-npm run install-emscripten
-source ~/.emsdk/emsdk_env.sh
-npm run build-wasm
-```
+If you cannot install Java, you can:
 
-The test suite will automatically check if WASM needs rebuilding and provide instructions.
+1. Ask someone with Java to run `bun run build` and commit the generated files
+2. Use the pre-built parser from a CI/CD system
+3. Use a Docker container with Java pre-installed
 
-### Build Commands
+## Testing
 
 ```bash
-# Build grammar and TypeScript
-bun run build
-
-# Run tests
 bun test
-
-# Development mode
-bun run dev
 ```
 
-## Project Structure
-
-The parser package is structured to support both native Node.js and WebAssembly builds.
-
-- **`grammar.js`**: The source of truth for the RCL grammar. This is where the language syntax is defined.
-- **`tree-sitter.json`**: Configuration file for the Tree-sitter CLI, defining metadata and language settings.
-- **`binding.gyp`**: Build configuration for the native Node.js addon, used by `node-gyp`.
-- **`src/`**: Contains all TypeScript source code and the C files (`parser.c`, `scanner.c`, `grammar.json`, `node-types.json`) generated from `grammar.js`.
-- **`build/`**: Contains compiled output, such as the native `.node` binding and the `.wasm` module. This directory is git-ignored.
-- **`tests/`**: Unit and integration tests for the parser.
-- **`dist/`**: Contains the compiled JavaScript and TypeScript declaration files for distribution.
-
-## Grammar
-
-The grammar is defined in `grammar.js` and supports:
-
-- Agent definitions with configuration
-- Flow systems with state transitions  
-- Message templates with rich content
-- Type system with validation
-- Import statements
-- Embedded JavaScript/TypeScript code
-
-## License
-
-MIT
+Tests include:
+- Grammar validation
+- Parser functionality
+- Context variable support

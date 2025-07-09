@@ -1,0 +1,10 @@
+
+agent EmptyAgent
+  displayName: "Empty Agent"
+  
+  # This has valid syntax but missing required content
+  flow EmptyFlow
+    # Missing start state and other required elements
+  
+  messages EmptyMessages
+    # No actual messages defined

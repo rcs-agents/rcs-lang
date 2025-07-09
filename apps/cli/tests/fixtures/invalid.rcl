@@ -1,0 +1,6 @@
+
+agent InvalidAgent
+  # Missing required sections and invalid syntax
+  flow InvalidFlow
+    :invalid syntax here
+    missing -> operator

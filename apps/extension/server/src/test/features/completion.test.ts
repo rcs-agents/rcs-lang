@@ -19,11 +19,14 @@ describe('CompletionProvider', () => {
 
       const completions = await completionProvider.getCompletions(document, position);
 
-      const agentCompletion = completions.find(item => item.label === 'agent');
+      const agentCompletion = completions.find((item) => item.label === 'agent');
       assert.ok(agentCompletion, 'Should provide agent completion');
       assert.equal(agentCompletion.kind, CompletionItemKind.Keyword);
       assert.equal(agentCompletion.detail, 'Agent Definition');
-      assert.ok(agentCompletion.insertText?.includes('AgentName'), 'Should include snippet placeholder');
+      assert.ok(
+        agentCompletion.insertText?.includes('AgentName'),
+        'Should include snippet placeholder',
+      );
     });
 
     it('should provide flow keyword completion', async () => {
@@ -33,7 +36,7 @@ describe('CompletionProvider', () => {
 
       const completions = await completionProvider.getCompletions(document, position);
 
-      const flowCompletion = completions.find(item => item.label === 'flow');
+      const flowCompletion = completions.find((item) => item.label === 'flow');
       assert.ok(flowCompletion, 'Should provide flow completion');
       assert.equal(flowCompletion.kind, CompletionItemKind.Keyword);
       assert.equal(flowCompletion.detail, 'Flow Definition');
@@ -46,7 +49,7 @@ describe('CompletionProvider', () => {
 
       const completions = await completionProvider.getCompletions(document, position);
 
-      const displayNameCompletion = completions.find(item => item.label === 'displayName');
+      const displayNameCompletion = completions.find((item) => item.label === 'displayName');
       assert.ok(displayNameCompletion, 'Should provide displayName completion');
       assert.equal(displayNameCompletion.kind, CompletionItemKind.Property);
       assert.equal(displayNameCompletion.detail, 'Agent Display Name');
@@ -72,7 +75,10 @@ describe('CompletionProvider', () => {
       const completions = await completionProvider.getCompletions(document, position);
 
       assert.ok(completions.length > 0, 'Should provide completions mid-word');
-      assert.ok(completions.some(item => item.label === 'agent'), 'Should include agent keyword');
+      assert.ok(
+        completions.some((item) => item.label === 'agent'),
+        'Should include agent keyword',
+      );
     });
   });
 
@@ -84,7 +90,7 @@ describe('CompletionProvider', () => {
 
       const completions = await completionProvider.getCompletions(document, position);
 
-      completions.forEach(item => {
+      completions.forEach((item) => {
         assert.ok(item.label, 'Each completion should have a label');
         assert.ok(item.kind !== undefined, 'Each completion should have a kind');
         // Optional properties can be undefined
@@ -99,7 +105,11 @@ describe('CompletionProvider', () => {
 
       const resolvedItem = completionProvider.resolveCompletion(originalItem);
 
-      assert.deepEqual(resolvedItem, originalItem, 'Should return the same item for basic resolution');
+      assert.deepEqual(
+        resolvedItem,
+        originalItem,
+        'Should return the same item for basic resolution',
+      );
     });
   });
 
@@ -112,7 +122,10 @@ describe('CompletionProvider', () => {
       const completions = await completionProvider.getCompletions(document, position);
 
       assert.ok(completions.length > 0, 'Should provide completions in multi-line documents');
-      assert.ok(completions.some(item => item.label === 'flow'), 'Should suggest flow keyword');
+      assert.ok(
+        completions.some((item) => item.label === 'flow'),
+        'Should suggest flow keyword',
+      );
     });
   });
 });

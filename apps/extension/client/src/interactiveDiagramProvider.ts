@@ -1,7 +1,7 @@
+import * as cp from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as cp from 'child_process';
 import { getBuildHash, getExtensionVersion } from './utils';
 
 interface RCLNode {
@@ -44,7 +44,8 @@ interface WebviewToExtensionMessage {
     | 'nodeUpdated'
     | 'edgeCreated'
     | 'edgeDeleted'
-    | 'modelChanged';
+    | 'modelChanged'
+    | 'nodeSelected';
   data: any;
 }
 
@@ -59,6 +60,7 @@ export class InteractiveDiagramProvider {
     agent: {},
   };
   private _compilationService?: any;
+  private _nodePositionMap: Map<string, vscode.Range> = new Map();
 
   constructor(private readonly _extensionContext: vscode.ExtensionContext) {
     this._extensionUri = _extensionContext.extensionUri;
@@ -66,6 +68,34 @@ export class InteractiveDiagramProvider {
 
   public setCompilationService(compilationService: any) {
     this._compilationService = compilationService;
+  }
+
+  public isOpen(): boolean {
+    return this._panel !== undefined;
+  }
+
+  public async syncCursorPosition(document: vscode.TextDocument, position: vscode.Position) {
+    if (!this._panel || document.uri.toString() !== this._currentDocument?.uri.toString()) {
+      return;
+    }
+
+    // Find the node at the cursor position
+    const nodeId = this.findNodeAtPosition(position);
+    if (nodeId) {
+      this._panel.webview.postMessage({
+        type: 'highlightNode',
+        data: { nodeId },
+      });
+    }
+  }
+
+  private findNodeAtPosition(position: vscode.Position): string | null {
+    for (const [nodeId, range] of this._nodePositionMap) {
+      if (range.contains(position)) {
+        return nodeId;
+      }
+    }
+    return null;
   }
 
   public async openInteractiveDiagram(document?: vscode.TextDocument) {
@@ -119,16 +149,46 @@ export class InteractiveDiagramProvider {
 
   private async _loadModelFromDocument() {
     if (!this._currentDocument) {
+      console.log('⚠️ InteractiveDiagram: No current document');
       return;
     }
+
+    console.log(`🔍 InteractiveDiagram: Loading model from ${this._currentDocument.uri.fsPath}`);
 
     try {
       // Compile the RCL document to extract flow information
       const compiledData = await this._compileRCLDocument(this._currentDocument);
 
+      console.log('📊 InteractiveDiagram: Compilation result:', {
+        success: compiledData.success,
+        hasData: !!compiledData.data,
+        errorCount: compiledData.errors?.length || 0,
+        errors: compiledData.errors,
+      });
+
       if (compiledData.success && compiledData.data) {
+        console.log('📋 InteractiveDiagram: Raw compiled data structure:', {
+          agent: compiledData.data.agent,
+          flowNames: Object.keys(compiledData.data.flows || {}),
+          messageCount: Object.keys(compiledData.data.messages || {}).length,
+          flows: Object.keys(compiledData.data.flows || {}).map((flowName) => ({
+            name: flowName,
+            stateCount: Object.keys(compiledData.data.flows[flowName]?.states || {}).length,
+            stateNames: Object.keys(compiledData.data.flows[flowName]?.states || {}),
+          })),
+        });
+
         // Convert compiled data to visual diagram model
         const diagramModels = this._convertToSprottyModel(compiledData.data);
+
+        console.log('🎨 InteractiveDiagram: Converted diagram models:', {
+          flowCount: Object.keys(diagramModels).length,
+          flows: Object.keys(diagramModels).map((flowName) => ({
+            name: flowName,
+            nodeCount: diagramModels[flowName].nodes.length,
+            edgeCount: diagramModels[flowName].edges.length,
+          })),
+        });
 
         this._state = {
           flows: diagramModels,
@@ -137,12 +197,85 @@ export class InteractiveDiagramProvider {
           activeFlow: Object.keys(diagramModels)[0], // Set first flow as active
         };
 
+        console.log('🎯 InteractiveDiagram: Final state:', {
+          activeFlow: this._state.activeFlow,
+          flowCount: Object.keys(this._state.flows).length,
+          messageCount: Object.keys(this._state.messages).length,
+        });
+
+        // Build position map for cursor synchronization
+        this._buildNodePositionMap();
+
+        console.log('📡 InteractiveDiagram: Updating webview...');
         this._updateWebview();
+      } else {
+        console.error('❌ InteractiveDiagram: Compilation failed', compiledData.errors);
+        vscode.window.showErrorMessage(
+          `RCL compilation failed: ${compiledData.errors?.[0] || 'Unknown error'}`,
+        );
       }
     } catch (error) {
+      console.error('💥 InteractiveDiagram: Error loading model:', error);
       vscode.window.showErrorMessage(
         `Failed to load diagram model: ${error instanceof Error ? error.message : String(error)}`,
       );
+    }
+  }
+
+  private _buildNodePositionMap() {
+    if (!this._currentDocument) {
+      return;
+    }
+
+    this._nodePositionMap.clear();
+    const text = this._currentDocument.getText();
+    const lines = text.split('\n');
+
+    // Simple regex-based parsing to find node positions
+    // This should be replaced with proper AST parsing when available
+
+    // Find flow states and transitions
+    const flowPattern = /^\s*flow\s+(\w+)/;
+    const transitionPattern = /^\s*(\w+)\s*->/;
+    const messagePattern = /^\s*(text|richCard|carousel)\s+(\w+)/;
+
+    let currentFlow: string | null = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Check for flow definition
+      const flowMatch = line.match(flowPattern);
+      if (flowMatch) {
+        currentFlow = flowMatch[1];
+        continue;
+      }
+
+      // Check for state in transitions
+      if (currentFlow) {
+        const transitionMatch = line.match(transitionPattern);
+        if (transitionMatch) {
+          const stateId = transitionMatch[1];
+          const startChar = line.indexOf(stateId);
+          const range = new vscode.Range(
+            new vscode.Position(i, startChar),
+            new vscode.Position(i, startChar + stateId.length),
+          );
+          this._nodePositionMap.set(stateId, range);
+        }
+      }
+
+      // Check for message definitions
+      const messageMatch = line.match(messagePattern);
+      if (messageMatch) {
+        const messageId = messageMatch[2];
+        const startChar = line.indexOf(messageId);
+        const range = new vscode.Range(
+          new vscode.Position(i, startChar),
+          new vscode.Position(i, startChar + messageId.length),
+        );
+        this._nodePositionMap.set(messageId, range);
+      }
     }
   }
 
@@ -156,16 +289,28 @@ export class InteractiveDiagramProvider {
       const edges: RCLEdge[] = [];
 
       // Apply hierarchical layout algorithm
+      console.log(`🔍 InteractiveDiagram: Layout for flow ${flowId}:`, {
+        stateCount: Object.keys(flow.states || {}).length,
+        stateNames: Object.keys(flow.states || {}),
+        initial: flow.initial,
+        sampleState: flow.states ? Object.entries(flow.states)[0] : null,
+      });
+
       const layoutedNodes = this._layoutFlowNodes(flow, compiledData.messages);
+
+      console.log(`📐 InteractiveDiagram: Layouted nodes:`, {
+        count: layoutedNodes.length,
+        nodeIds: layoutedNodes.map((n) => n.id),
+      });
 
       // Create nodes with enhanced RCL data
       layoutedNodes.forEach((layoutNode) => {
         const state = flow.states[layoutNode.id];
         const message = compiledData.messages?.[layoutNode.id];
-        
+
         // Determine node type based on RCL semantics
         let nodeType: RCLNode['type'] = layoutNode.type as RCLNode['type'];
-        
+
         // Override type based on message content
         if (message) {
           if (message.contentMessage?.richCard?.carouselCard) {
@@ -203,7 +348,7 @@ export class InteractiveDiagramProvider {
           Object.keys(state.on).forEach((trigger) => {
             const transition = state.on[trigger];
             const targetState = typeof transition === 'string' ? transition : transition.target;
-            
+
             edges.push({
               id: `${stateId}-${trigger}-${targetState}`,
               source: stateId,
@@ -228,16 +373,19 @@ export class InteractiveDiagramProvider {
     return diagramModels;
   }
 
-  private _layoutFlowNodes(flow: any, messages: any): Array<{id: string; type: string; position: {x: number; y: number}}> {
-    const nodes: Array<{id: string; type: string; position: {x: number; y: number}}> = [];
+  private _layoutFlowNodes(
+    flow: any,
+    _messages: any,
+  ): Array<{ id: string; type: string; position: { x: number; y: number } }> {
+    const nodes: Array<{ id: string; type: string; position: { x: number; y: number } }> = [];
     const visited = new Set<string>();
     const levels: string[][] = [];
-    
+
     // Find the actual starting state - prefer :start over start if it has transitions
     let startingState = flow.initial || 'start';
-    if (flow.states[':start'] && flow.states[':start'].on && Object.keys(flow.states[':start'].on).length > 0) {
+    if (flow.states[':start']?.on && Object.keys(flow.states[':start'].on).length > 0) {
       startingState = ':start';
-    } else if (flow.states['start'] && flow.states['start'].on && Object.keys(flow.states['start'].on).length > 0) {
+    } else if (flow.states.start?.on && Object.keys(flow.states.start.on).length > 0) {
       startingState = 'start';
     } else {
       // Find any state with transitions as fallback
@@ -248,72 +396,83 @@ export class InteractiveDiagramProvider {
         }
       }
     }
-    
+
     if (flow.states[startingState]) {
       this._traverseFlow(startingState, flow.states, 0, levels, visited);
     }
-    
-    // Add any disconnected states that have transitions (to ensure all referenced states are included)
+
+    // Add any disconnected states (to ensure all states are included)
     const allStates = Object.keys(flow.states);
-    const unvisitedStates = allStates.filter(stateId => !visited.has(stateId));
-    
-    for (const stateId of unvisitedStates) {
-      const state = flow.states[stateId];
-      // Include states that have outgoing transitions or are referenced by other states
-      if (state?.on && Object.keys(state.on).length > 0) {
-        if (!levels[levels.length]) {
-          levels[levels.length] = [];
-        }
+    const unvisitedStates = allStates.filter((stateId) => !visited.has(stateId));
+
+    // Include ALL unvisited states, not just those with transitions
+    if (unvisitedStates.length > 0) {
+      if (!levels[levels.length]) {
+        levels[levels.length] = [];
+      }
+
+      unvisitedStates.forEach((stateId) => {
         levels[levels.length - 1].push(stateId);
         visited.add(stateId);
-      }
+      });
     }
-    
+
     // Position nodes hierarchically
     const xSpacing = 180;
     const ySpacing = 100;
     const startX = 100;
     const startY = 100;
-    
+
     levels.forEach((level, levelIndex) => {
-      const levelWidth = level.length * xSpacing;
-      const levelStartX = startX + (levelIndex * xSpacing);
-      
+      const _levelWidth = level.length * xSpacing;
+      const levelStartX = startX + levelIndex * xSpacing;
+
       level.forEach((nodeId, nodeIndex) => {
         const state = flow.states[nodeId];
         let nodeType = 'message';
-        
+
         if (nodeId === startingState || nodeId === 'start' || nodeId === ':start') {
           nodeType = 'start';
-        } else if (state?.type === 'final' || nodeId === 'end' || nodeId === ':end' || nodeId.includes('end')) {
+        } else if (
+          state?.type === 'final' ||
+          nodeId === 'end' ||
+          nodeId === ':end' ||
+          nodeId.includes('end')
+        ) {
           nodeType = 'end';
         }
-        
+
         nodes.push({
           id: nodeId,
           type: nodeType,
           position: {
             x: levelStartX,
-            y: startY + (nodeIndex * ySpacing) - ((level.length - 1) * ySpacing / 2),
+            y: startY + nodeIndex * ySpacing - ((level.length - 1) * ySpacing) / 2,
           },
         });
       });
     });
-    
+
     return nodes;
   }
-  
-  private _traverseFlow(nodeId: string, states: any, level: number, levels: string[][], visited: Set<string>) {
+
+  private _traverseFlow(
+    nodeId: string,
+    states: any,
+    level: number,
+    levels: string[][],
+    visited: Set<string>,
+  ) {
     if (visited.has(nodeId)) return;
     visited.add(nodeId);
-    
+
     // Ensure level array exists
     if (!levels[level]) {
       levels[level] = [];
     }
-    
+
     levels[level].push(nodeId);
-    
+
     // Traverse transitions
     const state = states[nodeId];
     if (state?.on) {
@@ -325,44 +484,47 @@ export class InteractiveDiagramProvider {
       });
     }
   }
-  
+
   private _extractNodeLabel(nodeId: string, message: any, state: any): string {
     // Priority: message text > state label > node ID
     if (message?.contentMessage?.text) {
       const text = message.contentMessage.text;
-      return text.length > 30 ? text.substring(0, 27) + '...' : text;
+      return text.length > 30 ? `${text.substring(0, 27)}...` : text;
     }
-    
+
     if (state?.meta?.label) {
       return state.meta.label;
     }
-    
+
     // Clean up node ID for display
-    return nodeId.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+    return nodeId
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .trim();
   }
-  
+
   private _hasConditions(state: any): boolean {
     if (!state?.on) return false;
-    
-    return Object.values(state.on).some((transition: any) => 
-      typeof transition === 'object' && transition.cond
+
+    return Object.values(state.on).some(
+      (transition: any) => typeof transition === 'object' && transition.cond,
     );
   }
-  
+
   private _hasSuggestions(message: any): boolean {
     return !!(message?.contentMessage?.suggestions?.length > 0);
   }
-  
+
   private _getMessageType(message: any): string {
     if (!message?.contentMessage) return 'unknown';
-    
+
     const content = message.contentMessage;
     if (content.text) return 'text';
     if (content.richCard?.standaloneCard) return 'standalone_card';
     if (content.richCard?.carouselCard) return 'carousel_card';
     if (content.uploadedRbmFile) return 'file';
     if (content.contentInfo) return 'content_info';
-    
+
     return 'unknown';
   }
 
@@ -377,15 +539,14 @@ export class InteractiveDiagramProvider {
 
     try {
       const result = await this._compilationService.compileFile(document.uri);
-      
+
       if (result.success && result.data) {
         return { success: true, data: result.data };
-      } else {
-        return { 
-          success: false, 
-          errors: result.diagnostics.map((d: any) => d.message) 
-        };
       }
+      return {
+        success: false,
+        errors: result.diagnostics.map((d: any) => d.message),
+      };
     } catch (error) {
       return {
         success: false,
@@ -393,7 +554,6 @@ export class InteractiveDiagramProvider {
       };
     }
   }
-
 
   private _handleWebviewMessage(message: WebviewToExtensionMessage) {
     switch (message.type) {
@@ -424,6 +584,29 @@ export class InteractiveDiagramProvider {
       case 'modelChanged':
         this._handleModelChanged(message.data);
         break;
+
+      case 'nodeSelected':
+        this._handleNodeSelected(message.data);
+        break;
+    }
+  }
+
+  private async _handleNodeSelected(data: { nodeId: string }) {
+    if (!this._currentDocument || !data.nodeId) {
+      return;
+    }
+
+    // Find the position of this node in the document
+    const range = this._nodePositionMap.get(data.nodeId);
+    if (range) {
+      // Show the editor and move cursor to the node
+      const editor = await vscode.window.showTextDocument(this._currentDocument, {
+        viewColumn: vscode.ViewColumn.One,
+        preserveFocus: false,
+      });
+
+      editor.selection = new vscode.Selection(range.start, range.end);
+      editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
     }
   }
 
@@ -536,7 +719,7 @@ export class InteractiveDiagramProvider {
         rclCode += `  brandName: "${this._state.agent.brandName}"\n`;
       }
       rclCode += '\n';
-      
+
       // Add config section if present
       if (this._state.agent.rcsBusinessMessagingAgent) {
         rclCode += '  agentConfig Config\n';
@@ -585,15 +768,15 @@ export class InteractiveDiagramProvider {
     // Generate messages section with enhanced formatting
     if (Object.keys(this._state.messages).length > 0) {
       rclCode += '  messages Messages\n';
-      
+
       Object.keys(this._state.messages).forEach((messageId) => {
         const message = this._state.messages[messageId];
         const content = message.contentMessage;
-        
+
         if (content?.text) {
           // Simple text message
           rclCode += `    text ${messageId} "${content.text}"\n`;
-          
+
           // Add suggestions if present
           if (content.suggestions?.length > 0) {
             content.suggestions.forEach((suggestion: any) => {
@@ -643,6 +826,9 @@ export class InteractiveDiagramProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.css'),
     );
+    const sprottyStyleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'sprotty-diagram.css'),
+    );
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'interactive-diagram.js'),
     );
@@ -661,6 +847,7 @@ export class InteractiveDiagramProvider {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-eval'; font-src ${webview.cspSource};">
         <link href="${styleUri}" rel="stylesheet">
+        <link href="${sprottyStyleUri}" rel="stylesheet">
         <title>RCL Interactive Diagram</title>
     </head>
     <body>
@@ -689,10 +876,8 @@ export class InteractiveDiagramProvider {
                 <div class="sidebar">
                     <div class="node-palette">
                         <h3>Node Palette</h3>
-                        <div class="palette-item" data-type="start">🟢 Start</div>
                         <div class="palette-item" data-type="message">📝 Message</div>
                         <div class="palette-item" data-type="rich_card">⭐ Rich Card</div>
-                        <div class="palette-item" data-type="end">🔴 End</div>
                     </div>
                     
                     <div class="properties-panel">
@@ -723,7 +908,6 @@ export class InteractiveDiagramProvider {
   public dispose() {
     this._dispose();
   }
-
 }
 
 function getNonce() {

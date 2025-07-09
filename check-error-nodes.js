@@ -1,11 +1,11 @@
 const { parse } = require('./packages/parser/dist/index.js');
-const fs = require('fs');
+const fs = require('node:fs');
 
 function hasErrorNodes(node) {
   if (!node) return false;
   if (node.type === 'ERROR') return true;
   if (node.children) {
-    return node.children.some(child => hasErrorNodes(child));
+    return node.children.some((child) => hasErrorNodes(child));
   }
   return false;
 }
@@ -15,9 +15,9 @@ async function test() {
   console.log('Checking coffee-shop.rcl for ERROR nodes...');
   const coffeeContent = fs.readFileSync('./examples/coffee-shop.rcl', 'utf-8');
   const coffeeParsed = await parse(coffeeContent);
-  
+
   console.log('Has ERROR nodes:', hasErrorNodes(coffeeParsed.ast));
-  
+
   // If there are error nodes, find the first one
   if (hasErrorNodes(coffeeParsed.ast)) {
     function findFirstError(node, path = '') {
@@ -32,10 +32,13 @@ async function test() {
       }
       return null;
     }
-    
+
     const errorInfo = findFirstError(coffeeParsed.ast);
     console.log('First ERROR node path:', errorInfo.path);
-    console.log('ERROR node children:', errorInfo.node.children?.slice(0, 10).map(c => c.type));
+    console.log(
+      'ERROR node children:',
+      errorInfo.node.children?.slice(0, 10).map((c) => c.type),
+    );
   }
 }
 

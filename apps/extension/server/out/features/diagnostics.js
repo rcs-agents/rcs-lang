@@ -6,7 +6,7 @@ class DiagnosticsProvider {
         this.parser = parser;
         this.syntaxValidator = syntaxValidator;
     }
-    async getDiagnostics(document, settings) {
+    async getDiagnostics(document, _settings) {
         const diagnostics = [];
         // Syntax validation
         diagnostics.push(...this.syntaxValidator.validateDocument(document));

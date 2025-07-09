@@ -1,0 +1,4 @@
+
+agent BrokenAgent
+  displayName: "Broken"
+  invalid section syntax here

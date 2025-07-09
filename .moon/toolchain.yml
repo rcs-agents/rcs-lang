@@ -1,0 +1,3 @@
+bun:
+  inferTasksFromScripts: true
+  dependencyVersionFormat: 'workspace'

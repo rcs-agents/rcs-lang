@@ -37,5 +37,5 @@ export default {
   flows,
   agent,
   getMessage,
-  getFlow
+  getFlow,
 };

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCL IDE Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .status {
+            padding: 20px;
+            background: #2d2d30;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #f48771;
+        }
+        .success {
+            color: #89d185;
+        }
+    </style>
+</head>
+<body>
+    <h1>RCL IDE Test Page</h1>
+    
+    <div class="status">
+        <h2>Server Status</h2>
+        <p>✅ Server is running at http://localhost:4000</p>
+    </div>
+    
+    <div class="status">
+        <h2>Issue Diagnosis</h2>
+        <p class="error">❌ The main issue is that the browser cannot execute TypeScript files directly.</p>
+        <p>The index.html file is trying to load <code>src/main.ts</code> which is a TypeScript file.</p>
+        <p>Browsers can only execute JavaScript, not TypeScript.</p>
+    </div>
+    
+    <div class="status">
+        <h2>Solutions</h2>
+        <ol>
+            <li><strong>Use Vite dev server</strong> - Vite can compile TypeScript on the fly</li>
+            <li><strong>Build the project</strong> - Compile TypeScript to JavaScript first</li>
+            <li><strong>Use a bundler</strong> - Bundle and transpile all dependencies</li>
+        </ol>
+    </div>
+    
+    <div class="status">
+        <h2>Current Issues</h2>
+        <ul>
+            <li>Vite is not installed in the IDE directory</li>
+            <li>The project uses workspace dependencies which require installation from the root</li>
+            <li>Dependencies like Monaco Editor and RCL packages are not available</li>
+        </ul>
+    </div>
+    
+    <script>
+        console.log('Test page loaded successfully');
+        console.log('To fix the IDE:');
+        console.log('1. Install dependencies from the monorepo root');
+        console.log('2. Use a proper development server that can handle TypeScript');
+        console.log('3. Or build the project first before serving');
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ class CompletionProvider {
     constructor(parser) {
         this.parser = parser;
     }
-    async getCompletions(document, position) {
+    async getCompletions(_document, _position) {
         // Basic completion items for RCL
         return [
             {

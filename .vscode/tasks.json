@@ -2,19 +2,50 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "compile",
-      "path": "apps/extension",
-      "problemMatcher": "$tsc",
+      "type": "shell",
+      "command": "npm run compile",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/extension"
+      },
+      "problemMatcher": ["$tsc", "$tsc-watch"],
       "isBackground": false,
       "presentation": {
-        "reveal": "never"
+        "reveal": "never",
+        "panel": "dedicated"
       },
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "label": "npm: compile - apps/extension"
+      "label": "npm: compile - apps/extension",
+      "detail": "Compile the RCL extension"
+    },
+    {
+      "type": "shell",
+      "command": "npm run watch",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/extension"
+      },
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated"
+      },
+      "group": "build",
+      "label": "npm: watch - apps/extension",
+      "detail": "Watch and compile the RCL extension"
+    },
+    {
+      "type": "shell",
+      "command": "moon run extension:build",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$tsc",
+      "group": "build",
+      "label": "moon: build extension",
+      "detail": "Build extension using moon"
     }
   ]
 }

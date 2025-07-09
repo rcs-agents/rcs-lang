@@ -1,6 +1,6 @@
+import * as path from 'node:path';
+import { type CompilationResult, type Diagnostic, RclProgram } from '@rcl/language-service';
 import * as vscode from 'vscode';
-import * as path from 'path';
-import { RclProgram, CompilationResult, Diagnostic } from '@rcl/language-service';
 
 /**
  * Service for compiling RCL files using the language service
@@ -42,13 +42,13 @@ export class CompilationService {
    * Update diagnostics for a file
    */
   private updateDiagnostics(uri: vscode.Uri, diagnostics: Diagnostic[]) {
-    const vscDiagnostics: vscode.Diagnostic[] = diagnostics.map(diag => {
+    const vscDiagnostics: vscode.Diagnostic[] = diagnostics.map((diag) => {
       const severity = this.getSeverity(diag.severity);
       const range = new vscode.Range(
         (diag.line || 1) - 1,
         (diag.column || 1) - 1,
         (diag.line || 1) - 1,
-        (diag.column || 1) - 1 + 10 // Approximate length
+        (diag.column || 1) - 1 + 10, // Approximate length
       );
 
       const diagnostic = new vscode.Diagnostic(range, diag.message, severity);
