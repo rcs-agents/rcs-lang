@@ -19,12 +19,16 @@ program
   .command('compile <input>')
   .description('Compile an RCL file')
   .option('-o, --output <file>', 'Output file path (overrides config)')
-  .option('-f, --format <format>', 'Output format: js, json, or both', 'both')
+  .option('-f, --format <format>', 'Output format: js, json, or both')
   .option('--no-pretty', 'Disable pretty printing for JSON')
   .option('-w, --watch', 'Watch for changes and recompile')
   .option('-c, --config <path>', 'Path to rcl.config.json')
   .action(async (input: string, options: any) => {
     try {
+      // Set default format if not specified
+      if (!options.format) {
+        options.format = 'both';
+      }
       // Initial compilation
       await compileRCL(input, options);
 

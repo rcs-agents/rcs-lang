@@ -10,7 +10,8 @@ const lexical = {
   import_identifier: $ => /[a-zA-Z][a-zA-Z0-9_-]*/,
 
   // Simplified identifier - supports basic spaced identifiers (Title Case)
-  identifier: $ => /[A-Z][A-Za-z0-9\-_]*(\s[A-Z][A-Za-z0-9\-_]*)*/, 
+  // Now supports numbers starting words like "Travel Assistant 2000"
+  identifier: $ => /[A-Z][A-Za-z0-9\-_]*(\s[A-Z0-9][A-Za-z0-9\-_]*)*/, 
   
   // Attribute keys (lowercase)
   attribute_key: $ => /[a-z][a-zA-Z0-9_]*/,

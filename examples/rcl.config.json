@@ -1,5 +1,5 @@
 {
-  "outDir": "../dist/examples",
+  "outDir": "dist",
   "compilerOptions": {
     "generateSourceMap": false,
     "module": "esm"

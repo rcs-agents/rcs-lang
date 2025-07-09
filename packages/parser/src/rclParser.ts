@@ -69,10 +69,31 @@ export class RCLParser {
 
     const symbols: RCLSymbol[] = [];
     this.traverseAST(ast, (node) => {
-      if (['agent_definition', 'flow_definition', 'message_definition'].includes(node.type)) {
+      // Extract agent symbols
+      if (node.type === 'agent_definition') {
         symbols.push({
           name: this.extractNodeName(node),
-          kind: this.nodeTypeToSymbolKind(node.type),
+          kind: SymbolKind.Agent,
+          range: this.nodeToRange(node),
+          selectionRange: this.nodeToRange(node),
+        });
+      }
+      
+      // Extract flow symbols - support both flow_definition and flow_section
+      if (node.type === 'flow_definition' || (node as any).type === 'flow_section') {
+        symbols.push({
+          name: this.extractNodeName(node),
+          kind: SymbolKind.Flow,
+          range: this.nodeToRange(node),
+          selectionRange: this.nodeToRange(node),
+        });
+      }
+      
+      // Extract message symbols - add messages_section to extract the section itself
+      if ((node as any).type === 'messages_section') {
+        symbols.push({
+          name: 'Messages',
+          kind: SymbolKind.Message,
           range: this.nodeToRange(node),
           selectionRange: this.nodeToRange(node),
         });
@@ -101,8 +122,17 @@ export class RCLParser {
       return node.name as string;
     }
 
-    // Fallback: extract from text
-    const match = node.text?.match(/^\w+\s+(\w+)/);
+    // Find the identifier child node
+    if ('children' in node && node.children) {
+      const identifierNode = node.children.find((child: any) => child.type === 'identifier');
+      if (identifierNode && identifierNode.text) {
+        return identifierNode.text;
+      }
+    }
+
+    // Fallback: extract from text for RCL's Title Case identifiers
+    // Matches: agent CustomerServiceBot or flow Main Flow With Spaces
+    const match = node.text?.match(/^(?:agent|flow|messages?)\s+([A-Z][A-Za-z0-9\-_]*(?:\s+[A-Z][A-Za-z0-9\-_]*)*)/);
     return match ? match[1] : 'unknown';
   }
 
@@ -111,8 +141,12 @@ export class RCLParser {
       case 'agent_definition':
         return SymbolKind.Agent;
       case 'flow_definition':
+      case 'flow_section':
+      case 'flow':
         return SymbolKind.Flow;
       case 'message_definition':
+      case 'messages_section':
+      case 'messages':
         return SymbolKind.Message;
       default:
         return SymbolKind.Agent; // Default fallback

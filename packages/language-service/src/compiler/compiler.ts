@@ -63,42 +63,43 @@ export class Compiler {
       name: this.extractAgentName(agentNode, sourceContent),
     };
 
-    // Extract agent properties - handle both real parser and mock parser
+    // Extract agent properties
     const agentBody = findNodeByType(agentNode, 'agent_body');
     const propsContainer = agentBody || agentNode;
     
-    if (propsContainer) {
-      for (const child of propsContainer.children || []) {
-        if (child.type === 'property') {
-          const propName = this.extractPropertyName(child, sourceContent);
-          const propValue = this.extractPropertyValue(child, sourceContent);
-
-          switch (propName) {
-            case 'displayName':
-            case 'display-name':
-              agent.displayName = propValue;
-              break;
-            case 'brandName':
-            case 'brand-name':
-              agent.brandName = propValue;
-              break;
+    if (propsContainer && propsContainer.children) {
+      let i = 0;
+      const children = propsContainer.children;
+      
+      while (i < children.length) {
+        const child = children[i];
+        
+        // Check for property pattern: attribute_key : value
+        if (child.type === 'displayName' || child.type === 'brandName') {
+          const propName = child.type;
+          // Next should be colon, then value
+          if (i + 2 < children.length && children[i + 1].type === ':') {
+            const valueNode = children[i + 2];
+            const propValue = getNodeText(valueNode, sourceContent).replace(/^"|"$/g, '');
+            
+            switch (propName) {
+              case 'displayName':
+                agent.displayName = propValue;
+                break;
+              case 'brandName':
+                agent.brandName = propValue;
+                break;
+            }
+            i += 3; // Skip property name, colon, and value
+            continue;
           }
-        } else if (child.type === 'agent_config') {
+        } else if (child.type === 'config_section') {
           agent.config = this.extractAgentConfig(child, sourceContent);
-        } else if (child.type === 'agent_defaults') {
+        } else if (child.type === 'defaults_section') {
           agent.defaults = this.extractAgentDefaults(child, sourceContent);
         }
-      }
-    }
-
-    // Check if mock parser stored properties differently
-    if (!agent.displayName) {
-      // Look for properties directly in children
-      const displayNameProp = agentNode.children?.find(
-        child => child.type === 'property' && (child as any).key === 'displayName'
-      );
-      if (displayNameProp) {
-        agent.displayName = (displayNameProp as any).value?.replace(/['"]/g, '');
+        
+        i++;
       }
     }
 
@@ -109,6 +110,13 @@ export class Compiler {
    * Extract agent name from agent definition
    */
   private extractAgentName(agentNode: ASTNode, sourceContent: string): string {
+    // Look for agent name identifier (should be the second identifier child)
+    const identifiers = agentNode.children?.filter(child => child.type === 'identifier');
+    if (identifiers && identifiers.length >= 2) {
+      return getNodeText(identifiers[1], sourceContent);
+    }
+    
+    // Fallback: find any identifier
     const nameNode = findNodeByType(agentNode, 'identifier');
     if (!nameNode) {
       throw new Error('Agent name not found');
@@ -191,7 +199,7 @@ export class Compiler {
     const messagesSection = findNodeByType(ast, 'messages_section');
 
     if (!messagesSection) {
-      // Check for standalone text shortcuts (mock parser)
+      // Check for standalone text shortcuts
       const textShortcuts = findNodesByType(ast, 'text_shortcut');
       for (const shortcut of textShortcuts) {
         const message = this.extractTextShortcut(shortcut, sourceContent);
@@ -311,11 +319,9 @@ export class Compiler {
    * Extract text shortcut message
    */
   private extractTextShortcut(shortcutNode: ASTNode, sourceContent: string): { id: string; content: any } | null {
-    // text_shortcut has children: [identifier "text", identifier "name", string "content"]
-    if (!shortcutNode.children || shortcutNode.children.length < 3) return null;
-
-    const idNode = shortcutNode.children[1];
-    const textNode = shortcutNode.children[2];
+    // Find the identifier and content nodes
+    const idNode = shortcutNode.children?.find(child => child.type === 'identifier');
+    const textNode = shortcutNode.children?.find(child => child.type === 'string' || child.type === 'multiline_string' || child.type === 'embedded_code');
 
     if (!idNode || !textNode) return null;
 
@@ -345,7 +351,7 @@ export class Compiler {
     // Try flow_definition first (real parser)
     let flowDefinitions = findNodesByType(ast, 'flow_definition');
     
-    // If no flow_definition, try flow_section (mock parser)
+    // If no flow_definition, try flow_section
     if (flowDefinitions.length === 0) {
       flowDefinitions = findNodesByType(ast, 'flow_section');
     }

@@ -175,8 +175,9 @@
   },
   "scripts": {
     "vscode:prepublish": "nr compile",
-    "compile": "tsc -b",
-    "build": "tsc -b",
+    "compile": "tsc -b && npm run copy-wasm",
+    "build": "tsc -b && npm run copy-wasm",
+    "copy-wasm": "mkdir -p ./server/out && cp ../../packages/parser/tree-sitter-rcl.wasm ./server/out/ && mkdir -p ./server/out/build/Release && cp ../../packages/parser/build/Release/tree_sitter_rcl_binding.node ./server/out/build/Release/ || true",
     "dev": "tsc -b -w",
     "watch": "tsc -b -w",
     "clean": "rm -rf client/out server/out",
@@ -186,6 +187,8 @@
     "test": "nr test:server && nr test:client",
     "test:server": "cd server && bun test",
     "test:client": "cd client && bun test",
+    "test:integration": "nr compile && cd client && npm run test:integration",
+    "test:all": "nr test && nr test:integration",
     "package": "vsce package"
   },
   "devDependencies": {

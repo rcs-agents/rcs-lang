@@ -1,14 +1,14 @@
 agent TravelAgent
-  displayName: "Travel Assistant"
-  brandName: "Adventure Travel Co"
-  
-  flow BookingFlow
-    :start -> Welcome
-    Welcome -> Planning
-    Planning -> Confirmation
-    Confirmation -> :end
+    displayName: "Travel Assistant"
+    brandName: "Adventure Travel Co"
     
-  messages Messages
-    text Welcome "Welcome to Adventure Travel!"
-    text Planning "What type of trip are you planning?"
-    text Confirmation "Your booking has been confirmed!"
+    flow BookingFlow
+        :start -> Welcome
+        Welcome -> Planning
+        Planning -> Confirmation
+        Confirmation -> :end
+        
+    messages Messages
+        text Welcome "Welcome to Adventure Travel!"
+        text Planning "What type of trip are you planning?"
+        text Confirmation "Your booking has been confirmed!"

@@ -6,6 +6,7 @@ agent CustomerServiceBot
     description: "I can help with your questions and orders."
     logoUri: <url https://example.com/logo.png>
     color: "#2563eb"
+  end
 
   flow MainFlow
     :start -> Welcome
@@ -16,6 +17,7 @@ agent CustomerServiceBot
     Help -> Menu
     Orders -> Menu
     Goodbye -> :end
+  end
 
   messages Messages
     text Welcome "Hello! How can I help you today?"
@@ -35,3 +37,5 @@ agent CustomerServiceBot
       reply "Back to Menu" "menu"
 
     text Goodbye "Thank you for contacting us!"
+  end
+end

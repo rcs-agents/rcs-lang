@@ -38,7 +38,7 @@
     "dev": "tsc --watch",
     "pretest": "node scripts/check-wasm-dev.js",
     "test": "NODE_ENV=test vitest run",
-    "test:dev": "RCL_USE_MOCK_PARSER=true NODE_ENV=test vitest run",
+    "test:dev": "NODE_ENV=test vitest run",
     "test:watch": "RCL_DEV_MODE=true NODE_ENV=test vitest",
     "clean": "rm -rf dist build tree-sitter-rcl.wasm",
     "install": "node-gyp-build",

@@ -27,9 +27,12 @@ describe('RCLParser', () => {
         const content = `agent TestAgent
   displayName: "Test Agent"
   flow MainFlow
-    :start -> end
+    :start -> :end
+  end
   messages Messages
-    text Welcome "Hello!"`;
+    text Welcome "Hello!"
+  end
+end`;
 
         const doc = await parser.parseDocument(content, 'test.rcl');
         
@@ -56,7 +59,7 @@ describe('RCLParser', () => {
       });
 
       test('should cache parsed documents', async () => {
-        const content = 'agent Test\n  displayName: "Test"';
+        const content = 'agent Test\n  displayName: "Test"\n  flow Main\n  end\n  messages Messages\n  end\nend';
         const uri = 'test.rcl';
         
         const doc1 = await parser.parseDocument(content, uri, 1);
@@ -66,7 +69,7 @@ describe('RCLParser', () => {
       });
 
       test('should invalidate cache on version change', async () => {
-        const content = 'agent Test\n  displayName: "Test"';
+        const content = 'agent Test\n  displayName: "Test"\n  flow Main\n  end\n  messages Messages\n  end\nend';
         const uri = 'test.rcl';
         
         const doc1 = await parser.parseDocument(content, uri, 1);
@@ -90,7 +93,7 @@ describe('RCLParser', () => {
 
     describe('parseText', () => {
       test('should parse text without URI', async () => {
-        const content = 'agent Test\n  displayName: "Test"';
+        const content = 'agent Test\n  displayName: "Test"\n  flow Main\n  end\n  messages Messages\n  end\nend';
         
         const ast = await parser.parseText(content);
         
@@ -101,7 +104,7 @@ describe('RCLParser', () => {
 
     describe('cache management', () => {
       test('clearCache should remove all cached documents', async () => {
-        const content = 'agent Test\n  displayName: "Test"';
+        const content = 'agent Test\n  displayName: "Test"\n  flow Main\n  end\n  messages Messages\n  end\nend';
         
         // Parse and cache a document
         const doc1 = await parser.parseDocument(content, 'test.rcl', 1);

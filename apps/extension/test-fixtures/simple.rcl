@@ -1,11 +1,11 @@
 agent TestAgent
-  displayName: "Test Agent"
+    displayName: "Test Agent"
 
-flow MainFlow
-  :start -> Welcome
-  Welcome -> Help
-  Help -> :end
+    flow MainFlow
+        :start -> Welcome
+        Welcome -> Help
+        Help -> :end
 
-messages Messages
-  text Welcome "Welcome to our service!"
-  text Help "How can I help you?"
+    messages Messages
+        text Welcome "Welcome to our service!"
+        text Help "How can I help you?"

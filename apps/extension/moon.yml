@@ -43,6 +43,26 @@ tasks:
       - "**/*.json"
     env:
       NODE_ENV: "test"
+  
+  test-integration:
+    command: nr test:integration
+    inputs:
+      - "**/*.ts"
+      - "**/*.json"
+    deps:
+      - "build"
+    env:
+      NODE_ENV: "test"
+  
+  test-all:
+    command: nr test:all
+    inputs:
+      - "**/*.ts"
+      - "**/*.json"
+    deps:
+      - "build"
+    env:
+      NODE_ENV: "test"
 
   clean:
     command: nr clean

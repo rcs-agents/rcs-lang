@@ -144,27 +144,3 @@ export class TestUtils {
   }
 }
 
-/**
- * Mock parser that returns predictable AST structures for testing
- */
-export class MockParser {
-  parseDocument(content: string, uri: string) {
-    // Simple mock implementation for testing
-    // In real tests, we'll provide specific AST structures
-    return {
-      uri,
-      version: 1,
-      content,
-      ast: this.parseContent(content),
-      imports: [],
-      symbols: [],
-      diagnostics: []
-    };
-  }
-
-  private parseContent(content: string): RCLNode {
-    // Very basic parsing for test purposes
-    // Real tests will use pre-constructed AST nodes
-    return TestUtils.createMockNode('source_file', content);
-  }
-}

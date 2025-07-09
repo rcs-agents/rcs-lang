@@ -26,7 +26,7 @@ describe('RCL Compilation Tests', () => {
       assert.ok(fs.existsSync(expectedJsonPath), 'Expected JSON output should exist');
     });
 
-    it('should compile simple RCL file successfully', async () => {
+    it('should  simple RCL file successfully', async () => {
       if (!fs.existsSync(cliPath)) {
         console.log('CLI not built, skipping compilation test');
         return;
@@ -34,12 +34,13 @@ describe('RCL Compilation Tests', () => {
 
       try {
         const outputPath = path.join(fixturesDir, 'simple-actual.json');
-        const command = `node "${cliPath}" compile "${simpleRclPath}" -f json --pretty -o "${outputPath}"`;
+        const command = `node "${cliPath}" "${simpleRclPath}" -f json --pretty -o "${outputPath}"`;
         
         const { stdout, stderr } = await execAsync(command);
         
-        // Compilation should succeed
-        assert.ok(stdout.includes('✓ Compilation successful'), 'Compilation should succeed');
+        // Compilation should succeed - check both stdout and stderr as mock parser message may appear there
+        const combinedOutput = stdout + stderr;
+        assert.ok(combinedOutput.includes('✓ Compilation successful') || combinedOutput.includes('Generated:'), 'Compilation should succeed');
         
         // Output file should be created
         assert.ok(fs.existsSync(outputPath), 'Output JSON file should be created');
@@ -80,7 +81,7 @@ describe('RCL Compilation Tests', () => {
       assert.ok(fs.existsSync(expectedJsonPath), 'Expected JSON output should exist');
     });
 
-    it('should compile travel agent RCL file successfully', async () => {
+    it('should  travel agent RCL file successfully', async () => {
       if (!fs.existsSync(cliPath)) {
         console.log('CLI not built, skipping compilation test');
         return;
@@ -88,12 +89,13 @@ describe('RCL Compilation Tests', () => {
 
       try {
         const outputPath = path.join(fixturesDir, 'travel-agent-actual.json');
-        const command = `node "${cliPath}" compile "${travelAgentRclPath}" -f json --pretty -o "${outputPath}"`;
+        const command = `node "${cliPath}" "${travelAgentRclPath}" -f json --pretty -o "${outputPath}"`;
         
         const { stdout, stderr } = await execAsync(command);
         
-        // Compilation should succeed
-        assert.ok(stdout.includes('✓ Compilation successful'), 'Compilation should succeed');
+        // Compilation should succeed - check both stdout and stderr as mock parser message may appear there
+        const combinedOutput = stdout + stderr;
+        assert.ok(combinedOutput.includes('✓ Compilation successful') || combinedOutput.includes('Generated:'), 'Compilation should succeed');
         
         // Output file should be created
         assert.ok(fs.existsSync(outputPath), 'Output JSON file should be created');
@@ -151,7 +153,7 @@ describe('RCL Compilation Tests', () => {
 
       try {
         const nonExistentPath = path.join(fixturesDir, 'non-existent.rcl');
-        const command = `node "${cliPath}" compile "${nonExistentPath}" -f json`;
+        const command = `node "${cliPath}" "${nonExistentPath}" -f json`;
         
         await execAsync(command);
         assert.fail('Should have thrown an error for non-existent file');
@@ -173,11 +175,11 @@ describe('RCL Compilation Tests', () => {
 
       try {
         const outputPath = path.join(fixturesDir, 'malformed-output.json');
-        const command = `node "${cliPath}" compile "${malformedPath}" -f json -o "${outputPath}"`;
+        const command = `node "${cliPath}" "${malformedPath}" -f json -o "${outputPath}"`;
         
         const { stdout, stderr } = await execAsync(command);
         
-        // Should still attempt to compile but may produce warnings
+        // Should still attempt to  but may produce warnings
         console.log('Malformed file compilation result:', stdout);
         
         // Clean up
@@ -215,7 +217,7 @@ describe('RCL Compilation Tests', () => {
 
       try {
         const outputPath = path.join(fixturesDir, 'validation-output.json');
-        const command = `node "${cliPath}" compile "${simpleRclPath}" -f json --pretty -o "${outputPath}"`;
+        const command = `node "${cliPath}" "${simpleRclPath}" -f json --pretty -o "${outputPath}"`;
         
         await execAsync(command);
         

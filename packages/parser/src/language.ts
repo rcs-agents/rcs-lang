@@ -66,14 +66,21 @@ export async function loadRCLLanguage(): Promise<TreeSitterLanguage> {
     return cachedLanguage;
   }
 
-  // The native binding has fundamental issues with missing metadata
-  // For now, we'll indicate that the tree-sitter language is not available
-  // This will cause the parser to fall back to the mock implementation
-  throw new Error('Tree-sitter native binding has incomplete metadata - using mock parser');
+  // Load the tree-sitter language
+  try {
+    const RCLLanguage = require('../../bindings/node');
+    cachedLanguage = RCLLanguage;
+    return RCLLanguage;
+  } catch (error) {
+    throw new Error('Tree-sitter native binding not available');
+  }
 }
 
 export function isRCLLanguageAvailable(): boolean {
-  // The native binding has incomplete metadata, so we return false
-  // This ensures the parser falls back to mock implementation
-  return false;
+  try {
+    require('../../bindings/node');
+    return true;
+  } catch {
+    return false;
+  }
 }

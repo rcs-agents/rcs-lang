@@ -20,6 +20,7 @@ export class RclProgram implements IRclProgram {
   private config: RclConfig;
   private sourceFiles: Map<string, SourceFile> = new Map();
   private diagnostics: Diagnostic[] = [];
+  private semanticDiagnostics: Map<string, Diagnostic[]> = new Map();
   private compiler: Compiler;
   private emitter: Emitter;
 
@@ -91,6 +92,9 @@ export class RclProgram implements IRclProgram {
       // Compile AST
       const compiledAgent = this.compiler.compile(parseResult.ast, content, filePath);
       const compilerDiagnostics = this.compiler.getDiagnostics();
+      
+      // Store semantic diagnostics for this file
+      this.semanticDiagnostics.set(filePath, compilerDiagnostics);
 
       if (!compiledAgent || compilerDiagnostics.some(d => d.severity === 'error')) {
         return {
@@ -124,11 +128,16 @@ export class RclProgram implements IRclProgram {
   getDiagnostics(): Diagnostic[] {
     const allDiagnostics: Diagnostic[] = [...this.diagnostics];
     
-    // Add diagnostics from all source files
+    // Add parse errors from all source files
     for (const sourceFile of this.sourceFiles.values()) {
       if (sourceFile.parseErrors) {
         allDiagnostics.push(...sourceFile.parseErrors);
       }
+    }
+    
+    // Add semantic diagnostics from all source files
+    for (const diagnostics of this.semanticDiagnostics.values()) {
+      allDiagnostics.push(...diagnostics);
     }
     
     return allDiagnostics;
@@ -138,8 +147,11 @@ export class RclProgram implements IRclProgram {
    * Get semantic diagnostics (type checking, validation)
    */
   getSemanticDiagnostics(): Diagnostic[] {
-    // For now, return compiler diagnostics
-    return this.compiler.getDiagnostics();
+    const allSemanticDiagnostics: Diagnostic[] = [];
+    for (const diagnostics of this.semanticDiagnostics.values()) {
+      allSemanticDiagnostics.push(...diagnostics);
+    }
+    return allSemanticDiagnostics;
   }
 
   /**

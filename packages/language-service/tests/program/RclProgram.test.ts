@@ -41,14 +41,14 @@ describe('RclProgram', () => {
       const rclContent = `agent TravelBot
   displayName: "Travel Assistant"
   brandName: "TravelCo"
-
-flow MainFlow
-  :start -> Welcome
-  Welcome -> :end
-
-messages Messages
-  text Welcome "Hello, welcome to TravelBot!"
-`;
+  flow MainFlow
+    :start -> Welcome
+    Welcome -> :end
+  end
+  messages Messages
+    text Welcome "Hello, welcome to TravelBot!"
+  end
+end`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -68,10 +68,13 @@ messages Messages
       
       const rclContent = `agent TravelBot
   brandName: "TravelCo"
-
-messages Messages
-  text Welcome "Hello!"
-`;
+  flow MainFlow
+    :start -> :end
+  end
+  messages Messages
+    text Welcome "Hello!"
+  end
+end`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -88,7 +91,13 @@ messages Messages
       
       const rclContent = `agent TravelBot
   displayName "Missing colon"
-`;
+  flow MainFlow
+    :start -> :end
+  end
+  messages Messages
+    text Welcome "Hello!"
+  end
+end`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -107,14 +116,14 @@ messages Messages
       
       const rclContent = `agent TravelBot
   displayName: "Travel Assistant"
-
-flow MainFlow
-  :start -> Welcome
-  Welcome -> :end
-
-messages Messages
-  text Welcome "Hello!"
-`;
+  flow MainFlow
+    :start -> Welcome
+    Welcome -> :end
+  end
+  messages Messages
+    text Welcome "Hello!"
+  end
+end`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -162,10 +171,13 @@ messages Messages
       
       const rclContent = `agent TravelBot
   displayName: "Travel Assistant"
-
-messages Messages
-  text Welcome "Hello!"
-`;
+  flow MainFlow
+    :start -> :end
+  end
+  messages Messages
+    text Welcome "Hello!"
+  end
+end`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -186,15 +198,25 @@ messages Messages
       // File with missing displayName
       const file1 = path.join(testDir, 'agent1.rcl');
       fs.writeFileSync(file1, `agent Bot1
-messages Messages
-  text Hello "Hi"
-`);
+  flow MainFlow
+    :start -> :end
+  end
+  messages Messages
+    text Hello "Hi"
+  end
+end`);
 
       // File with parse error
       const file2 = path.join(testDir, 'agent2.rcl');
       fs.writeFileSync(file2, `agent Bot2
   displayName "Missing colon"
-`);
+  flow MainFlow
+    :start -> :end
+  end
+  messages Messages
+    text Hello "Hi"
+  end
+end`);
 
       await program.addSourceFile(file1);
       await program.addSourceFile(file2);

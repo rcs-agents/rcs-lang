@@ -12,13 +12,36 @@ export * from './validation';
 // AST helper exports
 export * from './ast';
 
-// Legacy parse function for backward compatibility
-import { MockParser } from './mockParser';
+// Legacy parse function - now uses the real parser
+import { RCLParser } from './rclParser';
 
-// Create a global mock parser instance for synchronous parsing
-const mockParser = new MockParser();
+// Create a global parser instance
+const parser = new RCLParser();
 
-export function parse(text: string): any {
-  // For CLI tests, use the mock parser which is synchronous
-  return mockParser.parse(text);
+export async function parse(text: string): Promise<{ ast: any; errors?: any[] }> {
+  try {
+    const document = await parser.parseDocument(text, 'inline-document.rcl');
+    
+    // Check for ERROR nodes in the AST
+    const errors: any[] = [];
+    function checkForErrors(node: any) {
+      if (!node) return;
+      if (node.type === 'ERROR') {
+        errors.push({
+          message: 'Syntax error',
+          line: node.startPosition?.row,
+          column: node.startPosition?.column,
+          type: 'ERROR'
+        });
+      }
+      if (node.children) {
+        node.children.forEach(checkForErrors);
+      }
+    }
+    checkForErrors(document.ast);
+    
+    return { ast: document.ast, errors };
+  } catch (error) {
+    return { ast: null, errors: [{ message: error instanceof Error ? error.message : String(error) }] };
+  }
 }
