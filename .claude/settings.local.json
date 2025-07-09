@@ -7,7 +7,16 @@
       "Bash(bunx:*)",
       "Bash(bun test:*)",
       "Bash(node:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tree-sitter parse:*)",
+      "Bash(rm:*)",
+      "Bash(npx @rcl/cli compile:*)",
+      "Bash(git checkout:*)",
+      "Bash(mv:*)",
+      "Bash(grep:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }

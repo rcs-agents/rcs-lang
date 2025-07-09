@@ -1,0 +1,54 @@
+{
+  "agent": {
+    "name": "CustomerServiceBot",
+    "displayName": "Customer Service",
+    "brandName": "Your Company",
+    "config": {}
+  },
+  "messages": {
+    "Welcome": {
+      "contentMessage": {
+        "text": "bye"
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Menu": {
+      "contentMessage": {
+        "text": "bye"
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Help": {
+      "contentMessage": {
+        "text": "I can assist with orders, returns, and general questions."
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Orders": {
+      "contentMessage": {
+        "text": "Here are your recent orders..."
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Goodbye": {
+      "contentMessage": {
+        "text": "Thank you for contacting us!"
+      },
+      "messageTrafficType": "TRANSACTION"
+    }
+  },
+  "flows": {
+    "MainFlow": {
+      "id": "MainFlow",
+      "initial": "start",
+      "states": {
+        "start": {
+          "on": {}
+        },
+        "end": {
+          "type": "final"
+        }
+      }
+    }
+  }
+}

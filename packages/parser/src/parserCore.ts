@@ -1,7 +1,6 @@
 import { RCLNode, RCLASTNode } from './astTypes';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { MockParser } from './mockParser';
 
 // Check if we're in a Node.js environment
 const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
@@ -32,8 +31,6 @@ export class ParserCore {
   private parser: ParserInterface | null = null;
   private language: LanguageInterface | null = null;
   private useNativeBinding = false;
-  private useMockParser = false;
-  private mockParser: MockParser | null = null;
   private initialized = false;
   private initializationPromise: Promise<boolean> | null = null;
 
@@ -52,150 +49,152 @@ export class ParserCore {
 
   private async initialize(): Promise<boolean> {
     try {
+      this.initialized = true;
+
       if (isNode) {
-        // Try native Node.js binding first
+        // Try Node.js native binding first
         try {
-          const TreeSitter = require('tree-sitter');
+          const Parser = require('tree-sitter');
+          // Try different paths for the native binding
+          let RCLLanguage;
           
-          // Try to load the native binding
-          let Language;
+          // Try multiple possible paths
+          const possiblePaths = [
+            '../../bindings/node',
+            '../bindings/node',
+            '../../build/Release/tree_sitter_rcl_binding',
+            '../build/Release/tree_sitter_rcl_binding'
+          ];
           
-          // First try the compiled native binding if it exists
-          const bindingPath = path.join(__dirname, '..', 'build', 'Release', 'tree_sitter_rcl_binding.node');
-          if (fs.existsSync(bindingPath)) {
+          for (const bindingPath of possiblePaths) {
             try {
-              Language = require(bindingPath);
-            } catch (e) {
-              // Try node-gyp-build which handles the platform-specific binding loading
-              try {
-                Language = require('node-gyp-build')(path.join(__dirname, '..'));
-              } catch (e2) {
-                // Native binding not available
-                throw new Error('Native binding not available');
-              }
+              RCLLanguage = require(bindingPath);
+              break;
+            } catch (err) {
+              // Continue to next path
             }
-          } else {
-            // Native binding not built, skip to web-tree-sitter
-            throw new Error('Native binding not built');
+          }
+          
+          if (!RCLLanguage) {
+            throw new Error('Could not find native binding');
           }
 
-          this.parser = new TreeSitter();
-
-          // The binding should export a language object
-          if (!Language) {
-            throw new Error('Failed to load language binding');
+          this.parser = new Parser();
+          this.language = RCLLanguage;
+          if (this.language && this.parser) {
+            this.parser.setLanguage(this.language);
           }
-
-          this.language = Language;
-          this.parser!.setLanguage(this.language!);
           this.useNativeBinding = true;
-          console.log('Successfully loaded native Node.js RCL language binding');
-          this.initialized = true;
+
           return true;
-        } catch (error) {
-          // Silently fall back to web-tree-sitter
-          // console.warn('Native binding not available, falling back to web-tree-sitter');
+        } catch (nativeError: unknown) {
+          const errorMessage = nativeError instanceof Error ? nativeError.message : String(nativeError);
+          console.warn('Native Node.js binding failed:', errorMessage);
         }
       }
 
-      // Fall back to web-tree-sitter
+      // Try web tree-sitter with WASM
       try {
-        const TreeSitter = require('web-tree-sitter');
-        
-        // Initialize the Parser class (required in newer versions)
-        if (TreeSitter.Parser.init) {
-          await TreeSitter.Parser.init();
-        }
-        
-        // Create parser instance
-        this.parser = new TreeSitter.Parser();
-
-        // Load the WASM language file
-        const wasmPath = path.join(__dirname, '..', 'tree-sitter-rcl.wasm');
-
-        if (!fs.existsSync(wasmPath)) {
-          // If WASM doesn't exist but we're in Node.js, we already failed above
-          if (isNode) {
-            throw new Error('Neither native binding nor WASM file is available');
-          }
-          // For browser, we'll need to load from a URL
-          throw new Error('WASM file not found and no URL provided');
-        }
-
-        const language = await TreeSitter.Language.load(wasmPath);
-        this.language = language;
-        this.parser!.setLanguage(language);
-
-        console.log('Successfully loaded web-tree-sitter RCL language');
-        this.initialized = true;
+        await this.initializeWebTreeSitter();
         return true;
-      } catch (error) {
-        console.error('Failed to initialize web-tree-sitter:', error);
-        throw error;
+      } catch (wasmError: unknown) {
+        const errorMessage = wasmError instanceof Error ? wasmError.message : String(wasmError);
+        console.warn('WASM binding failed:', errorMessage);
       }
+
+      // If we get here, both native and WASM failed
+      throw new Error('No parser available - both native and WASM bindings failed to load');
+
     } catch (error) {
-      console.error('Failed to initialize parser:', error);
-
-      // Only fall back to mock parser in development mode (not during tests)
-      const isTest = process.env.NODE_ENV === 'test';
-      const useMockParser = process.env.RCL_USE_MOCK_PARSER === 'true';
-      const isDevelopment = process.env.NODE_ENV === 'development' || (!process.env.NODE_ENV && !isTest);
-      
-      if (isDevelopment || useMockParser) {
-        console.warn('Falling back to mock parser for development.');
-        console.warn('To use the full parser, install emscripten and run: npm run build-wasm');
-        console.warn('See BUILDING_WASM.md for instructions.');
-
-        this.mockParser = new MockParser();
-        this.useMockParser = true;
-        this.initialized = true;
-        return true;
-      }
-      
-      // In test mode, throw the error
-      throw error;
+      console.error('Parser initialization failed:', error);
+      this.initialized = true; // Mark as initialized to prevent retry loops
+      return false;
     }
   }
 
   async parse(text: string): Promise<ParsedTree> {
-    await this.ensureInitialized();
-
-    if (this.useMockParser && this.mockParser) {
-      // Return a tree-like structure for compatibility
-      const rootNode = this.mockParser.parse(text);
-      return { rootNode };
+    const isInitialized = await this.ensureInitialized();
+    if (!isInitialized || !this.parser) {
+      throw new Error('Parser not available - tree-sitter initialization failed');
     }
 
-    if (!this.parser) {
-      throw new Error('Parser not initialized');
+    try {
+      return this.parser.parse(text);
+    } catch (error) {
+      throw new Error(`Parsing failed: ${error instanceof Error ? error.message : String(error)}`);
     }
-
-    return this.parser.parse(text);
   }
 
-  convertToRCLNode(node: TreeNode): RCLNode {
+  convertToRCLNode(treeNode: TreeNode): RCLNode {
     const rclNode: RCLNode = {
-      type: node.type,
-      text: node.text,
-      startPosition: node.startPosition,
-      endPosition: node.endPosition,
-      children: node.children?.map((child: TreeNode) => this.convertToRCLNode(child)) || [],
+      type: treeNode.type,
+      text: treeNode.text,
+      startPosition: treeNode.startPosition,
+      endPosition: treeNode.endPosition,
+      children: [],
       parent: null,
     };
 
-    // Set parent references
-    rclNode.children?.forEach((child) => {
-      child.parent = rclNode;
-    });
+    if (treeNode.children) {
+      rclNode.children = treeNode.children.map(child => {
+        const childNode = this.convertToRCLNode(child);
+        childNode.parent = rclNode;
+        return childNode;
+      });
+    }
 
     return rclNode;
   }
 
-  isUsingNativeBinding(): boolean {
-    return this.useNativeBinding;
+  private async initializeWebTreeSitter(): Promise<void> {
+    // Import web-tree-sitter - use require for better compatibility
+    const Parser = require('web-tree-sitter');
+    
+    // Initialize
+    if (Parser.init) {
+      await Parser.init();
+    }
+    
+    const wasmPath = this.findWasmFile();
+    if (!wasmPath) {
+      throw new Error('WASM file not found');
+    }
+
+    this.language = await Parser.Language.load(wasmPath);
+    this.parser = new Parser();
+    if (this.language && this.parser) {
+      this.parser.setLanguage(this.language as any);
+    }
+    
   }
 
-  isUsingMockParser(): boolean {
-    return this.useMockParser;
+  private findWasmFile(): string | null {
+    const possiblePaths = [
+      path.join(__dirname, '../tree-sitter-rcl.wasm'),
+      path.join(__dirname, '../../tree-sitter-rcl.wasm'),
+      path.join(__dirname, 'tree-sitter-rcl.wasm'),
+      path.join(process.cwd(), 'tree-sitter-rcl.wasm'),
+      path.join(process.cwd(), 'packages/parser/tree-sitter-rcl.wasm'),
+      path.join(process.cwd(), 'node_modules/@rcl/parser/tree-sitter-rcl.wasm'),
+      // For extension context
+      path.join(process.cwd(), 'server/out/tree-sitter-rcl.wasm'),
+      path.join(process.cwd(), '../tree-sitter-rcl.wasm'),
+    ];
+
+    for (const wasmPath of possiblePaths) {
+      if (fs.existsSync(wasmPath)) {
+        return wasmPath;
+      }
+    }
+
+    return null;
+  }
+
+  isInitialized(): boolean {
+    return this.initialized && this.parser !== null;
+  }
+
+  isUsingNativeBinding(): boolean {
+    return this.useNativeBinding;
   }
 }

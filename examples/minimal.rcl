@@ -1,9 +1,12 @@
-agent "Hello Agent"
+agent HelloAgent
   displayName: "Hello"
 
   flow MainFlow
-    :start -> greeting
-    greeting -> :end
+    :start -> Greeting
+    Greeting -> :end
+  end
 
   messages Messages
-    text greeting "Hello! Welcome to RCL."
+    text Greeting "Hello! Welcome to RCL."
+  end
+end

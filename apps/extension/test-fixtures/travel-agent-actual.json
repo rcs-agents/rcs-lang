@@ -1,0 +1,27 @@
+{
+  "agent": {
+    "name": "agent",
+    "displayName": "Travel Assistant"
+  },
+  "messages": {
+    "Welcome": {
+      "contentMessage": {
+        "text": "Welcome to Adventure Travel!"
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Planning": {
+      "contentMessage": {
+        "text": "What type of trip are you planning?"
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Confirmation": {
+      "contentMessage": {
+        "text": "Your booking has been confirmed!"
+      },
+      "messageTrafficType": "TRANSACTION"
+    }
+  },
+  "flows": {}
+}

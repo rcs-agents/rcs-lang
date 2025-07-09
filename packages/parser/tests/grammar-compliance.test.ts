@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const wasmPath = join(__dirname, '..', 'tree-sitter-rcl.wasm');
 const hasWasm = existsSync(wasmPath);
-const isDev = process.env.RCL_DEV_MODE === 'true' || process.env.RCL_USE_MOCK_PARSER === 'true';
+const isDev = process.env.RCL_DEV_MODE === 'true';
 
 describe('RCL Grammar Compliance Tests', () => {
   if (!hasWasm && !isDev) {

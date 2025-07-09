@@ -21,24 +21,19 @@ const agent = {
   agent_definition: $ => seq(
     'agent',
     field('name', $.identifier),
-    optional(seq(
-      $._newline,
-      field('body', $.agent_body)
-    ))
+    $._newline,
+    field('body', $.agent_body)
   ),
   
   agent_body: $ => seq(
     $._indent,
-    repeat1(seq(
-      choice(
-        seq('displayName', ':', $.string),
-        seq('brandName', ':', $.string),
-        $.config_section,
-        $.defaults_section,
-        $.flow_section,
-        $.messages_section
-      ),
-      optional($._newline)
+    repeat1(choice(
+      seq('displayName', ':', $.string, $._newline),
+      seq('brandName', ':', $.string, $._newline),
+      $.config_section,
+      $.defaults_section,
+      $.flow_section,
+      $.messages_section
     )),
     $._dedent
   ),

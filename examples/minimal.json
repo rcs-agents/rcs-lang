@@ -1,0 +1,28 @@
+{
+  "agent": {
+    "name": "HelloAgent",
+    "displayName": "Hello"
+  },
+  "messages": {
+    "Greeting": {
+      "contentMessage": {
+        "text": "Hello! Welcome to RCL."
+      },
+      "messageTrafficType": "TRANSACTION"
+    }
+  },
+  "flows": {
+    "MainFlow": {
+      "id": "MainFlow",
+      "initial": "start",
+      "states": {
+        "start": {
+          "on": {}
+        },
+        "end": {
+          "type": "final"
+        }
+      }
+    }
+  }
+}

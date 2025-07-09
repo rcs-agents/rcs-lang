@@ -1,6 +1,6 @@
 # RCL Formal Specification - Quick Reference Guide
 
-This document summarizes the key rules from the 951-line RCL formal specification to ensure grammar compliance without re-reading the full document.
+This document summarizes the key rules from the 976-line RCL formal specification to ensure grammar compliance without re-reading the full document.
 
 ## 1. Core Structure Requirements
 
@@ -15,14 +15,13 @@ RclFile ::=
 ```ebnf
 AgentDefinition ::=
     'agent' IDENTIFIER              // IDENTIFIER only, NOT string
-    INDENT
     ('displayName' ':' STRING)      // REQUIRED
     ('brandName' ':' STRING)?       // OPTIONAL
     (ConfigSection)?                // OPTIONAL
     (DefaultsSection)?              // OPTIONAL  
     (FlowSection)+                  // AT LEAST ONE required
     MessagesSection                 // MANDATORY
-    DEDENT
+    'end'                          // Explicit end keyword
 ```
 
 ## 2. Identifier Rules (CRITICAL - Must enforce strictly)
@@ -55,18 +54,16 @@ AgentDefinition ::=
 ```ebnf
 MessagesSection ::=
     'messages' 'Messages'           // EXACT reserved name
-    INDENT
     (AgentMessage | MessageShortcut)+
-    DEDENT
+    'end'                          // Explicit end keyword
 ```
 
 ### 4.2 Flow Section (AT LEAST ONE required)
 ```ebnf
 FlowSection ::=
     'flow' IDENTIFIER               // Flow name
-    INDENT
     (FlowRule)*
-    DEDENT
+    'end'                          // Explicit end keyword
 ```
 
 ## 5. Type Tags (Special syntax rules)
@@ -82,10 +79,12 @@ TypeTag ::=
 ### 5.2 Supported Type Tags
 - `email`, `phone`, `url`, `time`, `datetime`/`date`/`dt`, `zipcode`/`zip`, `duration`/`ttl`
 
-## 6. Indentation Rules (Python-like)
-- **INDENT**: Marks block start (increase in indentation)
-- **DEDENT**: Marks block end (decrease in indentation)  
-- **Consistency**: Use consistent spacing (2 or 4 spaces recommended)
+## 6. Block Structure Rules (Stack-based)
+- **Explicit Delimiters**: Blocks use explicit 'end' keywords instead of indentation
+- **Special Terminators**: 
+  - Multi-line strings: End with `|` on a line by itself
+  - Embedded code blocks: End with `<$`
+- **Readability**: Use consistent indentation for readability (not structurally required)
 
 ## 7. Message Shortcuts (Common patterns)
 
@@ -116,13 +115,15 @@ EMBEDDED_CODE ::= /\$((js|ts)?>)\s*[^\r\n]*/
 ```ebnf
 MULTI_LINE_EXPRESSION_START ::= /\$((js|ts)?)>>>/
 ```
-- **Example**: `$js>>>` followed by indented code block
+- **Example**: `$js>>>` followed by code block
+- **Termination**: End with `<$` on a line by itself
 
 ## 9. String and Value Rules
 
 ### 9.1 Strings
 - **Regular**: `"text content"` (double quotes only)
-- **Multi-line**: Start with `|`, `|-`, `+|`, or `+|+` followed by indented content
+- **Multi-line**: Start with `|`, `|-`, `+|`, or `+|+` followed by content
+- **Multi-line termination**: End with a line containing only `|`
 
 ### 9.2 ATOMs (Enums)
 - **Pattern**: `/:([_a-zA-Z][\w_]*|"[^"\\]*")/`
@@ -134,16 +135,20 @@ MULTI_LINE_EXPRESSION_START ::= /\$((js|ts)?)>>>/
 ❌ `agent "Travel Assistant"`  
 ✅ `agent TravelAssistant`
 
-### 10.2 Section Names MUST follow reserved name rules
+### 10.2 Suggestions Block (plural only)
+❌ Multiple `suggestion` entries
+✅ Single `suggestions` block with multiple items inside
+
+### 10.3 Section Names MUST follow reserved name rules
 ❌ `messages MyMessages`  
 ✅ `messages Messages`
 
-### 10.3 Flow Rules MUST have proper structure
+### 10.4 Flow Rules MUST have proper structure
 ✅ `flow MainFlow`  
 ✅ `:start -> Welcome`  
 ✅ `Welcome -> Planning`  
 
-### 10.4 Type Tags MUST NOT have quoted values
+### 10.5 Type Tags MUST NOT have quoted values
 ❌ `<url "https://example.com">`  
 ✅ `<url https://example.com>`
 
@@ -159,20 +164,105 @@ MULTI_LINE_EXPRESSION_START ::= /\$((js|ts)?)>>>/
 - At least one `flow` section is REQUIRED
 - `messages Messages` section is REQUIRED
 
-### 11.3 Indentation Structure
-- Every section body MUST be properly indented
-- INDENT/DEDENT tokens MUST match exactly
-- No mixing of tabs and spaces
+### 11.3 Block Structure
+- Every section MUST be properly terminated with 'end' keyword
+- Special blocks have their own terminators (`|` for strings, `<$` for code)
+- Indentation is for readability, not structure
 
-## 12. Error Prevention Checklist
+## 12. Stack-Based Parsing Updates (CRITICAL)
+
+### 12.1 Block Termination with 'end' Keywords
+- **OLD**: Blocks terminated by DEDENT tokens (indentation-based)
+- **NEW**: Blocks terminated by explicit 'end' keywords
+- **Examples**:
+  ```rcl
+  agent TravelBot
+    displayName: "Travel Assistant"
+    flow Main
+      :start -> Welcome
+    end
+    messages Messages
+      text Welcome "Hello!"
+    end
+  end
+  ```
+
+### 12.2 Multi-line String Termination
+- **Termination**: Line containing only `|`
+- **Example**:
+  ```rcl
+  description: |
+    This is a multi-line string
+    with multiple lines of content
+  |
+  ```
+
+### 12.3 Embedded Code Block Termination  
+- **Termination**: `<$` on a line by itself
+- **Example**:
+  ```rcl
+  postbackData: $js>>>
+    const data = {
+      user: context.user,
+      selection: context.reply.text
+    };
+    return JSON.stringify(data);
+  <$
+  ```
+
+### 12.4 When Block Structure
+- **NEW**: When blocks also use 'end' keyword
+- **Example**:
+  ```rcl
+  :start -> when @reply's text is ...
+    "Yes" -> Confirm
+    "No" -> Cancel
+    :default -> Unknown
+  end
+  ```
+
+### 12.5 Suggestions Block
+- **Structure**: Uses 'end' keyword
+- **Example**:
+  ```rcl
+  suggestions
+    reply "Yes"
+    reply "No" 
+    openUrl "Learn More" <url https://example.com>
+  end
+  ```
+
+### 12.6 Special Blocks Summary
+| Block Type | Start | End |
+|------------|-------|-----|
+| Agent | `agent Name` | `end` |
+| Flow | `flow Name` | `end` |
+| Messages | `messages Messages` | `end` |
+| Config | `agentConfig Config` | `end` |
+| Defaults | `agentDefaults Defaults` | `end` |
+| When | `when @var is ...` | `end` |
+| Suggestions | `suggestions` | `end` |
+| List | `list` | `end` |
+| Object | `object` | `end` |
+| Carousel | `carousel ID Title` | `end` |
+| Save Event | `saveEvent "Title"` | `end` |
+| Multi-line String | `\|` | `\|` (line by itself) |
+| Embedded Code | `$js>>>` | `<$` |
+
+## 13. Error Prevention Checklist
 
 Before implementing any grammar rule, verify:
 - [ ] IDENTIFIER patterns follow `/[A-Z]([A-Za-z0-9-_]|(\s(?=[A-Z0-9]))*/`
 - [ ] Reserved names used only in correct contexts
 - [ ] Required sections are present
 - [ ] Type tag syntax is correct (no quotes around values)
-- [ ] Indentation rules are properly enforced
+- [ ] All blocks end with proper terminators ('end', '|', or '<$')
+- [ ] Multi-line strings end with `|` on a line by itself
+- [ ] Embedded code blocks end with `<$` on a line by itself
+- [ ] When blocks end with 'end' keyword
+- [ ] Only `suggestions` (plural) blocks are used
+- [ ] postbackData only contains EmbeddedCode
 - [ ] Case sensitivity is respected
 - [ ] Message shortcuts have proper IDs
 
-This quick reference ensures all grammar implementations comply with the formal specification without needing to re-read the full 951-line document.
+This quick reference ensures all grammar implementations comply with the formal specification without needing to re-read the full 976-line document.

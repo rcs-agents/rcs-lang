@@ -6,15 +6,21 @@ agent CustomerSupport
     :start -> Welcome
     Welcome -> Help
     Help -> ThankYou
+    ThankYou -> :end
+  end
   
   flow OrderFlow
     :start -> OrderStart
     OrderStart -> OrderStatus
+    OrderStatus -> :end
+  end
   
   messages Messages
-    Welcome: "Hello! How can I help you today?"
-    Help: "I can assist with orders, returns, and general questions"
-    ThankYou: "Thank you for contacting us!"
-    OrderStart: "Let me help you with your order"
-    OrderStatus: "Checking your order status..."
-    Goodbye: "Have a great day!"
+    text Welcome "Hello! How can I help you today?"
+    text Help "I can assist with orders, returns, and general questions"
+    text ThankYou "Thank you for contacting us!"
+    text OrderStart "Let me help you with your order"
+    text OrderStatus "Checking your order status..."
+    text Goodbye "Have a great day!"
+  end
+end

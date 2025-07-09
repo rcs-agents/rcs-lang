@@ -42,6 +42,10 @@ export function getNodeText(node: ASTNode, sourceContent: string): string {
  * Find the first node of a given type
  */
 export function findNodeByType(node: ASTNode, type: string): ASTNode | null {
+  if (!node) {
+    return null;
+  }
+  
   if (node.type === type) {
     return node;
   }
@@ -63,6 +67,10 @@ export function findNodeByType(node: ASTNode, type: string): ASTNode | null {
  */
 export function findNodesByType(node: ASTNode, type: string): ASTNode[] {
   const results: ASTNode[] = [];
+  
+  if (!node) {
+    return results;
+  }
   
   if (node.type === type) {
     results.push(node);

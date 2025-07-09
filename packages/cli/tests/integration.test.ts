@@ -272,7 +272,7 @@ describe('End-to-End CLI Integration', () => {
         expect(content).toMatch(/displayName:/);
         expect(content).toMatch(/flow\s+\w+/);
         expect(content).toMatch(/text\s+\w+/);
-        expect(content).toMatch(/agentMessage\s+\w+/);
+        // No agentMessage in new syntax, messages are in messages section
 
         console.log('Realistic.rcl file found and validated');
         console.log('File size:', content.length, 'characters');

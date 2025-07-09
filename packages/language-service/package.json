@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@rcl/cli": "file:packages/cli",
     "@rcl/parser": "file:../parser",
     "tree-sitter": "^0.21.1"
   },
