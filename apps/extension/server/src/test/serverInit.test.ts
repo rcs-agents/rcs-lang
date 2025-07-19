@@ -1,4 +1,4 @@
-import { RCLParser } from '@rcl/parser';
+import { RCLParser } from '@rcs-lang/parser';
 import { describe, expect, test } from 'vitest';
 
 describe('Extension Server Initialization', () => {
@@ -64,18 +64,18 @@ describe('Extension Server Initialization', () => {
     const complexCode = `agent Complex Agent With Many Features
   displayName: "Complex Agent"
   brandName: "Test Brand"
-  
+
   agentConfig Config
     agentUseCase: :customer_care
     hostingRegion: :us_central
-  
+
   flow MainFlow
     :start -> welcome
     welcome -> askQuestion with
       message: text "How can I help?"
     askQuestion -> processResponse
     processResponse -> end
-  
+
   messages Messages
     text welcome "Welcome to our service!"
     text askQuestion "What would you like to do today?"

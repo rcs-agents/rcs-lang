@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
-import { RCLCompiler } from '@rcl/compiler';
+import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, it } from 'vitest';
 
 const execAsync = promisify(exec);
@@ -16,7 +16,7 @@ describe('Error Message Formatting', () => {
       const invalidRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   invalid_section
     error: here
 `;
@@ -46,13 +46,13 @@ agent TestAgent
       const rclWithError = `
 agent TestAgent
   displayName: "Test Agent"
-  
+
   flow TestFlow
     start: Start
-    
+
     # Error on this line
     invalid syntax here
-    
+
     on Start
       match @reply.text
         :default -> Start
@@ -312,18 +312,18 @@ agent TestAgent
       const multipleErrorsRcl = `
 agent BadAgent
   # Missing displayName
-  
+
   config
     invalid_property "missing colon"
     logoUri: <invalid tag>
-  
+
   flow BadFlow
     # Missing start
-    
+
     on State1
       # Missing match
       "hello" -> State2
-  
+
   messages Messages
     # Invalid message syntax
     BadMessage "no type specified"
@@ -346,13 +346,13 @@ agent BadAgent
 invalid content at the start
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: Start
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Hello"
 `;

@@ -1,4 +1,4 @@
-import type { IFileSystem, IFileSystemProvider } from '@rcl/core';
+import type { IFileSystem, IFileSystemProvider } from '@rcs-lang/core';
 import { MemoryFileSystem } from './memoryFileSystem';
 
 // Conditional imports to avoid Node.js modules in browser

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { IParseResult, IParser } from '@rcl/core';
+import type { IParseResult, IParser } from '@rcs-lang/core';
 import type {
   ASTNode,
   Range as ASTRange,

@@ -1,18 +1,18 @@
 project:
-  name: '@rcl/validation'
+  name: '@rcs-lang/validation'
   description: 'Validation pipeline for RCL language'
 
 type: library
 language: typescript
 
 dependsOn:
-  - '@rcl/core'
+  - '@rcs-lang/core'
 
 tasks:
   build:
     command: tsc
     deps:
-      - '@rcl/core:build'
+      - '@rcs-lang/core:build'
     inputs:
       - src/**/*
       - tsconfig.json
@@ -26,7 +26,7 @@ tasks:
   typecheck:
     command: tsc --noEmit
     deps:
-      - '@rcl/core:build'
+      - '@rcs-lang/core:build'
     inputs:
       - src/**/*
       - tsconfig.json

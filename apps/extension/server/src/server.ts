@@ -35,8 +35,8 @@ import {
   createConnection,
 } from 'vscode-languageserver/node';
 
-import { RCLParser } from '@rcl/parser';
-import type { RCLSettings } from '@rcl/parser';
+import { RCLParser } from '@rcs-lang/parser';
+import type { RCLSettings } from '@rcs-lang/parser';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { CodeActionProvider } from './features/codeActions';
 import { CompletionProvider } from './features/completion';

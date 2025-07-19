@@ -1,4 +1,4 @@
-import { Position, Range, type RclFile } from '@rcl/ast';
+import { Position, Range, type RclFile } from '@rcs-lang/ast';
 import type { Diagnostic } from './diagnostics';
 import type { Result } from './result';
 
@@ -28,7 +28,7 @@ export interface IParseResult {
 }
 
 // Re-export AST types for convenience
-export { RclFile as IASTNode, Position as IPosition, Range as IRange } from '@rcl/ast';
+export { RclFile as IASTNode, Position as IPosition, Range as IRange } from '@rcs-lang/ast';
 
 /**
  * Parser interface - all parsers must implement this

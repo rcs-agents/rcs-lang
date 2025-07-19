@@ -1,10 +1,10 @@
 import * as path from 'node:path';
-import { RCLCompiler } from '@rcl/compiler';
-import { generateD2Diagram, generateMermaidDiagram } from '@rcl/compiler';
-import type { Result } from '@rcl/core';
-import type { ICompilationResult, IFileSystem } from '@rcl/core';
-import { FileSystemFactory } from '@rcl/file-system';
-import { AntlrRclParser } from '@rcl/parser';
+import { RCLCompiler } from '@rcs-lang/compiler';
+import { generateD2Diagram, generateMermaidDiagram } from '@rcs-lang/compiler';
+import type { Result } from '@rcs-lang/core';
+import type { ICompilationResult, IFileSystem } from '@rcs-lang/core';
+import { FileSystemFactory } from '@rcs-lang/file-system';
+import { AntlrRclParser } from '@rcs-lang/parser';
 import chalk from 'chalk';
 
 export interface CompileOptions {

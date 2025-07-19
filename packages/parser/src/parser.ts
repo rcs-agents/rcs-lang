@@ -7,7 +7,7 @@ import {
   type ParserConfig,
   type ParserPlatform,
   type Result,
-} from '@rcl/core';
+} from '@rcs-lang/core';
 import {
   type ANTLRErrorListener,
   CharStream,
@@ -65,7 +65,7 @@ class ErrorListener implements ANTLRErrorListener {
     conflictingAlts: any,
     configs: any
   ): void {
-    // Optional - can be left empty  
+    // Optional - can be left empty
   }
 
   reportContextSensitivity(

@@ -17,7 +17,7 @@ import type {
   StringLiteral,
   TypeTag,
   Value,
-} from '@rcl/ast';
+} from '@rcs-lang/ast';
 import {
   isAtom,
   isAttribute,
@@ -35,9 +35,9 @@ import {
   isTypeTag,
   isValue,
   isVariable,
-} from '@rcl/ast';
-import { type IASTNode, type Result, err, ok } from '@rcl/core';
-import type { ICompilationOutput, ICompilationStage } from '@rcl/core';
+} from '@rcs-lang/ast';
+import { type IASTNode, type Result, err, ok } from '@rcs-lang/core';
+import type { ICompilationOutput, ICompilationStage } from '@rcs-lang/core';
 
 interface TransformInput {
   ast: IASTNode;

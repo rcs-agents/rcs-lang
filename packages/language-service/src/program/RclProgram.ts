@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { parse } from '@rcl/parser';
+import { parse } from '@rcs-lang/parser';
 import { Compiler } from '../compiler/compiler';
 import { Emitter } from '../compiler/emitter';
 import { loadConfig } from '../config/loader';

@@ -1,9 +1,9 @@
-import type { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcs-lang/parser';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { type DocumentSymbol, SymbolKind } from 'vscode-languageserver/node';
 
 export class SymbolsProvider {
-  constructor(private parser: RCLParser) {}
+  constructor(private parser: RCLParser) { }
 
   public async getDocumentSymbols(document: TextDocument): Promise<DocumentSymbol[]> {
     const symbols: DocumentSymbol[] = [];

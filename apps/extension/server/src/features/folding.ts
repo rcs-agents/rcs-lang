@@ -1,9 +1,9 @@
-import type { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcs-lang/parser';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { type FoldingRange, FoldingRangeKind } from 'vscode-languageserver/node';
 
 export class FoldingProvider {
-  constructor(private parser: RCLParser) {}
+  constructor(private parser: RCLParser) { }
 
   public async getFoldingRanges(document: TextDocument): Promise<FoldingRange[]> {
     const ranges: FoldingRange[] = [];

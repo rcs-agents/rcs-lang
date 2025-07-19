@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/core",
+  "name": "@rcs-lang/core",
   "version": "1.0.0",
   "description": "Core types and interfaces for RCL language infrastructure",
   "main": "dist/index.js",
@@ -13,7 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@rcl/ast": "workspace:*"
+    "@rcs-lang/ast": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

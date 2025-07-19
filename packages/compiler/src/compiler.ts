@@ -1,12 +1,12 @@
-import { type Diagnostic, type Result, err, ok } from '@rcl/core';
+import { type Diagnostic, type Result, err, ok } from '@rcs-lang/core';
 import type {
   ICompilationInput,
   ICompilationResult,
   ICompiler,
   ICompilerCapabilities,
   IFileSystem,
-} from '@rcl/core';
-import { FileSystemFactory } from '@rcl/file-system';
+} from '@rcs-lang/core';
+import { FileSystemFactory } from '@rcs-lang/file-system';
 import { D2Generator, JavaScriptGenerator, MermaidGenerator } from './generators';
 import { CompilationPipeline } from './pipeline/compilationPipeline';
 import { ParseStage, TransformStage, ValidateStage } from './stages';

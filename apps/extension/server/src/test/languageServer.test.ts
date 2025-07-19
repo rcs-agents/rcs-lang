@@ -1,4 +1,4 @@
-import { RCLParser } from '@rcl/parser';
+import { RCLParser } from '@rcs-lang/parser';
 import { beforeAll, describe, expect, test } from 'vitest';
 import { DiagnosticSeverity } from 'vscode-languageserver';
 import { SyntaxValidator } from '../syntaxValidator';
@@ -76,16 +76,16 @@ describe('Language Server Core Features', () => {
     test.skip('should extract symbols from document', async () => {
       const code = `agent CustomerServiceBot
   displayName: "Customer Service"
-  
+
   flow MainFlow
     :start -> greeting
     greeting -> askIntent
     askIntent -> end
-  
+
   flow ErrorFlow
     :error -> apologize
     apologize -> end
-    
+
   messages Messages
     text greeting "Hello! I'm here to help."
     text askIntent "What can I do for you?"

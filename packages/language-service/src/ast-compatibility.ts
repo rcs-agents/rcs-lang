@@ -3,8 +3,8 @@
  * Maps old AST usage patterns to new formal AST
  */
 
-import type * as AST from '@rcl/ast';
-import type { IASTNode } from '@rcl/core';
+import type * as AST from '@rcs-lang/ast';
+import type { IASTNode } from '@rcs-lang/core';
 
 /**
  * Old BaseNode type for compatibility

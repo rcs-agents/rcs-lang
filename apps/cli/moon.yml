@@ -1,7 +1,7 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
 project:
-  name: '@rcl/cli'
+  name: '@rcs-lang/cli'
   description: 'RCL command-line interface'
 
 id: cli
@@ -11,17 +11,17 @@ language: typescript
 platform: node
 
 dependsOn:
-  - '@rcl/core'
-  - '@rcl/compiler'
-  - '@rcl/file-system'
+  - '@rcs-lang/core'
+  - '@rcs-lang/compiler'
+  - '@rcs-lang/file-system'
 
 tasks:
   build:
     command: nr build
     deps:
-      - '@rcl/core:build'
-      - '@rcl/compiler:build'
-      - '@rcl/file-system:build'
+      - '@rcs-lang/core:build'
+      - '@rcs-lang/compiler:build'
+      - '@rcs-lang/file-system:build'
     inputs:
       - "src/**/*"
       - "tsconfig.json"

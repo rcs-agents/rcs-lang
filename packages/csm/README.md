@@ -1,4 +1,4 @@
-# @rcl/csm - Conversation State Machine
+# @rcs-lang/csm - Conversation State Machine
 
 A lightweight, TypeScript-first state machine library designed specifically for RCS conversational agents. CSM provides a simple, performant way to manage conversation flow state across stateless HTTP requests.
 
@@ -24,13 +24,13 @@ CSM (Conversation State Machine) is built to:
 ## Installation
 
 ```bash
-npm install @rcl/csm
+npm install @rcs-lang/csm
 ```
 
 ## Quick Start
 
 ```typescript
-import { ConversationalAgent, FlowDefinition } from '@rcl/csm';
+import { ConversationalAgent, FlowDefinition } from '@rcs-lang/csm';
 
 // Define your flow (usually generated from RCL)
 const coffeeFlow: FlowDefinition = {
@@ -87,18 +87,18 @@ The main class for managing conversation state across multiple flows.
 ```typescript
 class ConversationalAgent {
   constructor(options: AgentOptions);
-  
+
   // Flow management
   addFlow(flow: FlowDefinition): void;
   removeFlow(flowId: string): void;
-  
+
   // State processing
   processInput(input: string): Promise<ProcessResult>;
-  
+
   // Serialization
   toURLHash(): string;
   static fromURLHash(hash: string, options: AgentOptions): ConversationalAgent;
-  
+
   // State access
   getCurrentState(): AgentState;
   getContext(): Context;
@@ -142,10 +142,10 @@ Configuration for the agent.
 ```typescript
 interface AgentOptions {
   id: string;
-  
+
   // Single callback for all state changes
   onStateChange: (event: StateChangeEvent) => Promise<void>;
-  
+
   // Optional configuration
   serialization?: {
     compress?: boolean;      // Use compression for URL hash
@@ -154,7 +154,7 @@ interface AgentOptions {
       algorithm?: string;
     };
   };
-  
+
   // Error handling
   onError?: (error: Error, context: ErrorContext) => void;
 }
@@ -171,14 +171,14 @@ interface StateChangeEvent {
   machine: string;
   state: string;
   previousState?: string;
-  
+
   // Transition information
   trigger: 'input' | 'transient' | 'machine' | 'restore';
   input?: string;
-  
+
   // Context
   context: Context;
-  
+
   // Timestamp
   timestamp: number;
 }
@@ -257,27 +257,27 @@ base64url({
 ```typescript
 export async function handleMessage(request: Request) {
   const { stateHash, userInput } = await request.json();
-  
+
   // Restore agent state
-  const agent = stateHash 
+  const agent = stateHash
     ? ConversationalAgent.fromURLHash(stateHash, {
         id: 'CoffeeBot',
         onStateChange: async (event) => {
           // Log state change
           await logAnalytics(event);
-          
+
           // Get message for state
           const message = getMessageForState(event.state);
-          
+
           // Store response to send back
           response.message = message;
         }
       })
     : createNewAgent();
-  
+
   // Process input
   const result = await agent.processInput(userInput);
-  
+
   // Return response with new state
   return Response.json({
     message: response.message,
@@ -292,9 +292,9 @@ export async function handleMessage(request: Request) {
 ```typescript
 app.post('/conversation', async (req, res) => {
   const agent = createOrRestoreAgent(req.body.stateHash);
-  
+
   const result = await agent.processInput(req.body.input);
-  
+
   res.json({
     state: result,
     hash: agent.toURLHash()
@@ -306,7 +306,7 @@ app.post('/conversation', async (req, res) => {
 
 ```typescript
 // Import reusable flows
-import { ContactSupportFlow } from '@rcl/common-flows';
+import { ContactSupportFlow } from '@rcs-lang/common-flows';
 
 // Define custom flow
 const customFlow: FlowDefinition = {

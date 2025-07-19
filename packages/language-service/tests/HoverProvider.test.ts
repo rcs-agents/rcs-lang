@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { IParser } from '@rcl/core';
+import type { IParser } from '@rcs-lang/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
 import { HoverProvider } from '../src/providers/HoverProvider';
@@ -14,7 +14,7 @@ class MockTextDocument implements TextDocument {
   constructor(
     public uri: string,
     private content: string,
-  ) {}
+  ) { }
 
   getText(): string {
     return this.content;
@@ -212,7 +212,7 @@ flow MainFlow
 
 agent MainAgent
   name: "Main Agent"
-  
+
 flow MainFlow
   start -> SharedFlow
 `;
@@ -342,9 +342,9 @@ flow MainFlow
     });
 
     it('should handle malformed RCL content', async () => {
-      const content = `agent 
+      const content = `agent
 flow
-  -> 
+  ->
 `;
 
       const document = new MockTextDocument(path.join(tempDir, 'malformed.rcl'), content);

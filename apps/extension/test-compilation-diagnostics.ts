@@ -20,7 +20,7 @@ console.log('--------------------------------------');
 
 try {
   // Import the actual language service that the extension uses
-  const { RclProgram } = require('@rcl/language-service');
+  const { RclProgram } = require('@rcs-lang/language-service');
 
   console.log('   Creating RclProgram instance...');
   const program = new RclProgram(workspaceRoot);
@@ -71,7 +71,7 @@ try {
   }
 } catch (error) {
   console.log(`   ❌ Language service compilation failed: ${error.message}`);
-  console.log(`   This suggests the issue is in the @rcl/language-service package`);
+  console.log(`   This suggests the issue is in the @rcs-lang/language-service package`);
 }
 
 // Test 2: Compare with CLI compilation (which works)
@@ -106,7 +106,7 @@ console.log('------------------------------------');
 
 try {
   // Simulate what the CompilationService does
-  const { RclProgram } = require('@rcl/language-service');
+  const { RclProgram } = require('@rcs-lang/language-service');
 
   // Create program for workspace (as CompilationService does)
   const workspaceFolder = workspaceRoot;
@@ -197,7 +197,7 @@ console.log('\n=======================================');
 console.log('🎯 Investigation Summary');
 console.log('');
 console.log('This test helps identify:');
-console.log('1. Whether @rcl/language-service generates diagnostics for coffee-shop.rcl');
+console.log('1. Whether @rcs-lang/language-service generates diagnostics for coffee-shop.rcl');
 console.log('2. If the issue is in the CompilationService wrapper');
 console.log('3. If there are syntax issues not caught by the CLI');
 console.log('4. The exact diagnostics that will appear in VS Code');

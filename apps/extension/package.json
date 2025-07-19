@@ -194,8 +194,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@rcl/parser": "workspace:*",
-    "@rcl/language-service": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/language-service": "workspace:*",
     "sprotty": "^1.0.0",
     "sprotty-vscode-webview": "^1.0.0"
   }

@@ -1,4 +1,4 @@
-import { RCLParser } from '@rcl/parser';
+import { RCLParser } from '@rcs-lang/parser';
 import { expect } from 'chai';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
@@ -13,11 +13,11 @@ describe('RCL Parser Real Tests', () => {
     it('should handle whitespace and indentation correctly', async () => {
       const content = `agent TestAgent
   display-name: "Test Agent"
-  
+
   flow Welcome
     start -> greeting
     greeting -> end
-    
+
   messages
     greeting: "Hello, welcome!"
     end: "Thank you!"`;
@@ -37,12 +37,12 @@ describe('RCL Parser Real Tests', () => {
     it('should not throw errors on spaces and indentation', async () => {
       const content = `agent MyAgent
   display-name: "My Agent"
-  
+
   flow Main
     start -> state1
-    state1 -> state2 
+    state1 -> state2
     state2 -> end
-    
+
   messages
     state1: "First message"
     state2: "Second message"`;
@@ -58,10 +58,10 @@ describe('RCL Parser Real Tests', () => {
       const content = `agent PropertyTest
   display-name: "Property Test Agent"
   brand-name: "Test Brand"
-  
+
   flow TestFlow
     start -> greeting
-    
+
   messages
     greeting: "Hello world!"`;
 
@@ -76,12 +76,12 @@ describe('RCL Parser Real Tests', () => {
     it('should handle flow transitions with arrows correctly', async () => {
       const content = `agent FlowTest
   display-name: "Flow Test"
-  
+
   flow ComplexFlow
     start -> greeting
     greeting -> question
     question -> answer -> end
-    
+
   messages
     greeting: "Hello!"
     question: "How are you?"
@@ -101,11 +101,11 @@ describe('RCL Parser Real Tests', () => {
       // Using template literal with actual tab characters
       const content = `agent MixedIndentAgent
 \tdisplay-name: "Mixed Indent"
-  
+
   flow TestFlow
 \t  start -> greeting
     greeting -> end
-    
+
 \tmessages
     greeting: "Hello mixed indent!"`;
 
@@ -120,10 +120,10 @@ describe('RCL Parser Real Tests', () => {
     it('should extract symbols correctly', async () => {
       const content = `agent SymbolTest
   display-name: "Symbol Test"
-  
+
   flow MainFlow
     start -> end
-    
+
   messages
     welcome: "Welcome!"`;
 
@@ -140,12 +140,12 @@ describe('RCL Parser Real Tests', () => {
 agent CommentTest
   # Another comment
   display-name: "Comment Test"
-  
+
   # Flow comment
   flow TestFlow
     # Transition comment
     start -> greeting
-    
+
   messages
     greeting: "Hello!"
     # End comment`;
@@ -161,10 +161,10 @@ agent CommentTest
     it('should handle position-based node finding', async () => {
       const content = `agent PositionTest
   display-name: "Position Test"
-  
+
   flow TestFlow
     start -> greeting
-    
+
   messages
     greeting: "Hello!"`;
 
@@ -186,7 +186,7 @@ agent CommentTest
     it('should cache parsed documents correctly', async () => {
       const content = `agent CacheTest
   display-name: "Cache Test"
-  
+
   messages
     test: "Test message"`;
 
@@ -212,7 +212,7 @@ agent CommentTest
     it('should invalidate cache when document version changes', async () => {
       const content = `agent VersionTest
   display-name: "Version Test"
-  
+
   messages
     test: "Test message"`;
 
@@ -238,7 +238,7 @@ agent CommentTest
     it('should clear cache correctly', async () => {
       const content = `agent ClearTest
   display-name: "Clear Test"
-  
+
   messages
     test: "Test message"`;
 

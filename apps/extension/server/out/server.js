@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
-const parser_1 = require("@rcl/parser");
+const parser_1 = require("@rcs-lang/parser");
 const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
 const codeActions_1 = require("./features/codeActions");
 const completion_1 = require("./features/completion");

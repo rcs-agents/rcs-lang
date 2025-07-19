@@ -35,13 +35,13 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       // Add explicit aliases for workspace packages - point to dist for built packages
-      '@rcl/parser': resolve(__dirname, '../../packages/parser/dist'),
-      '@rcl/compiler': resolve(__dirname, '../../packages/compiler/dist'),
-      '@rcl/core': resolve(__dirname, '../../libs/core/dist'),
-      '@rcl/validation': resolve(__dirname, '../../libs/validation/dist'),
-      '@rcl/ast': resolve(__dirname, '../../packages/ast/dist'),
-      '@rcl/diagram': resolve(__dirname, '../../packages/diagram/src'),
-      '@rcl/file-system': resolve(__dirname, '../../libs/file-system/src'),
+      '@rcs-lang/parser': resolve(__dirname, '../../packages/parser/dist'),
+      '@rcs-lang/compiler': resolve(__dirname, '../../packages/compiler/dist'),
+      '@rcs-lang/core': resolve(__dirname, '../../libs/core/dist'),
+      '@rcs-lang/validation': resolve(__dirname, '../../libs/validation/dist'),
+      '@rcs-lang/ast': resolve(__dirname, '../../packages/ast/dist'),
+      '@rcs-lang/diagram': resolve(__dirname, '../../packages/diagram/src'),
+      '@rcs-lang/file-system': resolve(__dirname, '../../libs/file-system/src'),
       // Browser polyfills for Node.js modules
       assert: resolve(__dirname, 'src/polyfills/assert.ts'),
       util: resolve(__dirname, 'src/polyfills/util.ts'),
@@ -139,13 +139,13 @@ export default defineConfig({
     },
     // Exclude all workspace packages from optimization
     exclude: [
-      '@rcl/parser',
-      '@rcl/compiler',
-      '@rcl/core',
-      '@rcl/validation',
-      '@rcl/ast',
-      '@rcl/diagram',
-      '@rcl/file-system',
+      '@rcs-lang/parser',
+      '@rcs-lang/compiler',
+      '@rcs-lang/core',
+      '@rcs-lang/validation',
+      '@rcs-lang/ast',
+      '@rcs-lang/diagram',
+      '@rcs-lang/file-system',
     ],
   },
   // Enable esbuild for faster builds

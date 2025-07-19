@@ -6,4 +6,4 @@
 };
 
 // Export parser components
-export { ParserFactory, AntlrRclParser } from '@rcl/parser';
+export { ParserFactory, AntlrRclParser } from '@rcs-lang/parser';

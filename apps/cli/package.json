@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/cli",
+  "name": "@rcs-lang/cli",
   "version": "0.1.0",
   "description": "RCL command-line interface for compiling RCL files",
   "main": "dist/index.js",
@@ -24,10 +24,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/compiler": "workspace:*",
-    "@rcl/core": "workspace:*",
-    "@rcl/file-system": "workspace:*",
-    "@rcl/parser": "workspace:*",
+    "@rcs-lang/compiler": "workspace:*",
+    "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/file-system": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "commander": "^9.4.1",

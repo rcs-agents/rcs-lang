@@ -36,7 +36,7 @@ import {
   createPosition,
   createRange,
   withLocation,
-} from '@rcl/ast';
+} from '@rcs-lang/ast';
 
 
 export class ASTVisitor extends AbstractParseTreeVisitor<any> {

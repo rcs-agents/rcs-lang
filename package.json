@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@antfu/ni": "^25.0.0",
-    "@rcl/cli": "^0.1.0",
+    "@rcs-lang/cli": "^0.1.0",
     "tree-sitter": "^0.25.0",
     "tree-sitter-cli": "^0.25.6"
   },

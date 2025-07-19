@@ -1,4 +1,4 @@
-import { RCLCompiler } from '@rcl/compiler';
+import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, it } from 'vitest';
 
 describe('Empty Output Detection', () => {
@@ -9,13 +9,13 @@ describe('Empty Output Detection', () => {
       const emptyAgentRcl = `
 agent EmptyAgent
   # No content in agent
-  
+
   flow TestFlow
     start: Start
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -36,10 +36,10 @@ agent EmptyAgent
       const emptyFlowsRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow EmptyFlow
     # No content in flow
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -60,13 +60,13 @@ agent TestAgent
       const emptyMessagesRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: Start
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     # No messages defined
 `;
@@ -110,13 +110,13 @@ agent MinimalAgent
       const noDisplayNameRcl = `
 agent TestAgent
   # Missing displayName
-  
+
   flow TestFlow
     start: Start
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -137,13 +137,13 @@ agent TestAgent
       const noStartStateRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     # Missing start: attribute
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -164,11 +164,11 @@ agent TestAgent
       const noStatesRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: NonExistentState
     # No states defined
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -190,14 +190,14 @@ agent TestAgent
       const invalidStartStateRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: NonExistentState
-    
+
     on ExistingState
       match @reply.text
         :default -> ExistingState
-  
+
   messages Messages
     text ExistingState "Hello"
 `;
@@ -221,15 +221,15 @@ agent TestAgent
       const validRcl = `
 agent ContentAgent
   displayName: "Content Test"
-  
+
   flow MainFlow
     start: Welcome
-    
+
     on Welcome
       match @reply.text
         "hello" -> Welcome
         :default -> Welcome
-  
+
   messages Messages
     text Welcome "Welcome message"
       suggestions
@@ -288,15 +288,15 @@ agent ContentAgent
       const invalidTransitionRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         "next" -> NonExistentState
         :default -> Start
-  
+
   messages Messages
     text Start "Hello"
 `;
@@ -318,14 +318,14 @@ agent TestAgent
       const invalidMessageRefRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     # Missing the "Start" message that is referenced in flow
 `;

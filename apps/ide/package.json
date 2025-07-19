@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/ide",
+  "name": "@rcs-lang/ide",
   "version": "0.1.0",
   "description": "RCL IDE with Monaco editor and integrated tools",
   "type": "module",
@@ -11,9 +11,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/parser": "workspace:*",
-    "@rcl/compiler": "workspace:*",
-    "@rcl/diagram": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/compiler": "workspace:*",
+    "@rcs-lang/diagram": "workspace:*",
     "monaco-editor": "^0.48.0"
   },
   "devDependencies": {

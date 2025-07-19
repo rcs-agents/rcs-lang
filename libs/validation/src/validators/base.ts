@@ -1,11 +1,11 @@
-import { type Diagnostic, type Result, ok } from '@rcl/core';
-import type { IASTNode, IValidationContext, IValidationResult, IValidator } from '@rcl/core';
+import { type Diagnostic, type Result, ok } from '@rcs-lang/core';
+import type { IASTNode, IValidationContext, IValidationResult, IValidator } from '@rcs-lang/core';
 
 /**
  * Base validator class with common functionality
  */
 export abstract class BaseValidator implements IValidator {
-  constructor(public readonly name: string) {}
+  constructor(public readonly name: string) { }
 
   abstract validate(
     ast: IASTNode,

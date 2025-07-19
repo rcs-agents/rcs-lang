@@ -216,7 +216,7 @@ to ensure there are no integration issues. If there are issues, run plan-code-te
 
 ### Common Debugging Steps
 1. Check if file follows specification (use quick reference)
-2. Test with CLI: `npx @rcl/cli compile filename.rcl`
+2. Test with CLI: `npx @rcs-lang/cli compile filename.rcl`
 3. Check AST structure for ERROR nodes
 4. Verify grammar matches specification exactly
 5. Test with simple examples before complex ones

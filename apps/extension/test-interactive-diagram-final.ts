@@ -22,7 +22,7 @@ async function testInteractiveDiagramFinal() {
   console.log('===================================================');
 
   try {
-    const { RclProgram } = require('@rcl/language-service');
+    const { RclProgram } = require('@rcs-lang/language-service');
 
     const program = new RclProgram(workspaceRoot);
     const result = await program.compileFile(coffeeShopPath);
@@ -48,8 +48,8 @@ async function testInteractiveDiagramFinal() {
   console.log('========================================================');
 
   try {
-    const { parse } = require('@rcl/parser');
-    const { SemanticValidator } = require('@rcl/language-service/dist/semantic/SemanticValidator');
+    const { parse } = require('@rcs-lang/parser');
+    const { SemanticValidator } = require('@rcs-lang/language-service/dist/semantic/SemanticValidator');
 
     const content = fs.readFileSync(coffeeShopPath, 'utf-8');
     const parseResult = await parse(content);
@@ -81,7 +81,7 @@ async function testInteractiveDiagramFinal() {
   console.log('==================================');
 
   try {
-    const { RclProgram } = require('@rcl/language-service');
+    const { RclProgram } = require('@rcs-lang/language-service');
     const program = new RclProgram(workspaceRoot);
     const result = await program.compileFile(coffeeShopPath);
 
@@ -136,7 +136,7 @@ async function testInteractiveDiagramFinal() {
   console.log('===================================');
 
   try {
-    const { RclProgram } = require('@rcl/language-service');
+    const { RclProgram } = require('@rcs-lang/language-service');
     const program = new RclProgram(workspaceRoot);
     const result = await program.compileFile(coffeeShopPath);
 
@@ -188,7 +188,7 @@ async function testInteractiveDiagramFinal() {
     console.log('   2. User runs "Open Interactive Diagram" command ✓');
     console.log('   3. InteractiveDiagramProvider starts compilation...');
 
-    const { RclProgram } = require('@rcl/language-service');
+    const { RclProgram } = require('@rcs-lang/language-service');
     const program = new RclProgram(workspaceRoot);
     const compilationResult = await program.compileFile(coffeeShopPath);
 

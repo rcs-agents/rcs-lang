@@ -1,7 +1,7 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
 project:
-  name: '@rcl/parser'
+  name: '@rcs-lang/parser'
   description: 'ANTLR-based parser for RCL'
 
 id: parser
@@ -18,9 +18,9 @@ tasks:
     outputs:
       - 'src/generated'
       - 'dist'
-  
+
   test:
     command: 'bun test'
     inputs:
       - 'src/**/*'
-      - 'tests/**/*' 
+      - 'tests/**/*'

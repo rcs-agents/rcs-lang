@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { IParser } from '@rcl/core';
+import type { IParser } from '@rcs-lang/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
 import { ProjectRootDetector } from '../src/import-resolver/projectRoot';

@@ -5,9 +5,9 @@ This monorepo contains the official tree-sitter grammar and language tools for t
 ## 📦 Packages
 
 ### Core Packages
-- **[@rcl/parser](packages/parser)** - Tree-sitter grammar and parser with TypeScript AST utilities
-- **[@rcl/cli](packages/cli)** - Command-line compiler for RCL files
-- **[@rcl/language-service](packages/language-service)** - Advanced language service providers
+- **[@rcs-lang/parser](packages/parser)** - Tree-sitter grammar and parser with TypeScript AST utilities
+- **[@rcs-lang/cli](packages/cli)** - Command-line compiler for RCL files
+- **[@rcs-lang/language-service](packages/language-service)** - Advanced language service providers
 
 ### Applications
 - **[rcl-language-support](apps/extension)** - VSCode extension with full language support

@@ -1,11 +1,11 @@
-import { type Diagnostic, type Result, err, ok } from '@rcl/core';
+import { type Diagnostic, type Result, err, ok } from '@rcs-lang/core';
 import type {
   IASTNode,
   IValidationContext,
   IValidationPipeline,
   IValidationResult,
   IValidator,
-} from '@rcl/core';
+} from '@rcs-lang/core';
 
 /**
  * Implementation of validation pipeline

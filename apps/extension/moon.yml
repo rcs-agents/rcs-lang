@@ -11,15 +11,15 @@ language: typescript
 platform: node
 
 dependsOn:
-  - '@rcl/parser'
-  - '@rcl/language-service'
+  - '@rcs-lang/parser'
+  - '@rcs-lang/language-service'
 
 tasks:
   build:
     command: nr build
     deps:
-      - '@rcl/parser:build'
-      - '@rcl/language-service:build'
+      - '@rcs-lang/parser:build'
+      - '@rcs-lang/language-service:build'
     inputs:
       - "**/*.ts"
       - "**/*.json"
@@ -51,7 +51,7 @@ tasks:
       - "**/*.json"
     env:
       NODE_ENV: "test"
-  
+
   test-integration:
     command: nr test:integration
     inputs:
@@ -61,7 +61,7 @@ tasks:
       - "build"
     env:
       NODE_ENV: "test"
-  
+
   test-all:
     command: nr test:all
     inputs:

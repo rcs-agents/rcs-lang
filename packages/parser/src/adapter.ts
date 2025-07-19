@@ -2,8 +2,8 @@
  * Adapter to convert ANTLR parse tree to the formal AST structure
  */
 
-import type { RclFile } from '@rcl/ast';
-import type { Diagnostic, IParserAdapter, Result } from '@rcl/core';
+import type { RclFile } from '@rcs-lang/ast';
+import type { Diagnostic, IParserAdapter, Result } from '@rcs-lang/core';
 import { ParserRuleContext, ErrorNode, ParseTree } from 'antlr4ng';
 import { ASTVisitor } from './ast-visitor';
 

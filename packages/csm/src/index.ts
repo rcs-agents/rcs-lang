@@ -1,11 +1,11 @@
 /**
- * @module @rcl/csm
+ * @module @rcs-lang/csm
  *
  * Conversation State Machine - A lightweight state machine library for RCS conversational agents.
  *
  * @example
  * ```typescript
- * import { ConversationalAgent, FlowDefinition } from '@rcl/csm';
+ * import { ConversationalAgent, FlowDefinition } from '@rcs-lang/csm';
  *
  * // Define your flow
  * const flow: FlowDefinition = {

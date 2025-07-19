@@ -8,7 +8,7 @@ import {
   type Result,
   err,
   ok,
-} from '@rcl/core';
+} from '@rcs-lang/core';
 
 export interface PipelineOptions {
   stopOnError?: boolean;

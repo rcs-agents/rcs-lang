@@ -1,10 +1,10 @@
-import { type Diagnostic, type Result, err, ok } from '@rcl/core';
+import { type Diagnostic, type Result, err, ok } from '@rcs-lang/core';
 import type {
   ICompilationInput,
   ICompilationPipeline,
   ICompilationResult,
   ICompilationStage,
-} from '@rcl/core';
+} from '@rcs-lang/core';
 
 /**
  * Implementation of compilation pipeline

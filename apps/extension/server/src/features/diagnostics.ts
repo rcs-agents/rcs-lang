@@ -1,4 +1,4 @@
-import type { RCLDocument, RCLParser, RCLSettings } from '@rcl/parser';
+import type { RCLDocument, RCLParser, RCLSettings } from '@rcs-lang/parser';
 import type { Diagnostic } from 'vscode-languageserver/node';
 import type { SyntaxValidator } from '../syntaxValidator';
 
@@ -6,7 +6,7 @@ export class DiagnosticsProvider {
   constructor(
     private parser: RCLParser,
     private syntaxValidator: SyntaxValidator,
-  ) {}
+  ) { }
 
   public async getDiagnostics(
     document: RCLDocument,

@@ -4,7 +4,7 @@ import {
   RCLCompiler,
   TransformStage,
   ValidateStage,
-} from '@rcl/compiler';
+} from '@rcs-lang/compiler';
 import type { ASTNode } from '../ast-compatibility';
 import type { AgentData, CompiledAgent, Diagnostic } from '../program/types';
 

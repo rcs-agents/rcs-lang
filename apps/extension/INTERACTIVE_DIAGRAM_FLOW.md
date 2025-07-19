@@ -107,7 +107,7 @@ async compileFile(uri: vscode.Uri): Promise<CompilationResult>
 ```
 
 **Critical Dependencies:**
-- `@rcl/language-service` package
+- `@rcs-lang/language-service` package
 - `RclProgram` class
 - Workspace folder detection
 
@@ -248,7 +248,7 @@ const scriptUri = webview.asWebviewUri(/* ... */);
 ## Dependencies
 
 ### External Packages
-- `@rcl/language-service` - Core compilation logic
+- `@rcs-lang/language-service` - Core compilation logic
 - VS Code API - Webview, diagnostics, workspace
 - Node.js modules - fs, path, child_process
 

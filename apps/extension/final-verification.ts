@@ -19,7 +19,7 @@ async function finalVerification() {
 
   // Test the RclProgram directly (this is what CompilationService uses internally)
   try {
-    const { RclProgram } = require('@rcl/language-service');
+    const { RclProgram } = require('@rcs-lang/language-service');
 
     console.log('1. Creating RclProgram (same as CompilationService)...');
     const program = new RclProgram(workspaceRoot);
