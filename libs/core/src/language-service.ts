@@ -1,6 +1,6 @@
-import type { Diagnostic } from './diagnostics';
-import { IASTNode, type IPosition, type IRange } from './parser';
-import type { Result } from './result';
+import type { Diagnostic } from './diagnostics.js';
+import { IASTNode, type IPosition, type IRange } from './parser.js';
+import type { Result } from './result.js';
 
 /**
  * Language service interface - provides language features

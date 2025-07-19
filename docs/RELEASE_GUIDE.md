@@ -1,0 +1,232 @@
+# Release Guide
+
+This guide explains how to create releases and publish packages for the RCL monorepo.
+
+## Overview
+
+The RCL project uses a **release branch workflow**:
+
+- **Development** happens on `main` branch
+- **Releases** are triggered by pushing to `release` branch
+- **Tags** are automatically synced back to `main`
+
+## Release Workflow
+
+### How it Works
+
+1. **Develop on main branch** using [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat:` - New features (bumps minor version)
+   - `fix:` - Bug fixes (bumps patch version) 
+   - `feat!:` or `BREAKING CHANGE:` - Breaking changes (bumps major version)
+   - `docs:`, `chore:`, `test:`, etc. - Non-release changes
+
+2. **Update version** in package.json files when ready to release:
+   ```bash
+   # Update version in root package.json and all packages
+   bun run version:bump patch  # or minor, major
+   git add .
+   git commit -m "chore: bump version to 1.0.1"
+   ```
+
+3. **Push to release branch** to trigger automatic:
+   - GitHub release creation with changelog
+   - NPM package publishing
+   - VSCode extension publishing
+   - Tag creation and sync to main
+
+### Example Workflow
+
+```bash
+# Develop features on main
+git checkout main
+git add .
+git commit -m "feat(compiler): add support for async actions"
+git push origin main
+
+# When ready to release (one command!)
+bun run release:minor
+
+# This single command will:
+# 1. Ensure you're on main branch
+# 2. Pull latest changes
+# 3. Bump version to next minor (e.g., 1.0.0 → 1.1.0)
+# 4. Create release commit
+# 5. Push to release branch
+# 6. Trigger automatic release workflow
+
+# The GitHub Actions workflow then:
+# 1. Builds and tests everything
+# 2. Creates a v1.1.0 tag
+# 3. Creates GitHub release with changelog
+# 4. Publishes NPM packages
+# 5. Publishes VSCode extension
+# 6. Syncs the tag back to main
+```
+
+### Quick Release Commands
+
+```bash
+# Patch release (1.0.0 → 1.0.1)
+bun run release:patch
+
+# Minor release (1.0.0 → 1.1.0)
+bun run release:minor
+
+# Major release (1.0.0 → 2.0.0)
+bun run release:major
+
+# Dry run (see what would happen)
+bun run release:dry
+```
+
+### Commit Message Examples
+
+```bash
+# Feature (minor version bump)
+feat(parser): add support for nested flows
+feat(cli): add --watch flag for development
+
+# Bug fix (patch version bump)
+fix(compiler): resolve state transition validation
+fix(extension): fix syntax highlighting for strings
+
+# Breaking change (major version bump)
+feat(ast)!: change AST node structure for flows
+fix(compiler)!: require explicit state declarations
+
+# Multiple packages
+feat: update parser and compiler for new syntax
+```
+
+## Alternative: Manual Releases
+
+The manual workflow is available for special cases:
+- Emergency patches
+- Pre-releases/beta versions
+- Testing release process
+
+### Steps
+
+1. Go to GitHub Actions → "Manual Release & Publish"
+2. Click "Run workflow"
+3. Select:
+   - **Release type**: patch, minor, or major
+   - **Prerelease**: true for beta releases
+   - **Packages**: "all" or comma-separated list
+4. Click "Run workflow"
+
+## Release Triggers Summary
+
+### Primary: Release Branch
+- **Trigger**: Push to `release` branch
+- **When**: Ready to release new version
+- **Process**: Automatic build → test → publish → tag
+
+### Secondary: Manual Dispatch
+- **Trigger**: Manual workflow dispatch
+- **When**: Emergency releases or testing
+- **Process**: Direct release with options
+
+## Package Publishing
+
+### NPM Packages
+
+The following packages are published to NPM:
+
+| Package | Path | Public |
+|---------|------|---------|
+| @rcs-lang/ast | packages/ast | ✅ |
+| @rcs-lang/compiler | packages/compiler | ✅ |
+| @rcs-lang/csm | packages/csm | ✅ |
+| @rcs-lang/language-service | packages/language-service | ✅ |
+| @rcs-lang/cli | apps/cli | ✅ |
+| @rcs-lang/parser | packages/parser | ❌ (private) |
+
+### VSCode Extension
+
+- **Name**: rcl-language-support
+- **Path**: apps/extension
+- **Marketplace**: Visual Studio Code Marketplace
+- **Publishing**: Automatic when extension changes
+
+## Version Management
+
+### Synchronized Versioning
+All packages share the same version number for simplicity and consistency.
+
+### Version Bump Rules
+- **patch** (1.0.0 → 1.0.1): Bug fixes
+- **minor** (1.0.0 → 1.1.0): New features
+- **major** (1.0.0 → 2.0.0): Breaking changes
+
+### Pre-releases
+- Format: `1.1.0-beta.0`
+- Published with `beta` tag on NPM
+- Not published to VSCode marketplace
+
+## Required Secrets
+
+Configure these in GitHub repository settings:
+
+| Secret | Description | Required For |
+|--------|-------------|--------------|
+| `NPM_TOKEN` | NPM automation token | Publishing packages |
+| `VSCODE_PUBLISH_TOKEN` | VSCode marketplace Personal Access Token | Publishing extension |
+| `GITHUB_TOKEN` | Automatically provided | Creating releases |
+
+## Troubleshooting
+
+### Release Please not creating PR
+- Ensure commits follow conventional format
+- Check if there are releasable changes
+- Verify Release Please app has permissions
+
+### Package publish fails
+- Check NPM_TOKEN is valid
+- Verify package.json is not private
+- Ensure version doesn't already exist
+
+### VSCode extension publish fails
+- Verify VSCODE_PUBLISH_TOKEN is valid
+- Check extension manifest version
+- Ensure all required files are built
+
+## Best Practices
+
+1. **Use conventional commits** for automatic versioning
+2. **Group related changes** in single PRs
+3. **Review Release PRs** before merging
+4. **Test locally** before releasing
+5. **Document breaking changes** clearly
+6. **Use pre-releases** for testing major changes
+
+## Rollback Procedure
+
+If a release has issues:
+
+1. **Revert the release commit** on main
+2. **Deprecate bad NPM versions**: `npm deprecate @rcs-lang/package@version "Contains critical bug"`
+3. **Create fix** and release patch version
+4. **Update release notes** with known issues
+
+## FAQ
+
+### Q: How often should we release?
+A: Release when you have meaningful changes. Weekly or bi-weekly is common for active projects.
+
+### Q: Can I release a single package?
+A: Yes, use the manual workflow with specific package names.
+
+### Q: How to do a hotfix?
+A: Use manual workflow with "patch" type for fastest release.
+
+### Q: What about security releases?
+A: Use manual workflow immediately, document in SECURITY.md.
+
+## References
+
+- [Release Please Documentation](https://github.com/googleapis/release-please)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Semantic Versioning](https://semver.org/)
+- [NPM Publishing](https://docs.npmjs.com/cli/v8/commands/npm-publish)
+- [VSCode Extension Publishing](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)

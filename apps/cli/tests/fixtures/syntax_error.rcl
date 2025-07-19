@@ -1,0 +1,14 @@
+agent TestAgent
+  displayName: "Test Agent"
+  
+  flow MainFlow
+    start: Welcome
+    
+    on Welcome
+      match @reply.text
+        :default -> Welcome
+        # Missing closing quote
+        "test -> Test
+  
+  messages Messages
+    text Welcome "Hello"

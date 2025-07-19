@@ -15,55 +15,27 @@ dependsOn:
   - '@rcs-lang/compiler'
   - '@rcs-lang/file-system'
 
+tags:
+  - typescript
+  - test
+  - common
+  - biome
+  - dprint
+
 tasks:
   build:
-    command: nr build
     deps:
       - '@rcs-lang/core:build'
       - '@rcs-lang/compiler:build'
       - '@rcs-lang/file-system:build'
-    inputs:
-      - "src/**/*"
-      - "tsconfig.json"
-    outputs:
-      - "dist"
     env:
       NODE_ENV: "production"
 
-  dev:
-    command: nr dev
-    local: true
-
-  test:
-    command: bun test
-    inputs:
-      - "src/**/*"
-      - "tests/**/*"
-    env:
-      NODE_ENV: "test"
-
-  clean:
-    command: nr clean
-    local: true
-
   demo:
-    command: nr demo
+    command: node demo.js
     local: true
     inputs:
       - "demo.js"
-
-  lint:
-    command: nr lint
-    inputs:
-      - "src/**/*"
-
-  format:
-    command: nr format
-    inputs:
-      - "src/**/*"
-
-  typecheck:
-    command: nr typecheck
-    inputs:
-      - "src/**/*"
-      - "tsconfig.json"
+      - "dist/**/*"
+    deps:
+      - build

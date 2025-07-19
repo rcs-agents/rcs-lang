@@ -1,20 +1,21 @@
 {
   "name": "@rcs-lang/parser",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "private": true,
   "scripts": {
-    "prebuild": "rm -rf src/generated",
-    "build": "nr build:grammar && nr fix:generated && nr fix:imports && nr build:ts",
-    "build:grammar": "antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && cp src/generated/RclLexer.tokens src/ && antlr-ng -D language=TypeScript -visitor -o src/generated src/RclParser.g4 && rm src/RclLexer.tokens",
-    "fix:generated": "echo 'Generated files are already in correct location'",
-    "fix:imports": "echo 'import { RclLexerBase } from \"../RclLexerBase\";' | cat - src/generated/RclLexer.ts > temp && mv temp src/generated/RclLexer.ts",
-    "build:ts": "tsc",
-    "build:ts-only": "tsc",
-    "check-generated": "node check-generated.js",
-    "test": "vitest"
+    "build": "moon run parser:build",
+    "dev": "moon run parser:dev",
+    "test": "moon run parser:test",
+    "test:watch": "moon run parser:test-watch",
+    "test:coverage": "moon run parser:test-coverage",
+    "typecheck": "moon run parser:typecheck",
+    "clean": "moon run parser:clean",
+    "lint": "moon run parser:lint",
+    "format": "moon run parser:format"
   },
   "dependencies": {
     "@rcs-lang/ast": "workspace:*",
@@ -23,7 +24,6 @@
   },
   "devDependencies": {
     "antlr-ng": "^1.0.10",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
+    "typescript": "^5.0.0"
   }
 }

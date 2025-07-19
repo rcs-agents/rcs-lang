@@ -1,0 +1,33 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  test:
+    command: bun
+    args:
+      - test
+    platform: node
+    inputs:
+      - src/**/*
+      - tests/**/*
+      - test/**/*
+      - "*.test.ts"
+      - "*.test.js"
+      - "*.spec.ts"
+      - "*.spec.js"
+
+  test-watch:
+    command: bun
+    args:
+      - test
+      - --watch
+    platform: node
+    local: true
+
+  test-coverage:
+    command: bun
+    args:
+      - test
+      - --coverage
+    platform: node
+    outputs:
+      - coverage

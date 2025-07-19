@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { err, isErr, isOk, map, ok, unwrap } from '../src/result';
 
 describe('Result Type', () => {
-  it('should create successful results', () => {
+  test('should create successful results', () => {
     const result = ok(42);
     expect(isOk(result)).toBe(true);
     expect(isErr(result)).toBe(false);
@@ -12,7 +12,7 @@ describe('Result Type', () => {
     }
   });
 
-  it('should create error results', () => {
+  test('should create error results', () => {
     const error = new Error('Test error');
     const result = err(error);
     expect(isOk(result)).toBe(false);
@@ -23,7 +23,7 @@ describe('Result Type', () => {
     }
   });
 
-  it('should map successful results', () => {
+  test('should map successful results', () => {
     const result = ok(10);
     const mapped = map(result, (x) => x * 2);
     expect(isOk(mapped)).toBe(true);
@@ -32,12 +32,12 @@ describe('Result Type', () => {
     }
   });
 
-  it('should unwrap successful results', () => {
+  test('should unwrap successful results', () => {
     const result = ok('test');
     expect(unwrap(result)).toBe('test');
   });
 
-  it('should throw when unwrapping errors', () => {
+  test('should throw when unwrapping errors', () => {
     const error = new Error('Test error');
     const result = err(error);
     expect(() => unwrap(result)).toThrow(error);

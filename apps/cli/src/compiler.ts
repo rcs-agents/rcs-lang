@@ -76,7 +76,16 @@ export async function compileRCL(inputPath: string, options: CompileOptions): Pr
         d.severity === 'error' &&
         (d.code?.includes('SEMANTIC') ||
           d.code?.includes('VALIDATION') ||
-          d.message?.toLowerCase().includes('validation')),
+          d.code?.includes('REFERENCE') ||
+          d.code?.includes('RCL1') || // RCL1xx are semantic errors
+          d.code?.includes('RCL2') || // RCL2xx are reference errors
+          d.code?.includes('RCL3') || // RCL3xx are type errors
+          d.code?.includes('RCL4') || // RCL4xx are validation errors
+          d.message?.toLowerCase().includes('validation') ||
+          d.message?.toLowerCase().includes('undefined') ||
+          d.message?.toLowerCase().includes('missing') ||
+          d.message?.toLowerCase().includes('must have') ||
+          d.message?.toLowerCase().includes('cannot be empty')),
     );
 
     const error = new Error('Compilation failed');
@@ -165,7 +174,9 @@ async function emitOutput(
     const writeResult = await fileSystem.writeFile(jsonPath, jsonContent);
 
     if (!writeResult.success) {
-      throw new Error(`Failed to write JSON output: ${(writeResult as any).error.message}`);
+      const error = new Error(`Failed to write JSON output: ${(writeResult as any).error.message}`);
+      (error as any).code = 'OUTPUT_ERROR';
+      throw error;
     }
 
     console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsonPath)}`));
@@ -183,7 +194,9 @@ async function emitOutput(
     const writeResult = await fileSystem.writeFile(jsPath, jsContent);
 
     if (!writeResult.success) {
-      throw new Error(`Failed to write JavaScript output: ${(writeResult as any).error.message}`);
+      const error = new Error(`Failed to write JavaScript output: ${(writeResult as any).error.message}`);
+      (error as any).code = 'OUTPUT_ERROR';
+      throw error;
     }
 
     console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsPath)}`));
@@ -308,7 +321,9 @@ export async function parseRCL(
     const writeResult = await fileSystem.writeFile(outputPath, jsonOutput);
 
     if (!writeResult.success) {
-      throw new Error(`Failed to write output file: ${(writeResult as any).error.message}`);
+      const error = new Error(`Failed to write output file: ${(writeResult as any).error.message}`);
+      (error as any).code = 'OUTPUT_ERROR';
+      throw error;
     }
 
     console.log(chalk.green(`✅ AST written to: ${path.relative(process.cwd(), outputPath)}`));
@@ -433,7 +448,9 @@ export async function generateDiagram(
   const writeResult = await fileSystem.writeFile(resolvedOutput, diagramContent);
 
   if (!writeResult.success) {
-    throw new Error(`Failed to write diagram file: ${(writeResult as any).error.message}`);
+    const error = new Error(`Failed to write diagram file: ${(writeResult as any).error.message}`);
+    (error as any).code = 'OUTPUT_ERROR';
+    throw error;
   }
 
   console.log(

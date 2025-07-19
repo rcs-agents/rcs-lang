@@ -1,9 +1,10 @@
 {
   "name": "@rcs-lang/ast",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Parser-independent AST type definitions for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -13,11 +14,15 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome lint src",
-    "format": "biome format src --write"
+    "build": "moon run ast:build",
+    "dev": "moon run ast:dev",
+    "test": "moon run ast:test",
+    "test:watch": "moon run ast:test-watch",
+    "test:coverage": "moon run ast:test-coverage",
+    "typecheck": "moon run ast:typecheck",
+    "clean": "moon run ast:clean",
+    "lint": "moon run ast:lint",
+    "format": "moon run ast:format"
   },
   "dependencies": {},
   "devDependencies": {
@@ -25,8 +30,11 @@
     "@types/node": "^24.0.13",
     "typescript": "^5.0.0"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

@@ -1,0 +1,18 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  format:
+    command: dprint
+    args:
+      - fmt
+    platform: node
+    options:
+      mergeInputs: replace
+
+  format-check:
+    command: dprint
+    args:
+      - check
+    platform: node
+    options:
+      mergeInputs: replace

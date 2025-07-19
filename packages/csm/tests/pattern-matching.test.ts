@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type MachineDefinitionJSON } from '../src';
 
 describe('Pattern Matching', () => {
-  it('should match exact patterns (case insensitive)', async () => {
+  test('should match exact patterns (case insensitive)', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'TestFlow',
       initial: 'Start',
@@ -42,7 +43,7 @@ describe('Pattern Matching', () => {
     expect(result.state).toBe('Farewell');
   });
 
-  it('should support wildcard patterns', async () => {
+  test('should support wildcard patterns', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'WildcardFlow',
       initial: 'Start',
@@ -90,7 +91,7 @@ describe('Pattern Matching', () => {
     expect(result.state).toBe('CancelOrder');
   });
 
-  it('should handle default transitions', async () => {
+  test('should handle default transitions', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'DefaultFlow',
       initial: 'Start',
@@ -133,7 +134,7 @@ describe('Pattern Matching', () => {
     expect(result.state).toBe('Confused');
   });
 
-  it('should respect transition priority', async () => {
+  test('should respect transition priority', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'PriorityFlow',
       initial: 'Start',
@@ -180,7 +181,7 @@ describe('Pattern Matching', () => {
     expect(result.state).toBe('Fallback');
   });
 
-  it('should support conditional transitions', async () => {
+  test('should support conditional transitions', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'ConditionalFlow',
       initial: 'Start',
@@ -227,7 +228,7 @@ describe('Pattern Matching', () => {
     expect(result.state).toBe('Denied');
   });
 
-  it('should handle no matching transitions', async () => {
+  test('should handle no matching transitions', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'NoMatchFlow',
       initial: 'Start',

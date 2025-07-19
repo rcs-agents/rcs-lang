@@ -1,6 +1,6 @@
 import type { ICompilationStage, ICompiler } from '@rcs-lang/core';
 import { err, ok } from '@rcs-lang/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { CompilationPipeline } from '../src/pipeline';
 
 describe('CompilationPipeline', () => {
@@ -40,7 +40,7 @@ describe('CompilationPipeline', () => {
   }
 
   describe('stage management', () => {
-    it('should add and execute stages in order', async () => {
+    test('should add and execute stages in order', async () => {
       const pipeline = new CompilationPipeline();
       const executionOrder: string[] = [];
 
@@ -69,7 +69,7 @@ describe('CompilationPipeline', () => {
       expect(executionOrder).toEqual(['stage1', 'stage2', 'stage3']);
     });
 
-    it('should clear stages', () => {
+    test('should clear stages', () => {
       const pipeline = new CompilationPipeline();
 
       pipeline.addStage(new MockTransformStage());
@@ -86,7 +86,7 @@ describe('CompilationPipeline', () => {
   });
 
   describe('execution', () => {
-    it('should pass context through stages', async () => {
+    test('should pass context through stages', async () => {
       const pipeline = new CompilationPipeline();
       pipeline.addStage(new MockTransformStage());
 
@@ -105,7 +105,7 @@ describe('CompilationPipeline', () => {
       }
     });
 
-    it('should stop on error when configured', async () => {
+    test('should stop on error when configured', async () => {
       const pipeline = new CompilationPipeline({ stopOnError: true });
 
       pipeline.addStage(new MockValidationStage(true)); // Will fail
@@ -126,7 +126,7 @@ describe('CompilationPipeline', () => {
       }
     });
 
-    it('should continue on error when configured', async () => {
+    test('should continue on error when configured', async () => {
       const pipeline = new CompilationPipeline({ stopOnError: false });
 
       pipeline.addStage(new MockValidationStage(true)); // Will fail
@@ -149,7 +149,7 @@ describe('CompilationPipeline', () => {
   });
 
   describe('compiler integration', () => {
-    it('should work as a compiler', async () => {
+    test('should work as a compiler', async () => {
       const pipeline = new CompilationPipeline();
       pipeline.addStage(new MockTransformStage());
 

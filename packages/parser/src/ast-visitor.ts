@@ -3,6 +3,8 @@
  */
 
 import { ParserRuleContext, type Token, AbstractParseTreeVisitor, ErrorNode, ParseTree, TerminalNode } from 'antlr4ng';
+import { RclParserVisitor } from './generated/RclParserVisitor';
+import { Rcl_fileContext } from './generated/RclParser';
 
 import {
   type Atom,
@@ -39,7 +41,7 @@ import {
 } from '@rcs-lang/ast';
 
 
-export class ASTVisitor extends AbstractParseTreeVisitor<any> {
+export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclParserVisitor<any> {
   private source: string;
 
   constructor(source: string) {
@@ -78,7 +80,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> {
   /**
    * Visit RCL file root
    */
-  visitRcl_file(ctx: any): RclFile {
+  visitRcl_file(ctx: Rcl_fileContext): RclFile {
     const imports: ImportStatement[] = [];
     const sections: Section[] = [];
 
@@ -443,13 +445,19 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> {
    */
   visitParameter(ctx: any): Parameter {
     // Check if it's a named parameter
-    if (ctx.ATTRIBUTE_NAME) {
+    const attributeName = ctx.ATTRIBUTE_NAME?.();
+    if (attributeName) {
       // Named parameter with colon included in token
+      const valueCtx = ctx.value(0);
+      if (!valueCtx) {
+        throw new Error('Named parameter must have a value');
+      }
+      
       return withLocation<Parameter>(
         {
           type: 'Parameter',
-          key: ctx.ATTRIBUTE_NAME().getText().slice(0, -1), // Remove trailing colon
-          value: this.visitValue(ctx.value(0)),
+          key: attributeName.getText().slice(0, -1), // Remove trailing colon
+          value: this.visitValue(valueCtx),
         },
         this.contextToLocation(ctx).location,
       );
@@ -458,21 +466,31 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> {
     const lowerName = ctx.LOWER_NAME();
     if (lowerName && ctx.COLON) {
       // key : value
+      const valueCtx = ctx.value(0);
+      if (!valueCtx) {
+        throw new Error('Named parameter must have a value after colon');
+      }
+      
       return withLocation<Parameter>(
         {
           type: 'Parameter',
           key: lowerName.getText(),
-          value: this.visitValue(ctx.value(0)),
+          value: this.visitValue(valueCtx),
         },
         this.contextToLocation(ctx).location,
       );
     }
 
     // Positional parameter
+    const valueCtx = ctx.value(0);
+    if (!valueCtx) {
+      throw new Error('Parameter must have a value');
+    }
+    
     return withLocation<Parameter>(
       {
         type: 'Parameter',
-        value: this.visitValue(ctx.value(0)),
+        value: this.visitValue(valueCtx),
       },
       this.contextToLocation(ctx).location,
     );
@@ -482,6 +500,10 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> {
    * Visit value
    */
   visitValue(ctx: any): Value {
+    if (!ctx) {
+      throw new Error('Cannot visit null value context');
+    }
+    
     // Primitive values
     if (ctx.primitive_value()) {
       return this.visitPrimitive_value(ctx.primitive_value()!);

@@ -117,19 +117,19 @@ export class MessageNormalizer {
 
     const messages: Record<string, AgentMessage> = {};
 
-    console.log(`[MessageNormalizer] Starting AST traversal, root type: ${ast.type}`);
+    // console.log(`[MessageNormalizer] Starting AST traversal, root type: ${ast.type}`);
 
     this.traverseAST(ast, (node) => {
       // Debug logging
       if (node.type === 'ERROR') {
-        console.log(
-          `[MessageNormalizer] ERROR node found, text: ${node.text?.substring(0, 100)}...`,
-        );
+        // console.log(
+        //   `[MessageNormalizer] ERROR node found, text: ${node.text?.substring(0, 100)}...`,
+        // );
       }
       if (node.type && (node.type.includes('message') || node.type.includes('shortcut'))) {
-        console.log(
-          `[MessageNormalizer] Found node type: ${node.type}, text: ${node.text?.substring(0, 50)}...`,
-        );
+        // console.log(
+        //   `[MessageNormalizer] Found node type: ${node.type}, text: ${node.text?.substring(0, 50)}...`,
+        // );
       }
 
       // Handle message shortcuts (text shortcut format)

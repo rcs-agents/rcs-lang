@@ -5,28 +5,36 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "schema", "README.md"],
+  "files": [
+    "dist",
+    "schema",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check src/",
-    "prepublishOnly": "bun run build && bun run test && bun run typecheck",
-    "publish:dry": "bunx npm publish --dry-run",
-    "publish:npm": "bunx npm publish --access public"
+    "build": "moon run csm:build",
+    "dev": "moon run csm:dev",
+    "test": "moon run csm:test",
+    "test:watch": "moon run csm:test-watch",
+    "test:coverage": "moon run csm:test-coverage",
+    "typecheck": "moon run csm:typecheck",
+    "clean": "moon run csm:clean",
+    "lint": "moon run csm:lint",
+    "format": "moon run csm:format"
   },
-  "keywords": ["state-machine", "fsm", "conversation", "rcs", "chat", "rcl"],
+  "keywords": [
+    "state-machine",
+    "fsm",
+    "conversation",
+    "rcs",
+    "chat",
+    "rcl"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.14.9",
-    "@vitest/coverage-v8": "^1.6.0",
     "tsup": "^8.1.0",
-    "typescript": "^5.5.3",
-    "vitest": "^1.6.0"
+    "typescript": "^5.5.3"
   },
   "dependencies": {},
   "engines": {

@@ -1,0 +1,13 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  lint:
+    command: biome
+    args:
+      - check
+      - --write
+      - --unsafe
+      - .
+    platform: system
+    options:
+      runFromWorkspaceRoot: false

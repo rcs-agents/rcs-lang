@@ -3,6 +3,8 @@ import * as antlr from "antlr4ng";
 import { Token } from "antlr4ng";
 
 import { RclParserListener } from "./RclParserListener.js";
+import { RclParserVisitor } from "./RclParserVisitor.js";
+
 // for running tests with parameters, TODO: discuss strategy for typed parameters in CI
 // eslint-disable-next-line no-unused-vars
 type int = number;
@@ -2094,6 +2096,13 @@ export class Rcl_fileContext extends antlr.ParserRuleContext {
              listener.exitRcl_file(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitRcl_file) {
+            return visitor.visitRcl_file(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2128,6 +2137,13 @@ export class Import_statementContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitImport_statement) {
              listener.exitImport_statement(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitImport_statement) {
+            return visitor.visitImport_statement(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2168,6 +2184,13 @@ export class Import_pathContext extends antlr.ParserRuleContext {
              listener.exitImport_path(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitImport_path) {
+            return visitor.visitImport_path(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2192,6 +2215,13 @@ export class SectionContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitSection) {
              listener.exitSection(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSection) {
+            return visitor.visitSection(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2229,6 +2259,13 @@ export class Section_headerContext extends antlr.ParserRuleContext {
              listener.exitSection_header(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSection_header) {
+            return visitor.visitSection_header(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2258,6 +2295,13 @@ export class Header_valuesContext extends antlr.ParserRuleContext {
              listener.exitHeader_values(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitHeader_values) {
+            return visitor.visitHeader_values(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2279,6 +2323,13 @@ export class IdentifierContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitIdentifier) {
              listener.exitIdentifier(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitIdentifier) {
+            return visitor.visitIdentifier(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2314,6 +2365,13 @@ export class Section_bodyContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitSection_body) {
              listener.exitSection_body(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSection_body) {
+            return visitor.visitSection_body(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2357,6 +2415,13 @@ export class Section_contentContext extends antlr.ParserRuleContext {
              listener.exitSection_content(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSection_content) {
+            return visitor.visitSection_content(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2386,6 +2451,13 @@ export class State_referenceContext extends antlr.ParserRuleContext {
              listener.exitState_reference(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitState_reference) {
+            return visitor.visitState_reference(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2413,6 +2485,13 @@ export class Spread_directiveContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitSpread_directive) {
              listener.exitSpread_directive(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSpread_directive) {
+            return visitor.visitSpread_directive(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2445,6 +2524,13 @@ export class Attribute_assignmentContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitAttribute_assignment) {
              listener.exitAttribute_assignment(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitAttribute_assignment) {
+            return visitor.visitAttribute_assignment(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2491,6 +2577,13 @@ export class Match_blockContext extends antlr.ParserRuleContext {
              listener.exitMatch_block(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitMatch_block) {
+            return visitor.visitMatch_block(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2535,6 +2628,13 @@ export class Match_caseContext extends antlr.ParserRuleContext {
              listener.exitMatch_case(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitMatch_case) {
+            return visitor.visitMatch_case(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2564,6 +2664,13 @@ export class Simple_transitionContext extends antlr.ParserRuleContext {
              listener.exitSimple_transition(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitSimple_transition) {
+            return visitor.visitSimple_transition(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2591,6 +2698,13 @@ export class Contextualized_valueContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitContextualized_value) {
              listener.exitContextualized_value(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitContextualized_value) {
+            return visitor.visitContextualized_value(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2631,6 +2745,13 @@ export class Parameter_listContext extends antlr.ParserRuleContext {
              listener.exitParameter_list(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitParameter_list) {
+            return visitor.visitParameter_list(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2661,6 +2782,13 @@ export class ParameterContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitParameter) {
              listener.exitParameter(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitParameter) {
+            return visitor.visitParameter(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2702,6 +2830,13 @@ export class ValueContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitValue) {
              listener.exitValue(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitValue) {
+            return visitor.visitValue(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2748,6 +2883,13 @@ export class Primitive_valueContext extends antlr.ParserRuleContext {
              listener.exitPrimitive_value(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitPrimitive_value) {
+            return visitor.visitPrimitive_value(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2792,6 +2934,13 @@ export class Triple_quote_stringContext extends antlr.ParserRuleContext {
              listener.exitTriple_quote_string(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitTriple_quote_string) {
+            return visitor.visitTriple_quote_string(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2816,6 +2965,13 @@ export class Triple_string_contentContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitTriple_string_content) {
              listener.exitTriple_string_content(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitTriple_string_content) {
+            return visitor.visitTriple_string_content(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2845,6 +3001,13 @@ export class InterpolationContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitInterpolation) {
              listener.exitInterpolation(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitInterpolation) {
+            return visitor.visitInterpolation(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2891,6 +3054,13 @@ export class Interpolation_exprContext extends antlr.ParserRuleContext {
              listener.exitInterpolation_expr(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitInterpolation_expr) {
+            return visitor.visitInterpolation_expr(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2930,6 +3100,13 @@ export class Variable_accessContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitVariable_access) {
              listener.exitVariable_access(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitVariable_access) {
+            return visitor.visitVariable_access(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -2973,6 +3150,13 @@ export class Type_tagContext extends antlr.ParserRuleContext {
              listener.exitType_tag(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitType_tag) {
+            return visitor.visitType_tag(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -2997,6 +3181,13 @@ export class ListContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitList) {
              listener.exitList(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitList) {
+            return visitor.visitList(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -3026,6 +3217,13 @@ export class Parentheses_listContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitParentheses_list) {
              listener.exitParentheses_list(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitParentheses_list) {
+            return visitor.visitParentheses_list(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -3066,6 +3264,13 @@ export class List_elementsContext extends antlr.ParserRuleContext {
              listener.exitList_elements(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitList_elements) {
+            return visitor.visitList_elements(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3101,6 +3306,13 @@ export class Block_listContext extends antlr.ParserRuleContext {
              listener.exitBlock_list(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitBlock_list) {
+            return visitor.visitBlock_list(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3130,6 +3342,13 @@ export class Block_list_itemContext extends antlr.ParserRuleContext {
              listener.exitBlock_list_item(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitBlock_list_item) {
+            return visitor.visitBlock_list_item(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3154,6 +3373,13 @@ export class DictionaryContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitDictionary) {
              listener.exitDictionary(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitDictionary) {
+            return visitor.visitDictionary(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -3200,6 +3426,13 @@ export class Brace_dictionaryContext extends antlr.ParserRuleContext {
              listener.exitBrace_dictionary(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitBrace_dictionary) {
+            return visitor.visitBrace_dictionary(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3235,6 +3468,13 @@ export class Block_dictionaryContext extends antlr.ParserRuleContext {
              listener.exitBlock_dictionary(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitBlock_dictionary) {
+            return visitor.visitBlock_dictionary(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3267,6 +3507,13 @@ export class Dict_entryContext extends antlr.ParserRuleContext {
              listener.exitDict_entry(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitDict_entry) {
+            return visitor.visitDict_entry(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3291,6 +3538,13 @@ export class Embedded_codeContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitEmbedded_code) {
              listener.exitEmbedded_code(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitEmbedded_code) {
+            return visitor.visitEmbedded_code(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -3326,6 +3580,13 @@ export class Multi_line_codeContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitMulti_line_code) {
              listener.exitMulti_line_code(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitMulti_line_code) {
+            return visitor.visitMulti_line_code(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }
@@ -3372,6 +3633,13 @@ export class Multi_line_stringContext extends antlr.ParserRuleContext {
              listener.exitMulti_line_string(this);
         }
     }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitMulti_line_string) {
+            return visitor.visitMulti_line_string(this);
+        } else {
+            return visitor.visitChildren(this);
+        }
+    }
 }
 
 
@@ -3396,6 +3664,13 @@ export class Multiline_contentContext extends antlr.ParserRuleContext {
     public override exitRule(listener: RclParserListener): void {
         if(listener.exitMultiline_content) {
              listener.exitMultiline_content(this);
+        }
+    }
+    public override accept<Result>(visitor: RclParserVisitor<Result>): Result | null {
+        if (visitor.visitMultiline_content) {
+            return visitor.visitMultiline_content(this);
+        } else {
+            return visitor.visitChildren(this);
         }
     }
 }

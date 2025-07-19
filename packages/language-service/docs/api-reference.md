@@ -1,0 +1,104 @@
+# Language Service API Reference
+
+## Overview
+
+The `@rcs-lang/language-service` package provides advanced IDE features for RCL through the Language Server Protocol.
+
+## Core Classes
+
+### LanguageService
+
+Main service class providing all language features.
+
+```typescript
+class LanguageService {
+  constructor(options?: LanguageServiceOptions)
+  
+  // Initialization
+  initialize(params: InitializeParams): Promise<void>
+  
+  // Core features
+  getCompletions(params: CompletionParams): Promise<CompletionItem[]>
+  getHover(params: HoverParams): Promise<Hover | null>
+  getDefinition(params: DefinitionParams): Promise<Location | null>
+  getReferences(params: ReferenceParams): Promise<Location[]>
+  
+  // Document management
+  updateDocument(uri: string, content: string): Promise<void>
+  closeDocument(uri: string): void
+  
+  // Diagnostics
+  getDiagnostics(uri: string): Promise<Diagnostic[]>
+  
+  // Advanced features
+  rename(params: RenameParams): Promise<WorkspaceEdit | null>
+  getDocumentSymbols(uri: string): Promise<DocumentSymbol[]>
+  getSemanticTokens(uri: string): Promise<SemanticTokens>
+}
+```
+
+## Provider Classes
+
+### CompletionProvider
+
+Provides context-aware code completion.
+
+```typescript
+class CompletionProvider {
+  getCompletions(
+    document: TextDocument,
+    position: Position,
+    context?: CompletionContext
+  ): Promise<CompletionItem[]>
+}
+```
+
+### DefinitionProvider
+
+Enables "Go to Definition" functionality.
+
+```typescript
+class DefinitionProvider {
+  getDefinition(
+    document: TextDocument,
+    position: Position
+  ): Promise<Location | null>
+}
+```
+
+### HoverProvider
+
+Provides rich hover information.
+
+```typescript
+class HoverProvider {
+  getHover(
+    document: TextDocument,
+    position: Position
+  ): Promise<Hover | null>
+}
+```
+
+## Integration Example
+
+```typescript
+import { LanguageService } from '@rcs-lang/language-service';
+
+const service = new LanguageService();
+
+// Initialize with workspace
+await service.initialize({
+  workspaceFolders: ['/path/to/workspace']
+});
+
+// Get completions
+const completions = await service.getCompletions({
+  uri: 'file:///example.rcl',
+  position: { line: 10, character: 15 }
+});
+
+// Get diagnostics
+const diagnostics = await service.getDiagnostics('file:///example.rcl');
+```
+
+See the main README for detailed usage examples and integration patterns.

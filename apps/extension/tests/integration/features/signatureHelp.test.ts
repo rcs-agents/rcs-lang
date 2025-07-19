@@ -228,7 +228,8 @@ flow MainFlow {
         .split('\n')
         .findIndex((line) => line.includes('media'));
 
-      const position = new vscode.Position(mediaLine, (line) => line.indexOf('media') + 5);
+      const mediaCharPos = document.getText().split('\n')[mediaLine].indexOf('media') + 5;
+      const position = new vscode.Position(mediaLine, mediaCharPos);
       const signatureHelp = await testHelpers.getSignatureHelp(document, position);
 
       expect(signatureHelp).to.not.be.null;
@@ -349,7 +350,8 @@ flow MainFlow {
         .split('\n')
         .findIndex((line) => line.includes('timeout'));
 
-      const position = new vscode.Position(timeoutLine, (line) => line.indexOf('timeout') + 7);
+      const timeoutCharPos = document.getText().split('\n')[timeoutLine].indexOf('timeout') + 7;
+      const position = new vscode.Position(timeoutLine, timeoutCharPos);
       const signatureHelp = await testHelpers.getSignatureHelp(document, position);
 
       expect(signatureHelp).to.not.be.null;
@@ -420,7 +422,8 @@ flow MainFlow {
         .split('\n')
         .findIndex((line) => line.includes('text'));
 
-      const position = new vscode.Position(textLine, (line) => line.indexOf('text') + 4);
+      const textCharPos = document.getText().split('\n')[textLine].indexOf('text') + 4;
+      const position = new vscode.Position(textLine, textCharPos);
       await testHelpers.setCursorPosition(position.line, position.character);
 
       await testHelpers.typeText(':');
@@ -463,7 +466,8 @@ flow MainFlow {
         .split('\n')
         .findIndex((line) => line.includes('reply'));
 
-      const position = new vscode.Position(replyLine, (line) => line.indexOf('reply') + 5);
+      const replyCharPos = document.getText().split('\n')[replyLine].indexOf('reply') + 5;
+      const position = new vscode.Position(replyLine, replyCharPos);
       await testHelpers.setCursorPosition(position.line, position.character);
 
       await testHelpers.typeText(' ');
@@ -504,7 +508,8 @@ flow MainFlow {
         .split('\n')
         .findIndex((line) => line.includes('text '));
 
-      const position = new vscode.Position(textLine, (line) => line.indexOf('text ') + 5);
+      const textCharPos = document.getText().split('\n')[textLine].indexOf('text ') + 5;
+      const position = new vscode.Position(textLine, textCharPos);
       await testHelpers.setCursorPosition(position.line, position.character);
 
       await testHelpers.typeText('"');
@@ -550,7 +555,8 @@ flow MainFlow {
         .findIndex((line) => line.includes('openUrl'));
 
       // Position after the comma
-      const position = new vscode.Position(openUrlLine, (line) => line.indexOf(',') + 1);
+      const openUrlCharPos = document.getText().split('\n')[openUrlLine].indexOf(',') + 1;
+      const position = new vscode.Position(openUrlLine, openUrlCharPos);
       await testHelpers.setCursorPosition(position.line, position.character);
 
       await testHelpers.typeText(' ');

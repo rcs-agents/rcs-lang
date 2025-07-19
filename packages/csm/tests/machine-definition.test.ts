@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { type MachineDefinitionJSON, validateMachineDefinition } from '../src';
 
 describe('Machine Definition Validation', () => {
-  it('should validate a correct machine definition', () => {
+  test('should validate a correct machine definition', () => {
     const definition: MachineDefinitionJSON = {
       id: 'TestMachine',
       initial: 'Start',
@@ -20,7 +21,7 @@ describe('Machine Definition Validation', () => {
     expect(validateMachineDefinition(definition)).toBe(true);
   });
 
-  it('should validate machine with metadata', () => {
+  test('should validate machine with metadata', () => {
     const definition: MachineDefinitionJSON = {
       id: 'TestMachine',
       initial: 'Start',
@@ -55,7 +56,7 @@ describe('Machine Definition Validation', () => {
     expect(() => validateMachineDefinition(definition)).not.toThrow();
   });
 
-  it('should reject definition without id', () => {
+  test('should reject definition without id', () => {
     const definition = {
       initial: 'Start',
       states: {
@@ -68,7 +69,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should reject definition without initial state', () => {
+  test('should reject definition without initial state', () => {
     const definition = {
       id: 'TestMachine',
       states: {
@@ -81,7 +82,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should reject definition without states', () => {
+  test('should reject definition without states', () => {
     const definition = {
       id: 'TestMachine',
       initial: 'Start',
@@ -92,7 +93,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should reject when initial state does not exist', () => {
+  test('should reject when initial state does not exist', () => {
     const definition = {
       id: 'TestMachine',
       initial: 'NonExistent',
@@ -106,7 +107,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should reject state without transitions array', () => {
+  test('should reject state without transitions array', () => {
     const definition = {
       id: 'TestMachine',
       initial: 'Start',
@@ -120,7 +121,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should reject transition without target', () => {
+  test('should reject transition without target', () => {
     const definition = {
       id: 'TestMachine',
       initial: 'Start',
@@ -136,7 +137,7 @@ describe('Machine Definition Validation', () => {
     );
   });
 
-  it('should accept complex transition definitions', () => {
+  test('should accept complex transition definitions', () => {
     const definition: MachineDefinitionJSON = {
       id: 'ComplexMachine',
       initial: 'Start',
@@ -171,7 +172,7 @@ describe('Machine Definition Validation', () => {
     expect(() => validateMachineDefinition(definition)).not.toThrow();
   });
 
-  it('should handle null and undefined inputs', () => {
+  test('should handle null and undefined inputs', () => {
     expect(() => validateMachineDefinition(null)).toThrow('Machine definition must be an object');
 
     expect(() => validateMachineDefinition(undefined)).toThrow(

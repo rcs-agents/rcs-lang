@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type MachineDefinitionJSON } from '../src';
 
 describe('Machine-to-Machine Transitions', () => {
@@ -64,7 +65,7 @@ describe('Machine-to-Machine Transitions', () => {
     },
   });
 
-  it('should transition between machines', async () => {
+  test('should transition between machines', async () => {
     const stateChanges: Array<{ machine: string; state: string }> = [];
 
     const agent = new ConversationalAgent({
@@ -106,7 +107,7 @@ describe('Machine-to-Machine Transitions', () => {
     });
   });
 
-  it('should preserve context across machine transitions', async () => {
+  test('should preserve context across machine transitions', async () => {
     const agent = new ConversationalAgent({
       id: 'ContextBot',
       onStateChange: vi.fn(),
@@ -130,7 +131,7 @@ describe('Machine-to-Machine Transitions', () => {
     expect(context.price).toBe(5);
   });
 
-  it('should handle transient state with machine transition', async () => {
+  test('should handle transient state with machine transition', async () => {
     const stateSequence: string[] = [];
 
     const agent = new ConversationalAgent({
@@ -158,7 +159,7 @@ describe('Machine-to-Machine Transitions', () => {
     });
   });
 
-  it('should serialize and restore across machine boundaries', async () => {
+  test('should serialize and restore across machine boundaries', async () => {
     const agent1 = new ConversationalAgent({
       id: 'SerializeBot',
       onStateChange: vi.fn(),
@@ -192,7 +193,7 @@ describe('Machine-to-Machine Transitions', () => {
     expect(agent2.getContext().ticketId).toBe('SUPP-123');
   });
 
-  it('should emit correct events for machine transitions', async () => {
+  test('should emit correct events for machine transitions', async () => {
     const events: any[] = [];
 
     const agent = new ConversationalAgent({

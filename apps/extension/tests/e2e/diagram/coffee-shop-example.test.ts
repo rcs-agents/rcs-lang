@@ -6,7 +6,7 @@ describe('Coffee Shop Example - Interactive Diagram', () => {
   let workbench: any;
 
   before(async () => {
-    workbench = await browser.getWorkbench();
+    workbench = await (browser as any).getWorkbench();
   });
 
   after(async () => {

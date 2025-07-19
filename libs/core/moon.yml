@@ -5,35 +5,23 @@ project:
 type: library
 language: typescript
 
+dependsOn:
+  - '@rcs-lang/ast'
+
+tags:
+  - typescript
+  - test
+  - common
+
 tasks:
   build:
-    command: tsc
-    inputs:
-      - src/**/*
-      - tsconfig.json
-    outputs:
-      - dist/**/*
-
-  clean:
-    command: rm -rf dist
-    local: true
+    deps:
+      - '@rcs-lang/ast:build'
 
   typecheck:
-    command: tsc --noEmit
-    inputs:
-      - src/**/*
-      - tsconfig.json
+    deps:
+      - '@rcs-lang/ast:build'
 
   test:
-    command: vitest run
-    deps:
-      - build
-    inputs:
-      - src/**/*
-      - tests/**/*
-
-  test-watch:
-    command: vitest
-    local: true
     deps:
       - build

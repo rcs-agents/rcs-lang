@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { ValidationPipeline } from '../src/pipeline';
 import { SemanticValidator } from '../src/validators/semanticValidator';
 import { SyntaxValidator } from '../src/validators/syntaxValidator';
 
 describe('Validation Pipeline', () => {
-  it('should add and execute validators', async () => {
+  test('should add and execute validators', async () => {
     const pipeline = new ValidationPipeline();
     pipeline.addValidator(new SyntaxValidator());
     pipeline.addValidator(new SemanticValidator());
@@ -15,7 +15,7 @@ describe('Validation Pipeline', () => {
     expect(validators[1].name).toBe('semantic-validator');
   });
 
-  it('should reject duplicate validators', () => {
+  test('should reject duplicate validators', () => {
     const pipeline = new ValidationPipeline();
     const validator = new SyntaxValidator();
 
@@ -23,7 +23,7 @@ describe('Validation Pipeline', () => {
     expect(() => pipeline.addValidator(validator)).toThrow('already exists');
   });
 
-  it('should validate AST with no errors', async () => {
+  test('should validate AST with no errors', async () => {
     const pipeline = new ValidationPipeline();
     pipeline.addValidator(new SyntaxValidator());
 

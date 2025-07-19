@@ -1,27 +1,7 @@
 import type { IFileSystem, IFileSystemProvider } from '@rcs-lang/core';
-import { MemoryFileSystem } from './memoryFileSystem';
-
-// Conditional imports to avoid Node.js modules in browser
-let NodeFileSystem: any = null;
-let BrowserFileSystem: any = null;
-
-try {
-  // Only import NodeFileSystem if we're in Node.js environment
-  if (typeof process !== 'undefined' && process.versions?.node) {
-    NodeFileSystem = require('./nodeFileSystem').NodeFileSystem;
-  }
-} catch (error) {
-  // Ignore import errors in browser
-}
-
-try {
-  // Try to import browser file system if available
-  if (typeof globalThis !== 'undefined' && (globalThis as any).window) {
-    BrowserFileSystem = require('./browserFileSystem').BrowserFileSystem;
-  }
-} catch (error) {
-  // Ignore import errors if not available
-}
+import { MemoryFileSystem } from './memoryFileSystem.js';
+import { NodeFileSystem } from './nodeFileSystem.js';
+import { BrowserFileSystem } from './browserFileSystem.js';
 
 /**
  * Node.js file system provider
@@ -30,8 +10,10 @@ export class NodeFileSystemProvider implements IFileSystemProvider {
   private fileSystem: any;
 
   constructor() {
-    if (NodeFileSystem) {
+    try {
       this.fileSystem = new NodeFileSystem();
+    } catch (error) {
+      // NodeFileSystem not available
     }
   }
 
@@ -45,7 +27,7 @@ export class NodeFileSystemProvider implements IFileSystemProvider {
 
   isAvailable(): boolean {
     return (
-      NodeFileSystem &&
+      this.fileSystem !== undefined &&
       typeof process !== 'undefined' &&
       process.versions &&
       process.versions.node !== undefined
@@ -60,8 +42,10 @@ export class BrowserFileSystemProvider implements IFileSystemProvider {
   private fileSystem: any;
 
   constructor() {
-    if (BrowserFileSystem) {
+    try {
       this.fileSystem = new BrowserFileSystem();
+    } catch (error) {
+      // BrowserFileSystem not available
     }
   }
 
@@ -74,7 +58,7 @@ export class BrowserFileSystemProvider implements IFileSystemProvider {
   }
 
   isAvailable(): boolean {
-    return BrowserFileSystem && typeof globalThis !== 'undefined' && (globalThis as any).window;
+    return this.fileSystem !== undefined && typeof globalThis !== 'undefined' && (globalThis as any).window;
   }
 }
 

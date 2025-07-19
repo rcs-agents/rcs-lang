@@ -1,11 +1,11 @@
 // File system implementations
-export * from './memoryFileSystem';
-export * from './browserFileSystem';
+export * from './memoryFileSystem.js';
+export * from './browserFileSystem.js';
 
 // Conditional export for Node.js
 if (typeof process !== 'undefined' && process.versions?.node) {
   try {
-    const nodeFs = require('./nodeFileSystem');
+    const nodeFs = require('./nodeFileSystem.js');
     Object.assign(exports, nodeFs);
   } catch (error) {
     // Ignore in browser
@@ -13,4 +13,4 @@ if (typeof process !== 'undefined' && process.versions?.node) {
 }
 
 // Factory and providers
-export * from './fileSystemFactory';
+export * from './fileSystemFactory.js';

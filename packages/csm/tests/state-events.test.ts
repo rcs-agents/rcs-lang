@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type MachineDefinitionJSON, type StateChangeEvent } from '../src';
 
 describe('State Change Events', () => {
@@ -31,7 +32,7 @@ describe('State Change Events', () => {
     },
   });
 
-  it('should emit init event when first flow is added', () => {
+  test('should emit init event when first flow is added', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange,
@@ -39,7 +40,7 @@ describe('State Change Events', () => {
 
     agent.addFlow(createTestFlow());
 
-    expect(onStateChange).toHaveBeenCalledOnce();
+    expect(onStateChange.calls.length).toBe(1);
     expect(events[0]).toMatchObject({
       agent: 'TestBot',
       machine: 'EventFlow',
@@ -50,7 +51,7 @@ describe('State Change Events', () => {
     expect(events[0].timestamp).toBeDefined();
   });
 
-  it('should emit input event on user input transition', async () => {
+  test('should emit input event on user input transition', async () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange,
@@ -87,7 +88,7 @@ describe('State Change Events', () => {
     });
   });
 
-  it('should include transition details in events', async () => {
+  test('should include transition details in events', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'DetailFlow',
       initial: 'Start',
@@ -126,7 +127,7 @@ describe('State Change Events', () => {
     });
   });
 
-  it('should handle async state change callbacks', async () => {
+  test('should handle async state change callbacks', async () => {
     const asyncResults: string[] = [];
     const slowStateChange = vi.fn(async (event: StateChangeEvent) => {
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -141,14 +142,14 @@ describe('State Change Events', () => {
     agent.addFlow(createTestFlow());
     await agent.processInput('process');
 
-    expect(slowStateChange).toHaveBeenCalledTimes(3); // init, input, transient
+    expect(slowStateChange.calls.length).toBe(3); // init, input, transient
     expect(asyncResults).toHaveLength(3);
     expect(asyncResults).toContain('Start-processed');
     expect(asyncResults).toContain('Processing-processed');
     expect(asyncResults).toContain('Complete-processed');
   });
 
-  it('should handle errors in state change callback', async () => {
+  test('should handle errors in state change callback', async () => {
     const errorHandler = vi.fn();
     const failingStateChange = vi.fn(async (event: StateChangeEvent) => {
       if (event.state === 'Processing') {
@@ -167,18 +168,19 @@ describe('State Change Events', () => {
     // Should not throw, but should call error handler
     await expect(agent.processInput('process')).resolves.toBeDefined();
 
-    expect(errorHandler).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'Processing failed' }),
-      expect.objectContaining({
-        agent: 'ErrorBot',
-        machine: 'EventFlow',
-        state: 'Processing',
-        operation: 'stateEntry',
-      }),
-    );
+    // Check errorHandler was called with expected args
+    expect(errorHandler.calls.length).toBeGreaterThan(0);
+    const [error, context] = errorHandler.calls[0];
+    expect(error.message).toBe('Processing failed');
+    expect(context).toMatchObject({
+      agent: 'ErrorBot',
+      machine: 'EventFlow',
+      state: 'Processing',
+      operation: 'stateEntry',
+    });
   });
 
-  it('should emit restore event when created from hash', (done) => {
+  test('should emit restore event when created from hash', (done) => {
     const originalAgent = new ConversationalAgent({
       id: 'RestoreBot',
       onStateChange: vi.fn(),
@@ -206,7 +208,7 @@ describe('State Change Events', () => {
     restoredAgent.setState('EventFlow', 'Start');
   });
 
-  it('should track state change timing', async () => {
+  test('should track state change timing', async () => {
     const timings: Array<{ state: string; timestamp: number }> = [];
 
     const agent = new ConversationalAgent({

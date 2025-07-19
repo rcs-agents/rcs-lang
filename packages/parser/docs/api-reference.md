@@ -1,0 +1,142 @@
+# Parser API Reference
+
+## Overview
+
+The `@rcs-lang/parser` package provides a high-performance ANTLR4-based parser for RCL with TypeScript AST generation.
+
+## Core Classes
+
+### RCLParser
+
+Main parser class for converting RCL source to AST.
+
+```typescript
+class RCLParser {
+  constructor(options?: ParsingOptions)
+  
+  // Parsing methods
+  parse(source: string, fileName?: string): Promise<ParseResult>
+  parseFile(filePath: string): Promise<ParseResult>
+  parseIncremental(
+    source: string, 
+    fileName: string, 
+    changes: TextChange[]
+  ): Promise<ParseResult>
+  
+  // Configuration
+  setOptions(options: Partial<ParsingOptions>): void
+  getOptions(): ParsingOptions
+  
+  // Cache management
+  clearCache(): void
+  dispose(): void
+}
+```
+
+## Key Interfaces
+
+### ParsingOptions
+
+```typescript
+interface ParsingOptions {
+  // Error handling
+  maxErrors?: number
+  continueOnError?: boolean
+  
+  // Performance
+  enableCaching?: boolean
+  incrementalMode?: boolean
+  
+  // Features
+  includeComments?: boolean
+  preserveWhitespace?: boolean
+  
+  // Validation
+  strictMode?: boolean
+  allowExperimentalFeatures?: boolean
+}
+```
+
+### ParseResult
+
+```typescript
+interface ParseResult {
+  success: boolean
+  data?: RclFile
+  diagnostics: Diagnostic[]
+  sourceMap?: SourceMap
+  performance?: ParseMetrics
+}
+```
+
+## Visitor Pattern
+
+```typescript
+import { RCLBaseVisitor } from '@rcs-lang/parser';
+
+class CustomVisitor extends RCLBaseVisitor<void> {
+  visitFlowDefinition(ctx: FlowDefinitionContext): void {
+    console.log('Found flow:', ctx.IDENTIFIER().getText());
+    this.visitChildren(ctx);
+  }
+}
+
+// Usage
+const visitor = new CustomVisitor();
+visitor.visit(parseTree);
+```
+
+## Listener Pattern
+
+```typescript
+import { RCLBaseListener, ParseTreeWalker } from '@rcs-lang/parser';
+
+class CustomListener extends RCLBaseListener {
+  enterMessageDefinition(ctx: MessageDefinitionContext): void {
+    console.log('Entering message:', ctx.IDENTIFIER().getText());
+  }
+}
+
+// Usage
+const listener = new CustomListener();
+const walker = new ParseTreeWalker();
+walker.walk(listener, parseTree);
+```
+
+## Usage Examples
+
+### Basic Parsing
+
+```typescript
+import { RCLParser } from '@rcs-lang/parser';
+
+const parser = new RCLParser();
+const result = await parser.parse(rclSource, 'example.rcl');
+
+if (result.success) {
+  const ast = result.data;
+  console.log('Agent:', ast.agent.name);
+} else {
+  result.diagnostics.forEach(diagnostic => {
+    console.error(`Error: ${diagnostic.message}`);
+  });
+}
+```
+
+### Incremental Parsing
+
+```typescript
+const parser = new RCLParser({ incrementalMode: true });
+
+// Initial parse
+const result1 = await parser.parse(source, 'file.rcl');
+
+// Update with changes
+const result2 = await parser.parseIncremental(
+  updatedSource,
+  'file.rcl',
+  textChanges
+);
+```
+
+See the main README for comprehensive examples and build requirements.

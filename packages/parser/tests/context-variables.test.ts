@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { AntlrRclParser } from '../src/parser';
 
 // Helper function to parse RCL content
@@ -21,7 +21,7 @@ async function parseRcl(input: string) {
 }
 
 describe('Context Variables (@variable syntax)', async () => {
-  it('should parse simple context variable reference', async () => {
+  test('should parse simple context variable reference', async () => {
     const input = `
 flow TestFlow
   on StateA
@@ -32,7 +32,7 @@ flow TestFlow
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse context variable with property access', async () => {
+  test('should parse context variable with property access', async () => {
     const input = `
 flow TestFlow
   on StateA
@@ -45,7 +45,7 @@ flow TestFlow
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse context variable in string interpolation', async () => {
+  test('should parse context variable in string interpolation', async () => {
     const input = `
 messages Messages
   text Welcome "Hello #{@userName}!"
@@ -56,7 +56,7 @@ messages Messages
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse nested property access', async () => {
+  test('should parse nested property access', async () => {
     const input = `
 flow TestFlow
   on ProcessOrder
@@ -69,7 +69,7 @@ flow TestFlow
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse context variable in with clause', async () => {
+  test('should parse context variable in with clause', async () => {
     const input = `
 flow TestFlow
   on StateA
@@ -82,7 +82,7 @@ flow TestFlow
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse the Invalid Option pattern from coffee-shop example', async () => {
+  test('should parse the Invalid Option pattern from coffee-shop example', async () => {
     const input = `
 flow OrderFlow
   on Invalid Option
@@ -100,7 +100,7 @@ flow OrderFlow
 });
 
 describe('Context Variable Edge Cases', async () => {
-  it('should handle context variables in various positions', async () => {
+  test('should handle context variables in various positions', async () => {
     const input = `
 agent TestAgent
   displayName: "Test #{@env.name}"
@@ -131,7 +131,7 @@ flow TestFlow
     expect(result.ast).toBeTruthy();
   });
 
-  it('should parse multiline content with context variables', async () => {
+  test('should parse multiline content with context variables', async () => {
     const input = `
 messages Messages
   text LongMessage """

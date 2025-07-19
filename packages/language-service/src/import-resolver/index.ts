@@ -1,3 +1,3 @@
-export * from './types';
-export * from './ImportResolver';
-export * from './projectRoot';
+export * from './types.js';
+export * from './ImportResolver.js';
+export * from './projectRoot.js';

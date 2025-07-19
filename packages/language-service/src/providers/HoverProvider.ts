@@ -17,7 +17,7 @@ import { walkAST } from '../ast-compatibility';
 import type { ImportResolver } from '../import-resolver';
 import { SymbolType } from '../import-resolver/types';
 import type { WorkspaceIndex } from '../workspace-index';
-import type { Position, TextDocument } from './types';
+import type { Position, TextDocument } from './types.js';
 
 /**
  * Represents hover information

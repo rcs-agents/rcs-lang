@@ -1,22 +1,27 @@
 {
   "name": "rcl-tree-sitter-monorepo",
   "version": "0.1.0",
+  "type": "module",
   "author": {
     "name": "Saulo Vallory",
     "email": "saulo@tokilabs.io",
     "url": "https://tokilabs.io/"
   },
-  "repository": "https://github.com/rcs-agents/rcl-tree-sitter",
+  "repository": "https://github.com/rcs-agents/rcs-lang",
   "description": "RCL Language Monorepo - Tree-sitter grammar and language tools",
   "engines": {
     "bun": ">=1.2.0"
   },
   "packageManager": "bun@1.2.18",
-  "workspaces": ["apps/*", "libs/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "packages/*"
+  ],
   "license": "MIT",
   "dependencies": {
     "@antfu/ni": "^25.0.0",
-    "@rcs-lang/cli": "^0.1.0",
+    "@rcs-lang/cli": "workspace:*",
     "tree-sitter": "^0.25.0",
     "tree-sitter-cli": "^0.25.6"
   },
@@ -28,7 +33,15 @@
     "clean": "moon run :clean",
     "lint": "moon run :lint",
     "format": "moon run :format",
-    "typecheck": "moon run :typecheck"
+    "typecheck": "moon run :typecheck",
+    "prepublish:all": "bun run build && bun run test",
+    "publish:dry": "bun run prepublish:all && bun scripts/publish.js --dry-run",
+    "publish:packages": "bun run prepublish:all && bun scripts/publish.js",
+    "version:bump": "bun scripts/version.js",
+    "release:patch": "bun scripts/prepare-release.js patch",
+    "release:minor": "bun scripts/prepare-release.js minor",
+    "release:major": "bun scripts/prepare-release.js major",
+    "release:dry": "bun scripts/prepare-release.js patch --dry-run"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",

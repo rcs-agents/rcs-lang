@@ -55,11 +55,11 @@ agent TestAgent
   flow WelcomeFlow
     :start -> greeting
     greeting: text "Hello! Welcome to our service."
-    
+
   messages Greetings
     welcome: "Welcome to our service!"
     goodbye: "Thank you for using our service!"
-    
+
   configuration
     webhook_url: "https://example.com/webhook"
     timeout: 30s
@@ -140,6 +140,6 @@ MIT License - see LICENSE file for details.
 
 ## Support
 
-- [GitHub Issues](https://github.com/rcs-agents/rcl-tree-sitter)
+- [GitHub Issues](https://github.com/rcs-agents/rcs-lang)
 - [Documentation](https://rcs-agents.github.io/rcl-docs)
 - [RCL Specification](../rcl-formal-specification.md)

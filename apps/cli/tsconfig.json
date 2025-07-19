@@ -6,7 +6,9 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "strict": false,
     "noImplicitAny": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "module": "esnext",
+    "target": "ES2020"
   },
   "include": ["src/**/*"],
   "exclude": ["dist", "node_modules", "**/*.test.ts", "src/legacy/**/*"],

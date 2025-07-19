@@ -129,7 +129,7 @@ export class WebviewHelpers {
         try {
           const element = await $(selector);
           if ((await element.isExisting()) && (await element.isDisplayed())) {
-            const rect = await element.getBoundingClientRect();
+            const rect = await (element as any).getRect();
 
             await browser.performActions([
               {
@@ -299,7 +299,7 @@ export async function getAvailableFlows(): Promise<string[]> {
  */
 export async function dragNode(nodeId: string, deltaX: number, deltaY: number): Promise<void> {
   const node = await getNodeById(nodeId);
-  const rect = await node.getBoundingClientRect();
+  const rect = await (node as any).getRect();
 
   await browser.performActions([
     {
@@ -354,8 +354,8 @@ export async function createEdge(sourceNodeId: string, targetNodeId: string): Pr
   const sourceNode = await getNodeById(sourceNodeId);
   const targetNode = await getNodeById(targetNodeId);
 
-  const sourceRect = await sourceNode.getBoundingClientRect();
-  const targetRect = await targetNode.getBoundingClientRect();
+  const sourceRect = await (sourceNode as any).getRect();
+  const targetRect = await (targetNode as any).getRect();
 
   // Find edge port on source node (usually on the right)
   const sourceX = Math.floor(sourceRect.x + sourceRect.width - 10);

@@ -1,0 +1,44 @@
+{
+  "name": "@rcs-lang/diagram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Interactive Sprotty-based diagram component for RCL flows",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./web": {
+      "import": "./src/web-diagram.js"
+    },
+    "./styles": "./src/styles/diagram.css"
+  },
+  "scripts": {
+    "build": "moon run diagram:build",
+    "dev": "moon run diagram:dev",
+    "test": "moon run diagram:test",
+    "test:watch": "moon run diagram:test-watch",
+    "test:coverage": "moon run diagram:test-coverage",
+    "typecheck": "moon run diagram:typecheck",
+    "clean": "moon run diagram:clean",
+    "lint": "moon run diagram:lint",
+    "format": "moon run diagram:format"
+  },
+  "dependencies": {
+    "elkjs": "^0.10.0",
+    "inversify": "6.2.2",
+    "reflect-metadata": "^0.2.2",
+    "sprotty": "^1.4.0",
+    "sprotty-protocol": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@rcs-lang/compiler": "workspace:*"
+  }
+}

@@ -10,7 +10,7 @@ import {
   type SymbolInfo,
   type SymbolLocation,
   type WorkspaceIndexConfig,
-} from './types';
+} from './types.js';
 
 /**
  * Manages workspace-wide indexing of RCL files

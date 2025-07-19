@@ -1,3 +1,3 @@
-export * from './parseStage';
-export * from './validateStage';
-export * from './transformStage';
+export * from './parseStage.js';
+export * from './validateStage.js';
+export * from './transformStage.js';

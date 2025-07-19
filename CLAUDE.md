@@ -231,3 +231,16 @@ to ensure there are no integration issues. If there are issues, run plan-code-te
 - Semicolons always
 - Biome for linting/formatting JS/TS
 - dprint for JSON/Markdown/TOML
+
+## Server Infrastructure
+
+- **context7 is an MCP server for up-to-date libraries and tools documentation**
+
+## Debugging Best Practices
+
+- Temporary files created for debugging MUST always be placed inside the "agent/temp/" folder
+
+## Documentation References
+
+- Always refer to `@docs/rcl-formal-specification.md` for the RCL language syntax
+- Always refer to `@docs/rcl-output-specification.md` for JSON schema of the compiler output

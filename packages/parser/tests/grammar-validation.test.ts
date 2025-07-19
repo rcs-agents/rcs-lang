@@ -1,23 +1,23 @@
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 
 describe('ANTLR Grammar Validation', () => {
-  it('should have valid lexer grammar syntax', () => {
+  test('should have valid lexer grammar syntax', () => {
     const lexerGrammar = resolve(__dirname, '../src/RclLexer.g4');
     expect(existsSync(lexerGrammar)).toBe(true);
 
     // This should not throw if the grammar is valid
     expect(() => {
-      execSync(`antlr4ts -o /tmp/test-lexer ${lexerGrammar}`, {
+      execSync(`antlr-ng -D language=TypeScript -o /tmp/test-lexer ${lexerGrammar}`, {
         stdio: 'pipe',
         timeout: 10000,
       });
     }).not.toThrow();
   });
 
-  it('should have valid parser grammar syntax when lexer is available', () => {
+  test('should have valid parser grammar syntax when lexer is available', () => {
     const parserGrammar = resolve(__dirname, '../src/RclParser.g4');
     const lexerTokens = resolve(__dirname, '../src/RclLexer.tokens');
 
@@ -26,7 +26,7 @@ describe('ANTLR Grammar Validation', () => {
     // Only test if tokens file exists (after build)
     if (existsSync(lexerTokens)) {
       expect(() => {
-        execSync(`antlr4ts -visitor -o /tmp/test-parser ${parserGrammar}`, {
+        execSync(`antlr-ng -D language=TypeScript --generate-visitor -o /tmp/test-parser ${parserGrammar}`, {
           stdio: 'pipe',
           timeout: 10000,
           cwd: resolve(__dirname, '../src'),
@@ -37,7 +37,7 @@ describe('ANTLR Grammar Validation', () => {
     }
   });
 
-  it('should have generated parser files', () => {
+  test('should have generated parser files', () => {
     const generatedDir = resolve(__dirname, '../src/generated');
     const requiredFiles = [
       'RclLexer.ts',
@@ -52,7 +52,7 @@ describe('ANTLR Grammar Validation', () => {
     }
   });
 
-  it('should validate grammar rules have proper alternation syntax', () => {
+  test('should validate grammar rules have proper alternation syntax', () => {
     // Read the parser grammar file and check for common syntax errors
     const fs = require('node:fs');
     const parserGrammar = resolve(__dirname, '../src/RclParser.g4');
@@ -92,7 +92,7 @@ describe('ANTLR Grammar Validation', () => {
     }
   });
 
-  it('should fail build process with invalid grammar', () => {
+  test('should fail build process with invalid grammar', () => {
     // This test verifies that the build process catches grammar errors
     // We'll temporarily introduce an error and check that ANTLR generation fails
 
@@ -112,14 +112,18 @@ describe('ANTLR Grammar Validation', () => {
       );
       fs.writeFileSync(parserGrammar, invalidContent);
 
-      // Try to generate parser - should fail
-      expect(() => {
-        execSync(`antlr4ts -visitor -o /tmp/test-fail ${parserGrammar}`, {
-          stdio: 'pipe',
+      // Try to generate parser - should fail or produce errors
+      const result = execSync(
+        `antlr-ng -D language=TypeScript --generate-visitor -o /tmp/test-fail ${parserGrammar} 2>&1 || echo "FAILED"`,
+        {
+          encoding: 'utf8',
           timeout: 5000,
           cwd: resolve(__dirname, '../src'),
-        });
-      }).toThrow();
+        },
+      );
+      
+      // Check if there are error messages in the output
+      expect(result).toMatch(/error\(\d+\):|FAILED/i);
     } finally {
       // Restore original file
       if (existsSync(backupPath)) {
@@ -130,7 +134,7 @@ describe('ANTLR Grammar Validation', () => {
     }
   });
 
-  it('should not have undefined token references', () => {
+  test('should not have undefined token references', () => {
     const fs = require('node:fs');
     const lexerGrammar = resolve(__dirname, '../src/RclLexer.g4');
     const parserGrammar = resolve(__dirname, '../src/RclParser.g4');

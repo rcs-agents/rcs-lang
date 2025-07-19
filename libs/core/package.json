@@ -1,16 +1,24 @@
 {
   "name": "@rcs-lang/core",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "description": "Core types and interfaces for RCL language infrastructure",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "moon run core:build",
+    "dev": "moon run core:dev",
+    "test": "moon run core:test",
+    "test:watch": "moon run core:test-watch",
+    "test:coverage": "moon run core:test-coverage",
+    "typecheck": "moon run core:typecheck",
+    "clean": "moon run core:clean",
+    "lint": "moon run core:lint",
+    "format": "moon run core:format"
   },
   "dependencies": {
     "@rcs-lang/ast": "workspace:*"

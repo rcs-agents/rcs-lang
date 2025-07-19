@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type FlowDefinition } from '../src';
 
 describe('ConversationalAgent', () => {
@@ -21,7 +22,7 @@ describe('ConversationalAgent', () => {
     },
   });
 
-  it('should create an agent and add a flow', () => {
+  test('should create an agent and add a flow', () => {
     const onStateChange = vi.fn();
     const agent = new ConversationalAgent({
       id: 'TestBot',
@@ -37,7 +38,7 @@ describe('ConversationalAgent', () => {
     });
   });
 
-  it('should process input and transition states', async () => {
+  test('should process input and transition states', async () => {
     const onStateChange = vi.fn();
     const agent = new ConversationalAgent({
       id: 'TestBot',
@@ -50,17 +51,17 @@ describe('ConversationalAgent', () => {
 
     expect(result.state).toBe('Greeting');
     expect(result.transitioned).toBe(true);
-    expect(onStateChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        state: 'Greeting',
-        previousState: 'Start',
-        trigger: 'input',
-        input: 'hello',
-      }),
-    );
+    // Check that onStateChange was called with the expected arguments
+    const lastCall = onStateChange.calls[onStateChange.calls.length - 1];
+    expect(lastCall[0]).toMatchObject({
+      state: 'Greeting',
+      previousState: 'Start',
+      trigger: 'input',
+      input: 'hello',
+    });
   });
 
-  it('should handle context updates', async () => {
+  test('should handle context updates', async () => {
     const flow: FlowDefinition = {
       id: 'ContextFlow',
       initial: 'Start',
@@ -91,7 +92,7 @@ describe('ConversationalAgent', () => {
     expect(agent.getContext()).toEqual({ name: 'John' });
   });
 
-  it('should serialize and deserialize state', () => {
+  test('should serialize and deserialize state', () => {
     const onStateChange = vi.fn();
     const agent = new ConversationalAgent({
       id: 'TestBot',
@@ -123,7 +124,7 @@ describe('ConversationalAgent', () => {
     expect(restored.getContext()).toEqual({ userId: '123' });
   });
 
-  it('should handle transient states', async () => {
+  test('should handle transient states', async () => {
     const flow: FlowDefinition = {
       id: 'TransientFlow',
       initial: 'Start',

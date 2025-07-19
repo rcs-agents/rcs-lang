@@ -1,7 +1,7 @@
 import * as AST from '@rcs-lang/ast';
 import type { Diagnostic, Result } from '@rcs-lang/core';
 import type { IASTNode, IValidationContext, IValidationResult } from '@rcs-lang/core';
-import { BaseValidator } from './base';
+import { BaseValidator } from './base.js';
 
 /**
  * Validates required fields in RCL structures

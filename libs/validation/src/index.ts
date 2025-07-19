@@ -1,10 +1,10 @@
 // Validation pipeline
-export * from './pipeline';
+export * from './pipeline.js';
 
 // Validators
-export * from './validators';
+export * from './validators/index.js';
 
 // Pre-configured pipelines
-export { createDefaultPipeline } from './presets';
-export { createStrictPipeline } from './presets';
-export { createRelaxedPipeline } from './presets';
+export { createDefaultPipeline } from './presets.js';
+export { createStrictPipeline } from './presets.js';
+export { createRelaxedPipeline } from './presets.js';

@@ -24,7 +24,7 @@ export interface Reference {
   };
 }
 
-import type { Position, TextDocument } from './types';
+import type { Position, TextDocument } from './types.js';
 
 /**
  * Provides "Find All References" functionality for RCL files

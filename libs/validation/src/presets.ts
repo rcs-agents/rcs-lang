@@ -1,6 +1,7 @@
-import { ValidationPipeline } from './pipeline';
-import { RequiredFieldsValidator } from './validators/requiredFieldsValidator';
-import { SyntaxValidator } from './validators/syntaxValidator';
+import { ValidationPipeline } from './pipeline.js';
+import { RequiredFieldsValidator } from './validators/requiredFieldsValidator.js';
+import { SyntaxValidator } from './validators/syntaxValidator.js';
+import { RcsAgentValidator } from './validators/rcsAgentValidator.js';
 // import { SemanticValidator } from './validators/semanticValidator';
 // import { NamingValidator } from './validators/namingValidator';
 
@@ -13,6 +14,7 @@ export function createDefaultPipeline(): ValidationPipeline {
   // Order matters - syntax first, then semantic, then naming
   pipeline.addValidator(new SyntaxValidator());
   pipeline.addValidator(new RequiredFieldsValidator());
+  pipeline.addValidator(new RcsAgentValidator());
   // Temporarily disabled until AST types are updated for generic RCL
   // pipeline.addValidator(new SemanticValidator());
   // pipeline.addValidator(new NamingValidator());

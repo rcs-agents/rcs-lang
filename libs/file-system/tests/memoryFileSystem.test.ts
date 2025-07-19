@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { MemoryFileSystem } from '../src/memoryFileSystem';
 
 describe('MemoryFileSystem', () => {
@@ -8,7 +8,7 @@ describe('MemoryFileSystem', () => {
     fs = new MemoryFileSystem();
   });
 
-  it('should write and read files', async () => {
+  test('should write and read files', async () => {
     const content = 'Hello, World!';
     const writeResult = await fs.writeFile('/test.txt', content);
     expect(writeResult.success).toBe(true);
@@ -20,7 +20,7 @@ describe('MemoryFileSystem', () => {
     }
   });
 
-  it('should check file existence', async () => {
+  test('should check file existence', async () => {
     await fs.writeFile('/exists.txt', 'content');
 
     const exists = await fs.exists('/exists.txt');
@@ -36,7 +36,7 @@ describe('MemoryFileSystem', () => {
     }
   });
 
-  it('should create directories', async () => {
+  test('should create directories', async () => {
     const result = await fs.mkdir('/test/nested', true);
     expect(result.success).toBe(true);
 
@@ -47,7 +47,7 @@ describe('MemoryFileSystem', () => {
     }
   });
 
-  it('should handle path operations', () => {
+  test('should handle path operations', () => {
     expect(fs.join('path', 'to', 'file.txt')).toBe('path/to/file.txt');
     expect(fs.basename('/path/to/file.txt')).toBe('file.txt');
     expect(fs.dirname('/path/to/file.txt')).toBe('/path/to');

@@ -1,0 +1,317 @@
+import { exec } from 'child_process';
+import * as path from 'path';
+import { promisify } from 'util';
+import * as fs from 'fs/promises';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+const execAsync = promisify(exec);
+
+describe('CLI Integration Tests', () => {
+  const testDir = path.join(__dirname, '../fixtures');
+  const cliPath = path.resolve(__dirname, '../../dist/index.js');
+
+  beforeEach(async () => {
+    // Ensure test directory exists
+    await fs.mkdir(testDir, { recursive: true });
+  });
+
+  afterEach(async () => {
+    // Clean up generated files
+    try {
+      const files = await fs.readdir(testDir);
+      const generatedFiles = files.filter((f) => f.endsWith('.json') || f.endsWith('.js'));
+
+      await Promise.all(
+        generatedFiles.map((f) => fs.unlink(path.join(testDir, f)).catch(() => {})),
+      );
+    } catch (error) {
+      // Directory might not exist, ignore
+    }
+  });
+
+  describe('Parser Error Handling', () => {
+    test('should fail compilation when RCL file has syntax errors', async () => {
+      const invalidRcl = `
+agent InvalidAgent
+  # Missing required sections and invalid syntax
+  flow InvalidFlow
+    :invalid syntax here
+    missing -> operator
+`;
+
+      const testFile = path.join(testDir, 'invalid.rcl');
+      await fs.writeFile(testFile, invalidRcl);
+
+      try {
+        const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+
+        // Should fail - if we get here, the CLI incorrectly reported success
+        expect.fail(`CLI should have failed but reported success. Output: ${result.stdout}`);
+      } catch (error: any) {
+        // CLI should exit with non-zero code for parse errors
+        expect(error.code).toBeGreaterThan(0);
+        expect(error.stderr || error.stdout).toMatch(/error|ERROR/i);
+      }
+    });
+
+    test('should not generate output files when compilation fails', async () => {
+      const invalidRcl = `
+agent BrokenAgent
+  displayName: "Broken"
+  invalid section syntax here
+`;
+
+      const testFile = path.join(testDir, 'broken.rcl');
+      await fs.writeFile(testFile, invalidRcl);
+
+      try {
+        await execAsync(`node ${cliPath} compile ${testFile}`);
+        expect.fail('CLI should have failed');
+      } catch (error: any) {
+        // Verify no output files were created
+        const jsonPath = testFile.replace('.rcl', '.json');
+        const jsPath = testFile.replace('.rcl', '.js');
+
+        const jsonExists = await fs
+          .access(jsonPath)
+          .then(() => true)
+          .catch(() => false);
+        const jsExists = await fs
+          .access(jsPath)
+          .then(() => true)
+          .catch(() => false);
+
+        expect(jsonExists).toBe(false);
+        expect(jsExists).toBe(false);
+      }
+    });
+
+    test('should provide meaningful error messages for common syntax errors', async () => {
+      const testCases = [
+        {
+          name: 'missing agent name',
+          content: 'agent\n  displayName: "Test"',
+          expectedError: /flow.*required|messages.*required/i,
+        },
+        {
+          name: 'missing flow section',
+          content: 'agent TestAgent\n  displayName: "Test"',
+          expectedError: /flow|required/i,
+        },
+        {
+          name: 'invalid type tag',
+          content: 'agent TestAgent\n  config\n    logoUri: <invalid tag>',
+          expectedError: /displayName.*required|flow.*required|messages.*required/i,
+        },
+      ];
+
+      for (const testCase of testCases) {
+        const testFile = path.join(testDir, `${testCase.name.replace(/\s+/g, '_')}.rcl`);
+        await fs.writeFile(testFile, testCase.content);
+
+        try {
+          await execAsync(`node ${cliPath} compile ${testFile}`);
+          expect.fail(`CLI should have failed for: ${testCase.name}`);
+        } catch (error: any) {
+          const output = error.stderr || error.stdout || '';
+          expect(output).toMatch(testCase.expectedError);
+        }
+      }
+    });
+  });
+
+  describe('Output Content Validation', () => {
+    test('should generate non-empty output for valid RCL files', async () => {
+      const validRcl = `
+agent SimpleAgent
+  displayName: "Simple Test Agent"
+  
+  flow MainFlow
+    start: Welcome
+    
+    on Welcome
+      match @reply.text
+        "hello" -> Welcome
+        :default -> Welcome
+  
+  messages Messages
+    text Welcome "Hello! How can I help you?"
+      suggestions
+        reply "hello"
+`;
+
+      const testFile = path.join(testDir, 'valid.rcl');
+      await fs.writeFile(testFile, validRcl);
+
+      const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+
+      // execAsync resolves successfully for exit code 0
+      expect(result.stdout).toMatch(/compilation successful/i);
+
+      // Verify output files exist and contain meaningful content
+      const jsonPath = testFile.replace('.rcl', '.json');
+      const jsPath = testFile.replace('.rcl', '.js');
+
+      const jsonContent = await fs.readFile(jsonPath, 'utf-8');
+      const jsContent = await fs.readFile(jsPath, 'utf-8');
+
+      // Parse JSON to verify it's valid
+      const parsedJson = JSON.parse(jsonContent);
+
+      // Verify structure is not empty
+      expect(Object.keys(parsedJson)).toContain('agent');
+      expect(Object.keys(parsedJson)).toContain('messages');
+      expect(Object.keys(parsedJson)).toContain('flows');
+
+      // Verify actual content exists (not just empty objects)
+      expect(Object.keys(parsedJson.agent).length).greaterThan(0);
+      expect(Object.keys(parsedJson.messages).length).greaterThan(0);
+      expect(Object.keys(parsedJson.flows).length).greaterThan(0);
+
+      // Verify JS file contains exports
+      expect(jsContent).toMatch(/export.*agent/);
+      expect(jsContent).toMatch(/export.*messages/);
+      expect(jsContent).toMatch(/export.*flows/);
+    });
+
+    test('should fail when output would be empty despite no syntax errors', async () => {
+      // This tests the semantic validation layer
+      const emptyRcl = `
+agent EmptyAgent
+  displayName: "Empty Agent"
+  
+  # This has valid syntax but missing required content
+  flow EmptyFlow
+    # Missing start state and other required elements
+  
+  messages EmptyMessages
+    # No actual messages defined
+`;
+
+      const testFile = path.join(testDir, 'empty.rcl');
+      await fs.writeFile(testFile, emptyRcl);
+
+      try {
+        const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+
+        // If compilation succeeds, check that output has meaningful content
+        const jsonPath = testFile.replace('.rcl', '.json');
+        const jsonContent = await fs.readFile(jsonPath, 'utf-8');
+        const parsedJson = JSON.parse(jsonContent);
+
+        // Should not have empty objects
+        if (Object.keys(parsedJson.flows).length === 0) {
+          expect.fail('Generated empty flows object - semantic validation should have caught this');
+        }
+        if (Object.keys(parsedJson.messages).length === 0) {
+          expect.fail(
+            'Generated empty messages object - semantic validation should have caught this',
+          );
+        }
+      } catch (error: any) {
+        // This is the expected behavior - should fail due to semantic validation
+        expect(error.code).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('Exit Code Validation', () => {
+    test('should return 0 for successful compilation', async () => {
+      const validRcl = `
+agent SuccessAgent
+  displayName: "Success Test"
+  
+  flow MainFlow
+    start: Start
+    
+    on Start
+      match @reply.text
+        :default -> Start
+  
+  messages Messages
+    text Start "Ready to help!"
+`;
+
+      const testFile = path.join(testDir, 'success.rcl');
+      await fs.writeFile(testFile, validRcl);
+
+      const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+      expect(result.code || 0).toBe(0);
+    });
+
+    test('should return non-zero for failed compilation', async () => {
+      const invalidRcl = 'invalid rcl content with syntax errors';
+      const testFile = path.join(testDir, 'fail.rcl');
+      await fs.writeFile(testFile, invalidRcl);
+
+      try {
+        await execAsync(`node ${cliPath} compile ${testFile}`);
+        expect.fail('Should have thrown due to non-zero exit code');
+      } catch (error: any) {
+        expect(error.code).toBeGreaterThan(0);
+      }
+    });
+
+    test('should return non-zero when input file does not exist', async () => {
+      const nonExistentFile = path.join(testDir, 'does-not-exist.rcl');
+
+      try {
+        await execAsync(`node ${cliPath} compile ${nonExistentFile}`);
+        expect.fail('Should have thrown due to non-zero exit code');
+      } catch (error: any) {
+        expect(error.code).toBeGreaterThan(0);
+        expect(error.stderr || error.stdout).toMatch(/not found|does not exist/i);
+      }
+    });
+  });
+
+  describe('Error Message Quality', () => {
+    test('should provide context for syntax errors', async () => {
+      const rclWithError = `
+agent TestAgent
+  displayName: "Test"
+  
+  flow BadFlow
+    start: Start
+    
+    on Start
+      # Missing match section - should provide helpful error
+      "hello" -> Start
+`;
+
+      const testFile = path.join(testDir, 'context_error.rcl');
+      await fs.writeFile(testFile, rclWithError);
+
+      try {
+        await execAsync(`node ${cliPath} compile ${testFile}`);
+        expect.fail('Should have failed');
+      } catch (error: any) {
+        const output = error.stderr || error.stdout;
+
+        // Should include line numbers or position information
+        expect(output).toMatch(/line|position|\d+/);
+
+        // Should be actionable
+        expect(output).toMatch(/expect|missing|invalid/i);
+      }
+    });
+
+    test('should not report success when there are errors', async () => {
+      const errorRcl = 'agent InvalidAgent\n  invalid syntax everywhere';
+      const testFile = path.join(testDir, 'no_false_success.rcl');
+      await fs.writeFile(testFile, errorRcl);
+
+      try {
+        const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+
+        // If we get here, check that success wasn't reported with errors present
+        if (result.stdout.includes('ERROR') || result.stderr.includes('ERROR')) {
+          expect.fail('CLI reported success despite errors in output');
+        }
+      } catch (error: any) {
+        // This is expected - CLI should fail
+        expect(error.code).toBeGreaterThan(0);
+      }
+    });
+  });
+});

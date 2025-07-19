@@ -7,6 +7,8 @@ import {
   type ParserConfig,
   type ParserPlatform,
   type Result,
+  RCLErrorFactory,
+  errorToDiagnostic,
 } from '@rcs-lang/core';
 import {
   type ANTLRErrorListener,
@@ -15,7 +17,7 @@ import {
   type RecognitionException,
   type Recognizer,
 } from 'antlr4ng';
-import { AntlrAdapter } from './adapter';
+import { AntlrAdapter } from './adapter.js';
 import { RclLexer } from './generated/RclLexer';
 import { RclParser } from './generated/RclParser';
 // import { wrapAST } from './ast-wrapper'; // No longer needed
@@ -28,21 +30,41 @@ class ErrorListener implements ANTLRErrorListener {
 
   syntaxError(
     _recognizer: any,
-    _offendingSymbol: any,
+    offendingSymbol: any,
     line: number,
     charPositionInLine: number,
     msg: string,
     _e: RecognitionException | null,
   ): void {
-    this.diagnostics.push({
-      severity: 'error',
-      message: msg,
-      range: {
-        start: { line: line - 1, character: charPositionInLine },
-        end: { line: line - 1, character: charPositionInLine + 1 },
-      },
-      source: 'antlr-parser',
-    });
+    // Create a proper RCL error based on the ANTLR error message
+    const position = { line: line - 1, character: charPositionInLine };
+    
+    // Try to categorize the error based on the message
+    let rclError;
+    if (msg.includes("missing") && msg.includes("'{'")) {
+      rclError = RCLErrorFactory.missingColon(line - 1, this.extractPropertyName(msg));
+    } else if (msg.includes("extraneous input")) {
+      const token = offendingSymbol?.text || 'unknown';
+      rclError = RCLErrorFactory.unexpectedToken(token, position);
+    } else if (msg.includes("no viable alternative")) {
+      const token = offendingSymbol?.text || 'unknown';
+      rclError = RCLErrorFactory.unexpectedToken(token, position, 'valid RCL syntax');
+    } else {
+      // Generic syntax error
+      rclError = RCLErrorFactory.unexpectedToken(
+        offendingSymbol?.text || 'unknown token',
+        position,
+        msg
+      );
+    }
+    
+    this.diagnostics.push(errorToDiagnostic(rclError));
+  }
+  
+  private extractPropertyName(msg: string): string {
+    // Try to extract property name from error messages like "missing ':' at 'value'"
+    const match = msg.match(/at '([^']+)'/);
+    return match ? match[1] : 'property';
   }
 
   reportAmbiguity(

@@ -19,8 +19,6 @@ export class ParseStage implements ICompilationStage {
         });
       }
 
-      console.log('ParseStage: Creating parser...');
-
       // Create parser
       const parserResult = await ParserFactory.create();
       if (!parserResult.success) {
@@ -28,8 +26,6 @@ export class ParseStage implements ICompilationStage {
       }
 
       const parser = parserResult.value;
-
-      console.log('ParseStage: Parsing source...');
 
       // Parse the source
       const parseResult = await parser.parse(input.source, input.uri);

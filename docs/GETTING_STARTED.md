@@ -1,0 +1,380 @@
+# Getting Started with RCL
+
+Welcome to RCL (Rich Communication Language)! This guide will help you get started with creating conversational agents using RCL and its toolchain.
+
+## What is RCL?
+
+RCL is a domain-specific language designed for creating Rich Communication Services (RCS) agents. It provides a declarative syntax for defining conversational flows, message types, and agent behaviors.
+
+## Quick Start
+
+### 1. Installation
+
+#### Using npm
+```bash
+# Install the CLI globally
+npm install -g @rcs-lang/cli
+
+# Or use npx (recommended)
+npx @rcs-lang/cli --version
+```
+
+#### Using the Web IDE
+Visit [RCS Agent Studio](https://rcs-lang.github.io/ide) for a browser-based development experience with no installation required.
+
+### 2. Your First Agent
+
+Create a file called `hello-bot.rcl`:
+
+```rcl
+agent HelloBot
+  displayName "Hello Bot"
+  description "A simple greeting bot"
+  
+  flow greeting
+    start -> welcome
+    
+    welcome: "Hello! I'm your friendly bot. How can I help you today?"
+      "help" -> show_help
+      "bye" -> goodbye
+      * -> confused
+      
+    show_help: "I can greet you and say goodbye. Try saying 'bye' when you're ready to leave."
+      * -> welcome
+      
+    goodbye: "Goodbye! Have a great day!"
+      * -> end
+      
+    confused: "I didn't quite understand that. Try saying 'help' for assistance."
+      * -> welcome
+      
+  messages Messages
+    # Messages will be automatically generated from the flow
+```
+
+### 3. Compile Your Agent
+
+```bash
+# Compile to JavaScript (for runtime execution)
+npx @rcs-lang/cli compile hello-bot.rcl
+
+# Compile to specific format
+npx @rcs-lang/cli compile hello-bot.rcl --format javascript
+npx @rcs-lang/cli compile hello-bot.rcl --format json
+
+# Generate a flow diagram
+npx @rcs-lang/cli compile hello-bot.rcl --format d2
+```
+
+### 4. Test Your Agent
+
+```bash
+# Validate syntax and semantics
+npx @rcs-lang/cli validate hello-bot.rcl
+
+# Interactive testing (if available)
+npx @rcs-lang/cli test hello-bot.rcl
+```
+
+## Core Concepts
+
+### Agents
+
+An agent is the top-level container for your conversational bot:
+
+```rcl
+agent MyBot
+  displayName "My Conversational Bot"
+  description "Description of what the bot does"
+  version "1.0.0"
+  
+  # Agent configuration goes here
+```
+
+### Flows
+
+Flows define the conversation logic using states and transitions:
+
+```rcl
+flow conversation
+  start -> greeting
+  
+  greeting: "Hello!"
+    "hi" -> friendly_response
+    "help" -> show_help
+    * -> default_response
+```
+
+### Messages
+
+Messages define what the bot says and how it's presented:
+
+```rcl
+# Simple text message
+state: "Hello there!"
+
+# Rich message with suggestions
+state: "What would you like to do?"
+  suggestions ["Option A", "Option B", "Help"]
+
+# Rich card message
+state:
+  richCard "Welcome" medium
+    title "Welcome to our service"
+    description "How can we help you today?"
+    media <image src="welcome.jpg" alt="Welcome">
+```
+
+### Context Variables
+
+Store and use information throughout the conversation:
+
+```rcl
+flow ordering
+  start -> get_name
+  
+  get_name: "What's your name?"
+    * -> get_order
+    
+  get_order: "Hi {match}! What would you like to order?"
+    context.customer_name = match
+    * -> confirm_order
+    
+  confirm_order: "Got it, {context.customer_name}! Your order is confirmed."
+    * -> end
+```
+
+### Pattern Matching
+
+RCL supports flexible pattern matching for user input:
+
+```rcl
+state: "How can I help you?"
+  "order *" -> take_order          # Matches "order coffee", "order pizza", etc.
+  "help" -> show_help              # Exact match
+  "cancel*" -> cancel_flow         # Matches anything starting with "cancel"
+  /\d+/ -> handle_number           # Regular expression for numbers
+  * -> default_handler             # Catch-all pattern
+```
+
+## Development Workflow
+
+### 1. Write RCL Code
+
+Start with a simple agent structure and gradually add complexity:
+
+```rcl
+agent SimpleBot
+  displayName "Simple Bot"
+  
+  flow main
+    start -> hello
+    hello: "Hello!"
+      * -> end
+      
+  messages Messages
+```
+
+### 2. Validate and Compile
+
+Always validate your code before deployment:
+
+```bash
+# Check for syntax and semantic errors
+npx @rcs-lang/cli validate my-bot.rcl
+
+# Compile to your target format
+npx @rcs-lang/cli compile my-bot.rcl --format javascript
+```
+
+### 3. Test Locally
+
+Test your agent logic before deployment:
+
+```javascript
+// test-agent.js
+const { ConversationalAgent } = require('@rcs-lang/csm');
+const agentDefinition = require('./my-bot.js');
+
+const agent = new ConversationalAgent(agentDefinition);
+
+async function test() {
+  const response = await agent.processMessage({
+    type: 'text',
+    content: 'hello'
+  });
+  
+  console.log('Bot response:', response.message);
+}
+
+test();
+```
+
+### 4. Deploy
+
+Deploy your compiled agent to your preferred platform:
+
+- Web applications (Express.js, React, etc.)
+- Cloud functions (AWS Lambda, Google Cloud Functions)
+- Mobile applications (React Native, Flutter)
+- Chat platforms (Slack, Discord, Teams)
+
+## Best Practices
+
+### 1. Start Simple
+
+Begin with basic flows and add complexity gradually:
+
+```rcl
+# Good: Simple, focused flow
+flow greeting
+  start -> welcome
+  welcome: "Hello! How can I help?"
+    "help" -> show_help
+    * -> end
+
+# Avoid: Complex nested flows initially
+```
+
+### 2. Use Clear State Names
+
+Choose descriptive names for your states:
+
+```rcl
+# Good: Descriptive names
+flow ordering
+  start -> welcome_customer
+  welcome_customer -> take_drink_order
+  take_drink_order -> confirm_order
+
+# Avoid: Generic names
+flow ordering
+  start -> state1
+  state1 -> state2
+  state2 -> state3
+```
+
+### 3. Handle Edge Cases
+
+Always provide fallback responses:
+
+```rcl
+state: "What size drink?"
+  "small" -> confirm_small
+  "medium" -> confirm_medium
+  "large" -> confirm_large
+  * -> ask_size_again  # Handle unexpected input
+
+ask_size_again: "I didn't catch that. Please choose small, medium, or large."
+  * -> state  # Try again
+```
+
+### 4. Use Context Wisely
+
+Store important information but don't over-complicate:
+
+```rcl
+# Good: Store essential information
+get_name: "What's your name?"
+  * -> get_email
+  context.customer_name = match
+
+# Good: Use stored context
+confirm: "Thanks {context.customer_name}! Your order is confirmed."
+
+# Avoid: Storing too much unnecessary data
+```
+
+### 5. Organize Complex Agents
+
+For larger agents, consider breaking flows into logical sections:
+
+```rcl
+agent CustomerService
+  displayName "Customer Service Bot"
+  
+  # Main entry flow
+  flow main
+    start -> identify_need
+    identify_need: "How can I help you today?"
+      "technical*" -> technical_support.start
+      "billing*" -> billing_support.start
+      "general*" -> general_support.start
+  
+  # Specialized flows
+  flow technical_support
+    # Technical support logic
+    
+  flow billing_support
+    # Billing support logic
+    
+  flow general_support
+    # General support logic
+```
+
+## Common Patterns
+
+### FAQ Bot
+
+```rcl
+agent FAQBot
+  displayName "FAQ Bot"
+  
+  flow faq
+    start -> main_menu
+    
+    main_menu: "What would you like to know about?"
+      suggestions ["Hours", "Location", "Contact", "Services"]
+      "hours" -> show_hours
+      "location" -> show_location
+      "contact" -> show_contact
+      "services" -> show_services
+      * -> main_menu
+      
+    show_hours: "We're open Monday-Friday 9AM-5PM, Saturday 10AM-3PM."
+      * -> main_menu
+      
+    show_location: "We're located at 123 Main Street, Downtown."
+      * -> main_menu
+```
+
+### Order Taking Bot
+
+```rcl
+agent OrderBot
+  displayName "Order Taking Bot"
+  
+  flow ordering
+    start -> welcome
+    
+    welcome: "Welcome! What would you like to order?"
+      * -> process_order
+      
+    process_order: "Great choice! What size?"
+      context.item = match
+      "small" -> confirm_order(size="small")
+      "medium" -> confirm_order(size="medium")
+      "large" -> confirm_order(size="large")
+      * -> ask_size_again
+      
+    confirm_order: "Perfect! One {context.size} {context.item}. Anything else?"
+      "no" -> finalize_order
+      "yes" -> welcome
+      * -> finalize_order
+```
+
+## Next Steps
+
+1. **Explore Examples**: Check out [examples/](../examples/) for more complex agent implementations
+2. **Read the API Documentation**: Learn about the full [API](./API_DOCUMENTATION.md)
+3. **Join the Community**: Get help and share your agents
+4. **Contribute**: Help improve RCL by contributing to the project
+
+## Getting Help
+
+- **Documentation**: Browse the [docs/](./README.md) directory
+- **Examples**: See [examples/](../examples/) for real-world use cases
+- **Issues**: Report bugs or request features on GitHub
+- **Community**: Join our Discord server for discussions
+
+Happy bot building! 🤖

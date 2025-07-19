@@ -1,6 +1,6 @@
-import type { Diagnostic } from './diagnostics';
-import type { IASTNode } from './parser';
-import type { Result } from './result';
+import type { Diagnostic } from './diagnostics.js';
+import type { IASTNode } from './parser.js';
+import type { Result } from './result.js';
 
 /**
  * Compilation input

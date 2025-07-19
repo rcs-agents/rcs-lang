@@ -4,17 +4,17 @@
   "description": "Advanced language service providers for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
-    "build": "nr build:ts",
-    "build:ts": "tsc",
-    "compile": "tsc",
-    "dev": "tsc --watch",
-    "test": "NODE_ENV=test vitest run",
-    "test:watch": "NODE_ENV=test vitest",
-    "clean": "rm -rf dist",
-    "lint": "biome lint src",
-    "format": "biome format src --write",
-    "typecheck": "tsc --noEmit"
+    "build": "moon run language-service:build",
+    "dev": "moon run language-service:dev",
+    "test": "moon run language-service:test",
+    "test:watch": "moon run language-service:test-watch",
+    "test:coverage": "moon run language-service:test-coverage",
+    "typecheck": "moon run language-service:typecheck",
+    "clean": "moon run language-service:clean",
+    "lint": "moon run language-service:lint",
+    "format": "moon run language-service:format"
   },
   "dependencies": {
     "@rcs-lang/parser": "workspace:*",
@@ -34,5 +34,11 @@
     "typescript": "^5.0.0",
     "vitest": "^3.2.4"
   },
-  "files": ["dist/**/*"]
+  "files": [
+    "dist/**/*"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

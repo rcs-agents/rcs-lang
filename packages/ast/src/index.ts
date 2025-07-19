@@ -6,16 +6,16 @@
  */
 
 // Export the formal AST types
-export * from './ast';
+export * from './ast.js';
 
 // Export position tracking utilities
-export * from './position';
+export * from './position.js';
 
 // Export node type guards
-export * from './guards';
+export * from './guards.js';
 
 // Export AST utilities
-export * from './utils';
+export * from './utils.js';
 
 // Re-export commonly used types at top level
 export type {
@@ -27,4 +27,4 @@ export type {
   SpreadDirective,
   MatchBlock,
   MatchCase,
-} from './ast';
+} from './ast.js';

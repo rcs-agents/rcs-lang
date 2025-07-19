@@ -5,14 +5,13 @@ import { Compiler } from '../compiler/compiler';
 import { Emitter } from '../compiler/emitter';
 import { loadConfig } from '../config/loader';
 import type { RclConfig } from '../config/types';
-import { SemanticValidator } from '../semantic/SemanticValidator';
 import type {
   CompilationResult,
   Diagnostic,
   EmitResult,
   RclProgram as IRclProgram,
   SourceFile,
-} from './types';
+} from './types.js';
 
 /**
  * Implementation of RclProgram interface
@@ -24,7 +23,6 @@ export class RclProgram implements IRclProgram {
   private semanticDiagnostics: Map<string, Diagnostic[]> = new Map();
   private compiler: Compiler;
   private emitter: Emitter;
-  private semanticValidator: SemanticValidator;
 
   constructor(configPath?: string) {
     // Load configuration
@@ -40,10 +38,9 @@ export class RclProgram implements IRclProgram {
       );
     }
 
-    // Initialize compiler, emitter, and semantic validator
+    // Initialize compiler and emitter
     this.compiler = new Compiler();
     this.emitter = new Emitter(this.config);
-    this.semanticValidator = new SemanticValidator();
   }
 
   /**
@@ -86,21 +83,12 @@ export class RclProgram implements IRclProgram {
 
       this.sourceFiles.set(filePath, sourceFile);
 
-      // Perform semantic validation
-      const validationResult = this.semanticValidator.validate(parseResult.ast);
-
-      // Validation diagnostics are already in the correct format
-      const semanticDiagnostics: Diagnostic[] = validationResult.diagnostics.map((d) => ({
-        ...d,
-        file: filePath,
-      }));
-
-      // Compile AST
+      // Compile using modern pipeline (which includes validation)
       const compiledAgent = await this.compiler.compile(parseResult.ast, content, filePath);
       const compilerDiagnostics = this.compiler.getDiagnostics();
 
-      // Combine semantic validation diagnostics with compiler diagnostics
-      const allDiagnostics = [...semanticDiagnostics, ...compilerDiagnostics];
+      // Combine parse errors with compiler diagnostics
+      const allDiagnostics = [...(sourceFile.parseErrors || []), ...compilerDiagnostics];
 
       // Store semantic diagnostics for this file
       this.semanticDiagnostics.set(filePath, allDiagnostics);

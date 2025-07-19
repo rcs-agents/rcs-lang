@@ -1,5 +1,12 @@
 type: library
 language: typescript
+
+tags:
+  - typescript
+  - common
+  - biome
+  - dprint
+
 fileGroups:
   sources:
     - "src/**/*"
@@ -7,29 +14,3 @@ fileGroups:
     - "tsconfig.json"
   tests:
     - "tests/**/*"
-
-tasks:
-  build:
-    command: bun run build
-    inputs:
-      - "@group(sources)"
-    outputs:
-      - "dist"
-
-  clean:
-    command: bun run clean
-
-  typecheck:
-    command: bun run typecheck
-    inputs:
-      - "@group(sources)"
-
-  lint:
-    command: bun run lint
-    inputs:
-      - "@group(sources)"
-
-  format:
-    command: bun run format
-    inputs:
-      - "@group(sources)"

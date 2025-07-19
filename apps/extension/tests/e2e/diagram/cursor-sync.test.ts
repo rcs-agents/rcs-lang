@@ -10,7 +10,7 @@ describe('Cursor Synchronization', () => {
 
   before(async () => {
     // Get VSCode workbench
-    workbench = await browser.getWorkbench();
+    workbench = await (browser as any).getWorkbench();
 
     // Open test file
     await workbench.executeCommand('File: Open File');
