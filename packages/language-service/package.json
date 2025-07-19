@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/language-service",
+  "name": "@rcs-lang/language-service",
   "version": "0.1.0",
   "description": "Advanced language service providers for RCL",
   "main": "dist/index.js",
@@ -17,10 +17,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcl/parser": "workspace:*",
-    "@rcl/compiler": "workspace:*",
-    "@rcl/core": "workspace:*",
-    "@rcl/validation": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/compiler": "workspace:*",
+    "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/validation": "workspace:*",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "tree-sitter": "^0.21.1",

@@ -41,19 +41,19 @@ rcl-tree-sitter/
 
 #### Published Packages (in `packages/`)
 
-1. **@rcl/parser**
+1. **@rcs-lang/parser**
    - Tree-sitter grammar and parser
    - AST type definitions and utilities
    - Platform-agnostic parser factory (Node.js/WASM)
    - No business logic, just parsing
 
-2. **@rcl/compiler**
+2. **@rcs-lang/compiler**
    - High-level compilation API
    - Compilation pipeline with stages
    - Integrates parser, validation, and code generation
    - Main entry point for programmatic compilation
 
-3. **@rcl/language-service**
+3. **@rcs-lang/language-service**
    - Advanced language service providers
    - Hover, completion, diagnostics, etc.
    - Workspace indexing and management
@@ -61,19 +61,19 @@ rcl-tree-sitter/
 
 #### Internal Libraries (in `libs/`)
 
-1. **@rcl/core**
+1. **@rcs-lang/core**
    - Core types: `Result<T,E>`, `Diagnostic`
    - All interfaces: `IParser`, `ICompiler`, `IValidator`, etc.
    - Platform-agnostic abstractions
    - No implementation, only contracts
 
-2. **@rcl/validation**
+2. **@rcs-lang/validation**
    - Validation pipeline implementation
    - Pluggable validators: syntax, semantic, naming
    - Extensible validation framework
    - Returns detailed diagnostics
 
-3. **@rcl/file-system**
+3. **@rcs-lang/file-system**
    - File system abstraction layer
    - `NodeFileSystem` for Node.js
    - `MemoryFileSystem` for testing/browser
@@ -83,13 +83,13 @@ rcl-tree-sitter/
 
 #### 1. Result Type for Error Handling
 ```typescript
-export type Result<T, E = Error> = 
+export type Result<T, E = Error> =
   | { success: true; value: T }
   | { success: false; error: E };
 ```
 
 #### 2. Interface-Based Architecture
-All major components are defined as interfaces in `@rcl/core`:
+All major components are defined as interfaces in `@rcs-lang/core`:
 - `IParser`: Parser abstraction
 - `ICompiler`: Compiler abstraction
 - `IFileSystem`: File system abstraction
@@ -106,15 +106,15 @@ All major components are defined as interfaces in `@rcl/core`:
 ### Dependency Flow
 
 ```
-@rcl/core (types & interfaces)
+@rcs-lang/core (types & interfaces)
     ↓
-@rcl/validation, @rcl/file-system (implementations)
+@rcs-lang/validation, @rcs-lang/file-system (implementations)
     ↓
-@rcl/parser (uses core types)
+@rcs-lang/parser (uses core types)
     ↓
-@rcl/compiler (orchestrates everything)
+@rcs-lang/compiler (orchestrates everything)
     ↓
-@rcl/language-service (builds on compiler)
+@rcs-lang/language-service (builds on compiler)
     ↓
 apps (CLI, VSCode extension)
 ```
@@ -166,7 +166,7 @@ The implemented architecture differs from the original proposal in several pract
 
 1. **Consolidated packages**: Instead of 7 separate packages (ast, lexer, parser, semantic, ir, codegen, diagnostics), we have 6 focused packages
 2. **No separate IR**: Direct AST → Output transformation (can add IR later if needed)
-3. **Unified core**: Single `@rcl/core` instead of separate type packages
+3. **Unified core**: Single `@rcs-lang/core` instead of separate type packages
 4. **Libs folder**: Internal packages in `libs/` to distinguish from published packages
 
 These changes were made to:

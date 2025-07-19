@@ -10,7 +10,7 @@ let _RCLNode: any;
 let _parserAvailable = false;
 
 try {
-  ({ _RCLNode } = require('@rcl/parser'));
+  ({ _RCLNode } = require('@rcs-lang/parser'));
   _parserAvailable = true;
 } catch (error) {
   console.warn('Parser not available, using mock node types:', error.message);

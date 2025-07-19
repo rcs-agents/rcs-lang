@@ -1,5 +1,5 @@
 /**
- * Wrapper for @rcl/parser to handle optional tree-sitter dependency
+ * Wrapper for @rcs-lang/parser to handle optional tree-sitter dependency
  * This allows the CLI to work in environments where tree-sitter is not available
  */
 
@@ -22,7 +22,7 @@ export interface ValidationResult {
 }
 
 // Import parser with proper ES6 imports
-import { RCLParser as RealRCLParser } from '@rcl/parser';
+import { RCLParser as RealRCLParser } from '@rcs-lang/parser';
 
 // Check if parser is available
 const parserAvailable = true;
@@ -78,19 +78,19 @@ export const schemaValidator = mockSchemaValidator;
 export const RCLParser = parserAvailable
   ? RealRCLParser
   : class MockRCLParser {
-      parseDocument(content: string, uri: string) {
-        console.warn('Using mock parser - real parsing not available');
-        return {
-          uri,
-          version: 1,
-          content,
-          ast: null,
-          imports: [],
-          symbols: [],
-          diagnostics: [],
-        };
-      }
-    };
+    parseDocument(content: string, uri: string) {
+      console.warn('Using mock parser - real parsing not available');
+      return {
+        uri,
+        version: 1,
+        content,
+        ast: null,
+        imports: [],
+        symbols: [],
+        diagnostics: [],
+      };
+    }
+  };
 
 // Mock ASTWalker since ANTLR parser doesn't have this interface yet
 export const ASTWalker = {

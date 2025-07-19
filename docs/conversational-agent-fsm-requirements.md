@@ -9,7 +9,7 @@ This document analyzes the requirements for a Finite State Machine (FSM) impleme
 ### 1. State Persistence and Restoration
 - **Requirement**: Ability to save and restore machine state between requests
 - **Use Case**: HTTP-based conversations where each request is stateless
-- **Details**: 
+- **Details**:
   - Serialize current state, context variables, and history
   - Deserialize and resume from any point in the conversation
 
@@ -152,7 +152,7 @@ interface FlowMachine {
   states: Map<string, State>;
   currentState: string;
   context: Record<string, any>;
-  
+
   transition(input: string): TransitionResult;
   serialize(): MachineState;
 }
@@ -162,7 +162,7 @@ interface Agent {
   machines: Map<string, FlowMachine>;
   activeMachine: string;
   globalContext: Record<string, any>;
-  
+
   processInput(input: string): Promise<Response>;
   switchMachine(machineId: string, initialState?: string): void;
   toURLHash(): string;
@@ -180,7 +180,7 @@ interface Agent {
 - Pros: Tiny, functional API, TypeScript support
 - Cons: Less features, smaller community
 
-**nanostate** (~3KB)  
+**nanostate** (~3KB)
 - Pros: Simple API, event emitter based
 - Cons: No TypeScript, less maintained
 
@@ -235,7 +235,7 @@ export class ConversationalAgent {
   async processInput(input: string): Promise<AgentResponse> {
     const machine = this.machines.get(this.activeMachineId);
     const result = machine.transition(input, this.context);
-    
+
     if (result.type === 'state') {
       this.activeStateId = result.stateId;
       return this.executeState(result.stateId);
@@ -261,8 +261,8 @@ export class ConversationalAgent {
 }
 
 // Usage - Composing an agent from reusable flows
-import { ContactSupportFlow } from '@rcl/common-flows';
-import { FAQFlow } from '@rcl/common-flows';
+import { ContactSupportFlow } from '@rcs-lang/common-flows';
+import { FAQFlow } from '@rcs-lang/common-flows';
 
 const agent = new ConversationalAgent('RetailBot');
 agent.addFlow(WelcomeFlow); // Custom flow
@@ -279,7 +279,7 @@ agent.addFlow(FAQFlow); // Reusable
 ### Migration Path:
 
 1. Build the lightweight FSM alongside XState output
-2. Add a compiler flag to choose output format  
+2. Add a compiler flag to choose output format
 3. Gradually migrate services to use lightweight FSM
 4. Remove XState dependency once stable
 
@@ -304,17 +304,17 @@ A custom solution of ~300 lines can handle the agent orchestration, while each f
 ```rcl
 agent CustomerService
   start: MainMenu
-  
+
   # Import reusable flows
-  import ContactSupportFlow from "@rcl/common-flows/contact-support"
-  import FAQFlow from "@rcl/common-flows/faq"
+  import ContactSupportFlow from "@rcs-lang/common-flows/contact-support"
+  import FAQFlow from "@rcs-lang/common-flows/faq"
   import StoreLocatorFlow from "./store-locator"
-  
+
   flow MainMenu
     on Welcome
       match @reply.text
         "Contact Support" -> machine ContactSupportFlow
-        "FAQ" -> machine FAQFlow  
+        "FAQ" -> machine FAQFlow
         "Find Store" -> machine StoreLocatorFlow
 ```
 

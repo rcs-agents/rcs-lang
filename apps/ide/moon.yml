@@ -45,5 +45,5 @@ tasks:
     inputs: []
 
 dependsOn:
-  - id: '@rcl/compiler'
+  - id: '@rcs-lang/compiler'
     scope: 'build'

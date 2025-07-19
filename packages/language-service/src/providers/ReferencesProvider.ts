@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import type { IParser } from '@rcl/core';
+import type { IParser } from '@rcs-lang/core';
 import type { ImportResolver } from '../import-resolver';
 import { SymbolType } from '../import-resolver/types';
 import type { WorkspaceIndex } from '../workspace-index';

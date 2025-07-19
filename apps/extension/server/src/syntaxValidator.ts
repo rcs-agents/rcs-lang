@@ -1,4 +1,4 @@
-import type { RCLDocument } from '@rcl/parser';
+import type { RCLDocument } from '@rcs-lang/parser';
 import { type Diagnostic, DiagnosticSeverity } from 'vscode-languageserver/node';
 
 export class SyntaxValidator {

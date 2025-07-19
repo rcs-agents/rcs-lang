@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/compiler",
+  "name": "@rcs-lang/compiler",
   "version": "1.0.0",
   "description": "Compilation pipeline for RCL language",
   "main": "dist/index.js",
@@ -20,11 +20,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@rcl/core": "workspace:*",
-    "@rcl/ast": "workspace:*",
-    "@rcl/parser": "workspace:*",
-    "@rcl/validation": "workspace:*",
-    "@rcl/file-system": "workspace:*"
+    "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/ast": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/validation": "workspace:*",
+    "@rcs-lang/file-system": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -1,4 +1,4 @@
-import type { ICompilationOutput } from '@rcl/core';
+import type { ICompilationOutput } from '@rcs-lang/core';
 
 interface MermaidGeneratorOptions {
   title?: string;
@@ -199,7 +199,7 @@ export class MermaidGenerator {
     classDef matchNode fill:#b3e5fc,stroke:#0277bd,stroke-width:2px
     classDef invalidNode fill:#ffcdd2,stroke:#b71c1c,stroke-width:2px
     classDef startNode fill:#ffffff,stroke:#0277bd,stroke-width:2px
-    
+
     %% Apply styles to nodes (add node names as needed)`;
   }
 }

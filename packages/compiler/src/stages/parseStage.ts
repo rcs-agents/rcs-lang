@@ -1,6 +1,6 @@
-import { type Result, err, ok } from '@rcl/core';
-import type { ICompilationInput, ICompilationStage } from '@rcl/core';
-import { ParserFactory } from '@rcl/parser';
+import { type Result, err, ok } from '@rcs-lang/core';
+import type { ICompilationInput, ICompilationStage } from '@rcs-lang/core';
+import { ParserFactory } from '@rcs-lang/parser';
 
 /**
  * Parse stage - converts source text to AST

@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/parser",
+  "name": "@rcs-lang/parser",
   "version": "1.0.0",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
@@ -17,8 +17,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@rcl/ast": "workspace:*",
-    "@rcl/core": "workspace:*",
+    "@rcs-lang/ast": "workspace:*",
+    "@rcs-lang/core": "workspace:*",
     "antlr4ng": "^3.0.16"
   },
   "devDependencies": {

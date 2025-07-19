@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { type CompilationResult, type Diagnostic, RclProgram } from '@rcl/language-service';
+import { type CompilationResult, type Diagnostic, RclProgram } from '@rcs-lang/language-service';
 import * as vscode from 'vscode';
 
 /**

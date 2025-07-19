@@ -10,7 +10,7 @@ The simplest possible RCL agent with basic flow and text message.
 - Simple linear flow
 - Single text message
 
-### [`simple.rcl`](./simple.rcl) 
+### [`simple.rcl`](./simple.rcl)
 A customer service bot demonstrating common patterns.
 - Agent configuration with branding
 - Conditional flow logic with JavaScript
@@ -46,7 +46,7 @@ Demonstrates RCL's message shortcut syntax vs verbose syntax.
 1. Open any `.rcl` file in a text editor with RCL language support
 2. Use the RCL CLI to compile and validate:
    ```bash
-   npx @rcl/cli compile example.rcl
+   npx @rcs-lang/cli compile example.rcl
    ```
 3. Explore the VSCode extension for syntax highlighting and live preview
 

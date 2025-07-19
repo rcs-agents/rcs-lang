@@ -1,6 +1,6 @@
-import { findNodeByType, findNodesByType } from '@rcl/ast';
-import type { Diagnostic, Result } from '@rcl/core';
-import type { IASTNode, IValidationContext, IValidationResult } from '@rcl/core';
+import { findNodeByType, findNodesByType } from '@rcs-lang/ast';
+import type { Diagnostic, Result } from '@rcs-lang/core';
+import type { IASTNode, IValidationContext, IValidationResult } from '@rcs-lang/core';
 import { BaseValidator } from './base';
 
 /**

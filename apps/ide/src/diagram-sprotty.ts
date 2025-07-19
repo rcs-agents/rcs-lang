@@ -1,4 +1,4 @@
-import { PropertyManager, RCLDiagramEngine, type RCLFlowModel } from '@rcl/diagram';
+import { PropertyManager, RCLDiagramEngine, type RCLFlowModel } from '@rcs-lang/diagram';
 
 interface FlowNode {
   id: number;
@@ -208,10 +208,10 @@ export class SprottyDiagramRenderer {
         label: node.label,
         messageData: node.message
           ? {
-              contentMessage: {
-                text: node.message,
-              },
-            }
+            contentMessage: {
+              text: node.message,
+            },
+          }
           : undefined,
         rclMetadata: {
           hasConditions: false,
@@ -258,10 +258,10 @@ export class SprottyDiagramRenderer {
         text: node.message,
         messageData: node.message
           ? {
-              contentMessage: {
-                text: node.message,
-              },
-            }
+            contentMessage: {
+              text: node.message,
+            },
+          }
           : undefined,
       },
     };

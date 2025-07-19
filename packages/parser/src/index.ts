@@ -1,4 +1,4 @@
-import type { ParserConfig } from '@rcl/core';
+import type { ParserConfig } from '@rcs-lang/core';
 import { CharStream, CommonTokenStream } from 'antlr4ng';
 import { RclLexer } from './generated/RclLexer';
 import { RclParser } from './generated/RclParser';
@@ -16,11 +16,11 @@ export async function parse(source: string): Promise<{ ast: any; errors?: any[] 
       errors:
         result.value.diagnostics.length > 0
           ? result.value.diagnostics.map((d) => ({
-              message: d.message,
-              line: d.range?.start.line,
-              column: d.range?.start.character,
-              type: 'ERROR',
-            }))
+            message: d.message,
+            line: d.range?.start.line,
+            column: d.range?.start.character,
+            type: 'ERROR',
+          }))
           : undefined,
     };
   }
@@ -60,7 +60,7 @@ export { AntlrAdapter } from './adapter';
 export { RclLexer, RclParser };
 
 // Export types from core
-export type { IParser, IParseResult, IParserCapabilities, ParserConfig } from '@rcl/core';
+export type { IParser, IParseResult, IParserCapabilities, ParserConfig } from '@rcs-lang/core';
 
 // Legacy types for compatibility
 export interface RCLDocument {

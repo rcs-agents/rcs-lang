@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/file-system",
+  "name": "@rcs-lang/file-system",
   "version": "1.0.0",
   "description": "File system abstraction for RCL",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@rcl/core": "file:../core"
+    "@rcs-lang/core": "file:../core"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

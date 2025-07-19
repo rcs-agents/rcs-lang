@@ -1,5 +1,5 @@
 // TODO: Replace with actual validation utilities
-// import { schemaValidator, ValidationResult, ValidationError } from '@rcl/validation';
+// import { schemaValidator, ValidationResult, ValidationError } from '@rcs-lang/validation';
 
 export interface ValidationResult {
   isValid: boolean;

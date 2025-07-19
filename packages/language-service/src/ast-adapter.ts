@@ -2,8 +2,8 @@
  * Adapter to ensure language-service always works with old AST format
  */
 
-import type * as AST from '@rcl/ast';
-import { IASTNode } from '@rcl/core';
+import type * as AST from '@rcs-lang/ast';
+import { IASTNode } from '@rcs-lang/core';
 import { type ASTNode, convertNewASTToOld, toBaseNode } from './ast-compatibility';
 
 /**

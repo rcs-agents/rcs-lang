@@ -1,5 +1,5 @@
-import type { ICompilationStage, ICompiler } from '@rcl/core';
-import { err, ok } from '@rcl/core';
+import type { ICompilationStage, ICompiler } from '@rcs-lang/core';
+import { err, ok } from '@rcs-lang/core';
 import { describe, expect, it } from 'vitest';
 import { CompilationPipeline } from '../src/pipeline';
 
@@ -23,7 +23,7 @@ describe('CompilationPipeline', () => {
   class MockValidationStage implements ICompilationStage {
     name = 'mock-validation';
 
-    constructor(private shouldFail = false) {}
+    constructor(private shouldFail = false) { }
 
     async process(input: any): Promise<any> {
       if (this.shouldFail) {
@@ -46,7 +46,7 @@ describe('CompilationPipeline', () => {
 
       // Create stages that record execution
       class RecordingStage implements ICompilationStage {
-        constructor(public name: string) {}
+        constructor(public name: string) { }
 
         async process(input: any): Promise<any> {
           executionOrder.push(this.name);

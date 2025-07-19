@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/validation",
+  "name": "@rcs-lang/validation",
   "version": "1.0.0",
   "description": "Validation pipeline for RCL language",
   "main": "dist/index.js",
@@ -12,8 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@rcl/core": "workspace:*",
-    "@rcl/parser": "workspace:*"
+    "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/parser": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

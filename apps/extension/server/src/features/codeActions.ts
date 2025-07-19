@@ -1,4 +1,4 @@
-import type { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcs-lang/parser';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import {
   type CodeAction,
@@ -14,7 +14,7 @@ import {
 } from 'vscode-languageserver/node';
 
 export class CodeActionProvider {
-  constructor(private parser: RCLParser) {}
+  constructor(private parser: RCLParser) { }
 
   /**
    * Provide code actions for the given range and context

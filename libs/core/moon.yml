@@ -1,5 +1,5 @@
 project:
-  name: '@rcl/core'
+  name: '@rcs-lang/core'
   description: 'Core types and interfaces for RCL'
 
 type: library

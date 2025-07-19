@@ -1,6 +1,6 @@
-import { type Result, err, ok } from '@rcl/core';
-import type { IASTNode, ICompilationStage } from '@rcl/core';
-import { createDefaultPipeline } from '@rcl/validation';
+import { type Result, err, ok } from '@rcs-lang/core';
+import type { IASTNode, ICompilationStage } from '@rcs-lang/core';
+import { createDefaultPipeline } from '@rcs-lang/validation';
 
 interface ValidateInput {
   ast: IASTNode;

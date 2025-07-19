@@ -1,5 +1,5 @@
 {
-  "name": "@rcl/csm",
+  "name": "@rcs-lang/csm",
   "version": "0.1.0",
   "description": "Lightweight conversation state machine for RCS agents",
   "main": "./dist/index.js",

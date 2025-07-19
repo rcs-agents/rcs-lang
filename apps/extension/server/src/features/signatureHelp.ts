@@ -1,4 +1,4 @@
-import type { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcs-lang/parser';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import {
   MarkupKind,
@@ -83,9 +83,9 @@ export class SignatureHelpProvider {
       const nextLine =
         position.line + 1 < document.lineCount
           ? document.getText({
-              start: { line: position.line + 1, character: 0 },
-              end: { line: position.line + 1, character: 100 },
-            })
+            start: { line: position.line + 1, character: 0 },
+            end: { line: position.line + 1, character: 100 },
+          })
           : '';
 
       if (

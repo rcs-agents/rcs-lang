@@ -1,4 +1,4 @@
-import { RCLCompiler } from '@rcl/compiler';
+import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, it } from 'vitest';
 
 describe('CLI Output Content Validation', () => {
@@ -9,15 +9,15 @@ describe('CLI Output Content Validation', () => {
       const validRcl = `
 agent TestAgent
   displayName: "Test Agent"
-  
+
   flow MainFlow
     start: Welcome
-    
+
     on Welcome
       match @reply.text
         "hello" -> Welcome
         :default -> Welcome
-  
+
   messages Messages
     text Welcome "Hello there!"
       suggestions
@@ -55,19 +55,19 @@ agent TestAgent
       const validRcl = `
 agent ContentAgent
   displayName: "Content Agent"
-  
+
   config
     description: "A test agent"
     color: "#FF0000"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         "test" -> Start
         :default -> Start
-  
+
   messages Messages
     text Start "Starting message"
 `;
@@ -104,34 +104,34 @@ agent ContentAgent
       const complexRcl = `
 agent SchemaTestAgent
   displayName: "Schema Test"
-  
+
   config
     description: "Testing schema compliance"
     logoUri: <url https://example.com/logo.png>
     color: "#123456"
-  
+
   flow MainFlow
     start: Welcome
-    
+
     on Welcome
       match @reply.text
         "option1" -> Option1
         "option2" -> Option2
         :default -> Welcome
-    
+
     on Option1
       -> Welcome
-    
+
     on Option2
       -> Welcome
-  
+
   messages Messages
     richCard Welcome "Welcome Card" :large
       description: "Choose an option"
       suggestions
         reply "option1"
         reply "option2"
-    
+
     text Option1 "You chose option 1"
     text Option2 "You chose option 2"
 `;
@@ -190,14 +190,14 @@ agent SchemaTestAgent
       const validRcl = `
 agent JSTestAgent
   displayName: "JavaScript Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Test message"
 `;
@@ -229,14 +229,14 @@ agent JSTestAgent
       const rclWithSpecialChars = `
 agent EscapeTestAgent
   displayName: "Test \"Quotes\" and 'Apostrophes'"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Message with \"quotes\" and 'apostrophes' and backslashes: \\"
 `;
@@ -258,14 +258,14 @@ agent EscapeTestAgent
       const rclContent = `
 agent FormatTestAgent
   displayName: "Format Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text Start "Test"
 `;
@@ -287,25 +287,25 @@ agent FormatTestAgent
       const fullAgentRcl = `
 agent CompleteAgent
   displayName: "Complete Agent"
-  
+
   config
     description: "A complete agent for testing"
     logoUri: <url https://example.com/logo.png>
     color: "#FF5733"
     phoneNumber: <phone +1-555-0123>
     phoneLabel: "Call Support"
-  
+
   defaults
     fallbackMessage: "Sorry, I didn't understand."
     messageTrafficType: :transactional
-  
+
   flow MainFlow
     start: Welcome
-    
+
     on Welcome
       match @reply.text
         :default -> Welcome
-  
+
   messages Messages
     text Welcome "Welcome!"
 `;
@@ -332,27 +332,27 @@ agent CompleteAgent
       const complexFlowRcl = `
 agent FlowTestAgent
   displayName: "Flow Test"
-  
+
   flow ComplexFlow
     start: State1
-    
+
     on State1
       match @reply.text
         "next" -> State2
         "jump" -> State3
         :default -> State1
-    
+
     on State2
       match @reply.text
         "back" -> State1
         "forward" -> State3
         :default -> State2
-    
+
     on State3
       match @reply.text
         "restart" -> State1
         :default -> State3
-  
+
   messages Messages
     text State1 "State 1"
     text State2 "State 2"
@@ -380,23 +380,23 @@ agent FlowTestAgent
       const messageTypesRcl = `
 agent MessageTestAgent
   displayName: "Message Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         :default -> Start
-  
+
   messages Messages
     text SimpleText "Simple text message"
-    
+
     richCard RichMessage "Rich Card Title" :medium
       description: "Rich card description"
       suggestions
         reply "Reply Option"
         action "Action" <url https://example.com>
-    
+
     carousel CarouselMessage "Carousel Title" :large
       richCard Card1 "Card 1" :compact
         description: "First card"

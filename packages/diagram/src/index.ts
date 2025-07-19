@@ -1,4 +1,4 @@
-// Main entry point for @rcl/diagram package
+// Main entry point for @rcs-lang/diagram package
 
 // Export the main diagram engine
 export { RCLDiagramEngine } from './diagram';

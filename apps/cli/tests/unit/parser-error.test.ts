@@ -1,4 +1,4 @@
-import { RCLCompiler } from '@rcl/compiler';
+import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, it } from 'vitest';
 
 describe('Parser Error Handling', () => {
@@ -60,10 +60,10 @@ agent TestAgent
       const invalidRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       # Invalid match syntax
       "hello" -> NextState
@@ -80,10 +80,10 @@ agent TestAgent
       const invalidRcl = `
 agent TestAgent
 displayName: "Test"  # Wrong indentation
-  
+
   flow TestFlow
     start: Start
-    
+
     on Start
       match @reply.text
         "hello" -> Start
@@ -101,7 +101,7 @@ displayName: "Test"  # Wrong indentation
       const invalidRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   # Error on line 6
   invalid syntax here
 `;
@@ -145,13 +145,13 @@ agent TestAgent
       const multipleErrorsRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   invalid_section
     error: here
-  
+
   another_invalid_section
     more: errors
-  
+
   flow TestFlow
     invalid flow syntax
 `;
@@ -172,7 +172,7 @@ agent TestAgent
       const invalidRcl = `
 agent TestAgent
   displayName: "Test"
-  
+
   flow TestFlow
     # Missing start attribute
     on State1

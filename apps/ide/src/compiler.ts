@@ -46,7 +46,7 @@ export class RCLCompiler {
 
   async initialize() {
     if (!this.initialized) {
-      const compiler = await import('@rcl/compiler');
+      const compiler = await import('@rcs-lang/compiler');
 
       // Create compilation pipeline
       const {

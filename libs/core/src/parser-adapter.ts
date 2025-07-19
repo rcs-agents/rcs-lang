@@ -1,4 +1,4 @@
-import type { RclFile } from '@rcl/ast';
+import type { RclFile } from '@rcs-lang/ast';
 import type { Diagnostic } from './diagnostics';
 import type { Result } from './result';
 

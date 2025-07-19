@@ -1,8 +1,8 @@
 import { constants } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { type Result, err, ok } from '@rcl/core';
-import type { IFileStats, IFileSystem } from '@rcl/core';
+import { type Result, err, ok } from '@rcs-lang/core';
+import type { IFileStats, IFileSystem } from '@rcs-lang/core';
 
 /**
  * Node.js file system implementation

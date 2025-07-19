@@ -1,4 +1,4 @@
-import type { ICompilationOutput } from '@rcl/core';
+import type { ICompilationOutput } from '@rcs-lang/core';
 
 interface D2GeneratorOptions {
   title?: string;

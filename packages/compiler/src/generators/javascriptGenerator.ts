@@ -1,4 +1,4 @@
-import type { ICompilationOutput } from '@rcl/core';
+import type { ICompilationOutput } from '@rcs-lang/core';
 
 export class JavaScriptGenerator {
   generate(output: ICompilationOutput, fileName: string): string {
@@ -6,7 +6,7 @@ export class JavaScriptGenerator {
 
     // Add header comment
     lines.push(`// Generated from ${fileName}`);
-    lines.push('// Compatible with @rcl/csm - Conversation State Machine library');
+    lines.push('// Compatible with @rcs-lang/csm - Conversation State Machine library');
     lines.push('');
 
     // Export agent
@@ -34,7 +34,7 @@ export class JavaScriptGenerator {
     // Add helper function to create CSM agent
     lines.push('// Helper to create ConversationalAgent with these flows');
     lines.push('export function createAgent(options) {');
-    lines.push('  const { ConversationalAgent } = require("@rcl/csm");');
+    lines.push('  const { ConversationalAgent } = require("@rcs-lang/csm");');
     lines.push('  ');
     lines.push('  const agent = new ConversationalAgent({');
     lines.push('    id: agent.name,');

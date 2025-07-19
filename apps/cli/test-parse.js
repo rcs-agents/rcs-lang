@@ -12,7 +12,7 @@ messages Messages:
 
 flow Main:
   initial state: Welcome
-  
+
   state Welcome:
     message: Welcome
 `;
@@ -30,14 +30,14 @@ const Module = require('module');
 const originalRequire = Module.prototype.require;
 
 Module.prototype.require = function (id) {
-  if (id === '@rcl/file-system') {
+  if (id === '@rcs-lang/file-system') {
     return {
       FileSystemFactory: {
         getDefault: () => mockFileSystem,
       },
     };
   }
-  if (id === '@rcl/parser') {
+  if (id === '@rcs-lang/parser') {
     return {
       AntlrRclParser: class {
         constructor() {
