@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { RCLCompiler } from '../src/compiler';
 
 describe('JavaScript Output Generation', () => {
-  it('should generate valid JavaScript from RCL', async () => {
+  test('should generate valid JavaScript from RCL', async () => {
     const compiler = new RCLCompiler();
 
     const rclSource = `

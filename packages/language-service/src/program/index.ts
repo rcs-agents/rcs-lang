@@ -1,2 +1,2 @@
-export * from './types';
-export { RclProgram } from './RclProgram';
+export * from './types.js';
+export { RclProgram } from './RclProgram.js';

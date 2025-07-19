@@ -1,0 +1,555 @@
+# AST API Reference
+
+## Overview
+
+The `@rcs-lang/ast` package provides TypeScript type definitions for the RCL Abstract Syntax Tree. This reference documents all available types, interfaces, and utilities.
+
+## Core Types
+
+### Base Types
+
+#### ASTNode
+Base interface for all AST nodes.
+
+```typescript
+interface ASTNode {
+  type: string;
+  range: Range;
+  parent?: ASTNode;
+  children?: ASTNode[];
+}
+```
+
+#### Range
+Represents a location in source code.
+
+```typescript
+interface Range {
+  start: Position;
+  end: Position;
+}
+
+interface Position {
+  line: number;
+  character: number;
+}
+```
+
+## Document Structure
+
+### RclFile
+The root node of an RCL document.
+
+```typescript
+interface RclFile extends ASTNode {
+  type: 'RclFile';
+  agent: AgentDefinition;
+  messages?: MessagesSection;
+}
+```
+
+**Properties:**
+- `agent` - The agent definition (required)
+- `messages` - Optional messages section
+
+## Agent Definition
+
+### AgentDefinition
+Defines an RCS agent with its configuration and flows.
+
+```typescript
+interface AgentDefinition extends ASTNode {
+  type: 'AgentDefinition';
+  name: string;
+  displayName?: string;
+  config?: ConfigSection;
+  defaults?: DefaultsSection;
+  flows: FlowDefinition[];
+}
+```
+
+**Properties:**
+- `name` - Agent identifier (must be valid identifier)
+- `displayName` - Human-readable name
+- `config` - Agent configuration section
+- `defaults` - Default values section
+- `flows` - Array of conversation flows
+
+### ConfigSection
+Agent configuration settings.
+
+```typescript
+interface ConfigSection extends ASTNode {
+  type: 'ConfigSection';
+  properties: ConfigProperty[];
+}
+
+interface ConfigProperty extends ASTNode {
+  type: 'ConfigProperty';
+  key: string;
+  value: PropertyValue;
+}
+```
+
+**Standard Config Properties:**
+- `description` - Agent description
+- `logoUri` - Agent logo URL
+- `color` - Brand color
+- `phoneNumber` - Contact phone number
+- `phoneLabel` - Phone number label
+
+### DefaultsSection
+Default configuration values.
+
+```typescript
+interface DefaultsSection extends ASTNode {
+  type: 'DefaultsSection';
+  properties: DefaultProperty[];
+}
+
+interface DefaultProperty extends ASTNode {
+  type: 'DefaultProperty';
+  key: string;
+  value: PropertyValue;
+}
+```
+
+**Standard Default Properties:**
+- `fallbackMessage` - Default fallback message
+- `messageTrafficType` - Message traffic type
+
+## Flow Definitions
+
+### FlowDefinition
+Defines a conversation flow with states and transitions.
+
+```typescript
+interface FlowDefinition extends ASTNode {
+  type: 'FlowDefinition';
+  name: string;
+  start: string;
+  states: StateDefinition[];
+}
+```
+
+**Properties:**
+- `name` - Flow identifier
+- `start` - Starting state name
+- `states` - Array of state definitions
+
+### StateDefinition
+Defines a state within a flow.
+
+```typescript
+interface StateDefinition extends ASTNode {
+  type: 'StateDefinition';
+  name: string;
+  transitions?: TransitionDefinition[];
+  actions?: ActionDefinition[];
+}
+```
+
+**Properties:**
+- `name` - State identifier
+- `transitions` - Outgoing transitions
+- `actions` - Actions to perform in this state
+
+### TransitionDefinition
+Defines a transition between states.
+
+```typescript
+interface TransitionDefinition extends ASTNode {
+  type: 'TransitionDefinition';
+  condition?: ConditionExpression;
+  target: string;
+  actions?: ActionDefinition[];
+}
+```
+
+**Properties:**
+- `condition` - Condition for transition
+- `target` - Target state name
+- `actions` - Actions to perform during transition
+
+## Match Blocks
+
+### MatchBlock
+Pattern matching for user input.
+
+```typescript
+interface MatchBlock extends ASTNode {
+  type: 'MatchBlock';
+  discriminant: Expression;
+  cases: MatchCase[];
+  defaultCase?: MatchCase;
+}
+```
+
+### MatchCase
+A single case in a match block.
+
+```typescript
+interface MatchCase extends ASTNode {
+  type: 'MatchCase';
+  pattern: MatchPattern;
+  target: string;
+  actions?: ActionDefinition[];
+}
+```
+
+### MatchPattern
+Patterns for matching user input.
+
+```typescript
+type MatchPattern = 
+  | StringPattern
+  | RegexPattern
+  | DefaultPattern;
+
+interface StringPattern extends ASTNode {
+  type: 'StringPattern';
+  value: string;
+}
+
+interface RegexPattern extends ASTNode {
+  type: 'RegexPattern';
+  pattern: string;
+  flags?: string;
+}
+
+interface DefaultPattern extends ASTNode {
+  type: 'DefaultPattern';
+}
+```
+
+## Message Definitions
+
+### MessagesSection
+Container for message definitions.
+
+```typescript
+interface MessagesSection extends ASTNode {
+  type: 'MessagesSection';
+  messages: MessageDefinition[];
+}
+```
+
+### MessageDefinition
+Base interface for all message types.
+
+```typescript
+interface MessageDefinition extends ASTNode {
+  name: string;
+  messageType: MessageType;
+}
+
+type MessageType = 'text' | 'richCard' | 'carousel';
+```
+
+### TextMessage
+Simple text message.
+
+```typescript
+interface TextMessage extends MessageDefinition {
+  type: 'TextMessage';
+  messageType: 'text';
+  text: string;
+  suggestions?: Suggestion[];
+}
+```
+
+### RichCardMessage
+Rich card with media and buttons.
+
+```typescript
+interface RichCardMessage extends MessageDefinition {
+  type: 'RichCardMessage';
+  messageType: 'richCard';
+  title: string;
+  size?: CardSize;
+  description?: string;
+  media?: MediaElement;
+  suggestions?: Suggestion[];
+}
+
+type CardSize = 'compact' | 'medium' | 'large';
+```
+
+### CarouselMessage
+Carousel of multiple cards.
+
+```typescript
+interface CarouselMessage extends MessageDefinition {
+  type: 'CarouselMessage';
+  messageType: 'carousel';
+  title: string;
+  size?: CardSize;
+  cards: RichCardMessage[];
+}
+```
+
+## Suggestions
+
+### Suggestion
+Base interface for suggestions.
+
+```typescript
+interface Suggestion extends ASTNode {
+  suggestionType: SuggestionType;
+  text: string;
+}
+
+type SuggestionType = 'reply' | 'action';
+```
+
+### ReplySuggestion
+Quick reply suggestion.
+
+```typescript
+interface ReplySuggestion extends Suggestion {
+  type: 'ReplySuggestion';
+  suggestionType: 'reply';
+}
+```
+
+### ActionSuggestion
+Action suggestion with URL.
+
+```typescript
+interface ActionSuggestion extends Suggestion {
+  type: 'ActionSuggestion';
+  suggestionType: 'action';
+  url: string;
+}
+```
+
+## Expressions
+
+### Expression
+Base interface for expressions.
+
+```typescript
+interface Expression extends ASTNode {
+  expressionType: ExpressionType;
+}
+
+type ExpressionType = 
+  | 'identifier'
+  | 'literal'
+  | 'memberAccess'
+  | 'functionCall';
+```
+
+### Identifier
+Variable or property reference.
+
+```typescript
+interface Identifier extends Expression {
+  type: 'Identifier';
+  expressionType: 'identifier';
+  name: string;
+}
+```
+
+### Literal
+Literal value.
+
+```typescript
+interface Literal extends Expression {
+  type: 'Literal';
+  expressionType: 'literal';
+  value: string | number | boolean;
+}
+```
+
+### MemberAccess
+Property access expression.
+
+```typescript
+interface MemberAccess extends Expression {
+  type: 'MemberAccess';
+  expressionType: 'memberAccess';
+  object: Expression;
+  property: string;
+}
+```
+
+## Type Guards
+
+The package provides type guard functions for runtime type checking:
+
+```typescript
+// Document structure
+function isRclFile(node: ASTNode): node is RclFile;
+function isAgentDefinition(node: ASTNode): node is AgentDefinition;
+function isMessagesSection(node: ASTNode): node is MessagesSection;
+
+// Flow elements
+function isFlowDefinition(node: ASTNode): node is FlowDefinition;
+function isStateDefinition(node: ASTNode): node is StateDefinition;
+function isTransitionDefinition(node: ASTNode): node is TransitionDefinition;
+
+// Messages
+function isMessageDefinition(node: ASTNode): node is MessageDefinition;
+function isTextMessage(node: ASTNode): node is TextMessage;
+function isRichCardMessage(node: ASTNode): node is RichCardMessage;
+function isCarouselMessage(node: ASTNode): node is CarouselMessage;
+
+// Suggestions
+function isSuggestion(node: ASTNode): node is Suggestion;
+function isReplySuggestion(node: ASTNode): node is ReplySuggestion;
+function isActionSuggestion(node: ASTNode): node is ActionSuggestion;
+
+// Expressions
+function isExpression(node: ASTNode): node is Expression;
+function isIdentifier(node: ASTNode): node is Identifier;
+function isLiteral(node: ASTNode): node is Literal;
+function isMemberAccess(node: ASTNode): node is MemberAccess;
+```
+
+## Utility Functions
+
+### AST Traversal
+
+```typescript
+function walkAST(node: ASTNode, visitor: (node: ASTNode) => void): void;
+function walkASTAsync(node: ASTNode, visitor: (node: ASTNode) => Promise<void>): Promise<void>;
+```
+
+### AST Queries
+
+```typescript
+function findNode(root: ASTNode, predicate: (node: ASTNode) => boolean): ASTNode | null;
+function findAllNodes(root: ASTNode, predicate: (node: ASTNode) => boolean): ASTNode[];
+function getParent(node: ASTNode): ASTNode | null;
+function getChildren(node: ASTNode): ASTNode[];
+```
+
+### Location Utilities
+
+```typescript
+function getNodeRange(node: ASTNode): Range;
+function isPositionInRange(position: Position, range: Range): boolean;
+function comparePositions(a: Position, b: Position): number;
+function compareRanges(a: Range, b: Range): number;
+```
+
+## Constants
+
+### Node Types
+
+```typescript
+export const NodeTypes = {
+  // Document
+  RCL_FILE: 'RclFile',
+  
+  // Agent
+  AGENT_DEFINITION: 'AgentDefinition',
+  CONFIG_SECTION: 'ConfigSection',
+  DEFAULTS_SECTION: 'DefaultsSection',
+  
+  // Flows
+  FLOW_DEFINITION: 'FlowDefinition',
+  STATE_DEFINITION: 'StateDefinition',
+  TRANSITION_DEFINITION: 'TransitionDefinition',
+  
+  // Messages
+  MESSAGES_SECTION: 'MessagesSection',
+  TEXT_MESSAGE: 'TextMessage',
+  RICH_CARD_MESSAGE: 'RichCardMessage',
+  CAROUSEL_MESSAGE: 'CarouselMessage',
+  
+  // Suggestions
+  REPLY_SUGGESTION: 'ReplySuggestion',
+  ACTION_SUGGESTION: 'ActionSuggestion',
+  
+  // Expressions
+  IDENTIFIER: 'Identifier',
+  LITERAL: 'Literal',
+  MEMBER_ACCESS: 'MemberAccess'
+} as const;
+```
+
+### Message Types
+
+```typescript
+export const MessageTypes = {
+  TEXT: 'text',
+  RICH_CARD: 'richCard',
+  CAROUSEL: 'carousel'
+} as const;
+```
+
+### Card Sizes
+
+```typescript
+export const CardSizes = {
+  COMPACT: 'compact',
+  MEDIUM: 'medium',
+  LARGE: 'large'
+} as const;
+```
+
+## Examples
+
+### Creating AST Nodes
+
+```typescript
+import * as AST from '@rcs-lang/ast';
+
+// Create a text message
+const textMessage: AST.TextMessage = {
+  type: 'TextMessage',
+  messageType: 'text',
+  name: 'Welcome',
+  text: 'Hello, world!',
+  range: {
+    start: { line: 1, character: 0 },
+    end: { line: 1, character: 30 }
+  }
+};
+
+// Create an agent definition
+const agent: AST.AgentDefinition = {
+  type: 'AgentDefinition',
+  name: 'MyAgent',
+  displayName: 'My Agent',
+  flows: [],
+  range: {
+    start: { line: 0, character: 0 },
+    end: { line: 10, character: 0 }
+  }
+};
+```
+
+### AST Traversal
+
+```typescript
+import { walkAST, isMessageDefinition } from '@rcs-lang/ast';
+
+function collectMessages(ast: AST.RclFile): string[] {
+  const messages: string[] = [];
+  
+  walkAST(ast, (node) => {
+    if (isMessageDefinition(node)) {
+      messages.push(node.name);
+    }
+  });
+  
+  return messages;
+}
+```
+
+### Type Guards
+
+```typescript
+import { isTextMessage, isRichCardMessage } from '@rcs-lang/ast';
+
+function analyzeMessage(message: AST.MessageDefinition) {
+  if (isTextMessage(message)) {
+    console.log('Text message:', message.text);
+  } else if (isRichCardMessage(message)) {
+    console.log('Rich card:', message.title);
+  }
+}
+```

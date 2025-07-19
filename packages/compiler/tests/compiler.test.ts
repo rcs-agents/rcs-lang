@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 import { CompilerImpl } from '../src/compiler';
 
 describe('CompilerImpl', () => {
   describe('compile', () => {
-    it('should compile valid RCL AST', async () => {
+    test('should compile valid RCL AST', async () => {
       const compiler = new CompilerImpl();
 
       // Simple AST structure
@@ -34,7 +34,7 @@ describe('CompilerImpl', () => {
       }
     });
 
-    it('should handle null AST', async () => {
+    test('should handle null AST', async () => {
       const compiler = new CompilerImpl();
 
       const input = {
@@ -52,7 +52,7 @@ describe('CompilerImpl', () => {
       }
     });
 
-    it('should report missing displayName', async () => {
+    test('should report missing displayName', async () => {
       const compiler = new CompilerImpl();
 
       // AST without displayName
@@ -86,7 +86,7 @@ describe('CompilerImpl', () => {
   });
 
   describe('configuration', () => {
-    it('should use default configuration', () => {
+    test('should use default configuration', () => {
       const compiler = new CompilerImpl();
       const config = compiler.getConfiguration();
 
@@ -94,7 +94,7 @@ describe('CompilerImpl', () => {
       expect(config.strict).toBe(true);
     });
 
-    it('should accept custom configuration', () => {
+    test('should accept custom configuration', () => {
       const customConfig = {
         strict: false,
         allowPartialCompilation: true,

@@ -1,11 +1,11 @@
 import { RCLCompiler } from '@rcs-lang/compiler';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'bun:test';
 
 describe('Empty Output Detection', () => {
   const compiler = new RCLCompiler();
 
   describe('Empty Structure Detection', () => {
-    it('should fail when agent section is empty', async () => {
+    test('should fail when agent section is empty', async () => {
       const emptyAgentRcl = `
 agent EmptyAgent
   # No content in agent
@@ -32,7 +32,7 @@ agent EmptyAgent
       ).toBe(true);
     });
 
-    it('should fail when flows section is empty', async () => {
+    test('should fail when flows section is empty', async () => {
       const emptyFlowsRcl = `
 agent TestAgent
   displayName: "Test"
@@ -56,7 +56,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should fail when messages section is empty', async () => {
+    test('should fail when messages section is empty', async () => {
       const emptyMessagesRcl = `
 agent TestAgent
   displayName: "Test"
@@ -83,7 +83,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should fail when generated JSON would have empty objects', async () => {
+    test('should fail when generated JSON would have empty objects', async () => {
       const minimalRcl = `
 agent MinimalAgent
   displayName: "Minimal"
@@ -106,7 +106,7 @@ agent MinimalAgent
   });
 
   describe('Semantic Validation', () => {
-    it('should require displayName in agent section', async () => {
+    test('should require displayName in agent section', async () => {
       const noDisplayNameRcl = `
 agent TestAgent
   # Missing displayName
@@ -133,7 +133,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should require start state in flow section', async () => {
+    test('should require start state in flow section', async () => {
       const noStartStateRcl = `
 agent TestAgent
   displayName: "Test"
@@ -160,7 +160,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should require at least one state in flow', async () => {
+    test('should require at least one state in flow', async () => {
       const noStatesRcl = `
 agent TestAgent
   displayName: "Test"
@@ -186,7 +186,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should validate that start state actually exists', async () => {
+    test('should validate that start state actually exists', async () => {
       const invalidStartStateRcl = `
 agent TestAgent
   displayName: "Test"
@@ -217,7 +217,7 @@ agent TestAgent
   });
 
   describe('Content Validation', () => {
-    it('should ensure generated output has meaningful content', async () => {
+    test('should ensure generated output has meaningful content', async () => {
       const validRcl = `
 agent ContentAgent
   displayName: "Content Test"
@@ -239,26 +239,25 @@ agent ContentAgent
       const result = await compiler.compileSource(validRcl, 'test.rcl');
 
       if (result.success && result.output) {
-        const jsonOutput = JSON.parse(result.output.json);
+        const jsonOutput = result.output;
 
         // Agent should have displayName
         expect(jsonOutput.agent.displayName).toBe('Content Test');
 
         // Flows should have actual flow data
         expect(Object.keys(jsonOutput.flows)).toContain('MainFlow');
-        expect(jsonOutput.flows.MainFlow.start).toBe('Welcome');
+        expect(jsonOutput.flows.MainFlow.initial).toBe('Welcome');
         expect(jsonOutput.flows.MainFlow.states).toBeDefined();
         expect(Object.keys(jsonOutput.flows.MainFlow.states)).toContain('Welcome');
 
         // Messages should have actual message data
         expect(Object.keys(jsonOutput.messages)).toContain('Welcome');
-        expect(jsonOutput.messages.Welcome.text).toBe('Welcome message');
+        expect(jsonOutput.messages.Welcome.type).toBe('text');
 
-        // JS output should have proper exports
-        expect(result.output.js).toMatch(/export const agent/);
-        expect(result.output.js).toMatch(/export const messages/);
-        expect(result.output.js).toMatch(/export const flows/);
-        expect(result.output.js).not.toMatch(/\{\s*\}/); // Should not have empty objects
+        // Output should not be empty
+        expect(Object.keys(jsonOutput.agent).length).toBeGreaterThan(0);
+        expect(Object.keys(jsonOutput.messages).length).toBeGreaterThan(0);
+        expect(Object.keys(jsonOutput.flows).length).toBeGreaterThan(0);
       } else {
         expect.fail(
           `Valid RCL should compile successfully. Errors: ${JSON.stringify(result.errors)}`,
@@ -266,25 +265,25 @@ agent ContentAgent
       }
     });
 
-    it('should prevent generation of placeholder content', async () => {
+    test('should prevent generation of placeholder content', async () => {
       const result = await compiler.compileSource('invalid content', 'test.rcl');
 
       expect(result.success).toBe(false);
 
       // If somehow output is generated, it should not be placeholder content
       if (result.output) {
-        expect(result.output.json).not.toMatch(
+        const outputStr = JSON.stringify(result.output);
+        expect(outputStr).not.toMatch(
           /\{\s*"agent":\s*\{\s*\}\s*,\s*"messages":\s*\{\s*\}\s*,\s*"flows":\s*\{\s*\}\s*\}/,
         );
-        expect(result.output.js).not.toMatch(/export const agent = \{\}/);
-        expect(result.output.js).not.toMatch(/export const messages = \{\}/);
-        expect(result.output.js).not.toMatch(/export const flows = \{\}/);
+        // Check that sections aren't empty
+        expect(Object.keys(result.output.agent || {}).length).toBeGreaterThan(0);
       }
     });
   });
 
   describe('Cross-Reference Validation', () => {
-    it('should validate state transitions reference existing states', async () => {
+    test('should validate state transitions reference existing states', async () => {
       const invalidTransitionRcl = `
 agent TestAgent
   displayName: "Test"
@@ -314,7 +313,7 @@ agent TestAgent
       ).toBe(true);
     });
 
-    it('should validate message references exist', async () => {
+    test('should validate message references exist', async () => {
       const invalidMessageRefRcl = `
 agent TestAgent
   displayName: "Test"

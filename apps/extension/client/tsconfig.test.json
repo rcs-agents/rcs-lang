@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "types": ["node", "vscode", "vitest/globals"]
-  },
-  "include": ["src/**/*.test.ts"],
-  "exclude": ["node_modules", "out"]
-}

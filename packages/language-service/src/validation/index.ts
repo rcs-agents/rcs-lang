@@ -1,4 +1,4 @@
 // Validation providers will be implemented here
-export * from './SemanticValidator';
-export * from './ImportValidator';
-export * from './ReferenceValidator';
+export * from './SemanticValidator.js';
+export * from './ImportValidator.js';
+export * from './ReferenceValidator.js';

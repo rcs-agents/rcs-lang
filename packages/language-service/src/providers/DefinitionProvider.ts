@@ -20,7 +20,7 @@ export interface Definition {
   symbolName?: string;
 }
 
-import type { Position, TextDocument } from './types';
+import type { Position, TextDocument } from './types.js';
 
 /**
  * Provides "Go to Definition" functionality for RCL files

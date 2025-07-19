@@ -1,11 +1,11 @@
 // Main compiler export
-export * from './compiler';
+export * from './compiler.js';
 
 // Pipeline exports
-export * from './pipeline/compilationPipeline';
+export * from './pipeline/compilationPipeline.js';
 
 // Stage exports
-export * from './stages';
+export * from './stages/index.js';
 
 // Generator exports
-export * from './generators';
+export * from './generators/index.js';

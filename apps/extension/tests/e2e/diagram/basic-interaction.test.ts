@@ -6,7 +6,7 @@ describe('Interactive Diagram Basic Features', () => {
   let workbench: any;
 
   before(async () => {
-    workbench = await browser.getWorkbench();
+    workbench = await (browser as any).getWorkbench();
 
     // Open test file
     await workbench.executeCommand('File: Open File');
@@ -196,7 +196,7 @@ describe('Interactive Diagram Basic Features', () => {
       // Implementation depends on how Sprotty handles edge creation
 
       const sourceNode = await webviewHelpers.getNodeById('GreetingFlow');
-      const rect = await sourceNode.getBoundingClientRect();
+      const rect = await (sourceNode as any).getRect();
 
       // Start drag from edge port
       await browser.performActions([

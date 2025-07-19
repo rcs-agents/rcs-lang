@@ -1,6 +1,6 @@
 import type { RclFile } from '@rcs-lang/ast';
-import type { Diagnostic } from './diagnostics';
-import type { Result } from './result';
+import type { Diagnostic } from './diagnostics.js';
+import type { Result } from './result.js';
 
 /**
  * Parser adapter interface - converts parser-specific trees to common AST

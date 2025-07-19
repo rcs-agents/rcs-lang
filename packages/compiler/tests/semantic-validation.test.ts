@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, test } from 'bun:test';
 import { RCLCompiler } from '../src/compiler';
 import { CompilationPipeline } from '../src/pipeline/compilationPipeline';
 import { ParseStage, TransformStage, ValidateStage } from '../src/stages';
@@ -17,7 +17,7 @@ describe('Semantic Validation', () => {
   });
 
   describe('Context Variable Requirements', () => {
-    it('should parse context variables without syntax errors', async () => {
+    test('should parse context variables without syntax errors', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"
@@ -54,7 +54,7 @@ flow MainFlow
       expect(result.success).toBe(true);
     });
 
-    it.skip('should validate that states using @next require next parameter', async () => {
+    test.skip('should validate that states using @next require next parameter', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"
@@ -101,7 +101,7 @@ flow MainFlow
       expect(missingNextError).toBeDefined();
     });
 
-    it.skip('should accept states with required context variables when provided', async () => {
+    test.skip('should accept states with required context variables when provided', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"
@@ -140,7 +140,7 @@ flow MainFlow
       expect(result.output).toBeDefined();
     });
 
-    it.skip('should validate context variable usage in messages', async () => {
+    test.skip('should validate context variable usage in messages', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"
@@ -179,7 +179,7 @@ messages Messages
       expect(result.output).toBeDefined(); // Should still compile
     });
 
-    it.skip('should track context variables through flow transitions', async () => {
+    test.skip('should track context variables through flow transitions', async () => {
       const input = `
 agent CoffeeShop
   displayName: "Coffee Shop"
@@ -234,7 +234,7 @@ messages Messages
   });
 
   describe('State Flow Validation', () => {
-    it.skip('should validate that all referenced states exist', async () => {
+    test.skip('should validate that all referenced states exist', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"
@@ -269,7 +269,7 @@ flow MainFlow
       expect(stateNotFoundError).toBeDefined();
     });
 
-    it.skip('should validate message references', async () => {
+    test.skip('should validate message references', async () => {
       const input = `
 agent TestAgent
   displayName: "Test Agent"

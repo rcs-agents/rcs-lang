@@ -552,8 +552,8 @@ export class AgentExtractor {
     this.traverseAST(node, (child) => {
       // Debug logging
       if (child.type?.includes('shortcut') || child.type === 'agent_message') {
-        console.log(`[DEBUG] Found message node type: ${child.type}`);
-        console.log(`[DEBUG] Node text: ${child.text?.substring(0, 100)}`);
+        // console.log(`[DEBUG] Found message node type: ${child.type}`);
+        // console.log(`[DEBUG] Node text: ${child.text?.substring(0, 100)}`);
       }
 
       // Handle all shortcut types
@@ -564,7 +564,7 @@ export class AgentExtractor {
         child.type === 'file_shortcut'
       ) {
         const messageId = this.extractMessageIdFromShortcut(child);
-        console.log(`[DEBUG] Extracted message ID from ${child.type}: ${messageId}`);
+        // console.log(`[DEBUG] Extracted message ID from ${child.type}: ${messageId}`);
         if (messageId && !messageIds.includes(messageId)) {
           messageIds.push(messageId);
         }
@@ -572,14 +572,14 @@ export class AgentExtractor {
 
       if (child.type === 'agent_message') {
         const messageId = this.extractMessageIdFromAgentMessage(child);
-        console.log(`[DEBUG] Extracted message ID from agent_message: ${messageId}`);
+        // console.log(`[DEBUG] Extracted message ID from agent_message: ${messageId}`);
         if (messageId && !messageIds.includes(messageId)) {
           messageIds.push(messageId);
         }
       }
     });
 
-    console.log(`[DEBUG] Total message IDs found: ${messageIds.length}`, messageIds);
+    // console.log(`[DEBUG] Total message IDs found: ${messageIds.length}`, messageIds);
     return messageIds;
   }
 

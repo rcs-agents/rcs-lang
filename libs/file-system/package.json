@@ -1,22 +1,27 @@
 {
   "name": "@rcs-lang/file-system",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "description": "File system abstraction for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "moon run file-system:build",
+    "dev": "moon run file-system:dev",
+    "test": "moon run file-system:test",
+    "test:watch": "moon run file-system:test-watch",
+    "test:coverage": "moon run file-system:test-coverage",
+    "typecheck": "moon run file-system:typecheck",
+    "clean": "moon run file-system:clean",
+    "lint": "moon run file-system:lint",
+    "format": "moon run file-system:format"
   },
   "dependencies": {
     "@rcs-lang/core": "file:../core"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^3.2.4"
+    "typescript": "^5.0.0"
   }
 }

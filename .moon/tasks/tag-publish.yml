@@ -1,0 +1,32 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  prepublish:
+    deps:
+      - build
+      - test
+      - typecheck
+    platform: node
+
+  publish:
+    command: bunx
+    args:
+      - npm
+      - publish
+      - --access
+      - public
+    deps:
+      - prepublish
+    platform: node
+    local: true
+
+  publish-dry:
+    command: bunx
+    args:
+      - npm
+      - publish
+      - --dry-run
+    deps:
+      - prepublish
+    platform: node
+    local: true

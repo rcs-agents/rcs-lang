@@ -30,7 +30,7 @@ import type {
   TypeTag,
   Value,
   Variable,
-} from './ast';
+} from './ast.js';
 
 // Type guard helper
 function hasType<T extends { type: string }>(obj: any, type: string): obj is T {

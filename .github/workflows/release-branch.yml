@@ -1,0 +1,272 @@
+name: Release from Branch
+
+on:
+  push:
+    branches:
+      - release
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  BUN_VERSION: 1.2.18
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      should_release: ${{ steps.check.outputs.should_release }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Check if tag exists
+        id: check
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ steps.version.outputs.version }} already exists"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "Tag v${{ steps.version.outputs.version }} does not exist, proceeding with release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+  create-release:
+    needs: determine-version
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+          
+      - name: Setup Java 17 (for ANTLR)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Install dependencies
+        run: bun install
+        
+      - name: Build all packages
+        run: moon run :build
+        
+      - name: Run tests
+        run: moon run :test
+        
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          echo "## What's Changed" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          
+          if [ -n "$PREV_TAG" ]; then
+            # Get commits since last tag
+            git log --pretty=format:"* %s (%an)" "$PREV_TAG"..HEAD >> RELEASE_NOTES.md
+          else
+            # First release
+            echo "Initial release of RCL packages" >> RELEASE_NOTES.md
+          fi
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...v${{ needs.determine-version.outputs.version }}" >> RELEASE_NOTES.md
+          
+      - name: Create and push tag
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git tag -a "v${{ needs.determine-version.outputs.version }}" -m "Release v${{ needs.determine-version.outputs.version }}"
+          git push origin "v${{ needs.determine-version.outputs.version }}"
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.determine-version.outputs.version }}
+          name: Release v${{ needs.determine-version.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+
+  publish-npm:
+    needs: [determine-version, create-release]
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - { name: '@rcs-lang/ast', path: 'packages/ast' }
+          - { name: '@rcs-lang/compiler', path: 'packages/compiler' }
+          - { name: '@rcs-lang/csm', path: 'packages/csm' }
+          - { name: '@rcs-lang/language-service', path: 'packages/language-service' }
+          - { name: '@rcs-lang/cli', path: 'apps/cli' }
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.determine-version.outputs.version }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+          
+      - name: Install dependencies
+        run: bun install
+        
+      - name: Build package
+        run: |
+          cd ${{ matrix.path }}
+          moon run build
+          
+      - name: Check if package should be published
+        id: should_publish
+        run: |
+          cd ${{ matrix.path }}
+          if ! grep -q '"private": true' package.json; then
+            echo "publish=true" >> $GITHUB_OUTPUT
+          else
+            echo "publish=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Publish to NPM
+        if: steps.should_publish.outputs.publish == 'true'
+        run: |
+          cd ${{ matrix.path }}
+          
+          # Check if this version already exists
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version 2>/dev/null; then
+            echo "Version $PACKAGE_VERSION of $PACKAGE_NAME already published, skipping..."
+            exit 0
+          fi
+          
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-vscode:
+    needs: [determine-version, create-release]
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.determine-version.outputs.version }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+          
+      - name: Install dependencies
+        run: bun install
+        
+      - name: Build extension
+        run: |
+          cd apps/extension
+          moon run build
+          
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+        
+      - name: Package extension
+        run: |
+          cd apps/extension
+          vsce package
+          
+      - name: Publish to VSCode Marketplace
+        run: |
+          cd apps/extension
+          vsce publish --pat ${{ secrets.VSCODE_PUBLISH_TOKEN }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCODE_PUBLISH_TOKEN }}
+          
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension-${{ needs.determine-version.outputs.version }}
+          path: apps/extension/*.vsix
+
+  sync-to-main:
+    needs: [determine-version, create-release]
+    if: needs.determine-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: release
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Sync tag to main branch
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Fetch main branch
+          git fetch origin main:main
+          
+          # Get the tag we just created
+          TAG="v${{ needs.determine-version.outputs.version }}"
+          
+          # Get the commit SHA the tag points to
+          TAG_COMMIT=$(git rev-list -n 1 $TAG)
+          
+          # Switch to main branch
+          git checkout main
+          
+          # Create the same tag on main
+          git tag -a "$TAG" -m "Release $TAG" $TAG_COMMIT || echo "Tag already exists on main"
+          
+          # Push the tag to main
+          git push origin main --tags

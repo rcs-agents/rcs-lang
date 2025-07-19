@@ -1,15 +1,21 @@
 {
   "name": "@rcs-lang/validation",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
   "description": "Validation pipeline for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "moon run validation:build",
+    "dev": "moon run validation:dev",
+    "test": "moon run validation:test",
+    "test:watch": "moon run validation:test-watch",
+    "test:coverage": "moon run validation:test-coverage",
+    "typecheck": "moon run validation:typecheck",
+    "clean": "moon run validation:clean",
+    "lint": "moon run validation:lint",
+    "format": "moon run validation:format"
   },
   "dependencies": {
     "@rcs-lang/core": "workspace:*",

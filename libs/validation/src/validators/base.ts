@@ -1,4 +1,4 @@
-import { type Diagnostic, type Result, ok } from '@rcs-lang/core';
+import { type Diagnostic, type Result, ok, RCLError, errorToDiagnostic } from '@rcs-lang/core';
 import type { IASTNode, IValidationContext, IValidationResult, IValidator } from '@rcs-lang/core';
 
 /**
@@ -72,5 +72,15 @@ export abstract class BaseValidator implements IValidator {
       source: this.name,
       range: (node as any)?.location?.range,
     };
+  }
+
+  /**
+   * Helper to create a diagnostic from an RCL error
+   */
+  protected createDiagnosticFromError(error: RCLError): Diagnostic {
+    const diagnostic = errorToDiagnostic(error);
+    // Override source to be this validator
+    diagnostic.source = this.name;
+    return diagnostic;
   }
 }

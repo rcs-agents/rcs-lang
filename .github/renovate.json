@@ -1,0 +1,74 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "timezone": "UTC",
+  "schedule": ["before 4am on monday"],
+  "labels": ["dependencies"],
+  "assignees": ["@saulovallory"],
+  "reviewers": ["@saulovallory"],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageExtra": "to {{newVersion}}",
+  "prTitle": "chore(deps): update {{depName}} to {{newVersion}}",
+  "prBodyTemplate": "This PR updates {{depName}} from {{currentVersion}} to {{newVersion}}.\n\n{{#if hasReleaseNotes}}{{releaseNotes}}{{/if}}",
+  "semanticCommits": "enabled",
+  "separateMinorPatch": true,
+  "separateMultipleMajor": true,
+  "separateMajorMinor": true,
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true,
+      "schedule": ["before 4am on monday"]
+    },
+    {
+      "matchPackageNames": ["@types/**"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["node", "npm", "bun"],
+      "enabled": false
+    },
+    {
+      "matchPackagePatterns": ["^@rcs-lang/"],
+      "groupName": "rcs-lang packages",
+      "schedule": ["at any time"]
+    },
+    {
+      "matchPackageNames": ["typescript", "@typescript-eslint/**"],
+      "groupName": "typescript",
+      "schedule": ["before 4am on monday"]
+    },
+    {
+      "matchPackageNames": ["vitest", "@vitest/**"],
+      "groupName": "vitest",
+      "schedule": ["before 4am on monday"]
+    },
+    {
+      "matchPackageNames": ["antlr4", "antlr4ts"],
+      "groupName": "antlr",
+      "schedule": ["before 4am on monday"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "assignees": ["@saulovallory"],
+    "schedule": ["at any time"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 4am on monday"],
+    "commitMessageAction": "update lockfile"
+  },
+  "rangeStrategy": "bump",
+  "bumpVersion": "patch"
+}

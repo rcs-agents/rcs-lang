@@ -1,14 +1,14 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { IParser } from '@rcs-lang/core';
-import { ProjectRootDetector } from './projectRoot';
+import { ProjectRootDetector } from './projectRoot.js';
 import {
   type ExportedSymbol,
   type ImportResolverConfig,
   type ImportStatement,
   type ResolvedImport,
   SymbolType,
-} from './types';
+} from './types.js';
 
 /**
  * Handles import resolution for RCL files

@@ -47,14 +47,18 @@ export function parseRcl(source: string) {
 }
 
 // Export the main parser class
-export { AntlrRclParser } from './parser';
-export { AntlrRclParser as RCLParser } from './parser'; // Alias for compatibility
+export { AntlrRclParser } from './parser.js';
+export { AntlrRclParser as RCLParser } from './parser.js'; // Alias for compatibility
 
 // Import for factory
-import { AntlrRclParser } from './parser';
+import { AntlrRclParser } from './parser.js';
 
 // Export parser adapter
-export { AntlrAdapter } from './adapter';
+export { AntlrAdapter } from './adapter.js';
+
+// Export symbol extractor
+export { RclSymbolExtractor } from './symbol-extractor.js';
+export type { SymbolExtractorOptions } from './symbol-extractor.js';
 
 // Export generated classes
 export { RclLexer, RclParser };

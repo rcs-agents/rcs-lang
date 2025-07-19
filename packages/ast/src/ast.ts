@@ -8,7 +8,7 @@
  * that the parsed AST is a faithful representation of the source code's structure.
  */
 
-import type { WithLocation } from './position';
+import type { WithLocation } from './position.js';
 
 // #region Core Interfaces
 

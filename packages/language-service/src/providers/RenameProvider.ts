@@ -4,8 +4,8 @@ import type { Position, Range, TextDocument } from 'vscode-languageserver-textdo
 import { URI } from 'vscode-uri';
 import type { ImportResolver } from '../import-resolver';
 import type { WorkspaceIndex } from '../workspace-index';
-import type { DefinitionProvider } from './DefinitionProvider';
-import type { ReferencesProvider } from './ReferencesProvider';
+import type { DefinitionProvider } from './DefinitionProvider.js';
+import type { ReferencesProvider } from './ReferencesProvider.js';
 
 export interface RenameResult {
   range: Range | null;

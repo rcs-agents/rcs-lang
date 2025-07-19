@@ -1,12 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { browser } from '@wdio/globals';
-import { expect } from 'chai';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as webviewHelpers from '../utils/webviewHelpers';
 
+// Use global expect from Jest/browser environment
+declare const expect: any;
+
 // Add custom matcher
-expect.extend({ toMatchImageSnapshot });
+if (expect && expect.extend) {
+  expect.extend({ toMatchImageSnapshot });
+}
 
 describe('Visual Regression Tests', () => {
   let workbench: any;
@@ -18,7 +22,7 @@ describe('Visual Regression Tests', () => {
       fs.mkdirSync(screenshotDir, { recursive: true });
     }
 
-    workbench = await browser.getWorkbench();
+    workbench = await (browser as any).getWorkbench();
   });
 
   after(async () => {
@@ -51,7 +55,7 @@ describe('Visual Regression Tests', () => {
 
         // Take screenshot
         const diagram = await $('#sprotty-diagram');
-        const screenshot = await diagram.saveScreenshot();
+        const screenshot = await browser.takeScreenshot();
 
         // Compare with baseline
         expect(screenshot).toMatchImageSnapshot({
@@ -105,7 +109,7 @@ describe('Visual Regression Tests', () => {
 
         // Take screenshot
         const diagram = await $('#sprotty-diagram');
-        const screenshot = await diagram.saveScreenshot();
+        const screenshot = await browser.takeScreenshot();
 
         expect(screenshot).toMatchImageSnapshot({
           customSnapshotIdentifier: `diagram-theme-${theme.name.toLowerCase()}`,
@@ -163,7 +167,7 @@ describe('Visual Regression Tests', () => {
 
       // Take screenshot of selected state
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-node-selected',
@@ -182,7 +186,7 @@ describe('Visual Regression Tests', () => {
 
       // Take screenshot of hover state
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-node-hover',
@@ -202,7 +206,7 @@ describe('Visual Regression Tests', () => {
       // Take screenshot of synchronized state
       await webviewHelpers.waitForDiagram();
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-node-synchronized',
@@ -245,7 +249,7 @@ describe('Visual Regression Tests', () => {
       await svg.moveTo();
       await browser.pause(500);
 
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-edge-labels',
@@ -258,7 +262,7 @@ describe('Visual Regression Tests', () => {
     it('should show edge creation preview', async () => {
       // Start creating an edge
       const sourceNode = await webviewHelpers.getNodeById('GreetingFlow');
-      const rect = await sourceNode.getBoundingClientRect();
+      const rect = await (sourceNode as any).getRect();
 
       await browser.performActions([
         {
@@ -286,7 +290,7 @@ describe('Visual Regression Tests', () => {
 
       // Take screenshot with edge preview
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       // Cancel edge creation
       await browser.performActions([
@@ -337,7 +341,7 @@ describe('Visual Regression Tests', () => {
 
       // Take screenshot
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-layout-reset',
@@ -371,7 +375,7 @@ describe('Visual Regression Tests', () => {
 
       // Take screenshot showing error states
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-error-states',
@@ -418,7 +422,7 @@ describe('Visual Regression Tests', () => {
       }
 
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-zoomed-in',
@@ -438,7 +442,7 @@ describe('Visual Regression Tests', () => {
       }
 
       const diagram = await $('#sprotty-diagram');
-      const screenshot = await diagram.saveScreenshot();
+      const screenshot = await browser.takeScreenshot();
 
       expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: 'diagram-zoomed-out',

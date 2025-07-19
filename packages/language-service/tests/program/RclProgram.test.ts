@@ -46,8 +46,11 @@ describe('RclProgram', () => {
   flow MainFlow
     start: Welcome
     
+    on Welcome
+      -> Welcome
+    
   messages Messages
-    Welcome: "Hello, welcome to TravelBot!"`;
+    text Welcome "Hello, welcome to TravelBot!"`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -88,8 +91,11 @@ describe('RclProgram', () => {
   flow MainFlow
     start: Welcome
     
+    on Welcome
+      -> Welcome
+    
   messages Messages
-    Welcome: "Hello!"`;
+    text Welcome "Hello!"`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -110,11 +116,13 @@ describe('RclProgram', () => {
   displayName "Missing colon"
   
   flow MainFlow
-    start: end
+    start: Welcome
+    
+    on Welcome
+      -> Welcome
   
   messages Messages
-    Welcome:
-      text: "Hello!"`;
+    text Welcome "Hello!"`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -138,8 +146,11 @@ describe('RclProgram', () => {
   flow MainFlow
     start: Welcome
     
+    on Welcome
+      -> Welcome
+    
   messages Messages
-    Welcome: "Hello!"`;
+    text Welcome "Hello!"`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -192,8 +203,11 @@ describe('RclProgram', () => {
   flow MainFlow
     start: Welcome
     
+    on Welcome
+      -> Welcome
+    
   messages Messages
-    Welcome: "Hello!"`;
+    text Welcome "Hello!"`;
 
       const rclPath = path.join(testDir, 'agent.rcl');
       fs.writeFileSync(rclPath, rclContent);
@@ -217,10 +231,13 @@ describe('RclProgram', () => {
         file1,
         `agent Bot1
   flow MainFlow
-    start: end
+    start: Hello
+    
+    on Hello
+      -> Hello
     
   messages Messages
-    Hello: "Hi"`,
+    text Hello "Hi"`,
       );
 
       // File with parse error
@@ -231,10 +248,13 @@ describe('RclProgram', () => {
   displayName "Missing colon"
   
   flow MainFlow
-    start: end
+    start: Hello
+    
+    on Hello
+      -> Hello
     
   messages Messages
-    Hello: "Hi"`,
+    text Hello "Hi"`,
       );
 
       await program.addSourceFile(file1);

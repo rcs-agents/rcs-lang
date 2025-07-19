@@ -1,9 +1,10 @@
 {
   "name": "@rcs-lang/compiler",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Compilation pipeline for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -13,11 +14,15 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "moon run compiler:build",
+    "dev": "moon run compiler:dev",
+    "test": "moon run compiler:test",
+    "test:watch": "moon run compiler:test-watch",
+    "test:coverage": "moon run compiler:test-coverage",
+    "typecheck": "moon run compiler:typecheck",
+    "clean": "moon run compiler:clean",
+    "lint": "moon run compiler:lint",
+    "format": "moon run compiler:format"
   },
   "dependencies": {
     "@rcs-lang/core": "workspace:*",
@@ -28,7 +33,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^3.2.4"
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

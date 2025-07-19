@@ -1,0 +1,35 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  test-coverage:
+    command: bun
+    args:
+      - test
+      - --coverage
+    platform: system
+    options:
+      runFromWorkspaceRoot: false
+    
+  coverage-report:
+    command: bun
+    args:
+      - test
+      - --coverage
+      - --coverage-reporter
+      - html
+    platform: system
+    options:
+      runFromWorkspaceRoot: false
+
+  coverage-ci:
+    command: bun
+    args:
+      - test
+      - --coverage
+      - --coverage-reporter
+      - lcov
+      - --coverage-reporter
+      - json-summary
+    platform: system
+    options:
+      runFromWorkspaceRoot: false

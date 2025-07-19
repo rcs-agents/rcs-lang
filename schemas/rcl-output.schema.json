@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcl-lang.org/schemas/rcl-output.schema.json",
+  "title": "RCL Compilation Output",
+  "description": "Schema for RCL compiler output combining agent configuration, conversation flows, and messages",
+  "type": "object",
+  "required": ["agent", "flows", "messages"],
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "$ref": "#/definitions/agentOutput",
+      "description": "Agent configuration and metadata"
+    },
+    "flows": {
+      "type": "object",
+      "description": "Dictionary of conversation flows, keyed by flow ID",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "$ref": "https://rcl-lang.org/schemas/csm/machine-definition.schema.json"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "messages": {
+      "type": "object",
+      "description": "Dictionary of agent messages, keyed by message ID",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "$ref": "#/definitions/messageOutput"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    }
+  },
+  "definitions": {
+    "agentOutput": {
+      "type": "object",
+      "description": "Combined agent configuration based on agent-config.schema.json but flattened for RCL output",
+      "required": ["displayName"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the agent (from RCL agent declaration)"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Required. The name that the agent displays to users"
+        },
+        "brandName": {
+          "type": "string",
+          "description": "The name of the brand associated with the agent"
+        },
+        "config": {
+          "type": "object",
+          "description": "RCS Business Messaging agent configuration",
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Description of the agent"
+            },
+            "logoUri": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI for the agent's logo"
+            },
+            "heroUri": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI for the agent's hero image"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "description": "Brand color in hex format"
+            },
+            "phoneNumber": {
+              "type": "string",
+              "description": "Phone number in E.164 format"
+            },
+            "phoneLabel": {
+              "type": "string",
+              "description": "Label for the phone number"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "Email address"
+            },
+            "emailLabel": {
+              "type": "string",
+              "description": "Label for the email address"
+            },
+            "website": {
+              "type": "string",
+              "format": "uri",
+              "description": "Website URL"
+            },
+            "websiteLabel": {
+              "type": "string",
+              "description": "Label for the website"
+            },
+            "address": {
+              "type": "string",
+              "description": "Physical address of the business"
+            },
+            "openingHours": {
+              "type": "string",
+              "description": "Business opening hours"
+            },
+            "agentUseCase": {
+              "type": "string",
+              "enum": ["AGENT_USE_CASE_UNSPECIFIED", "TRANSACTIONAL", "PROMOTIONAL", "OTP", "MULTI_USE"],
+              "description": "Agent use case type"
+            },
+            "hostingRegion": {
+              "type": "string",
+              "enum": ["HOSTING_REGION_UNSPECIFIED", "NORTH_AMERICA", "EUROPE", "ASIA_PACIFIC"],
+              "description": "Hosting region for the agent"
+            }
+          }
+        },
+        "defaults": {
+          "type": "object",
+          "description": "Default values and settings for the agent",
+          "additionalProperties": true,
+          "properties": {
+            "messageTrafficType": {
+              "type": "string",
+              "enum": ["MESSAGE_TRAFFIC_TYPE_UNSPECIFIED", "AUTHENTICATION", "TRANSACTION", "PROMOTION", "SERVICEREQUEST", "ACKNOWLEDGEMENT"],
+              "description": "Default message traffic type"
+            },
+            "fallbackMessage": {
+              "type": "string",
+              "description": "Default fallback message for unrecognized input"
+            },
+            "postbackData": {
+              "type": "string",
+              "description": "Template for generating postback data from suggestion text"
+            }
+          }
+        }
+      }
+    },
+    "messageOutput": {
+      "type": "object",
+      "description": "Simplified message structure for RCL output, based on agent-message.schema.json",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "richCard", "carousel"],
+          "description": "Type of message content"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "UTF-8 encoded text content. Required for text messages."
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Title for rich cards and carousels"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Description for rich cards"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["small", "medium", "large", "compact"],
+          "description": "Size specification for rich cards and carousels"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/suggestionOutput"
+          },
+          "maxItems": 11,
+          "description": "List of suggested replies and actions. Maximum 11 suggestions."
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cardOutput"
+          },
+          "minItems": 2,
+          "maxItems": 10,
+          "description": "Cards for carousel messages. Required for carousel type."
+        },
+        "messageTrafficType": {
+          "type": "string",
+          "enum": ["MESSAGE_TRAFFIC_TYPE_UNSPECIFIED", "AUTHENTICATION", "TRANSACTION", "PROMOTION", "SERVICEREQUEST", "ACKNOWLEDGEMENT"],
+          "description": "Message traffic type. If not specified, uses agent default."
+        },
+        "ttl": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]{1,9})?s$",
+          "description": "Message time-to-live in seconds"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "text" } }
+          },
+          "then": {
+            "required": ["text"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "richCard" } }
+          },
+          "then": {
+            "required": ["title"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "carousel" } }
+          },
+          "then": {
+            "required": ["title", "cards"]
+          }
+        }
+      ]
+    },
+    "suggestionOutput": {
+      "type": "object",
+      "description": "Simplified suggestion structure for RCL output",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["reply", "action"],
+          "description": "Type of suggestion"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 25,
+          "description": "Text displayed to the user"
+        },
+        "postbackData": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "Data sent back when suggestion is tapped. Auto-generated if not specified."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "description": "URL for action suggestions"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Phone number for dial actions"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "action" } }
+          },
+          "then": {
+            "anyOf": [
+              { "required": ["url"] },
+              { "required": ["phoneNumber"] }
+            ]
+          }
+        }
+      ]
+    },
+    "cardOutput": {
+      "type": "object",
+      "description": "Card structure for carousel messages",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Title of the card"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Description of the card"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/suggestionOutput"
+          },
+          "maxItems": 4,
+          "description": "Suggestions specific to this card. Maximum 4 suggestions."
+        }
+      }
+    }
+  }
+}

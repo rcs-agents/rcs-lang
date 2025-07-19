@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { RclCompilerOptions, RclConfig, RclConfigLoadResult } from './types';
+import type { RclCompilerOptions, RclConfig, RclConfigLoadResult } from './types.js';
 
 const CONFIG_FILE_NAME = 'rcl.config.json';
 

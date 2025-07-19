@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type MachineDefinitionJSON } from '../src';
 
 describe('Error Handling', () => {
@@ -15,7 +16,7 @@ describe('Error Handling', () => {
     },
   });
 
-  it('should handle adding duplicate flows', () => {
+  test('should handle adding duplicate flows', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),
@@ -26,7 +27,7 @@ describe('Error Handling', () => {
     expect(() => agent.addFlow(createTestFlow())).toThrow("Flow with ID 'TestFlow' already exists");
   });
 
-  it('should handle removing active flow', () => {
+  test('should handle removing active flow', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),
@@ -37,7 +38,7 @@ describe('Error Handling', () => {
     expect(() => agent.removeFlow('TestFlow')).toThrow('Cannot remove the currently active flow');
   });
 
-  it('should handle invalid state transitions', () => {
+  test('should handle invalid state transitions', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),
@@ -50,7 +51,7 @@ describe('Error Handling', () => {
     );
   });
 
-  it('should handle invalid machine transitions', async () => {
+  test('should handle invalid machine transitions', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'MainFlow',
       initial: 'Start',
@@ -75,7 +76,7 @@ describe('Error Handling', () => {
     );
   });
 
-  it('should handle errors in condition evaluation', async () => {
+  test('should handle errors in condition evaluation', async () => {
     const flow: MachineDefinitionJSON = {
       id: 'ConditionFlow',
       initial: 'Start',
@@ -110,7 +111,7 @@ describe('Error Handling', () => {
     expect(result.state).toBe('Fallback');
   });
 
-  it('should call error handler for various operations', async () => {
+  test('should call error handler for various operations', async () => {
     const errors: Array<{ error: Error; context: any }> = [];
     const errorHandler = vi.fn((error, context) => {
       errors.push({ error, context });
@@ -144,10 +145,10 @@ describe('Error Handling', () => {
     agent2.addFlow(createTestFlow());
 
     // Error handler should be called
-    expect(errorHandler).toHaveBeenCalled();
+    expect(errorHandler.calls.length).toBeGreaterThan(0);
   });
 
-  it('should handle deserialization errors', () => {
+  test('should handle deserialization errors', () => {
     // Invalid base64
     expect(() =>
       ConversationalAgent.fromURLHash('invalid!@#$', {
@@ -177,7 +178,7 @@ describe('Error Handling', () => {
     ).toThrow('Invalid state structure');
   });
 
-  it('should provide detailed error context', async () => {
+  test('should provide detailed error context', async () => {
     let capturedContext: any;
     const errorHandler = vi.fn((error, context) => {
       capturedContext = context;
@@ -199,7 +200,7 @@ describe('Error Handling', () => {
     agent.addFlow(createTestFlow());
     await agent.processInput('next');
 
-    expect(errorHandler).toHaveBeenCalled();
+    expect(errorHandler.calls.length).toBeGreaterThan(0);
     expect(capturedContext).toBeDefined();
     expect(capturedContext.agent).toBe('ContextBot');
     expect(capturedContext.machine).toBe('TestFlow');
@@ -208,7 +209,7 @@ describe('Error Handling', () => {
     expect(capturedContext.context.userId).toBe('123');
   });
 
-  it('should continue operation after handled errors', async () => {
+  test('should continue operation after handled errors', async () => {
     let errorCount = 0;
     const agent = new ConversationalAgent({
       id: 'RecoveryBot',

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { FlowCompiler } from '../src/legacy/compilers/flowCompiler';
 import { AgentExtractor } from '../src/legacy/extractors/agentExtractor';
 import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';
@@ -164,7 +164,7 @@ describe('End-to-End CLI Integration', () => {
   });
 
   describe('Complete Compilation Pipeline', () => {
-    it('should compile a complete RCL agent with messages and flows', () => {
+    test('should compile a complete RCL agent with messages and flows', () => {
       const mockAST = createRealisticMockAST() as any;
 
       // Step 1: Extract agent configuration
@@ -205,13 +205,13 @@ describe('End-to-End CLI Integration', () => {
       expect(agentConfig?.messages).toContain('MsgWelcome');
       expect(agentConfig?.messages).toContain('MsgCircularWorld');
 
-      console.log('Compilation Results:');
-      console.log('Agent Config:', JSON.stringify(agentConfig, null, 2));
-      console.log('Messages:', Object.keys(messages));
-      console.log('Flows:', Object.keys(flows));
+      // console.log('Compilation Results:');
+      // console.log('Agent Config:', JSON.stringify(agentConfig, null, 2));
+      // console.log('Messages:', Object.keys(messages));
+      // console.log('Flows:', Object.keys(flows));
     });
 
-    it('should handle schema validation throughout compilation', () => {
+    test('should handle schema validation throughout compilation', () => {
       const mockAST = createRealisticMockAST() as any;
 
       // Extract everything
@@ -239,7 +239,7 @@ describe('End-to-End CLI Integration', () => {
       });
     });
 
-    it('should create coherent conversation flow', () => {
+    test('should create coherent conversation flow', () => {
       const mockAST = createRealisticMockAST() as any;
 
       const messages = messageNormalizer.extractAndNormalize(mockAST);
@@ -270,7 +270,7 @@ describe('End-to-End CLI Integration', () => {
   });
 
   describe('Real File Processing', () => {
-    it('should handle realistic.rcl file structure if available', () => {
+    test('should handle realistic.rcl file structure if available', () => {
       const realisticPath = path.join(__dirname, '../../../examples/realistic-fixed.rcl');
 
       if (fs.existsSync(realisticPath)) {
@@ -299,7 +299,7 @@ describe('End-to-End CLI Integration', () => {
       }
     });
 
-    it('should process realistic.rcl with mock parser if available', () => {
+    test('should process realistic.rcl with mock parser if available', () => {
       // This would be the integration test with actual parser
       // For now, we simulate the expected structure
 
@@ -338,7 +338,7 @@ describe('End-to-End CLI Integration', () => {
   });
 
   describe('Error Handling and Edge Cases', () => {
-    it('should handle incomplete RCL files gracefully', () => {
+    test('should handle incomplete RCL files gracefully', () => {
       const incompleteAST = {
         type: 'source_file',
         children: [
@@ -365,7 +365,7 @@ describe('End-to-End CLI Integration', () => {
       }).not.toThrow();
     });
 
-    it('should handle RCL with only messages (no flows)', () => {
+    test('should handle RCL with only messages (no flows)', () => {
       const messagesOnlyAST = {
         type: 'source_file',
         children: [
@@ -397,7 +397,7 @@ describe('End-to-End CLI Integration', () => {
       expect(Object.keys(flows)).toHaveLength(0); // No flows
     });
 
-    it('should handle RCL with only flows (no messages)', () => {
+    test('should handle RCL with only flows (no messages)', () => {
       const flowsOnlyAST = {
         type: 'source_file',
         children: [
@@ -443,7 +443,7 @@ describe('End-to-End CLI Integration', () => {
   });
 
   describe('Performance and Scalability', () => {
-    it('should handle large RCL files efficiently', () => {
+    test('should handle large RCL files efficiently', () => {
       // Create a large mock AST with many components
       const largeAST: any = {
         type: 'source_file',
@@ -512,12 +512,12 @@ describe('End-to-End CLI Integration', () => {
       expect(Object.keys(flows)).toHaveLength(20);
       expect(agentConfig?.messages).toHaveLength(100);
 
-      console.log(`Compiled 100 messages and 20 flows in ${compilationTime}ms`);
+      // console.log(`Compiled 100 messages and 20 flows in ${compilationTime}ms`);
     });
   });
 
   describe('Output Validation', () => {
-    it('should produce JSON-serializable output', () => {
+    test('should produce JSON-serializable output', () => {
       const mockAST = createRealisticMockAST() as any;
 
       const agentConfig = agentExtractor.extractAgentConfig(mockAST);
@@ -539,7 +539,7 @@ describe('End-to-End CLI Integration', () => {
       expect(flowsJSON.length).toBeGreaterThan(100);
     });
 
-    it('should create valid compilation manifest', () => {
+    test('should create valid compilation manifest', () => {
       const mockAST = createRealisticMockAST() as any;
 
       const agentConfig = agentExtractor.extractAgentConfig(mockAST);
@@ -568,11 +568,11 @@ describe('End-to-End CLI Integration', () => {
       // Should be JSON serializable
       expect(() => JSON.stringify(manifest)).not.toThrow();
 
-      console.log('Compilation manifest created:', {
-        agent: manifest.agent?.name,
-        messageCount: manifest.metadata.messageCount,
-        flowCount: manifest.metadata.flowCount,
-      });
+      // console.log('Compilation manifest created:', {
+      //   agent: manifest.agent?.name,
+      //   messageCount: manifest.metadata.messageCount,
+      //   flowCount: manifest.metadata.flowCount,
+      // });
     });
   });
 });

@@ -1,0 +1,23 @@
+# Build output
+dist/
+*.vsix
+
+# VS Code test artifacts
+.vscode-test/
+test-results/
+test-coverage/
+
+# Test workspace
+.test-workspace/
+
+# Node modules (should be inherited from parent, but just in case)
+node_modules/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local

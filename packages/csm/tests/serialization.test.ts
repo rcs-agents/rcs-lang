@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { vi } from './test-utils';
+import { describe, expect, test } from 'bun:test';
 import { ConversationalAgent, type MachineDefinitionJSON } from '../src';
 
 describe('Serialization', () => {
@@ -18,7 +19,7 @@ describe('Serialization', () => {
     },
   });
 
-  it('should generate URL-safe hash', () => {
+  test('should generate URL-safe hash', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),
@@ -34,7 +35,7 @@ describe('Serialization', () => {
     expect(hash).toMatch(/^[A-Za-z0-9_-]+$/); // Only URL-safe chars
   });
 
-  it('should restore complete state from hash', async () => {
+  test('should restore complete state from hash', async () => {
     const onStateChange = vi.fn();
     const originalAgent = new ConversationalAgent({
       id: 'TestBot',
@@ -74,7 +75,7 @@ describe('Serialization', () => {
     });
   });
 
-  it('should handle hash with special characters in context', () => {
+  test('should handle hash with special characters in context', () => {
     const agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),
@@ -98,7 +99,7 @@ describe('Serialization', () => {
     expect(restored.getContext().unicode).toBe('™️ © ® € £ ¥');
   });
 
-  it('should maintain state across multiple serialization cycles', async () => {
+  test('should maintain state across multiple serialization cycles', async () => {
     let agent = new ConversationalAgent({
       id: 'TestBot',
       onStateChange: vi.fn(),

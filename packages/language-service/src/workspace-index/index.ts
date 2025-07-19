@@ -1,3 +1,3 @@
-export * from './types';
-export * from './WorkspaceIndex';
-export * from './FileWatcher';
+export * from './types.js';
+export * from './WorkspaceIndex.js';
+export * from './FileWatcher.js';

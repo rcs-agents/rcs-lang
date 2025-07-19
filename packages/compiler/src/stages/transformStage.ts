@@ -375,11 +375,14 @@ export class TransformStage implements ICompilationStage {
     }
     if (isTypeTag(value)) {
       // Return the value with type information
-      return {
+      const result: any = {
         type: value.tagName,
         value: value.value,
-        qualifier: value.qualifier,
       };
+      if (value.qualifier !== undefined) {
+        result.qualifier = value.qualifier;
+      }
+      return result;
     }
     if (isList(value)) {
       return value.items.map((item) => this.extractValue(item));

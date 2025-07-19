@@ -8,45 +8,73 @@ The RCL compiler transforms RCL files into two output formats: JSON and JavaScri
 
 ### 1. JSON Output (`-f json`)
 
-The JSON output contains three main sections:
+The JSON output contains three main sections that must comply with their respective schemas:
 
 ```json
 {
   "agent": {
-    "name": "AgentName",
-    "displayName": "Agent Display Name",
+    // Must comply with @schemas/agent-config.schema.json
+    "name": "agents/AgentName",
+    "displayName": "Coffee Shop Assistant",
+    "brandName": "Acme Coffee",
     "rcsBusinessMessagingAgent": {
-      "description": "Agent description",
+      "description": "Your friendly coffee ordering assistant",
       "logoUri": "https://example.com/logo.png",
-      "color": "#RRGGBB",
+      "heroUri": "https://example.com/hero.png",
+      "color": "#FF5733",
       "phoneNumbers": [{
         "number": "+1234567890",
-        "label": "Phone Label"
-      }]
+        "label": "Customer Support"
+      }],
+      "emails": [{
+        "address": "support@example.com",
+        "label": "Email Support"
+      }],
+      "websites": [{
+        "url": "https://example.com",
+        "label": "Our Website"
+      }],
+      "privacy": {
+        "url": "https://example.com/privacy",
+        "label": "Privacy Policy"
+      },
+      "termsConditions": {
+        "url": "https://example.com/terms",
+        "label": "Terms of Service"
+      },
+      "agentUseCase": "PROMOTIONAL",
+      "hostingRegion": "NORTH_AMERICA"
     }
   },
   "flows": {
-    "FlowId": {
-      "id": "FlowId",
-      "initial": "MessageId",
+    // XState machine definitions for conversation flows
+    "MainFlow": {
+      "id": "MainFlow",
+      "initial": "Welcome",
       "states": {
-        "MessageId": {
+        "Welcome": {
           "entry": {
             "type": "sendParent",
             "event": {
               "type": "DISPLAY_MESSAGE",
-              "messageId": "MessageId"
+              "messageId": "WelcomeMessage"
             }
           },
           "on": {
-            "postback_data_value": {
-              "target": "NextMessageId",
-              "actions": {
-                "type": "xstate.assign",
-                "assignment": {
-                  "contextVar": "value"
-                }
-              }
+            "order_coffee": {
+              "target": "OrderCoffee"
+            },
+            "view_menu": {
+              "target": "ViewMenu"
+            }
+          }
+        },
+        "OrderCoffee": {
+          "entry": {
+            "type": "sendParent",
+            "event": {
+              "type": "DISPLAY_MESSAGE",
+              "messageId": "CoffeeSelectionMessage"
             }
           }
         }
@@ -55,17 +83,60 @@ The JSON output contains three main sections:
     }
   },
   "messages": {
-    "MessageId": {
+    // Must comply with @schemas/agent-message.schema.json
+    "WelcomeMessage": {
       "contentMessage": {
-        "text": "Message content",
+        "text": "Welcome to Acme Coffee! How can I help you today?",
         "suggestions": [{
           "reply": {
-            "text": "Suggestion Text",
-            "postbackData": "postback_data_value"
+            "text": "Order Coffee",
+            "postbackData": "order_coffee"
+          }
+        }, {
+          "reply": {
+            "text": "View Menu",
+            "postbackData": "view_menu"
           }
         }]
       },
       "messageTrafficType": "PROMOTION"
+    },
+    "CoffeeSelectionMessage": {
+      "contentMessage": {
+        "richCard": {
+          "standaloneCard": {
+            "cardOrientation": "VERTICAL",
+            "cardContent": {
+              "title": "Select Your Coffee",
+              "description": "Choose from our premium selection",
+              "media": {
+                "height": "MEDIUM",
+                "contentInfo": {
+                  "fileUrl": "https://example.com/coffee-selection.jpg"
+                }
+              },
+              "suggestions": [{
+                "reply": {
+                  "text": "Espresso",
+                  "postbackData": "select_espresso"
+                }
+              }, {
+                "reply": {
+                  "text": "Cappuccino",
+                  "postbackData": "select_cappuccino"
+                }
+              }, {
+                "reply": {
+                  "text": "Latte",
+                  "postbackData": "select_latte"
+                }
+              }]
+            }
+          }
+        }
+      },
+      "messageTrafficType": "PROMOTION",
+      "ttl": "3600s"
     }
   }
 }
@@ -96,31 +167,53 @@ export default { messages, flows, agent, getMessage, getFlow, createMachine };
 
 ## Schema Compliance
 
+### Agent Configuration
+- **MUST conform to `@schemas/agent-config.schema.json`**
+- Required fields:
+  - `displayName`: The agent's display name (max 100 chars)
+  - `rcsBusinessMessagingAgent`: Nested object with agent details
+- Optional fields:
+  - `name`: Agent identifier (usually "agents/AgentName" format)
+  - `brandName`: Brand name associated with the agent
+- The `rcsBusinessMessagingAgent` object contains:
+  - Contact info: `phoneNumbers[]`, `emails[]`, `websites[]` (all arrays)
+  - Branding: `logoUri`, `heroUri`, `color` (hex format)
+  - Legal: `privacy`, `termsConditions` (WebEntry objects)
+  - Config: `agentUseCase`, `hostingRegion`, `billingConfig`
+
 ### Messages
-- Must conform to `@schemas/agent-message.schema.json`
-- Required fields: `contentMessage`, `messageTrafficType`
-- Text content limited to 2048 characters
-- Suggestions limited to 11 items
-- Suggestion text limited to 25 characters
+- **MUST conform to `@schemas/agent-message.schema.json`**
+- Required fields:
+  - `contentMessage`: The message content
+  - `messageTrafficType`: One of PROMOTION, TRANSACTION, etc.
+- Optional fields:
+  - `ttl`: Time-to-live in seconds format (e.g., "3600s")
+  - `expireTime`: RFC3339 timestamp (mutually exclusive with ttl)
+- Content types (only ONE per message):
+  - `text`: Simple text message (max 2048 chars)
+  - `uploadedRbmFile`: Previously uploaded file
+  - `richCard`: Standalone or carousel card
+  - `contentInfo`: External file reference
+- Suggestions:
+  - Max 11 suggestions per message
+  - Max 4 suggestions per carousel card
+  - Each suggestion is either:
+    - `reply`: Text and postbackData (both required)
+    - `action`: Text, postbackData, and action type (dial, url, etc.)
 - **postbackData Generation**: 
-  - Generated from suggestion text using the expression in `defaults.postbackData`
+  - Generated from suggestion text if not explicitly provided
   - Default pattern: lowercase text with non-alphanumeric replaced by underscore
   - Example: `"Order Coffee"` → `"order_coffee"`
   - Example: `"Small $3.50"` → `"small__3_50"`
 
-### Agent Configuration
-- Must conform to `@schemas/agent-config.schema.json`
-- Required field: `displayName`
-- Optional fields: `name`, `brandName`, `rcsBusinessMessagingAgent`
-
 ### Flows
-- XState-compatible machine configurations
-- Must have `id`, `initial`, and `states` properties
-- State transitions follow XState format
-- **Important**: Each message ID corresponds to a state in the flow
-  - When a user receives a message, they are "on" that state
-  - Message suggestions create transitions to other states (messages)
-  - Transitions use the `postbackData` value as the event name
+- **XState-compatible machine configurations**
+- Required properties:
+  - `id`: Flow identifier
+  - `initial`: Starting state
+  - `states`: State definitions
+- State structure:
+  - Each message ID corresponds to a state in the flow
   - States should have `entry` actions that send `DISPLAY_MESSAGE` events:
     ```json
     "entry": {
@@ -131,35 +224,149 @@ export default { messages, flows, agent, getMessage, getFlow, createMachine };
       }
     }
     ```
-  - Use `xstate.assign` actions to update context variables
-  - Use `after` for automatic delayed transitions
-  - Use `always` for immediate transitions without user input
+  - Transitions triggered by `postbackData` values from suggestions
+  - Use `xstate.assign` for updating context variables
+  - Use `after` for delayed transitions
+  - Use `always` for immediate transitions
 
-## Current Implementation Status
+## Important Implementation Notes
 
-### Working Examples
-- **simple.rcl**: Basic text messages and flows
-- **travel-agent.rcl**: Multi-message example with replies
+### Rich Card Structure
+For rich cards, the compiler output must follow the exact nested structure:
+```json
+{
+  "contentMessage": {
+    "richCard": {
+      "standaloneCard": {
+        "cardOrientation": "VERTICAL",
+        "cardContent": {
+          "title": "Card Title",
+          "description": "Card description",
+          "media": {
+            "height": "MEDIUM",
+            "contentInfo": {
+              "fileUrl": "https://example.com/image.jpg"
+            }
+          }
+        }
+      }
+    }
+  },
+  "messageTrafficType": "PROMOTION"
+}
+```
 
-### Complex Features (In Progress)
-- **realistic.rcl**: Contains advanced features that require grammar improvements:
-  - URLs with dots (travel.example.com)
-  - Embedded JavaScript expressions ($js>)
-  - Complex multi-line strings
-  - Advanced type tags
-  - Rich cards and carousels
+### Carousel Structure
+For carousels, use the `carouselCard` structure:
+```json
+{
+  "contentMessage": {
+    "richCard": {
+      "carouselCard": {
+        "cardWidth": "MEDIUM",
+        "cardContents": [{
+          "title": "Card 1",
+          "description": "First card",
+          "media": {
+            "height": "MEDIUM",
+            "contentInfo": {
+              "fileUrl": "https://example.com/image1.jpg"
+            }
+          },
+          "suggestions": [{
+            "reply": {
+              "text": "Select 1",
+              "postbackData": "select_1"
+            }
+          }]
+        }, {
+          "title": "Card 2",
+          "description": "Second card",
+          "media": {
+            "height": "MEDIUM",
+            "contentInfo": {
+              "fileUrl": "https://example.com/image2.jpg"
+            }
+          },
+          "suggestions": [{
+            "reply": {
+              "text": "Select 2",
+              "postbackData": "select_2"
+            }
+          }]
+        }]
+      }
+    }
+  },
+  "messageTrafficType": "PROMOTION"
+}
+```
 
-## Testing
+### Action Suggestions
+For action suggestions, the structure must include the action type:
+```json
+{
+  "action": {
+    "text": "Call Us",
+    "postbackData": "action_call",
+    "dialAction": {
+      "phoneNumber": "+1234567890"
+    }
+  }
+}
+```
 
-Test fixtures are located in `/apps/extension/test-fixtures/` with expected output files:
-- `simple.rcl` + `simple-expected.json`
-- `travel-agent.rcl` + `travel-agent-expected.json`
+## Message Traffic Types
 
-The extension test suite validates that compiler output matches expected JSON structures.
+Valid values for `messageTrafficType`:
+- `MESSAGE_TRAFFIC_TYPE_UNSPECIFIED`
+- `AUTHENTICATION`
+- `TRANSACTION`
+- `PROMOTION`
+- `SERVICEREQUEST`
+- `ACKNOWLEDGEMENT`
 
-## Future Enhancements
+## Agent Use Cases
 
-1. **Grammar Improvements**: Support for complex URLs, embedded expressions
-2. **Rich Content**: Full rich card and carousel support
-3. **Type Tags**: Complete type tag validation and processing
-4. **Interactive Diagrams**: Flow visualization with Sprotty integration
+Valid values for `agentUseCase`:
+- `AGENT_USE_CASE_UNSPECIFIED`
+- `TRANSACTIONAL`
+- `PROMOTIONAL`
+- `OTP`
+- `MULTI_USE`
+
+## Hosting Regions
+
+Valid values for `hostingRegion`:
+- `HOSTING_REGION_UNSPECIFIED`
+- `NORTH_AMERICA`
+- `EUROPE`
+- `ASIA_PACIFIC`
+
+## Default Values and Transformations
+
+### postbackData Generation
+When a suggestion doesn't specify `postbackData`, it should be generated from the text:
+1. Convert to lowercase
+2. Replace non-alphanumeric characters with underscores
+3. Collapse multiple underscores to single
+4. Trim leading/trailing underscores
+
+Examples:
+- `"Order Coffee"` → `"order_coffee"`
+- `"Small ($3.50)"` → `"small__3_50"`
+- `"Yes, please!"` → `"yes_please"`
+
+### Message Defaults
+If not specified in the RCL file:
+- `messageTrafficType`: Defaults to `"PROMOTION"` (or from agent defaults)
+- `ttl`: Optional, no default
+
+## Testing and Validation
+
+The compiler output should be validated against:
+1. `@schemas/agent-config.schema.json` for the agent section
+2. `@schemas/agent-message.schema.json` for each message
+3. XState compatibility for flows
+
+Test fixtures are located in `/apps/extension/test-fixtures/` with expected output files.

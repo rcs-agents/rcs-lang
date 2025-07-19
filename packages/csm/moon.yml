@@ -1,67 +1,18 @@
 project:
   name: csm
   description: Conversation State Machine library
-  # platform: node
-  # type: library
-  # tags:
-  #   - library
-  #   - runtime
-  #   - fsm
+
+type: library
+language: typescript
+
+tags:
+  - tsup
+  - test
+  - typescript
+  - publish
+  - common
 
 tasks:
-  build:
-    command: tsup
-    outputs:
-      - dist
-    inputs:
-      - src/**/*
-      - tsconfig.json
-      - tsup.config.ts
-
-  dev:
-    command: tsup --watch
-    local: true
-
-  test:
-    command: vitest run
-    inputs:
-      - src/**/*
-      - tests/**/*
-
-  test-watch:
-    command: vitest watch
-    local: true
-
-  test-coverage:
-    command: vitest run --coverage
-    outputs:
-      - coverage
-
-  typecheck:
-    command: tsc --noEmit
-    inputs:
-      - src/**/*
-      - tsconfig.json
-
   clean:
     command: rm -rf dist coverage
     platform: system
-
-  prepublish:
-    command: bun run prepublishOnly
-    deps:
-      - build
-      - test
-      - typecheck
-
-  publish:
-    command: bunx npm publish --access public
-    deps:
-      - prepublish
-    local: true
-
-  publish-dry:
-    command: bunx npm publish --dry-run
-    deps:
-      - prepublish
-    local: true

@@ -1,0 +1,19 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  build:
+    command: tsup
+    platform: node
+    inputs:
+      - src/**/*
+      - tsconfig.json
+      - tsup.config.ts
+    outputs:
+      - dist
+
+  build-watch:
+    command: tsup
+    args:
+      - --watch
+    platform: node
+    local: true

@@ -5,44 +5,8 @@ import {
   TransformStage,
   ValidateStage,
 } from '@rcs-lang/compiler';
-import type { ASTNode } from '../ast-compatibility';
+import type * as AST from '@rcs-lang/ast';
 import type { AgentData, CompiledAgent, Diagnostic } from '../program/types';
-
-// Temporary compatibility helpers for old tree-sitter style calls
-function getNodeText(node: any, _source?: string): string {
-  return node?.text || '';
-}
-function findNodeByType(root: any, type: string): any {
-  if (!root) return null;
-  if (root.type === type) return root;
-
-  if (root.children) {
-    for (const child of root.children) {
-      const found = findNodeByType(child, type);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-function findNodesByType(root: any, type: string): any[] {
-  const nodes: any[] = [];
-  if (!root) return nodes;
-
-  function traverse(node: any) {
-    if (node.type === type) {
-      nodes.push(node);
-    }
-    if (node.children) {
-      for (const child of node.children) {
-        traverse(child);
-      }
-    }
-  }
-
-  traverse(root);
-  return nodes;
-}
 
 /**
  * Compiles an RCL AST into the output format
@@ -54,7 +18,7 @@ export class Compiler {
    * Compile an AST into agent data
    */
   async compile(
-    ast: ASTNode | any,
+    ast: AST.RclFile | any,
     sourceContent: string,
     fileName?: string,
   ): Promise<CompiledAgent | null> {
@@ -118,25 +82,6 @@ export class Compiler {
     return this.diagnostics;
   }
 
-  /**
-   * Extract agent data from AST (LEGACY - no longer used)
-   */
-  private extractAgent(ast: ASTNode, sourceContent: string): AgentData {
-    // This method is no longer used since we're using the modern compiler
-    return {} as AgentData;
-  }
-
-  private extractMessages(ast: ASTNode, sourceContent: string): Record<string, any> {
-    // Legacy method - no longer used
-    return {};
-  }
-
-  private extractFlows(ast: ASTNode, sourceContent: string): Record<string, any> {
-    // Legacy method - no longer used
-    return {};
-  }
-
-  // All other legacy extraction methods removed since we use the modern compiler
   /**
    * Add an error diagnostic
    */

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { browser } from '@wdio/globals';
+import { expect } from 'chai';
 import { TestClient } from '../utils/testHelpers';
 import { WebviewHelpers } from '../utils/webviewHelpers';
 

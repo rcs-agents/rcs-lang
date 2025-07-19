@@ -1,0 +1,27 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  build:
+    command: tsc
+    platform: node
+    inputs:
+      - src/**/*
+      - tsconfig.json
+    outputs:
+      - dist
+
+  build-watch:
+    command: tsc
+    args:
+      - --watch
+    platform: node
+    local: true
+
+  typecheck:
+    command: tsc
+    args:
+      - --noEmit
+    platform: node
+    inputs:
+      - src/**/*
+      - tsconfig.json

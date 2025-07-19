@@ -1,4 +1,4 @@
-import { type Diagnostic, type Result, err, ok } from '@rcs-lang/core';
+import { type Diagnostic, type Result, err, ok, rclErrorToLegacy, legacyErrorToRCLError } from '@rcs-lang/core';
 import type {
   ICompilationInput,
   ICompilationResult,
@@ -7,9 +7,9 @@ import type {
   IFileSystem,
 } from '@rcs-lang/core';
 import { FileSystemFactory } from '@rcs-lang/file-system';
-import { D2Generator, JavaScriptGenerator, MermaidGenerator } from './generators';
-import { CompilationPipeline } from './pipeline/compilationPipeline';
-import { ParseStage, TransformStage, ValidateStage } from './stages';
+import { D2Generator, JavaScriptGenerator, MermaidGenerator } from './generators/index.js';
+import { CompilationPipeline } from './pipeline/compilationPipeline.js';
+import { ParseStage, TransformStage, ValidateStage } from './stages/index.js';
 
 export interface CompilerOptions {
   fileSystem?: IFileSystem;
@@ -147,7 +147,28 @@ export class RCLCompiler implements ICompiler {
   /**
    * Compile RCL source to output format
    */
-  async compile(input: ICompilationInput): Promise<Result<ICompilationResult>> {
+  async compile(input: ICompilationInput): Promise<Result<ICompilationResult>>;
+  async compile(source: string, uri: string): Promise<{ success: boolean; output?: { json: string; js: string }; errors?: any[] }>;
+  async compile(
+    inputOrSource: ICompilationInput | string, 
+    uri?: string
+  ): Promise<Result<ICompilationResult> | { success: boolean; output?: { json: string; js: string }; errors?: any[] }> {
+    
+    // Handle legacy two-parameter interface
+    if (typeof inputOrSource === 'string' && typeof uri === 'string') {
+      const result = await this.compileSource(inputOrSource, uri);
+      return {
+        success: result.success,
+        output: result.output ? {
+          json: JSON.stringify(result.output),
+          js: this.jsGenerator.generate(result.output, uri.split('/').pop() || 'unknown.rcl')
+        } : undefined,
+        errors: result.errors
+      };
+    }
+    
+    // Handle new interface
+    const input = inputOrSource as ICompilationInput;
     try {
       // Execute pipeline
       const result = await this.pipeline.execute(input);
@@ -174,13 +195,27 @@ export class RCLCompiler implements ICompiler {
     if (!result.success) {
       return {
         success: false,
-        errors: [{ message: result.error.message }],
+        errors: [{ 
+          message: result.error.message,
+          code: 'COMPILE_ERROR',
+          line: 1,
+          column: 1,
+          severity: 'error'
+        }],
         diagnostics: [],
       };
     }
 
     // Convert diagnostics to errors for backward compatibility
-    const errors = result.value.diagnostics?.filter((d) => d.severity === 'error') || [];
+    const diagnostics = result.value.diagnostics?.filter((d) => d.severity === 'error') || [];
+    const errors = diagnostics.map(d => ({
+      message: d.message,
+      code: d.code,
+      line: d.range?.start.line ?? 1,
+      column: d.range?.start.character ?? 1,
+      severity: d.severity,
+      range: d.range
+    }));
 
     return {
       ...result.value,

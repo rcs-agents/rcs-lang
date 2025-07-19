@@ -4,7 +4,7 @@
 
 import type * as AST from '@rcs-lang/ast';
 import { IASTNode } from '@rcs-lang/core';
-import { type ASTNode, convertNewASTToOld, toBaseNode } from './ast-compatibility';
+import { type ASTNode, convertNewASTToOld, toBaseNode } from './ast-compatibility.js';
 
 /**
  * Wraps any function that expects old AST to handle new AST

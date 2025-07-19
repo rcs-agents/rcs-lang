@@ -10,9 +10,9 @@ import type {
   Section,
   SpreadDirective,
   Value,
-} from './ast';
-import { isAttribute, isMatchBlock, isSection, isSpreadDirective } from './guards';
-import type { Position, Range, SourceLocation, WithLocation } from './position';
+} from './ast.js';
+import { isAttribute, isMatchBlock, isSection, isSpreadDirective } from './guards.js';
+import type { Position, Range, SourceLocation, WithLocation } from './position.js';
 
 /**
  * Create a position object

@@ -1,0 +1,84 @@
+name: Feature Request
+description: Suggest an idea for RCL language tools
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature!
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component should this feature be added to?
+      options:
+        - CLI (@rcs-lang/cli)
+        - Compiler (@rcs-lang/compiler)
+        - Parser (@rcs-lang/parser)
+        - Language Service (@rcs-lang/language-service)
+        - VSCode Extension
+        - IDE (@rcs-lang/ide)
+        - CSM (@rcs-lang/csm)
+        - AST (@rcs-lang/ast)
+        - Documentation
+        - Other
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when...
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: I would like to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions or features you've considered
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Code Examples
+      description: If applicable, provide examples of how this feature would be used
+      render: rcl
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would help my workflow
+        - High - Blocking my work
+      default: 0
+
+  - type: checkboxes
+    id: breaking
+    attributes:
+      label: Breaking Changes
+      description: Would this feature require breaking changes?
+      options:
+        - label: This feature would require breaking changes
+        - label: This feature is backwards compatible
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the feature request

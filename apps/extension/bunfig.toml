@@ -1,0 +1,3 @@
+[test]
+# Exclude integration tests that require VSCode runtime
+coverageThreshold = 0.6

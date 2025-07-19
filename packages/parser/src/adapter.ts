@@ -5,7 +5,7 @@
 import type { RclFile } from '@rcs-lang/ast';
 import type { Diagnostic, IParserAdapter, Result } from '@rcs-lang/core';
 import { ParserRuleContext, ErrorNode, ParseTree } from 'antlr4ng';
-import { ASTVisitor } from './ast-visitor';
+import { ASTVisitor } from './ast-visitor.js';
 
 export class AntlrAdapter implements IParserAdapter<ParseTree> {
   convertToAST(parseTree: ParseTree, source: string): Result<RclFile> {

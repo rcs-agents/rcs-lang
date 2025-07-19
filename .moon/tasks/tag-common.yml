@@ -1,0 +1,18 @@
+$schema: "../cache/schemas/tasks.json"
+
+tasks:
+  clean:
+    command: rm
+    args:
+      - -rf
+      - dist
+      - build
+      - out
+      - coverage
+    platform: system
+
+  dev:
+    command: echo
+    args: ["Development mode - override this task in project config"]
+    platform: node
+    local: true

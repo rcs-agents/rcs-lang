@@ -9,19 +9,21 @@
   },
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "files": ["dist", "demo.js"],
+  "type": "module",
+  "files": [
+    "dist",
+    "demo.js"
+  ],
   "scripts": {
-    "build": "tsc",
-    "compile": "tsc",
-    "dev": "tsc --watch",
-    "test": "NODE_ENV=test vitest run",
-    "test:watch": "NODE_ENV=test vitest",
-    "test:coverage": "NODE_ENV=test vitest --coverage",
-    "clean": "rm -rf dist",
-    "demo": "node demo.js",
-    "lint": "biome lint src",
-    "format": "biome format src --write",
-    "typecheck": "tsc --noEmit"
+    "build": "moon run cli:build",
+    "dev": "moon run cli:dev",
+    "test": "moon run cli:test",
+    "test:watch": "moon run cli:test-watch",
+    "test:coverage": "moon run cli:test-coverage",
+    "typecheck": "moon run cli:typecheck",
+    "clean": "moon run cli:clean",
+    "lint": "moon run cli:lint",
+    "format": "moon run cli:format"
   },
   "dependencies": {
     "@rcs-lang/compiler": "workspace:*",
@@ -43,9 +45,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/fs-extra": "^11.0.0",
-    "@vitest/ui": "^3.2.4",
-    "typescript": "^5.0.0",
-    "vitest": "^3.2.4"
+    "typescript": "^5.0.0"
   },
   "publishConfig": {
     "access": "public"
