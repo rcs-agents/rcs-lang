@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import markdoc from '@astrojs/markdoc';
+import starlightLlmsTxt from 'starlight-llms-txt';
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,6 +15,12 @@ export default defineConfig({
 			description: 'Rich Communication Language - A domain-specific language for creating RCS agents.',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/rcs-agents/rcs-lang' },
+			],
+			plugins: [
+				starlightLlmsTxt({
+					includeFull: true,
+					includeSmall: true,
+				}),
 			],
 			sidebar: [
 				{
@@ -48,6 +55,14 @@ export default defineConfig({
 						{ label: 'Release Guide', slug: 'release-guide' },
 						{ label: 'Local CI', slug: 'local-ci' },
 						{ label: 'FSM Requirements', slug: 'conversational-agent-fsm-requirements' },
+					],
+				},
+				{
+					label: 'LLM Resources',
+					items: [
+						{ label: 'llms.txt', link: '/llms.txt' },
+						{ label: 'llms-full.txt', link: '/llms-full.txt' },
+						{ label: 'llms-small.txt', link: '/llms-small.txt' },
 					],
 				},
 			],
