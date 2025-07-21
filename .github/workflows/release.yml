@@ -25,7 +25,7 @@ on:
 
 env:
   BUN_VERSION: 1.2.18
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_CONFIG_TOKEN: ${{ secrets.NPM_CONFIG_TOKEN }}
 
 jobs:
   release:
@@ -65,7 +65,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
 
       - name: Build all packages
         run: moon run :build
@@ -157,7 +157,7 @@ jobs:
           - { name: '@rcs-lang/compiler', path: 'packages/compiler' }
           - { name: '@rcs-lang/csm', path: 'packages/csm' }
           - { name: '@rcs-lang/language-service', path: 'packages/language-service' }
-          - { name: '@rcs-lang/cli', path: 'apps/cli' }
+          - { name: '@rcs-lang/cli', path: 'packages/cli' }
           # Note: IDE app removed as it doesn't exist in the filesystem
     
     steps:
@@ -181,7 +181,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
 
       - name: Build package
         run: |
@@ -214,12 +214,12 @@ jobs:
           
           # Publish the package
           if [[ "${{ github.event.inputs.prerelease }}" == "true" ]]; then
-            npm publish --tag beta --access public
+            bun publish --tag beta --access public
           else
-            npm publish --access public
+            bun publish --access public
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_CONFIG_TOKEN }}
 
   publish-vscode:
     name: Publish VSCode Extension
@@ -247,7 +247,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
 
       - name: Build extension
         run: |
@@ -255,7 +255,7 @@ jobs:
           moon run build
 
       - name: Install vsce
-        run: npm install -g @vscode/vsce
+        run: bun install -g @vscode/vsce
 
       - name: Package extension
         run: |

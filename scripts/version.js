@@ -40,6 +40,7 @@ const packages = [
   'packages/csm/package.json',
   'packages/language-service/package.json',
   'packages/parser/package.json',
+  'packages/cli/package.json',
   'libs/core/package.json',
   'libs/file-system/package.json',
   'libs/validation/package.json',

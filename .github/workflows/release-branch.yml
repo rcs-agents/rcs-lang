@@ -76,7 +76,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
         
       - name: Build all packages
         run: moon run :build
@@ -133,7 +133,7 @@ jobs:
           - { name: '@rcs-lang/compiler', path: 'packages/compiler' }
           - { name: '@rcs-lang/csm', path: 'packages/csm' }
           - { name: '@rcs-lang/language-service', path: 'packages/language-service' }
-          - { name: '@rcs-lang/cli', path: 'apps/cli' }
+          - { name: '@rcs-lang/cli', path: 'packages/cli' }
     
     steps:
       - name: Checkout code
@@ -156,7 +156,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
         
       - name: Build package
         run: |
@@ -187,9 +187,9 @@ jobs:
             exit 0
           fi
           
-          npm publish --access public
+          bun publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_CONFIG_TOKEN }}
 
   publish-vscode:
     needs: [determine-version, create-release]
@@ -216,7 +216,7 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
         
       - name: Build extension
         run: |
@@ -224,7 +224,7 @@ jobs:
           moon run build
           
       - name: Install vsce
-        run: npm install -g @vscode/vsce
+        run: bun install -g @vscode/vsce
         
       - name: Package extension
         run: |
