@@ -1,0 +1,211 @@
+---
+title: "@rcs-lang/file-system"
+description: "File system abstraction for RCL tooling"
+---
+
+# @rcs-lang/file-system
+
+The `@rcs-lang/file-system` package provides a unified file system abstraction layer for all RCL tooling. It enables consistent file operations across different environments (Node.js, browser, virtual file systems) and platforms.
+
+## Installation
+
+```bash
+bun add @rcs-lang/file-system
+```
+
+## Overview
+
+This package offers:
+
+- **Cross-platform file operations** - Works on Windows, macOS, and Linux
+- **Virtual file system support** - For in-memory operations and testing
+- **Async and sync APIs** - Choose based on your needs
+- **Path normalization** - Handles path differences across platforms
+- **File watching** - Monitor RCL files for changes
+- **Encoding support** - UTF-8, UTF-16, and other encodings
+
+## Features
+
+### File System Abstraction
+
+```typescript
+import { FileSystem, createFileSystem } from '@rcs-lang/file-system';
+
+// Create platform-specific file system
+const fs = createFileSystem();
+
+// Read RCL file
+const content = await fs.readFile('/path/to/agent.rcl', 'utf8');
+
+// Write compiled output
+await fs.writeFile('/path/to/output.json', JSON.stringify(compiled));
+
+// Check if file exists
+if (await fs.exists('/path/to/config.rcl')) {
+  // Process configuration
+}
+```
+
+### Virtual File System
+
+Perfect for testing and browser environments:
+
+```typescript
+import { createVirtualFileSystem } from '@rcs-lang/file-system';
+
+const vfs = createVirtualFileSystem({
+  '/src/agent.rcl': 'agent CustomerSupport { ... }',
+  '/src/messages.rcl': 'messages Messages { ... }'
+});
+
+// Use like regular file system
+const files = await vfs.readdir('/src');
+console.log(files); // ['agent.rcl', 'messages.rcl']
+```
+
+### File Watching
+
+Monitor RCL files for changes:
+
+```typescript
+import { watchFiles } from '@rcs-lang/file-system';
+
+const watcher = watchFiles('**/*.rcl', {
+  onChange: (path, eventType) => {
+    console.log(`File ${path} was ${eventType}`);
+    // Recompile on change
+  },
+  ignorePatterns: ['**/node_modules/**', '**/dist/**']
+});
+
+// Stop watching
+watcher.close();
+```
+
+### Path Utilities
+
+```typescript
+import { 
+  normalizePath, 
+  joinPath, 
+  relativePath,
+  isAbsolute,
+  getExtension 
+} from '@rcs-lang/file-system';
+
+// Normalize paths across platforms
+const normalized = normalizePath('src\\agents\\customer.rcl');
+// Result: 'src/agents/customer.rcl'
+
+// Join path segments safely
+const fullPath = joinPath(projectRoot, 'src', 'agents', 'customer.rcl');
+
+// Get relative paths
+const rel = relativePath('/project/src', '/project/src/agents/customer.rcl');
+// Result: 'agents/customer.rcl'
+```
+
+### Workspace Discovery
+
+Find RCL files in a workspace:
+
+```typescript
+import { findRCLFiles, WorkspaceScanner } from '@rcs-lang/file-system';
+
+// Find all RCL files
+const files = await findRCLFiles('/path/to/project', {
+  recursive: true,
+  includePatterns: ['**/*.rcl'],
+  excludePatterns: ['**/test/**']
+});
+
+// Advanced workspace scanning
+const scanner = new WorkspaceScanner({
+  rootPath: '/path/to/project',
+  fileTypes: ['.rcl', '.rcl.json']
+});
+
+const workspace = await scanner.scan();
+console.log(workspace.files); // All RCL-related files
+console.log(workspace.dependencies); // File dependencies
+```
+
+## Integration
+
+The file system package is used by:
+
+- **@rcs-lang/cli** - Reading source files and writing output
+- **@rcs-lang/compiler** - File I/O operations
+- **@rcs-lang/language-service** - Workspace file management
+- **VSCode Extension** - File operations in the editor
+
+## Configuration
+
+```typescript
+interface FileSystemConfig {
+  // Default encoding for text files
+  encoding?: BufferEncoding;
+  
+  // Enable file caching
+  cache?: boolean;
+  
+  // Maximum file size to read (in bytes)
+  maxFileSize?: number;
+  
+  // Follow symbolic links
+  followSymlinks?: boolean;
+}
+
+const fs = createFileSystem({
+  encoding: 'utf8',
+  cache: true,
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  followSymlinks: true
+});
+```
+
+## Error Handling
+
+```typescript
+import { FileSystemError, isFileSystemError } from '@rcs-lang/file-system';
+
+try {
+  await fs.readFile('/path/to/file.rcl');
+} catch (error) {
+  if (isFileSystemError(error)) {
+    switch (error.code) {
+      case 'ENOENT':
+        console.error('File not found');
+        break;
+      case 'EACCES':
+        console.error('Permission denied');
+        break;
+      default:
+        console.error(`File system error: ${error.message}`);
+    }
+  }
+}
+```
+
+## API Reference
+
+### Main Interfaces
+
+- `FileSystem` - Core file system interface
+- `VirtualFileSystem` - In-memory file system
+- `FileWatcher` - File watching interface
+- `WorkspaceScanner` - Workspace analysis
+
+### Factory Functions
+
+- `createFileSystem(config?)` - Create platform file system
+- `createVirtualFileSystem(files?)` - Create virtual file system
+- `watchFiles(pattern, options)` - Start watching files
+
+### Path Utilities
+
+- `normalizePath(path)` - Normalize path separators
+- `joinPath(...segments)` - Join path segments
+- `relativePath(from, to)` - Get relative path
+- `isAbsolute(path)` - Check if path is absolute
+- `getExtension(path)` - Get file extension
