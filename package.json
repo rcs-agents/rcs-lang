@@ -1,5 +1,5 @@
 {
-  "name": "rcl-tree-sitter-monorepo",
+  "name": "rcl-monorepo",
   "version": "0.1.0",
   "type": "module",
   "author": {
@@ -8,7 +8,7 @@
     "url": "https://tokilabs.io/"
   },
   "repository": "https://github.com/rcs-agents/rcs-lang",
-  "description": "RCL Language Monorepo - Tree-sitter grammar and language tools",
+  "description": "RCL Language Monorepo - ANTLR4 parser and language tools",
   "engines": {
     "bun": ">=1.2.0"
   },
@@ -21,12 +21,11 @@
   "license": "MIT",
   "dependencies": {
     "@antfu/ni": "^25.0.0",
-    "@rcs-lang/cli": "workspace:*",
-    "tree-sitter": "^0.25.0",
-    "tree-sitter-cli": "^0.25.6"
+    "@rcs-lang/cli": "workspace:*"
   },
   "private": true,
   "scripts": {
+    "setup": "./scripts/setup.sh",
     "build": "moon run :build",
     "dev": "moon run :dev",
     "test": "moon run :test",
@@ -41,7 +40,12 @@
     "release:patch": "bun scripts/prepare-release.js patch",
     "release:minor": "bun scripts/prepare-release.js minor",
     "release:major": "bun scripts/prepare-release.js major",
-    "release:dry": "bun scripts/prepare-release.js patch --dry-run"
+    "release:dry": "bun scripts/prepare-release.js patch --dry-run",
+    "act": "act",
+    "act:ci": "act -W .github/workflows/ci.yml",
+    "act:push": "act push",
+    "act:pr": "act pull_request",
+    "act:list": "act -l"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",

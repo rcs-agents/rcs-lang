@@ -1,0 +1,62 @@
+# Running GitHub Actions Locally
+
+This project includes scripts to run GitHub Actions workflows locally using [act](https://github.com/nektos/act).
+
+## Prerequisites
+
+Install act:
+```bash
+# macOS
+brew install act
+
+# Linux
+curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+# Windows (via Chocolatey)
+choco install act-cli
+```
+
+## Available Scripts
+
+Run these from the root directory:
+
+```bash
+# List all available workflows
+npm run act:list
+
+# Run the main CI workflow
+npm run act:ci
+
+# Simulate a push event (runs workflows triggered by push)
+npm run act:push
+
+# Simulate a pull request event
+npm run act:pr
+
+# Run with custom options
+npm run act -- [options]
+```
+
+## Common Use Cases
+
+### Test CI Before Pushing
+```bash
+npm run act:ci
+```
+
+### Debug a Specific Job
+```bash
+npm run act -- -j test -W .github/workflows/ci.yml
+```
+
+### Use a Different Runner Image
+```bash
+npm run act -- --platform ubuntu-latest=nektos/act-environments-ubuntu:22.04
+```
+
+## Notes
+
+- Act uses Docker to simulate GitHub Actions runners
+- Some GitHub-specific features may not work locally (like secrets)
+- For secrets, create a `.secrets` file in the root (gitignored)
+- Moon is installed as part of the workflow steps
