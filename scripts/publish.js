@@ -2,7 +2,7 @@
 
 import { $ } from 'bun';
 import { resolve } from 'path';
-import { writeFileSync, existsSync, readFileSync } from 'fs';
+import { writeFileSync, existsSync, readFileSync, readdirSync } from 'fs';
 import { homedir } from 'os';
 import { replaceWorkspaceDependencies, restorePackageJson } from './prepare-publish.js';
 
@@ -35,16 +35,97 @@ if (npmToken) {
 
 console.log(`🚀 Publishing RCL packages${isDryRun ? ' (DRY RUN)' : ''}...\n`);
 
-// Packages to publish in order (respecting dependencies)
-const PACKAGES = [
-  // Packages in dependency order
-  { name: '@rcs-lang/ast', path: 'packages/ast' },
-  { name: '@rcs-lang/parser', path: 'packages/parser' },
-  { name: '@rcs-lang/csm', path: 'packages/csm' },
-  { name: '@rcs-lang/compiler', path: 'packages/compiler' },
-  { name: '@rcs-lang/language-service', path: 'packages/language-service' },
-  { name: '@rcs-lang/cli', path: 'packages/cli' },
-];
+// Discover all packages in the packages directory
+function discoverPackages() {
+  const packagesDir = resolve(ROOT_DIR, 'packages');
+  const packages = [];
+  
+  if (!existsSync(packagesDir)) {
+    console.warn('⚠️  packages directory not found');
+    return packages;
+  }
+  
+  const entries = readdirSync(packagesDir, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const packageJsonPath = resolve(packagesDir, entry.name, 'package.json');
+      
+      if (existsSync(packageJsonPath)) {
+        try {
+          const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+          
+          // Only include packages that are not private
+          if (!packageJson.private) {
+            packages.push({
+              name: packageJson.name,
+              path: `packages/${entry.name}`,
+              version: packageJson.version,
+              dependencies: packageJson.dependencies || {},
+              packageJson
+            });
+          }
+        } catch (error) {
+          console.warn(`⚠️  Failed to read package.json for ${entry.name}:`, error.message);
+        }
+      }
+    }
+  }
+  
+  return packages;
+}
+
+// Sort packages by dependency order (topological sort)
+function sortPackagesByDependencies(packages) {
+  const sorted = [];
+  const visiting = new Set();
+  const visited = new Set();
+  
+  function visit(pkg) {
+    if (visited.has(pkg.name)) return;
+    if (visiting.has(pkg.name)) {
+      // Circular dependency - just add it anyway
+      console.warn(`⚠️  Circular dependency detected involving ${pkg.name}`);
+      return;
+    }
+    
+    visiting.add(pkg.name);
+    
+    // Visit dependencies first
+    for (const depName of Object.keys(pkg.dependencies)) {
+      if (depName.startsWith('@rcs-lang/')) {
+        const depPkg = packages.find(p => p.name === depName);
+        if (depPkg) {
+          visit(depPkg);
+        }
+      }
+    }
+    
+    visiting.delete(pkg.name);
+    visited.add(pkg.name);
+    sorted.push(pkg);
+  }
+  
+  // Visit all packages
+  for (const pkg of packages) {
+    visit(pkg);
+  }
+  
+  return sorted;
+}
+
+const discoveredPackages = discoverPackages();
+const PACKAGES = sortPackagesByDependencies(discoveredPackages);
+
+if (PACKAGES.length === 0) {
+  console.error('❌ No packages found to publish');
+  process.exit(1);
+}
+
+console.log(`📋 Found ${PACKAGES.length} packages to publish:`);
+for (const pkg of PACKAGES) {
+  console.log(`   • ${pkg.name}@${pkg.version} (${pkg.path})`);
+}
 
 async function publishPackage(pkg) {
   console.log(`\n📦 Publishing ${pkg.name}...`);
