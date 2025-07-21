@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Install Moon
+        run: npm install -g @moonrepo/cli
+
       - name: Build documentation
         run: bun run docs:build
 

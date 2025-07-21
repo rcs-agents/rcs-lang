@@ -6,14 +6,14 @@ import markdoc from '@astrojs/markdoc';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://rcs-agents.github.io',
-	base: '/rcl',
+	base: '/rcs-lang',
 	integrations: [
 		markdoc(),
 		starlight({
 			title: 'RCL Documentation',
 			description: 'Rich Communication Language - A domain-specific language for creating RCS agents.',
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/rcs-lang/rcl' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/rcs-agents/rcs-lang' },
 			],
 			sidebar: [
 				{
