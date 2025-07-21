@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/validation",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Validation pipeline for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

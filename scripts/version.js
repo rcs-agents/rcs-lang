@@ -36,14 +36,14 @@ console.log(`New version: ${newVersion}`);
 const packages = [
   'package.json',
   'packages/ast/package.json',
+  'packages/core/package.json',
+  'packages/file-system/package.json',
+  'packages/validation/package.json',
   'packages/compiler/package.json',
   'packages/csm/package.json',
   'packages/language-service/package.json',
   'packages/parser/package.json',
   'packages/cli/package.json',
-  'libs/core/package.json',
-  'libs/file-system/package.json',
-  'libs/validation/package.json',
   'libs/diagram/package.json',
 ];
 
