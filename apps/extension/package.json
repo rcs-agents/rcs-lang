@@ -5,6 +5,14 @@
   "version": "0.1.0",
   "publisher": "rcl-lang",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rcs-agents/rcs-lang"
+  },
+  "bugs": {
+    "url": "https://github.com/rcs-agents/rcs-lang/issues"
+  },
+  "homepage": "https://github.com/rcs-agents/rcs-lang/tree/main/apps/extension",
   "engines": {
     "vscode": "^1.89.0"
   },
@@ -187,14 +195,15 @@
     "clean": "moon run extension:clean",
     "lint": "moon run extension:lint",
     "format": "moon run extension:format",
-    "vsce:package": "vsce package",
-    "vsce:publish": "vsce publish",
+    "vscode:prepublish": "bun run build",
+    "vsce:package": "vsce package --no-dependencies",
+    "vsce:publish": "./publish.sh",
     "vsce:publish:dry": "vsce ls",
-    "vsce:publish:minor": "vsce publish minor",
-    "vsce:publish:patch": "vsce publish patch",
-    "vsce:publish:major": "vsce publish major",
+    "vsce:publish:minor": "./publish.sh minor",
+    "vsce:publish:patch": "./publish.sh patch",
+    "vsce:publish:major": "./publish.sh major",
     "prepublish": "bun run build && bun run test",
-    "publish:marketplace": "bun run prepublish && vsce publish"
+    "publish:marketplace": "bun run prepublish && ./publish.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1",

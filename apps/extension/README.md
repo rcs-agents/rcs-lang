@@ -140,6 +140,6 @@ MIT License - see LICENSE file for details.
 
 ## Support
 
-- [GitHub Issues](https://github.com/rcs-agents/rcs-lang)
+- [GitHub Issues](https://github.com/rcs-agents/rcs-lang/issues)
 - [Documentation](https://rcs-agents.github.io/rcl-docs)
-- [RCL Specification](../rcl-formal-specification.md)
+- [RCL Specification](https://github.com/rcs-agents/rcs-lang/blob/main/docs/rcl-formal-specification.md)
