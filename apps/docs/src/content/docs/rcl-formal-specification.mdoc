@@ -1,3 +1,7 @@
+---
+title: RCL Formal Specification
+description: Complete EBNF grammar specification for RCL
+---
 # Rich Communication Language (RCL) - Formal Specification
 
 ## 1. Introduction
@@ -35,8 +39,9 @@ DEDENT ::= // Decrease in indentation level
 
 ### 2.2 Hidden Terminals
 ```ebnf
-WS ::= /[\t ]+/                    // Whitespace (spaces/tabs), not newlines
-NL ::= /[\r\n]+/                   // Newlines
+WS ::= /[	 ]+/                    // Whitespace (spaces/tabs), not newlines
+NL ::= /[
+]+/                   // Newlines
 SL_COMMENT ::= /#.*/               // Single-line comments
 ```
 
@@ -48,7 +53,7 @@ SECTION_TYPE ::= /[a-z][a-zA-Z0-9]*/                       // lowercase section 
 VARIABLE ::= /@[a-zA-Z_][a-zA-Z0-9_]*/                     // @variable
 PROPERTY_ACCESS ::= VARIABLE ('.' ATTRIBUTE_KEY)*          // @obj.property
 ATOM ::= /:[a-zA-Z_][a-zA-Z0-9_]*/                        // :symbol
-STRING ::= /"(\\.|[^"\\])*"/                               // Double-quoted strings
+STRING ::= /"(\.|[^"\])*"/                               // Double-quoted strings
 TRIPLE_STRING_DELIM ::= /"""/                              // Triple quote delimiter
 NUMBER ::= /[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?/         // Numbers with optional decimals/exponents
 ISO_DURATION ::= /(P((\d+Y)|(\d+M)|(\d+W)|(\d+D)|(T((\d+H)|(\d+M)|(\d+(\.\d+)?S))+))+)|([0-9]+(\.[0-9]+)?s)/
@@ -63,7 +68,8 @@ INTERPOLATION_END ::= /\}/
 
 ### 2.5 Embedded Code Terminals
 ```ebnf
-EMBEDDED_CODE ::= /\$((js|ts)?>)\s*[^\r\n]*/              // $js> code or $> expr
+EMBEDDED_CODE ::= /\$((js|ts)?>)\s*[^
+]*/              // $js> code or $> expr
 MULTI_LINE_CODE_START ::= /\$((js|ts)?)>>>/               // $js>>> or $>>>
 MULTI_LINE_CODE_END ::= /<\$/                             // End marker
 ```
