@@ -6,7 +6,7 @@
   "publisher": "rcl-lang",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.89.0"
   },
   "categories": [
     "Programming Languages",
@@ -186,7 +186,15 @@
     "typecheck": "moon run extension:typecheck",
     "clean": "moon run extension:clean",
     "lint": "moon run extension:lint",
-    "format": "moon run extension:format"
+    "format": "moon run extension:format",
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish",
+    "vsce:publish:dry": "vsce ls",
+    "vsce:publish:minor": "vsce publish minor",
+    "vsce:publish:patch": "vsce publish patch",
+    "vsce:publish:major": "vsce publish major",
+    "prepublish": "bun run build && bun run test",
+    "publish:marketplace": "bun run prepublish && vsce publish"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1",
