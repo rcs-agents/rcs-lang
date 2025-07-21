@@ -1,0 +1,159 @@
+---
+title: "@rcs-lang/validation"
+description: "Validation pipeline for RCL language"
+---
+
+# @rcs-lang/validation
+
+The `@rcs-lang/validation` package provides comprehensive validation capabilities for RCL (Rich Communication Language) documents. It performs semantic analysis, type checking, and constraint validation on parsed RCL ASTs.
+
+## Installation
+
+```bash
+bun add @rcs-lang/validation
+```
+
+## Overview
+
+The validation package ensures RCL documents are:
+
+- **Syntactically correct** - Valid according to RCL grammar
+- **Semantically valid** - References resolve correctly
+- **Type-safe** - Values match expected types
+- **Constraint-compliant** - Meets all RCL specification requirements
+
+## Features
+
+### Validation Rules
+
+- **Agent validation**
+  - Valid agent names (Title Case identifiers)
+  - Required `displayName` field
+  - At least one flow definition
+  - Messages section present
+
+- **Flow validation**
+  - Valid state names and transitions
+  - Reachable states
+  - No circular dependencies
+  - Valid action references
+
+- **Message validation**
+  - Valid message IDs
+  - Proper template syntax
+  - Type tag validation
+  - Variable reference checking
+
+- **Type validation**
+  - URL format validation
+  - Phone number format checking
+  - Date/time format validation
+  - Custom type constraints
+
+### Error Reporting
+
+The validator provides detailed error messages with:
+- Precise source locations
+- Error severity levels (error, warning, info)
+- Suggested fixes when possible
+- Related information links
+
+## Usage Example
+
+```typescript
+import { validate, ValidationResult } from '@rcs-lang/validation';
+import { parse } from '@rcs-lang/parser';
+
+// Parse RCL document
+const ast = parse(rclSource);
+
+// Validate the AST
+const result: ValidationResult = validate(ast);
+
+if (result.isValid) {
+  console.log('Document is valid!');
+} else {
+  // Handle validation errors
+  result.diagnostics.forEach(diagnostic => {
+    console.error(`${diagnostic.severity}: ${diagnostic.message}`);
+    console.error(`  at ${diagnostic.range.start.line}:${diagnostic.range.start.column}`);
+  });
+}
+```
+
+## Validation Pipeline
+
+```typescript
+import { ValidationPipeline } from '@rcs-lang/validation';
+
+// Create custom validation pipeline
+const pipeline = new ValidationPipeline()
+  .addRule(customBusinessRule)
+  .addRule(organizationSpecificRule)
+  .configure({
+    strictMode: true,
+    allowDeprecated: false
+  });
+
+const result = pipeline.validate(ast);
+```
+
+## Custom Validation Rules
+
+```typescript
+import { ValidationRule, ValidationContext } from '@rcs-lang/validation';
+
+const customRule: ValidationRule = {
+  name: 'no-test-agents',
+  validate(node, context: ValidationContext) {
+    if (node.type === 'Agent' && node.name.includes('Test')) {
+      context.reportError(
+        'Test agents not allowed in production',
+        node.location
+      );
+    }
+  }
+};
+```
+
+## Integration
+
+The validation package integrates with:
+
+- **@rcs-lang/parser** - Validates parsed ASTs
+- **@rcs-lang/compiler** - Pre-compilation validation
+- **@rcs-lang/language-service** - Real-time validation in editors
+- **@rcs-lang/cli** - Command-line validation
+
+## Configuration
+
+```typescript
+interface ValidationConfig {
+  // Enable strict validation mode
+  strictMode?: boolean;
+  
+  // Allow deprecated features
+  allowDeprecated?: boolean;
+  
+  // Maximum errors before stopping
+  maxErrors?: number;
+  
+  // Custom validation rules
+  customRules?: ValidationRule[];
+}
+```
+
+## API Reference
+
+### Main Functions
+
+- `validate(ast: RCLAst, config?: ValidationConfig): ValidationResult`
+- `validateFile(filePath: string, config?: ValidationConfig): Promise<ValidationResult>`
+- `createValidator(config?: ValidationConfig): Validator`
+
+### Types
+
+- `ValidationResult` - Overall validation result
+- `Diagnostic` - Individual validation issue
+- `ValidationRule` - Custom rule interface
+- `ValidationContext` - Rule execution context

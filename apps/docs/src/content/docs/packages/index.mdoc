@@ -1,0 +1,124 @@
+---
+title: "RCL Packages"
+description: "Overview of all RCL ecosystem packages"
+---
+
+# RCL Packages
+
+The RCL ecosystem consists of several modular packages that work together to provide a complete language toolchain. Each package has a specific responsibility and can be used independently or as part of the full suite.
+
+## Core Infrastructure Packages
+
+These packages provide the foundation for the RCL ecosystem:
+
+### [@rcs-lang/core](/docs/packages/core)
+Core types and interfaces for RCL language infrastructure. This package defines the fundamental data structures and types used throughout the RCL ecosystem.
+
+### [@rcs-lang/ast](/docs/packages/ast)
+Abstract Syntax Tree definitions and utilities for RCL. Provides the tree structure representation of parsed RCL code.
+
+### [@rcs-lang/file-system](/docs/packages/file-system)
+File system abstraction layer that enables consistent file operations across different environments and platforms.
+
+### [@rcs-lang/validation](/docs/packages/validation)
+Comprehensive validation pipeline that performs semantic analysis, type checking, and constraint validation on RCL documents.
+
+## Language Processing Packages
+
+These packages handle parsing and compilation:
+
+### [@rcs-lang/parser](/docs/packages/parser)
+ANTLR4-based parser for RCL syntax. Converts RCL source code into an Abstract Syntax Tree (AST) for further processing.
+
+### [@rcs-lang/compiler](/docs/packages/compiler)
+Modern compilation pipeline that transforms validated RCL ASTs into executable JSON/JavaScript output for RCS agents.
+
+### [@rcs-lang/csm](/docs/packages/csm)
+Conversational State Machine library for building and managing conversation flows in RCS agents.
+
+## Developer Tools
+
+These packages provide tooling for RCL development:
+
+### [@rcs-lang/cli](/docs/packages/cli)
+Command-line interface for compiling RCL files. Provides `rcl` and `rcl-cli` commands for building RCS agents from the terminal.
+
+### [@rcs-lang/language-service](/docs/packages/language-service)
+Advanced language service providers that power IDE features like auto-completion, hover information, and diagnostics.
+
+## Installation
+
+All packages are published to npm and can be installed using your preferred package manager:
+
+```bash
+# Install individual packages
+bun add @rcs-lang/parser @rcs-lang/compiler
+
+# Install the CLI globally
+bun add -g @rcs-lang/cli
+```
+
+## Package Versioning
+
+All RCL packages follow synchronized versioning - when any package is updated, all packages are bumped to the same version number. This ensures compatibility across the ecosystem.
+
+Current version: **0.1.7**
+
+## Package Dependencies
+
+```mermaid
+graph TD
+    CLI[CLI] --> Compiler
+    CLI --> Parser
+    CLI --> FileSystem
+    
+    LanguageService[Language Service] --> Parser
+    LanguageService --> Compiler
+    LanguageService --> Core
+    LanguageService --> Validation
+    
+    Compiler --> Core
+    Compiler --> AST
+    Compiler --> Parser
+    Compiler --> Validation
+    Compiler --> FileSystem
+    
+    Parser --> Core
+    Parser --> AST
+    
+    Validation --> Core
+    Validation --> Parser
+    
+    CSM --> Core
+    
+    FileSystem --> Core
+    
+    AST
+    Core
+```
+
+## Development
+
+All packages are part of a monorepo managed with Moon and use Bun for package management. To work on the packages:
+
+```bash
+# Clone the repository
+git clone https://github.com/rcs-lang/rcl.git
+cd rcl
+
+# Install dependencies
+bun install
+
+# Build all packages
+moon run :build
+
+# Run tests
+moon run :test
+
+# Watch mode for development
+moon run :dev
+```
+
+## Contributing
+
+Contributions are welcome! Please see our [Contributing Guide](https://github.com/rcs-lang/rcl/blob/main/CONTRIBUTING.md) for details on how to get started.

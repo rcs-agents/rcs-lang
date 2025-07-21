@@ -1,0 +1,82 @@
+---
+title: "@rcs-lang/core"
+description: "Core types and interfaces for RCL language infrastructure"
+---
+
+# @rcs-lang/core
+
+The `@rcs-lang/core` package provides the fundamental types, interfaces, and utilities that form the foundation of the RCL language infrastructure. It serves as the shared dependency for all other RCL packages.
+
+## Installation
+
+```bash
+bun add @rcs-lang/core
+```
+
+## Overview
+
+This package contains:
+
+- **Core type definitions** for the RCL language structure
+- **Common interfaces** used across the RCL ecosystem
+- **Utility functions** for working with RCL data structures
+- **Error types** and error handling utilities
+- **Configuration types** for RCL tooling
+
+## Key Exports
+
+### Types and Interfaces
+
+- `RCLAgent` - Core agent type definition
+- `RCLFlow` - Flow state machine definition
+- `RCLMessage` - Message template structure
+- `RCLConfig` - Agent configuration type
+- `CompilationResult` - Result of RCL compilation
+- `DiagnosticSeverity` - Error/warning severity levels
+- `Position`, `Range`, `Location` - Source location types
+
+### Utilities
+
+- Type guards for runtime type checking
+- Validation helpers
+- Error formatting utilities
+
+## Usage Example
+
+```typescript
+import { 
+  RCLAgent, 
+  RCLFlow, 
+  CompilationResult,
+  isValidAgentName 
+} from '@rcs-lang/core';
+
+// Type-safe agent creation
+const agent: RCLAgent = {
+  name: 'CustomerSupport',
+  displayName: 'Customer Support Agent',
+  flows: new Map<string, RCLFlow>(),
+  messages: new Map(),
+  config: {
+    maxResponseTime: 30000
+  }
+};
+
+// Validation utilities
+if (isValidAgentName(agent.name)) {
+  console.log('Agent name is valid');
+}
+```
+
+## Integration with Other Packages
+
+The core package is used by:
+
+- **@rcs-lang/parser** - Uses core types for AST nodes
+- **@rcs-lang/compiler** - Uses compilation result types
+- **@rcs-lang/validation** - Uses diagnostic types
+- **@rcs-lang/language-service** - Uses all core types
+
+## API Reference
+
+For detailed API documentation, see the [TypeScript definitions](https://github.com/rcs-lang/rcl/tree/main/packages/core/src/index.ts).

@@ -35,6 +35,25 @@ if (npmToken) {
 
 console.log(`🚀 Publishing RCL packages${isDryRun ? ' (DRY RUN)' : ''}...\n`);
 
+// Function to check version consistency
+function checkVersionConsistency(packages) {
+  const versions = packages.map(pkg => pkg.version);
+  const uniqueVersions = [...new Set(versions)];
+  
+  if (uniqueVersions.length > 1) {
+    console.error('❌ Version mismatch detected!');
+    console.error('Found multiple versions across packages:');
+    uniqueVersions.forEach(v => {
+      const pkgs = packages.filter(p => p.version === v).map(p => p.name);
+      console.error(`   ${v}: ${pkgs.join(', ')}`);
+    });
+    console.error('\nPlease run "bun run version:bump" to align all package versions.');
+    process.exit(1);
+  }
+  
+  console.log(`✅ All packages are at version ${uniqueVersions[0]}\n`);
+}
+
 // Discover all packages in the packages directory
 function discoverPackages() {
   const packagesDir = resolve(ROOT_DIR, 'packages');
@@ -126,6 +145,11 @@ console.log(`📋 Found ${PACKAGES.length} packages to publish:`);
 for (const pkg of PACKAGES) {
   console.log(`   • ${pkg.name}@${pkg.version} (${pkg.path})`);
 }
+
+console.log('');
+
+// Check version consistency before proceeding
+checkVersionConsistency(PACKAGES);
 
 async function publishPackage(pkg) {
   console.log(`\n📦 Publishing ${pkg.name}...`);
