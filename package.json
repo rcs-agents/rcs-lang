@@ -50,7 +50,10 @@
     "publish:cli:dry": "cd apps/cli && npm run publish:dry",
     "publish:extension": "cd apps/extension && npm run publish:marketplace",
     "publish:extension:package": "cd apps/extension && npm run vsce:package",
-    "publish:extension:dry": "cd apps/extension && npm run vsce:publish:dry"
+    "publish:extension:dry": "cd apps/extension && npm run vsce:publish:dry",
+    "docs:build": "moon run docs:build",
+    "docs:dev": "moon run docs:dev",
+    "docs:preview": "moon run docs:preview"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
