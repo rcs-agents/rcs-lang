@@ -1,7 +1,6 @@
 {
   "name": "@rcs-lang/file-system",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.3",
   "description": "File system abstraction for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +17,7 @@
     "format": "moon run file-system:format"
   },
   "dependencies": {
-    "@rcs-lang/core": "file:../core"
+    "@rcs-lang/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

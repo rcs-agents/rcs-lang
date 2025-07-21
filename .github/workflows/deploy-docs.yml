@@ -39,7 +39,7 @@ jobs:
         run: bun install
 
       - name: Install Moon
-        run: npm install -g @moonrepo/cli
+        run: bun install -g @moonrepo/cli
 
       - name: Build documentation
         run: bun run docs:build
