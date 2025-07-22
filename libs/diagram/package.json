@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/diagram",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "private": true,
   "description": "Interactive Sprotty-based diagram component for RCL flows",
   "main": "src/index.ts",
@@ -39,6 +39,6 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "@rcs-lang/compiler": "^0.1.1"
+    "@rcs-lang/compiler": "workspace:*"
   }
 }

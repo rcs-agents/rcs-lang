@@ -1,11 +1,681 @@
 ---
 title: CSM Package
-description: Conversational State Machine implementation
+description: Conversational State Machine implementation and machine definition schema
 ---
 # CSM Package
 
-The CSM (Conversational State Machine) package provides the state machine implementation for managing conversational flows.
+The CSM (Conversational State Machine) package provides the runtime for executing conversational agents as finite state machines. It includes machine definition types, validation, and execution logic for managing conversational flows with context and pattern matching.
+
+## Core Features
+
+- **Machine Definition Schema**: JSON-based machine definitions with full TypeScript types
+- **State Management**: Handle transitions between conversation states
+- **Pattern Matching**: Match user input against patterns to determine transitions
+- **Context Management**: Maintain conversation context across state transitions
+- **Cross-Flow Transitions**: Support transitions between different conversation flows
+- **Validation**: Runtime validation of machine definitions against schema
+
+## Machine Definition Schema
+
+The core of the CSM package is the `MachineDefinitionJSON` interface, which defines the structure for conversational state machines.
+
+### Basic Structure
+
+A machine definition consists of:
+
+```typescript
+interface MachineDefinitionJSON {
+  id: string;           // Unique identifier for the machine
+  initial: string;      // ID of the starting state
+  states: Record<string, StateDefinitionJSON>;  // Map of state definitions
+  meta?: MachineMetadata;  // Optional metadata
+}
+```
+
+### State Definition
+
+Each state in the machine is defined by:
+
+```typescript
+interface StateDefinitionJSON {
+  transitions: TransitionJSON[];  // Array of possible transitions
+  meta?: StateMetadata;           // Optional state metadata
+}
+```
+
+### Transition Definition
+
+Transitions define how to move between states:
+
+```typescript
+interface TransitionJSON {
+  pattern?: string;      // Pattern to match user input (optional for auto-transitions)
+  target: string;        // Target state ID or "machine:FlowId" for cross-flow
+  context?: Record<string, any>;  // Context updates to apply
+  condition?: string;    // JavaScript condition expression
+  priority?: number;     // Priority for pattern matching (higher = first)
+}
+```
+
+### Metadata
+
+Both machines and states can have optional metadata:
+
+```typescript
+// Machine metadata
+interface MachineMetadata {
+  name?: string;         // Display name
+  description?: string;  // Description
+  version?: string;      // Version
+  tags?: string[];       // Categorization tags
+  custom?: Record<string, any>;  // Custom properties
+}
+
+// State metadata
+interface StateMetadata {
+  messageId?: string;    // Message to send when entering state
+  transient?: boolean;   // Auto-transition without user input
+  tags?: string[];       // Categorization tags
+  custom?: Record<string, any>;  // Custom properties
+}
+```
+
+## Creating Machine Definitions
+
+### Simple Example
+
+Here's a basic machine definition for a greeting flow:
+
+```json
+{
+  "id": "GreetingFlow",
+  "initial": "welcome",
+  "states": {
+    "welcome": {
+      "transitions": [
+        {
+          "pattern": "hello|hi|hey",
+          "target": "greeting_response"
+        },
+        {
+          "pattern": ":default",
+          "target": "help"
+        }
+      ],
+      "meta": {
+        "messageId": "welcome_message"
+      }
+    },
+    "greeting_response": {
+      "transitions": [
+        {
+          "target": "end"
+        }
+      ],
+      "meta": {
+        "messageId": "greeting_reply",
+        "transient": true
+      }
+    },
+    "help": {
+      "transitions": [
+        {
+          "target": "welcome"
+        }
+      ],
+      "meta": {
+        "messageId": "help_message",
+        "transient": true
+      }
+    },
+    "end": {
+      "transitions": [],
+      "meta": {
+        "messageId": "goodbye"
+      }
+    }
+  },
+  "meta": {
+    "name": "Greeting Flow",
+    "description": "Handles basic greetings and help",
+    "version": "1.0.0",
+    "tags": ["greeting", "basic"]
+  }
+}
+```
+
+### Advanced Example with Context
+
+```json
+{
+  "id": "UserProfileFlow",
+  "initial": "collect_name", 
+  "states": {
+    "collect_name": {
+      "transitions": [
+        {
+          "pattern": ".*",
+          "target": "collect_email",
+          "context": {
+            "name": "$input"
+          }
+        }
+      ],
+      "meta": {
+        "messageId": "ask_name"
+      }
+    },
+    "collect_email": {
+      "transitions": [
+        {
+          "pattern": "\\S+@\\S+\\.\\S+",
+          "target": "confirmation",
+          "context": {
+            "email": "$input"
+          }
+        },
+        {
+          "pattern": ".*",
+          "target": "invalid_email"
+        }
+      ],
+      "meta": {
+        "messageId": "ask_email"
+      }
+    },
+    "invalid_email": {
+      "transitions": [
+        {
+          "target": "collect_email"
+        }
+      ],
+      "meta": {
+        "messageId": "invalid_email_message",
+        "transient": true
+      }
+    },
+    "confirmation": {
+      "transitions": [
+        {
+          "pattern": "yes|confirm|ok",
+          "target": "complete"
+        },
+        {
+          "pattern": "no|cancel",
+          "target": "collect_name"
+        }
+      ],
+      "meta": {
+        "messageId": "confirm_details"
+      }
+    },
+    "complete": {
+      "transitions": [],
+      "meta": {
+        "messageId": "profile_saved"
+      }
+    }
+  }
+}
+```
+
+### Cross-Flow Transitions
+
+To transition to another machine/flow, use the `machine:FlowId` syntax:
+
+```json
+{
+  "id": "MainMenu",
+  "initial": "menu",
+  "states": {
+    "menu": {
+      "transitions": [
+        {
+          "pattern": "profile|account",
+          "target": "machine:UserProfileFlow"
+        },
+        {
+          "pattern": "help|support", 
+          "target": "machine:HelpFlow"
+        }
+      ]
+    }
+  }
+}
+```
+
+## Validation
+
+Use the `validateMachineDefinition` function to validate machine definitions at runtime:
+
+```typescript
+import { validateMachineDefinition, type MachineDefinitionJSON } from '@rcs-lang/csm';
+
+const definition: MachineDefinitionJSON = {
+  // ... your machine definition
+};
+
+try {
+  if (validateMachineDefinition(definition)) {
+    console.log('Machine definition is valid');
+  }
+} catch (error) {
+  console.error('Validation failed:', error.message);
+}
+```
+
+## Pattern Matching
+
+The CSM package supports several pattern types:
+
+- **Literal strings**: Match exact text
+- **Regular expressions**: Full regex support
+- **Special patterns**:
+  - `:default` - Fallback pattern (lowest priority)
+  - `.*` - Match any input
+  - `$input` - Capture user input in context
+
+## Usage with TypeScript
+
+The package provides full TypeScript support:
+
+```typescript
+import { 
+  type MachineDefinitionJSON,
+  type AgentDefinitionJSON,
+  validateMachineDefinition 
+} from '@rcs-lang/csm';
+
+// Type-safe machine definition
+const machine: MachineDefinitionJSON = {
+  id: 'MyFlow',
+  initial: 'start',
+  states: {
+    start: {
+      transitions: [
+        { pattern: 'begin', target: 'processing' }
+      ]
+    },
+    processing: {
+      transitions: [
+        { target: 'end' }
+      ],
+      meta: { transient: true }
+    },
+    end: {
+      transitions: []
+    }
+  }
+};
+
+// Validation with type checking
+if (validateMachineDefinition(machine)) {
+  // Machine is valid and type-safe
+}
+```
+
+## Real-World Example: Coffee Shop Agent
+
+Here's a complete machine definition for a coffee shop ordering system with multiple flows:
+
+```json
+{
+  "id": "CoffeeShopAgent",
+  "initial": "main_menu",
+  "states": {
+    "main_menu": {
+      "transitions": [
+        {
+          "pattern": "order|coffee|buy",
+          "target": "machine:OrderFlow"
+        },
+        {
+          "pattern": "menu|options|what",
+          "target": "show_menu"
+        },
+        {
+          "pattern": "help|support",
+          "target": "machine:HelpFlow"
+        },
+        {
+          "pattern": ":default",
+          "target": "welcome"
+        }
+      ],
+      "meta": {
+        "messageId": "main_menu"
+      }
+    },
+    "welcome": {
+      "transitions": [
+        {
+          "target": "main_menu"
+        }
+      ],
+      "meta": {
+        "messageId": "welcome_message",
+        "transient": true
+      }
+    },
+    "show_menu": {
+      "transitions": [
+        {
+          "pattern": "order",
+          "target": "machine:OrderFlow"
+        },
+        {
+          "target": "main_menu"
+        }
+      ],
+      "meta": {
+        "messageId": "menu_display",
+        "transient": true
+      }
+    }
+  },
+  "meta": {
+    "name": "Coffee Shop Main Agent",
+    "description": "Main entry point for coffee shop interactions",
+    "version": "2.0.0"
+  }
+}
+```
+
+And the OrderFlow machine:
+
+```json
+{
+  "id": "OrderFlow",
+  "initial": "choose_size",
+  "states": {
+    "choose_size": {
+      "transitions": [
+        {
+          "pattern": "small|s",
+          "target": "choose_drink",
+          "context": {
+            "size": "small",
+            "price": 3.50
+          }
+        },
+        {
+          "pattern": "medium|m",
+          "target": "choose_drink",
+          "context": {
+            "size": "medium", 
+            "price": 4.00
+          }
+        },
+        {
+          "pattern": "large|l",
+          "target": "choose_drink",
+          "context": {
+            "size": "large",
+            "price": 4.50
+          }
+        },
+        {
+          "pattern": ".*",
+          "target": "invalid_size"
+        }
+      ],
+      "meta": {
+        "messageId": "choose_size"
+      }
+    },
+    "invalid_size": {
+      "transitions": [
+        {
+          "target": "choose_size"
+        }
+      ],
+      "meta": {
+        "messageId": "invalid_size_message",
+        "transient": true
+      }
+    },
+    "choose_drink": {
+      "transitions": [
+        {
+          "pattern": "coffee|americano",
+          "target": "customize",
+          "context": {
+            "drink": "coffee"
+          }
+        },
+        {
+          "pattern": "latte",
+          "target": "customize",
+          "context": {
+            "drink": "latte"
+          }
+        },
+        {
+          "pattern": "cappuccino",
+          "target": "customize", 
+          "context": {
+            "drink": "cappuccino"
+          }
+        },
+        {
+          "pattern": ".*",
+          "target": "invalid_drink"
+        }
+      ],
+      "meta": {
+        "messageId": "choose_drink"
+      }
+    },
+    "invalid_drink": {
+      "transitions": [
+        {
+          "target": "choose_drink"
+        }
+      ],
+      "meta": {
+        "messageId": "invalid_drink_message",
+        "transient": true
+      }
+    },
+    "customize": {
+      "transitions": [
+        {
+          "pattern": "regular|whole",
+          "target": "confirm_order",
+          "context": {
+            "milk": "regular milk",
+            "extraCharge": 0
+          }
+        },
+        {
+          "pattern": "almond|soy|oat",
+          "target": "confirm_order",
+          "context": {
+            "milk": "$input milk",
+            "extraCharge": 0.60
+          }
+        },
+        {
+          "pattern": "skip|no|none",
+          "target": "confirm_order",
+          "context": {
+            "milk": "none",
+            "extraCharge": 0
+          }
+        },
+        {
+          "pattern": ".*",
+          "target": "invalid_milk"
+        }
+      ],
+      "meta": {
+        "messageId": "customize_message"
+      }
+    },
+    "invalid_milk": {
+      "transitions": [
+        {
+          "target": "customize"
+        }
+      ],
+      "meta": {
+        "messageId": "invalid_milk_message",
+        "transient": true
+      }
+    },
+    "confirm_order": {
+      "transitions": [
+        {
+          "pattern": "yes|confirm|ok",
+          "target": "place_order"
+        },
+        {
+          "pattern": "no|cancel|change",
+          "target": "choose_size",
+          "context": {
+            "size": null,
+            "drink": null,
+            "milk": null,
+            "price": 0,
+            "extraCharge": 0
+          }
+        }
+      ],
+      "meta": {
+        "messageId": "confirm_order"
+      }
+    },
+    "place_order": {
+      "transitions": [
+        {
+          "target": "machine:CoffeeShopAgent",
+          "context": {
+            "orderComplete": true,
+            "orderId": "$generateOrderId"
+          }
+        }
+      ],
+      "meta": {
+        "messageId": "order_placed",
+        "transient": true
+      }
+    }
+  },
+  "meta": {
+    "name": "Coffee Order Flow",
+    "description": "Handles the complete coffee ordering process",
+    "version": "1.2.0",
+    "tags": ["ordering", "coffee", "ecommerce"]
+  }
+}
+```
+
+## Multi-Machine Agent Definition
+
+For complex agents with multiple flows, use `AgentDefinitionJSON`:
+
+```json
+{
+  "id": "CoffeeShopBot",
+  "initial": "CoffeeShopAgent",
+  "machines": {
+    "CoffeeShopAgent": {
+      "id": "CoffeeShopAgent",
+      "initial": "main_menu",
+      "states": {
+        // ... main agent states
+      }
+    },
+    "OrderFlow": {
+      "id": "OrderFlow", 
+      "initial": "choose_size",
+      "states": {
+        // ... order flow states
+      }
+    },
+    "HelpFlow": {
+      "id": "HelpFlow",
+      "initial": "help_menu",
+      "states": {
+        "help_menu": {
+          "transitions": [
+            {
+              "pattern": "hours|time",
+              "target": "show_hours"
+            },
+            {
+              "pattern": "location|address",
+              "target": "show_location"
+            },
+            {
+              "pattern": "back|menu",
+              "target": "machine:CoffeeShopAgent"
+            }
+          ],
+          "meta": {
+            "messageId": "help_options"
+          }
+        },
+        "show_hours": {
+          "transitions": [
+            {
+              "target": "help_menu"
+            }
+          ],
+          "meta": {
+            "messageId": "store_hours",
+            "transient": true
+          }
+        },
+        "show_location": {
+          "transitions": [
+            {
+              "target": "help_menu"
+            }
+          ],
+          "meta": {
+            "messageId": "store_location",
+            "transient": true
+          }
+        }
+      }
+    }
+  },
+  "meta": {
+    "name": "Coffee Shop Bot",
+    "description": "Complete coffee shop ordering and support system",
+    "version": "2.0.0"
+  }
+}
+```
+
+## Usage in Code
+
+```typescript
+import { ConversationalAgent } from '@rcs-lang/csm';
+import { validateMachineDefinition } from '@rcs-lang/csm';
+import coffeeShopAgent from './coffee-shop-agent.json';
+
+// Validate the agent definition
+try {
+  validateMachineDefinition(coffeeShopAgent);
+  
+  // Create and run the agent
+  const agent = new ConversationalAgent(coffeeShopAgent);
+  
+  // Process user messages
+  const response = await agent.processMessage({
+    type: 'text',
+    content: 'I want to order a large latte'
+  });
+  
+  console.log('Bot response:', response);
+} catch (error) {
+  console.error('Invalid agent definition:', error);
+}
+```
 
 ## Documentation
 
 - [API Reference](./csm/csm-api-reference)
+- [JSON Schema](../../../packages/csm/schema/machine-definition.schema.json)

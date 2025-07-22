@@ -1,6 +1,7 @@
 {
   "name": "@rcs-lang/core",
-  "version": "0.1.7",
+  "version": "0.2.1",
+  "private": false,
   "description": "Core types and interfaces for RCL language infrastructure",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -30,7 +30,7 @@ This document provides comprehensive API documentation for all RCL language pack
 ### 1. @rcs-lang/ast
 **Purpose**: Parser-independent AST definitions and utilities  
 **Location**: `packages/ast/`  
-**Documentation**: [packages/ast/docs/](./packages/ast/docs/)
+**Documentation**: [AST Package Documentation](./packages/ast)
 
 Provides TypeScript type definitions for the RCL Abstract Syntax Tree, including all node types, position information, and tree manipulation utilities.
 
@@ -44,7 +44,7 @@ Provides TypeScript type definitions for the RCL Abstract Syntax Tree, including
 ### 2. @rcs-lang/compiler
 **Purpose**: Modular compilation pipeline  
 **Location**: `packages/compiler/`  
-**Documentation**: [packages/compiler/docs/](./packages/compiler/docs/)
+**Documentation**: [Compiler Package Documentation](./packages/compiler)
 
 Multi-stage compilation pipeline that transforms RCL source code into various output formats (JavaScript, D2 diagrams, Mermaid, etc.).
 
@@ -57,7 +57,7 @@ Multi-stage compilation pipeline that transforms RCL source code into various ou
 ### 3. @rcs-lang/csm
 **Purpose**: Conversation State Machine runtime  
 **Location**: `packages/csm/`  
-**Documentation**: [packages/csm/docs/](./packages/csm/docs/)
+**Documentation**: [CSM Package Documentation](./packages/csm)
 
 Runtime library for executing compiled RCL agents as conversation state machines. Handles message routing, context management, and flow execution.
 
@@ -70,7 +70,7 @@ Runtime library for executing compiled RCL agents as conversation state machines
 ### 4. @rcs-lang/language-service
 **Purpose**: IDE language features  
 **Location**: `packages/language-service/`  
-**Documentation**: [packages/language-service/docs/](./packages/language-service/docs/)
+**Documentation**: [Language Service Package Documentation](./packages/language-service)
 
 Advanced language service providers for IDE integration, including completion, hover, diagnostics, and more.
 
@@ -85,8 +85,8 @@ Advanced language service providers for IDE integration, including completion, h
 
 ### 5. @rcs-lang/cli
 **Purpose**: Command-line compiler  
-**Location**: `apps/cli/`  
-**Documentation**: [apps/cli/README.md](./apps/cli/README.md)
+**Location**: `packages/cli/`  
+**Documentation**: [CLI Package README](../../../packages/cli/README.md)
 
 Command-line interface for compiling RCL files and managing RCL projects.
 
@@ -97,12 +97,12 @@ npx @rcs-lang/cli validate input.rcl
 npx @rcs-lang/cli generate --format js input.rcl
 ```
 
-### 6. @rcs-lang/ide
-**Purpose**: Web-based RCS Agent Studio  
-**Location**: `apps/ide/`  
-**Documentation**: [apps/ide/README.md](./apps/ide/README.md)
+### 6. VSCode Extension
+**Purpose**: Full language support for VSCode  
+**Location**: `apps/extension/`  
+**Documentation**: [Extension README](../../../apps/extension/README.md)
 
-Browser-based IDE for creating and testing RCS agents without requiring local development setup.
+VSCode extension providing syntax highlighting, completion, diagnostics, and interactive diagram features for RCL files.
 
 ## Common Usage Patterns
 
@@ -258,7 +258,7 @@ class CSMError extends Error {
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on contributing to the RCL language toolchain.
+See the project repository for guidelines on contributing to the RCL language toolchain.
 
 ## License
 

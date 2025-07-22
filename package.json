@@ -35,7 +35,7 @@
     "typecheck": "moon run :typecheck",
     "prepublish:all": "bun run build && bun run test",
     "publish:dry": "bun run prepublish:all && infisical run -- bun scripts/publish.js --dry-run",
-    "publish:packages": "bun run prepublish:all && infisical run -- bun scripts/publish.js",
+    "publish:packages": "infisical run -- bun scripts/publish.js",
     "version:bump": "bun scripts/version.js",
     "release:patch": "bun scripts/prepare-release.js patch",
     "release:minor": "bun scripts/prepare-release.js minor",

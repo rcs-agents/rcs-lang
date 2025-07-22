@@ -1,171 +1,280 @@
 #!/usr/bin/env bun
 
 import { $ } from 'bun';
-import { resolve } from 'path';
-import { writeFileSync, existsSync, readFileSync, readdirSync } from 'fs';
-import { homedir } from 'os';
-import { replaceWorkspaceDependencies, restorePackageJson } from './prepare-publish.js';
+import { resolve, join } from 'path';
+import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'fs';
+import { execSync } from 'child_process';
 
 const ROOT_DIR = resolve(import.meta.dir, '..');
 const isDryRun = process.argv.includes('--dry-run');
 
-// Setup npm authentication
-const npmToken = process.env.NPM_CONFIG_TOKEN;
-if (!npmToken && !isDryRun) {
-  console.error('❌ NPM_CONFIG_TOKEN environment variable is not set');
-  console.error('Please set NPM_CONFIG_TOKEN in your .env file or environment');
-  process.exit(1);
-}
+// Parse version increment type from command line arguments
+const getVersionType = () => {
+  if (process.argv.includes('--major')) return 'major';
+  if (process.argv.includes('--minor')) return 'minor';
+  if (process.argv.includes('--patch')) return 'patch';
+  return 'patch'; // default
+};
 
-// Create or update .npmrc with auth token
-if (npmToken) {
-  const npmrcPath = resolve(homedir(), '.npmrc');
-  const npmrcContent = `//registry.npmjs.org/:_authToken=${npmToken}\n`;
-  
-  // Append to existing .npmrc or create new one
-  if (existsSync(npmrcPath)) {
-    const existing = readFileSync(npmrcPath, 'utf8');
-    if (!existing.includes('//registry.npmjs.org/:_authToken=')) {
-      writeFileSync(npmrcPath, existing + '\n' + npmrcContent);
-    }
-  } else {
-    writeFileSync(npmrcPath, npmrcContent);
-  }
-}
+const versionType = getVersionType();
 
 console.log(`🚀 Publishing RCL packages${isDryRun ? ' (DRY RUN)' : ''}...\n`);
 
-// Function to check version consistency
-function checkVersionConsistency(packages) {
-  const versions = packages.map(pkg => pkg.version);
-  const uniqueVersions = [...new Set(versions)];
+// Get the highest published version of all @rcs-lang packages
+function getHighestPublishedVersion() {
+  console.log('🔍 Finding @rcs-lang packages...');
   
-  if (uniqueVersions.length > 1) {
-    console.error('❌ Version mismatch detected!');
-    console.error('Found multiple versions across packages:');
-    uniqueVersions.forEach(v => {
-      const pkgs = packages.filter(p => p.version === v).map(p => p.name);
-      console.error(`   ${v}: ${pkgs.join(', ')}`);
-    });
-    console.error('\nPlease run "bun run version:bump" to align all package versions.');
-    process.exit(1);
-  }
-  
-  console.log(`✅ All packages are at version ${uniqueVersions[0]}\n`);
-}
-
-// Discover all packages in the packages directory
-function discoverPackages() {
-  const packagesDir = resolve(ROOT_DIR, 'packages');
-  const packages = [];
-  
-  if (!existsSync(packagesDir)) {
-    console.warn('⚠️  packages directory not found');
-    return packages;
-  }
-  
-  const entries = readdirSync(packagesDir, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const packageJsonPath = resolve(packagesDir, entry.name, 'package.json');
-      
-      if (existsSync(packageJsonPath)) {
-        try {
-          const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-          
-          // Only include packages that are not private
-          if (!packageJson.private) {
-            packages.push({
-              name: packageJson.name,
-              path: `packages/${entry.name}`,
-              version: packageJson.version,
-              dependencies: packageJson.dependencies || {},
-              packageJson
-            });
-          }
-        } catch (error) {
-          console.warn(`⚠️  Failed to read package.json for ${entry.name}:`, error.message);
+  // Get all packages from local packages/ directory (more reliable than npm search)
+  const localPackages = [];
+  try {
+    const packagesDir = join(ROOT_DIR, 'packages');
+    const dirs = readdirSync(packagesDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+    
+    for (const dir of dirs) {
+      const packagePath = join(packagesDir, dir, 'package.json');
+      try {
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+        if (packageJson.name && packageJson.name.startsWith('@rcs-lang/') && !packageJson.private) {
+          localPackages.push(packageJson.name);
         }
+      } catch (err) {
+        // Skip invalid package.json files
       }
     }
+  } catch (err) {
+    console.warn('⚠️ Failed to read local packages, using fallback list');
+  }
+  
+  // Fallback list if local discovery fails
+  const fallbackPackages = [
+    '@rcs-lang/ast',
+    '@rcs-lang/compiler', 
+    '@rcs-lang/csm',
+    '@rcs-lang/language-service',
+    '@rcs-lang/parser',
+    '@rcs-lang/cli',
+    '@rcs-lang/core',
+    '@rcs-lang/file-system',
+    '@rcs-lang/validation'
+  ];
+  
+  const packagesToCheck = localPackages.length > 0 ? localPackages : fallbackPackages;
+  let highestVersion = '0.0.0';
+  
+  console.log(`Checking ${packagesToCheck.length} packages for latest versions...`);
+  
+  for (const pkgName of packagesToCheck) {
+    try {
+      // Query each package individually to get the actual latest version (not stale search data)
+      const version = execSync(`npm view ${pkgName} version`, { encoding: 'utf8' }).trim();
+      
+      if (compareVersions(version, highestVersion) > 0) {
+        highestVersion = version;
+      }
+      console.log(`📦 ${pkgName}: ${version}`);
+    } catch (err) {
+      console.log(`📦 ${pkgName}: not found`);
+    }
+  }
+  
+  return highestVersion;
+}
+
+// Compare semver versions (returns -1, 0, or 1)
+function compareVersions(a, b) {
+  const partsA = a.split('.').map(Number);
+  const partsB = b.split('.').map(Number);
+  
+  for (let i = 0; i < 3; i++) {
+    if (partsA[i] > partsB[i]) return 1;
+    if (partsA[i] < partsB[i]) return -1;
+  }
+  return 0;
+}
+
+// Discover all packages in packages/ directory
+function discoverPackages() {
+  const packagesDir = join(ROOT_DIR, 'packages');
+  const packages = [];
+  
+  try {
+    const dirs = readdirSync(packagesDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .filter(dirent => !dirent.name.includes('node_modules'))
+      .map(dirent => dirent.name);
+    
+    for (const dir of dirs) {
+      const packagePath = join(packagesDir, dir, 'package.json');
+      try {
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+        
+        if (!packageJson.name) {
+          console.log(`⚠️ Skipping ${dir}: no package name`);
+          continue;
+        }
+        
+        if (packageJson.private === true) {
+          console.log(`🔒 Skipping private package: ${packageJson.name}`);
+          continue;
+        }
+        
+        packages.push({
+          name: packageJson.name,
+          path: `packages/${dir}`,
+          packageJson
+        });
+        console.log(`📦 Discovered: ${packageJson.name}`);
+      } catch (err) {
+        console.log(`⚠️ Skipping ${dir}: invalid package.json`);
+      }
+    }
+  } catch (err) {
+    console.error('❌ Failed to discover packages:', err.message);
+    process.exit(1);
   }
   
   return packages;
 }
 
-// Sort packages by dependency order (topological sort)
-function sortPackagesByDependencies(packages) {
-  const sorted = [];
-  const visiting = new Set();
-  const visited = new Set();
+console.log('🔍 Finding highest published version...');
+const highestPublished = getHighestPublishedVersion();
+const [major, minor, patch] = highestPublished.split('.').map(Number);
+
+let newVersion;
+switch (versionType) {
+  case 'major':
+    newVersion = `${major + 1}.0.0`;
+    break;
+  case 'minor':
+    newVersion = `${major}.${minor + 1}.0`;
+    break;
+  case 'patch':
+  default:
+    newVersion = `${major}.${minor}.${patch + 1}`;
+    break;
+}
+
+console.log(`\n📈 Highest published version: ${highestPublished}`);
+console.log(`🔧 Version increment type: ${versionType}`);
+console.log(`🚀 New version: ${newVersion}\n`);
+
+const PACKAGES = discoverPackages();
+console.log(`\n🎯 Found ${PACKAGES.length} packages to publish\n`);
+
+// Function to update @rcs-lang dependencies in a package.json
+function updateRcsLangDependencies(pkgPath, targetVersion, useWorkspace = false) {
+  const packageJson = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  const depTypes = ['dependencies', 'devDependencies', 'peerDependencies'];
+  let updated = false;
   
-  function visit(pkg) {
-    if (visited.has(pkg.name)) return;
-    if (visiting.has(pkg.name)) {
-      // Circular dependency - just add it anyway
-      console.warn(`⚠️  Circular dependency detected involving ${pkg.name}`);
-      return;
-    }
-    
-    visiting.add(pkg.name);
-    
-    // Visit dependencies first
-    for (const depName of Object.keys(pkg.dependencies)) {
-      if (depName.startsWith('@rcs-lang/')) {
-        const depPkg = packages.find(p => p.name === depName);
-        if (depPkg) {
-          visit(depPkg);
+  depTypes.forEach(depType => {
+    if (packageJson[depType]) {
+      Object.keys(packageJson[depType]).forEach(dep => {
+        if (dep.startsWith('@rcs-lang/')) {
+          const oldVersion = packageJson[depType][dep];
+          const newVersionSpec = useWorkspace ? 'workspace:*' : `^${targetVersion}`;
+          if (oldVersion !== newVersionSpec) {
+            packageJson[depType][dep] = newVersionSpec;
+            updated = true;
+          }
         }
-      }
+      });
     }
-    
-    visiting.delete(pkg.name);
-    visited.add(pkg.name);
-    sorted.push(pkg);
+  });
+  
+  if (updated) {
+    writeFileSync(pkgPath, JSON.stringify(packageJson, null, 2) + '\n');
   }
   
-  // Visit all packages
-  for (const pkg of packages) {
-    visit(pkg);
-  }
+  return updated;
+}
+
+// Discover all package.json files in the monorepo
+function discoverAllPackageJsons() {
+  const packages = [];
+  const searchDirs = ['apps', 'libs', 'packages'];
   
-  return sorted;
+  // Add root package.json
+  packages.push('package.json');
+  
+  searchDirs.forEach(searchDir => {
+    const dirPath = join(ROOT_DIR, searchDir);
+    try {
+      const dirs = readdirSync(dirPath, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
+      
+      dirs.forEach(dir => {
+        const packagePath = `${searchDir}/${dir}/package.json`;
+        const fullPath = join(ROOT_DIR, packagePath);
+        try {
+          // Check if package.json exists
+          readFileSync(fullPath, 'utf8');
+          packages.push(packagePath);
+        } catch (err) {
+          // Skip if package.json doesn't exist
+        }
+      });
+    } catch (err) {
+      // Skip if directory doesn't exist
+    }
+  });
+  
+  return packages;
 }
 
-const discoveredPackages = discoverPackages();
-const PACKAGES = sortPackagesByDependencies(discoveredPackages);
+// Update all package versions and dependencies
+function updateAllPackageVersions(targetVersion, useWorkspace = false) {
+  console.log(`\n📝 ${useWorkspace ? 'Restoring workspace dependencies' : 'Updating package versions and dependencies'}...\n`);
+  
+  const allPackages = discoverAllPackageJsons();
 
-if (PACKAGES.length === 0) {
-  console.error('❌ No packages found to publish');
-  process.exit(1);
+  allPackages.forEach(pkgPath => {
+    const fullPath = join(ROOT_DIR, pkgPath);
+    try {
+      const pkg = JSON.parse(readFileSync(fullPath, 'utf8'));
+      
+      // Update version for @rcs-lang packages only (but not when restoring workspace deps)
+      if (!useWorkspace && pkg.name && pkg.name.startsWith('@rcs-lang/')) {
+        pkg.version = targetVersion;
+        console.log(`✅ ${pkgPath}: version updated to ${targetVersion}`);
+      }
+      
+      // Update @rcs-lang dependencies in all packages
+      const depsUpdated = updateRcsLangDependencies(fullPath, targetVersion, useWorkspace);
+      if (depsUpdated) {
+        console.log(`✅ ${pkgPath}: dependencies ${useWorkspace ? 'restored to workspace:*' : `updated to ^${targetVersion}`}`);
+      }
+      
+      // Write the package.json with version updates if not useWorkspace
+      if (!useWorkspace && pkg.name && pkg.name.startsWith('@rcs-lang/')) {
+        writeFileSync(fullPath, JSON.stringify(pkg, null, 2) + '\n');
+      }
+    } catch (err) {
+      console.error(`❌ Failed to update ${pkgPath}:`, err.message);
+    }
+  });
 }
-
-console.log(`📋 Found ${PACKAGES.length} packages to publish:`);
-for (const pkg of PACKAGES) {
-  console.log(`   • ${pkg.name}@${pkg.version} (${pkg.path})`);
-}
-
-console.log('');
-
-// Check version consistency before proceeding
-checkVersionConsistency(PACKAGES);
 
 async function publishPackage(pkg) {
   console.log(`\n📦 Publishing ${pkg.name}...`);
   
   const packageDir = resolve(ROOT_DIR, pkg.path);
-  const packageJsonPath = resolve(packageDir, 'package.json');
+  const packageJsonPath = join(packageDir, 'package.json');
   
-  // Note: While bun publish handles workspace:* dependencies automatically,
-  // we still need to remove the "private: true" field from packages
-  const backupPath = replaceWorkspaceDependencies(packageJsonPath);
-  
-  process.chdir(packageDir);
+  // Create backup of original package.json
+  const originalContent = readFileSync(packageJsonPath, 'utf8');
+  const backupPath = packageJsonPath + '.backup';
+  writeFileSync(backupPath, originalContent);
   
   try {
-    // Use bun publish which automatically handles workspace:* dependencies
-    // --access public is required for scoped packages
+    // Replace workspace:* dependencies with actual versions before publishing
+    updateRcsLangDependencies(packageJsonPath, newVersion, false);
+    
+    process.chdir(packageDir);
+    
     if (isDryRun) {
       await $`bun publish --dry-run --access public`;
     } else {
@@ -177,32 +286,76 @@ async function publishPackage(pkg) {
     console.error(`❌ Failed to publish ${pkg.name}:`, error.message);
     return false;
   } finally {
-    // Always restore the original package.json
-    restorePackageJson(packageJsonPath, backupPath);
+    // Always restore original package.json
+    writeFileSync(packageJsonPath, originalContent);
+    try {
+      // Clean up backup file
+      unlinkSync(backupPath);
+    } catch (err) {
+      // Ignore cleanup errors
+    }
   }
 }
 
 async function main() {
-  let failedPackages = [];
-  
-  for (const pkg of PACKAGES) {
-    const success = await publishPackage(pkg);
-    if (!success) {
-      failedPackages.push(pkg.name);
-      if (!isDryRun) {
-        // Stop on first failure in real publish
-        break;
+  try {
+    // Step 0: Build and test everything BEFORE updating versions
+    if (!isDryRun) {
+      console.log('🏗️ Building and testing packages...\n');
+      try {
+        process.chdir(ROOT_DIR);
+        await $`bun run build`;
+        await $`bun run test`;
+        console.log('✅ Build and tests completed successfully!\n');
+      } catch (error) {
+        console.error('❌ Build or tests failed:', error.message);
+        console.error('Please fix build/test issues before publishing.');
+        process.exit(1);
+      }
+    } else {
+      console.log('⏭️ Skipping build and test for dry run\n');
+    }
+    
+    // Step 1: Update all package versions and dependencies
+    updateAllPackageVersions(newVersion, false);
+    
+    // Step 2: Publish packages
+    let failedPackages = [];
+    
+    for (const pkg of PACKAGES) {
+      const success = await publishPackage(pkg);
+      if (!success) {
+        failedPackages.push(pkg.name);
+        if (!isDryRun) {
+          // Stop on first failure in real publish
+          break;
+        }
       }
     }
-  }
-  
-  console.log('\n' + '='.repeat(50));
-  
-  if (failedPackages.length > 0) {
-    console.log(`\n❌ Failed to publish: ${failedPackages.join(', ')}`);
+    
+    console.log('\n' + '='.repeat(50));
+    
+    if (failedPackages.length > 0) {
+      console.log(`\n❌ Failed to publish: ${failedPackages.join(', ')}`);
+      // Still restore workspace dependencies even if publish failed
+      updateAllPackageVersions(newVersion, true);
+      process.exit(1);
+    } else {
+      console.log(`\n✨ All packages published successfully!`);
+    }
+    
+    // Step 3: Restore workspace dependencies
+    updateAllPackageVersions(newVersion, true);
+    
+  } catch (error) {
+    console.error('❌ Publish script failed:', error.message);
+    // Try to restore workspace dependencies even on error
+    try {
+      updateAllPackageVersions(newVersion, true);
+    } catch (restoreError) {
+      console.error('❌ Failed to restore workspace dependencies:', restoreError.message);
+    }
     process.exit(1);
-  } else {
-    console.log(`\n✨ All packages published successfully!`);
   }
 }
 

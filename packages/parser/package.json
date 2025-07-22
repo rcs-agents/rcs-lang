@@ -1,10 +1,11 @@
 {
   "name": "@rcs-lang/parser",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "private": false,
   "scripts": {
     "build": "moon run parser:build",
     "dev": "moon run parser:dev",
@@ -17,8 +18,8 @@
     "format": "moon run parser:format"
   },
   "dependencies": {
-    "@rcs-lang/ast": "^0.1.1",
-    "@rcs-lang/core": "^0.1.1",
+    "@rcs-lang/ast": "workspace:*",
+    "@rcs-lang/core": "workspace:*",
     "antlr4ng": "^3.0.16"
   },
   "devDependencies": {

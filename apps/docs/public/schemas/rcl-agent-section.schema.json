@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcl-lang.org/schemas/agent-section.json",
+  "title": "RCL Agent Section Schema",
+  "description": "Schema for validating agent sections in RCL's generic syntax",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "agent",
+      "description": "Section type must be 'agent'"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9_-]*$",
+      "description": "Agent identifier in Title Case"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Required. The name that the agent displays to users",
+          "maxLength": 100
+        },
+        "brandName": {
+          "type": "string",
+          "description": "The name of the brand associated with the agent"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the agent"
+        },
+        "logoUri": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI for the agent's logo"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Brand color in hex format"
+        },
+        "agentUseCase": {
+          "type": "string",
+          "enum": ["TRANSACTIONAL", "PROMOTIONAL", "OTP", "MULTI_USE"],
+          "description": "The use case type for the agent"
+        },
+        "hostingRegion": {
+          "type": "string",
+          "enum": ["NORTH_AMERICA", "EUROPE", "ASIA_PACIFIC"],
+          "description": "The hosting region for the agent"
+        }
+      },
+      "required": ["displayName"],
+      "additionalProperties": true
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/configSection"
+          },
+          {
+            "$ref": "#/definitions/defaultsSection"
+          }
+        ]
+      }
+    }
+  },
+  "required": ["type", "id", "attributes"],
+  "definitions": {
+    "configSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "config"
+        },
+        "id": {
+          "type": "string",
+          "const": "Config"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["type"]
+    },
+    "defaultsSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "defaults"
+        },
+        "id": {
+          "type": "string",
+          "const": "Defaults"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["type"]
+    }
+  }
+}

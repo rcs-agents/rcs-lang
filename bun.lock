@@ -69,7 +69,7 @@
     },
     "libs/diagram": {
       "name": "@rcs-lang/diagram",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
         "elkjs": "^0.10.0",
         "inversify": "6.2.2",
@@ -87,7 +87,7 @@
     },
     "packages/ast": {
       "name": "@rcs-lang/ast",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "devDependencies": {
         "@types/minimatch": "^6.0.0",
         "@types/node": "^24.0.13",
@@ -96,7 +96,7 @@
     },
     "packages/cli": {
       "name": "@rcs-lang/cli",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "bin": {
         "rcl-cli": "./dist/index.js",
         "rcl": "./dist/index.js",
@@ -126,7 +126,7 @@
     },
     "packages/compiler": {
       "name": "@rcs-lang/compiler",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -141,9 +141,9 @@
     },
     "packages/core": {
       "name": "@rcs-lang/core",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
-        "@rcs-lang/ast": "^0.1.1",
+        "@rcs-lang/ast": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.0.0",
@@ -153,7 +153,7 @@
     },
     "packages/csm": {
       "name": "@rcs-lang/csm",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "devDependencies": {
         "@types/node": "^20.14.9",
         "tsup": "^8.1.0",
@@ -162,7 +162,7 @@
     },
     "packages/file-system": {
       "name": "@rcs-lang/file-system",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
       },
@@ -173,7 +173,7 @@
     },
     "packages/language-service": {
       "name": "@rcs-lang/language-service",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
         "@rcs-lang/compiler": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -195,10 +195,10 @@
     },
     "packages/parser": {
       "name": "@rcs-lang/parser",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
-        "@rcs-lang/ast": "^0.1.1",
-        "@rcs-lang/core": "^0.1.1",
+        "@rcs-lang/ast": "workspace:*",
+        "@rcs-lang/core": "workspace:*",
         "antlr4ng": "^3.0.16",
       },
       "devDependencies": {
@@ -208,10 +208,10 @@
     },
     "packages/validation": {
       "name": "@rcs-lang/validation",
-      "version": "0.1.3",
+      "version": "0.1.7",
       "dependencies": {
-        "@rcs-lang/core": "^0.1.1",
-        "@rcs-lang/parser": "^0.1.1",
+        "@rcs-lang/core": "workspace:*",
+        "@rcs-lang/parser": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.0.0",
@@ -2521,9 +2521,9 @@
 
     "tunnel-agent": ["tunnel-agent@0.6.0", "", { "dependencies": { "safe-buffer": "^5.0.1" } }, "sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w=="],
 
-    "twoslash": ["twoslash@0.3.2", "", { "dependencies": { "@typescript/vfs": "^1.6.1", "twoslash-protocol": "0.3.2" }, "peerDependencies": { "typescript": "^5.5.0" } }, "sha512-TB+ja888uMKhbng8HzpTHm+JfxIWbngIHPy4nKEt2N93MFjpqmkqn8ppnPhIKj4kDnrohEsiogMF7T1gMY06rw=="],
+    "twoslash": ["twoslash@0.3.3", "", { "dependencies": { "@typescript/vfs": "^1.6.1", "twoslash-protocol": "0.3.3" }, "peerDependencies": { "typescript": "^5.5.0" } }, "sha512-Yen1RBSYh/NUR6tfK6xT7DsXkBYby7lfp078Q7XoJR5dtAeG9jB5PVL1oF2sZwHapLjaqcZNlw7GSB8himZNsQ=="],
 
-    "twoslash-protocol": ["twoslash-protocol@0.3.2", "", {}, "sha512-lWIL1dGcMr7cywSLSn8ufCoeyPab3bIwPE6DmAlQYQSMjJUgzzRvSz/LsQ179eNJafRghYDlIgF2v7pmsjV3Ww=="],
+    "twoslash-protocol": ["twoslash-protocol@0.3.3", "", {}, "sha512-26NXjXEj+2NgytwOjjhFtNpQI7Zgct6PTyLg6JO7fIbO7MIm+kx89IxvBustgBOSKxoWjNBN2LXjNHHMD7+k0g=="],
 
     "type": ["type@2.7.3", "", {}, "sha512-8j+1QmAbPvLZow5Qpi6NCaN8FB60p/6x8/vfNqOk/hC+HuvFZhL4+WfekuhQLiqFZXOgQdrs3B+XxEmCc6b3FQ=="],
 
