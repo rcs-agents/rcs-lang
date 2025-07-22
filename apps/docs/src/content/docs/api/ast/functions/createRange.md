@@ -7,7 +7,7 @@ title: "createRange"
 
 > **createRange**(`start`, `end`): [`Range`](/api/ast/interfaces/range/)
 
-Defined in: [utils.ts:27](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/utils.ts#L27)
+Defined in: [utils.ts:27](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/utils.ts#L27)
 
 Create a range object
 

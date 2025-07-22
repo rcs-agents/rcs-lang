@@ -5,7 +5,7 @@ prev: false
 title: "TypeTag"
 ---
 
-Defined in: [ast.ts:251](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L251)
+Defined in: [ast.ts:251](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L251)
 
 A type tag for semantic data types.
 
@@ -23,7 +23,7 @@ TypeTag ::= '<' TYPE_TAG_NAME (STRING | NUMBER | IDENTIFIER | ISO_DURATION) ('|'
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6
 
 > `optional` **qualifier**: `string`
 
-Defined in: [ast.ts:255](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L255)
+Defined in: [ast.ts:255](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L255)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:255](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05
 
 > **tagName**: `string`
 
-Defined in: [ast.ts:253](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L253)
+Defined in: [ast.ts:253](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L253)
 
 ***
 
@@ -51,7 +51,7 @@ Defined in: [ast.ts:253](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05
 
 > **type**: `"TypeTag"`
 
-Defined in: [ast.ts:252](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L252)
+Defined in: [ast.ts:252](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L252)
 
 ***
 
@@ -59,4 +59,4 @@ Defined in: [ast.ts:252](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05
 
 > **value**: `string` \| `number`
 
-Defined in: [ast.ts:254](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L254)
+Defined in: [ast.ts:254](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L254)
