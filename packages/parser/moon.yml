@@ -25,7 +25,7 @@ tasks:
     command: bash
     args: 
       - -c
-      - "antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && cp src/generated/RclLexer.tokens src/ && antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4 && rm src/RclLexer.tokens"
+      - "bunx antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && cp src/generated/RclLexer.tokens src/ && bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4 && rm src/RclLexer.tokens"
     deps:
       - prebuild
       
