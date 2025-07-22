@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import markdoc from '@astrojs/markdoc';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import starlightLinksValidator from 'starlight-links-validator';
 import react from '@astrojs/react';
 
 // https://astro.build/config
@@ -22,6 +23,7 @@ export default defineConfig({
 					includeFull: true,
 					includeSmall: true,
 				}),
+				starlightLinksValidator(),
 			],
 			sidebar: [
 				{
