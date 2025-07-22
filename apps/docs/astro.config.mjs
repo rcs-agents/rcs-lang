@@ -3,11 +3,13 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import markdoc from '@astrojs/markdoc';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://rcl.rcsagents.io',
 	integrations: [
+		react(),
 		markdoc(),
 		starlight({
 			title: 'RCL Documentation',

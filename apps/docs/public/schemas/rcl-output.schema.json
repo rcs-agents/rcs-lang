@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json",
+  "$id": "https://rcl.rcsagents.io/schemas/rcl-output.schema.json",
   "title": "RCL Compilation Output",
   "description": "Schema for RCL compiler output combining agent configuration, conversation flows, and messages",
   "type": "object",
@@ -16,7 +16,7 @@
       "description": "Dictionary of conversation flows, keyed by flow ID",
       "patternProperties": {
         "^[a-zA-Z][a-zA-Z0-9_]*$": {
-          "$ref": "https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json"
+          "$ref": "https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json"
         }
       },
       "additionalProperties": false,

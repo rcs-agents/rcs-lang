@@ -11,7 +11,7 @@ The RCL compiler transforms RCL files into two output formats: JSON and JavaScri
 
 ## Schema Reference
 
-All output must validate against: **[`https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json`](/schemas/rcl-output.schema.json)**
+All output must validate against: **[`https://rcl.rcsagents.io/schemas/rcl-output.schema.json`](/schemas/rcl-output.schema.json)**
 
 ## Output Formats
 
@@ -21,7 +21,7 @@ The JSON output contains three main sections:
 
 ```json
 {
-  "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json",
+  "$schema": "https://rcl.rcsagents.io/schemas/rcl-output.schema.json",
   "agent": {
     "name": "BMWAgent",
     "displayName": "BMW Virtual Assistant",
@@ -46,7 +46,7 @@ The JSON output contains three main sections:
   },
   "flows": {
     "MainFlow": {
-      "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json",
+      "$schema": "https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json",
       "id": "MainFlow", 
       "initial": "Welcome",
       "states": {
@@ -379,10 +379,10 @@ The compiler validates output against these schemas:
 **Validation Tools:**
 ```bash
 # Using ajv-cli
-npx ajv validate -s https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json -d output.json
+npx ajv validate -s https://rcl.rcsagents.io/schemas/rcl-output.schema.json -d output.json
 
 # Using jsonschema (Python) 
-jsonschema -i output.json https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json
+jsonschema -i output.json https://rcl.rcsagents.io/schemas/rcl-output.schema.json
 ```
 
 ## Implementation Notes
