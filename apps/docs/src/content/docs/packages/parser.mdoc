@@ -1,10 +1,260 @@
 ---
-title: Parser Package
-description: ANTLR4-based parser for RCL
+title: "@rcs-lang/parser"
+description: "ANTLR4-based grammar and parser for RCL"
 ---
-# Parser Package
 
-The Parser package provides ANTLR4-based grammar and parser for RCL (Rich Communication Language).
+# @rcs-lang/parser
+
+ANTLR4-based grammar and parser for RCL (Rich Communication Language) that converts source code into Abstract Syntax Trees for further processing.
+
+## Installation
+
+```bash
+bun add @rcs-lang/parser
+```
+
+## Overview
+
+This package provides the primary parser for RCL, built on ANTLR4 with support for:
+
+- **Python-like indentation** - Significant whitespace handling
+- **Context-aware parsing** - Proper scope and section handling  
+- **Error recovery** - Graceful handling of syntax errors
+- **Position tracking** - Source locations for diagnostics
+- **Symbol extraction** - Identifier and reference extraction
+
+## Quick Start
+
+```typescript
+import { AntlrRclParser } from '@rcs-lang/parser';
+
+const parser = new AntlrRclParser();
+
+// Initialize parser (required for ANTLR)
+await parser.initialize();
+
+// Parse RCL source code
+const result = await parser.parse(`
+  agent CoffeeShop
+    displayName: "Coffee Shop Agent"
+    
+    flow OrderFlow
+      start: Welcome
+      
+      on Welcome
+        match @userInput
+          "order coffee" -> ChooseSize
+          "view menu" -> ShowMenu
+    
+    messages Messages
+      text Welcome "Hello! How can I help you today?"
+`);
+
+if (result.success) {
+  console.log('AST:', result.value.ast);
+  console.log('Symbols:', result.value.symbols);
+} else {
+  console.error('Parse error:', result.error);
+}
+```
+
+## Grammar Structure
+
+The RCL parser is built from two ANTLR4 grammar files:
+
+### Lexer Grammar (`RclLexer.g4`)
+
+Defines tokenization rules for:
+- **Keywords** - `agent`, `flow`, `messages`, `match`, etc.
+- **Literals** - strings, numbers, booleans, atoms
+- **Identifiers** - names and variables
+- **Operators** - `->`, `:`, `...`, etc.
+- **Indentation** - Python-like INDENT/DEDENT tokens
+
+### Parser Grammar (`RclParser.g4`)
+
+Defines syntax rules for:
+- **Document structure** - imports, sections, attributes
+- **Agent definitions** - configuration and flows
+- **Flow definitions** - states and transitions  
+- **Message definitions** - text, rich cards, carousels
+- **Value expressions** - literals, variables, collections
+
+## Python-like Indentation
+
+The parser handles significant whitespace through a custom lexer base class:
+
+```typescript
+// RclLexerBase.ts provides indentation handling
+class RclLexerBase extends Lexer {
+  // Generates INDENT/DEDENT tokens based on indentation levels
+  // Maintains an indentation stack for proper nesting
+  // Handles mixed tabs/spaces with error reporting
+}
+```
+
+Example indentation handling:
+```rcl
+agent MyAgent           # Level 0
+  displayName: "..."    # Level 1 - INDENT
+  
+  flow Main             # Level 1
+    start: Welcome      # Level 2 - INDENT
+    
+    on Welcome          # Level 2
+      -> End            # Level 3 - INDENT
+                        # Level 0 - DEDENT DEDENT DEDENT
+```
+
+## Parser API
+
+### AntlrRclParser
+
+Main parser class implementing the `IParser` interface:
+
+```typescript
+class AntlrRclParser implements IParser {
+  // Initialize parser (required for ANTLR setup)
+  async initialize(): Promise<void>;
+  
+  // Parse source code into AST
+  async parse(source: string, fileName?: string): Promise<Result<ParseResult>>;
+  
+  // Check if parser is initialized
+  isInitialized(): boolean;
+}
+
+interface ParseResult {
+  ast: RclFile;           // Root AST node
+  symbols: SymbolTable;   // Extracted symbols  
+  parseTree?: any;        // Raw ANTLR parse tree (debug)
+}
+```
+
+### Symbol Extraction
+
+The parser extracts symbols during parsing for language service features:
+
+```typescript
+interface SymbolTable {
+  agents: AgentSymbol[];
+  flows: FlowSymbol[];
+  messages: MessageSymbol[];
+  states: StateSymbol[];
+  variables: VariableSymbol[];
+}
+
+interface AgentSymbol {
+  name: string;
+  displayName?: string;
+  range: Range;
+  flows: string[];
+}
+```
+
+## Error Handling
+
+The parser provides detailed error information:
+
+```typescript
+// Parse errors include location information
+const result = await parser.parse(invalidSource);
+
+if (!result.success) {
+  const error = result.error;
+  console.log(`Error at line ${error.line}, column ${error.column}`);
+  console.log(`Message: ${error.message}`);
+  console.log(`Context: ${error.context}`);
+}
+```
+
+Common error types:
+- **Syntax errors** - Invalid tokens or grammar violations
+- **Indentation errors** - Inconsistent or invalid indentation
+- **Context errors** - Invalid section nesting or structure
+
+## Integration with Compilation Pipeline
+
+The parser integrates seamlessly with the compilation pipeline:
+
+```typescript
+import { RCLCompiler } from '@rcs-lang/compiler';
+import { AntlrRclParser } from '@rcs-lang/parser';
+
+const compiler = new RCLCompiler({
+  parser: new AntlrRclParser()
+});
+
+const result = await compiler.compile(source);
+```
+
+## Build Requirements
+
+The parser requires Java to generate TypeScript files from ANTLR grammar:
+
+### Prerequisites
+
+- **Java 17 or later** must be installed
+- Run `./install-java.sh` for installation instructions
+
+### Build Process
+
+```bash
+# Install dependencies
+bun install
+
+# Generate parser and build TypeScript  
+bun run build
+```
+
+This process:
+1. Generates TypeScript parser files from ANTLR grammar
+2. Fixes import paths in generated files
+3. Compiles TypeScript to JavaScript
+
+### Generated Files
+
+The `src/generated/` directory contains ANTLR-generated files:
+- `RclLexer.ts` - Tokenizer implementation
+- `RclParser.ts` - Parser implementation  
+- `RclParserListener.ts` - Parse tree listener interface
+- `RclParserVisitor.ts` - Parse tree visitor interface
+
+⚠️ **Do not edit generated files manually** - they will be overwritten on rebuild.
+
+## Development
+
+### Testing Grammar Changes
+
+```bash
+# Test the parser
+bun test
+
+# Trace token generation  
+node trace-tokens.js input.rcl
+
+# Trace grammar rules
+node trace-comment.js input.rcl
+```
+
+### Grammar Debugging
+
+Use ANTLR tools for grammar development:
+
+```bash
+# Visualize parse tree (requires ANTLRWorks)
+antlr4-parse RclParser rclFile -gui input.rcl
+
+# Generate parse tree text
+antlr4-parse RclParser rclFile -tree input.rcl
+```
+
+## Performance Considerations
+
+- **Initialization cost** - Call `initialize()` once per parser instance
+- **Memory usage** - Parser instances hold ANTLR runtime state
+- **Parse speed** - ~1000 lines/second for typical RCL files
+- **Error recovery** - Performance degrades with many syntax errors
 
 ## Documentation
 

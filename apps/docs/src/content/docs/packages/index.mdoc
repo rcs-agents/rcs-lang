@@ -7,84 +7,157 @@ description: "Overview of all RCL ecosystem packages"
 
 The RCL ecosystem consists of several modular packages that work together to provide a complete language toolchain. Each package has a specific responsibility and can be used independently or as part of the full suite.
 
-## Core Infrastructure Packages
+## 🚀 Quick Start Guide
 
-These packages provide the foundation for the RCL ecosystem:
-
-### [@rcs-lang/core](/docs/packages/core)
-Core types and interfaces for RCL language infrastructure. This package defines the fundamental data structures and types used throughout the RCL ecosystem.
-
-### [@rcs-lang/ast](/docs/packages/ast)
-Abstract Syntax Tree definitions and utilities for RCL. Provides the tree structure representation of parsed RCL code.
-
-### [@rcs-lang/file-system](/docs/packages/file-system)
-File system abstraction layer that enables consistent file operations across different environments and platforms.
-
-### [@rcs-lang/validation](/docs/packages/validation)
-Comprehensive validation pipeline that performs semantic analysis, type checking, and constraint validation on RCL documents.
-
-## Language Processing Packages
-
-These packages handle parsing and compilation:
-
-### [@rcs-lang/parser](/docs/packages/parser)
-ANTLR4-based parser for RCL syntax. Converts RCL source code into an Abstract Syntax Tree (AST) for further processing.
-
-### [@rcs-lang/compiler](/docs/packages/compiler)
-Modern compilation pipeline that transforms validated RCL ASTs into executable JSON/JavaScript output for RCS agents.
-
-### [@rcs-lang/csm](/docs/packages/csm)
-Conversational State Machine library for building and managing conversation flows in RCS agents.
-
-## Developer Tools
-
-These packages provide tooling for RCL development:
-
-### [@rcs-lang/cli](/docs/packages/cli)
-Command-line interface for compiling RCL files. Provides `rcl` and `rcl-cli` commands for building RCS agents from the terminal.
-
-### [@rcs-lang/language-service](/docs/packages/language-service)
-Advanced language service providers that power IDE features like auto-completion, hover information, and diagnostics.
-
-## Installation
-
-All packages are published to npm and can be installed using your preferred package manager:
-
+**For Users:** Install the CLI globally to start compiling RCL files:
 ```bash
-# Install individual packages
-bun add @rcs-lang/parser @rcs-lang/compiler
-
-# Install the CLI globally
 bun add -g @rcs-lang/cli
+rcl compile my-agent.rcl
 ```
 
-## Package Versioning
+**For Developers:** Install packages for building RCL tools:
+```bash
+bun add @rcs-lang/parser @rcs-lang/compiler @rcs-lang/core
+```
 
-All RCL packages follow synchronized versioning - when any package is updated, all packages are bumped to the same version number. This ensures compatibility across the ecosystem.
+**For IDE Integration:** Use the language service for editor features:
+```bash
+bun add @rcs-lang/language-service
+```
 
-Current version: **0.1.7**
+---
 
-## Package Dependencies
+## 📦 Package Overview
+
+### 🏗️ **Foundation Packages**
+*Core infrastructure that everything else builds on*
+
+| Package | Purpose | When to Use |
+|---------|---------|-------------|
+| **[@rcs-lang/core](/docs/packages/core)** | Shared types, interfaces, and abstractions | Building any RCL tool - required foundation |
+| **[@rcs-lang/ast](/docs/packages/ast)** | Type-safe AST definitions and utilities | Working with parsed RCL syntax trees |
+| **[@rcs-lang/file-system](/docs/packages/file-system)** | Cross-platform file operations | Building tools that read/write files |
+
+### ⚙️ **Language Processing**
+*Parsing and compilation pipeline*
+
+| Package | Purpose | When to Use |
+|---------|---------|-------------|
+| **[@rcs-lang/parser](/docs/packages/parser)** | ANTLR4-based RCL parser | Converting RCL source code to AST |
+| **[@rcs-lang/compiler](/docs/packages/compiler)** | Modern compilation pipeline | Transforming AST to executable formats |
+| **[@rcs-lang/validation](/docs/packages/validation)** | Comprehensive validation system | Checking RCL code for errors/warnings |
+
+### 🛠️ **Developer Tools**
+*CLI and IDE integration*
+
+| Package | Purpose | When to Use |
+|---------|---------|-------------|
+| **[@rcs-lang/cli](/docs/packages/cli)** | Command-line compiler | Building RCS agents from terminal |
+| **[@rcs-lang/language-service](/docs/packages/language-service)** | IDE features (completion, hover, etc.) | Building editor extensions |
+
+### 🤖 **Runtime**
+*Conversation execution engine*
+
+| Package | Purpose | When to Use |
+|---------|---------|-------------|
+| **[@rcs-lang/csm](/docs/packages/csm)** | Lightweight conversation state machine | Running RCS agents in production |
+
+---
+
+## 🎯 **Choose the Right Package**
+
+### I want to...
+
+**📝 Parse RCL code**
+```typescript
+import { AntlrRclParser } from '@rcs-lang/parser';
+// ✅ Use @rcs-lang/parser
+```
+
+**🔨 Compile RCL to JSON/JavaScript**
+```typescript
+import { RCLCompiler } from '@rcs-lang/compiler';
+// ✅ Use @rcs-lang/compiler
+```
+
+**💻 Add RCL support to my editor**
+```typescript
+import { LanguageService } from '@rcs-lang/language-service';
+// ✅ Use @rcs-lang/language-service
+```
+
+**🚀 Run RCS agents in production**
+```typescript
+import { ConversationalAgent } from '@rcs-lang/csm';
+// ✅ Use @rcs-lang/csm
+```
+
+**🧪 Build custom tooling**
+```typescript
+import { Result, IFileSystem } from '@rcs-lang/core';
+// ✅ Start with @rcs-lang/core
+```
+
+---
+
+## 📊 **Package Maturity & Documentation Quality**
+
+| Package | Maturity | Docs Quality | Production Ready |
+|---------|----------|--------------|-------------------|
+| **@rcs-lang/ast** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/cli** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/compiler** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/core** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/csm** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | 🚧 In Development |
+| **@rcs-lang/file-system** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/language-service** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/parser** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **@rcs-lang/validation** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+
+---
+
+## 🏛️ **Architecture Overview**
+
+The RCL ecosystem follows a layered architecture:
 
 ```mermaid
-graph TD
-    CLI[CLI] --> Compiler
+graph TB
+    subgraph "🛠️ Developer Tools"
+        CLI[CLI Tool]
+        LS[Language Service]
+    end
+    
+    subgraph "⚙️ Language Processing"
+        Parser[Parser]
+        Compiler[Compiler] 
+        Validation[Validation]
+    end
+    
+    subgraph "🏗️ Foundation"
+        AST[AST Types]
+        Core[Core Interfaces]
+        FileSystem[File System]
+    end
+    
+    subgraph "🤖 Runtime"
+        CSM[Conversation State Machine]
+    end
+    
+    CLI --> Compiler
     CLI --> Parser
     CLI --> FileSystem
     
-    LanguageService[Language Service] --> Parser
-    LanguageService --> Compiler
-    LanguageService --> Core
-    LanguageService --> Validation
+    LS --> Parser
+    LS --> Compiler
+    LS --> Validation
     
-    Compiler --> Core
     Compiler --> AST
+    Compiler --> Core
     Compiler --> Parser
     Compiler --> Validation
-    Compiler --> FileSystem
     
-    Parser --> Core
     Parser --> AST
+    Parser --> Core
     
     Validation --> Core
     Validation --> Parser
@@ -92,14 +165,73 @@ graph TD
     CSM --> Core
     
     FileSystem --> Core
-    
-    AST
-    Core
 ```
 
-## Development
+### 🔄 **Typical Data Flow**
 
-All packages are part of a monorepo managed with Moon and use Bun for package management. To work on the packages:
+1. **Source Code** → **Parser** → **AST**
+2. **AST** → **Validation** → **Diagnostics**  
+3. **AST** → **Compiler** → **JSON/JavaScript**
+4. **JSON** → **CSM** → **Running Agent**
+
+---
+
+## 📚 **Learning Path**
+
+### 🟢 **Beginner** - Just want to use RCL
+1. Start with **[@rcs-lang/cli](/docs/packages/cli)** - compile your first agent
+2. Learn **[@rcs-lang/csm](/docs/packages/csm)** - run your agent
+
+### 🟡 **Intermediate** - Building RCL tools  
+1. Understand **[@rcs-lang/core](/docs/packages/core)** - core concepts
+2. Use **[@rcs-lang/parser](/docs/packages/parser)** - parse RCL code
+3. Explore **[@rcs-lang/ast](/docs/packages/ast)** - work with syntax trees
+
+### 🔴 **Advanced** - Contributing to RCL
+1. Master **[@rcs-lang/compiler](/docs/packages/compiler)** - compilation pipeline
+2. Study **[@rcs-lang/validation](/docs/packages/validation)** - validation system
+3. Dive into **[@rcs-lang/language-service](/docs/packages/language-service)** - IDE features
+
+---
+
+## 🚀 **Installation & Usage**
+
+### Global CLI Installation
+```bash
+# Install CLI globally for terminal usage
+bun add -g @rcs-lang/cli
+
+# Verify installation
+rcl --version
+```
+
+### Library Usage
+```bash
+# Core packages for building tools
+bun add @rcs-lang/core @rcs-lang/ast @rcs-lang/parser
+
+# Full compilation stack
+bun add @rcs-lang/compiler @rcs-lang/validation @rcs-lang/file-system
+
+# Runtime for production agents
+bun add @rcs-lang/csm
+
+# IDE integration
+bun add @rcs-lang/language-service
+```
+
+### Package Versioning
+
+All RCL packages follow **synchronized versioning** - when any package is updated, all packages are bumped to the same version number. This ensures compatibility across the ecosystem.
+
+**Current version: 0.2.1**
+
+---
+
+## 🧑‍💻 **Development**
+
+### Monorepo Structure
+All packages are part of a monorepo managed with **Moon** and use **Bun** for package management:
 
 ```bash
 # Clone the repository
@@ -119,6 +251,30 @@ moon run :test
 moon run :dev
 ```
 
-## Contributing
+### Package Management
+- **Build System:** Moon (task orchestration)
+- **Package Manager:** Bun (fast, modern)
+- **Runtime:** Node.js AND Web browser support
+- **Grammar:** ANTLR4 (replaced Tree-sitter)
 
-Contributions are welcome! Please see the project repository for details on how to get started.
+---
+
+## 🤝 **Contributing**
+
+We welcome contributions! Each package accepts:
+
+- **Bug reports** - Help us improve stability
+- **Feature requests** - Guide our roadmap  
+- **Documentation** - Make RCL more accessible
+- **Code contributions** - Implement features and fixes
+
+See the main repository for detailed contribution guidelines.
+
+---
+
+## 📖 **Additional Resources**
+
+- **[Getting Started Guide](/docs/getting-started)** - Build your first RCS agent
+- **[RCL Language Specification](/docs/rcl-formal-specification)** - Complete language reference
+- **[Examples](/docs/examples)** - Real-world RCL implementations
+- **[API Documentation](/docs/api)** - Complete API reference

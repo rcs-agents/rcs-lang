@@ -1,10 +1,329 @@
 ---
-title: Language Service Package
-description: IDE integration and language features
+title: "@rcs-lang/language-service"
+description: "Advanced language service providers for RCL"
 ---
-# Language Service Package
 
-The Language Service package provides advanced language service providers for IDE integration, including completion, hover, diagnostics, and more.
+# @rcs-lang/language-service
+
+Advanced language service implementation for RCL (Rich Communication Language) providing IDE features like code completion, diagnostics, hover information, and more. Powers the RCL VSCode extension and can be integrated into other editors.
+
+## Installation
+
+```bash
+bun add @rcs-lang/language-service
+```
+
+## Features
+
+- 🔍 **Go to Definition** - Navigate to symbol definitions across files
+- 📝 **Code Completion** - Context-aware suggestions for agents, flows, messages
+- 🔎 **Find References** - Locate all usages of symbols
+- 💡 **Hover Information** - Rich tooltips with documentation and type info
+- ⚠️ **Diagnostics** - Real-time error and warning detection
+- 🔄 **Rename** - Safe symbol renaming across entire workspace
+- 📑 **Document Symbols** - Outline view support for navigation
+- 🎨 **Semantic Highlighting** - Enhanced syntax coloring based on semantics
+
+## Quick Start
+
+```typescript
+import { LanguageService } from '@rcs-lang/language-service';
+
+const service = new LanguageService();
+
+// Initialize with workspace
+await service.initialize({
+  workspaceFolders: ['/path/to/workspace']
+});
+
+// Get completions
+const completions = await service.getCompletions({
+  uri: 'file:///example.rcl',
+  position: { line: 10, character: 15 }
+});
+
+// Get diagnostics
+const diagnostics = await service.getDiagnostics('file:///example.rcl');
+
+// Go to definition  
+const definition = await service.getDefinition({
+  uri: 'file:///example.rcl',
+  position: { line: 5, character: 10 }
+});
+```
+
+## Architecture
+
+The language service is built on several key components working together:
+
+### RclProgram
+
+Central coordinator that manages the compilation state and provides unified access to language features:
+
+```typescript
+import { RclProgram } from '@rcs-lang/language-service';
+
+const program = new RclProgram({
+  workspaceFolder: '/path/to/workspace',
+  fileSystem: fileSystemInstance
+});
+
+// Add files to program
+await program.addFile('file:///agent.rcl');
+
+// Get parsed file
+const file = program.getFile('file:///agent.rcl');
+
+// Get all symbols in workspace
+const symbols = program.getSymbols();
+```
+
+### WorkspaceIndex
+
+Maintains an index of all symbols across the workspace for fast lookups and cross-file references:
+
+```typescript
+import { WorkspaceIndex } from '@rcs-lang/language-service';
+
+const index = new WorkspaceIndex();
+
+// Index files
+await index.indexFile('file:///agent.rcl', ast);
+
+// Find symbol definitions
+const definitions = index.findDefinitions('AgentName');
+
+// Find all references
+const references = index.findReferences('MessageName');
+
+// Get symbols in file
+const fileSymbols = index.getSymbolsInFile('file:///agent.rcl');
+```
+
+## Language Providers
+
+Modular providers implement specific language features:
+
+### CompletionProvider
+
+Provides context-aware code completion:
+
+```typescript
+import { CompletionProvider } from '@rcs-lang/language-service';
+
+const provider = new CompletionProvider(program);
+
+const completions = await provider.getCompletions({
+  uri: 'file:///example.rcl',
+  position: { line: 10, character: 15 }
+});
+
+// Returns different completions based on context:
+// - Agent section: flow names, config options
+// - Flow section: state names, transition patterns  
+// - Message section: message types, RCS features
+// - Match block: pattern suggestions
+```
+
+### DefinitionProvider
+
+Implements go-to-definition functionality:
+
+```typescript
+import { DefinitionProvider } from '@rcs-lang/language-service';
+
+const provider = new DefinitionProvider(program);
+
+const definition = await provider.getDefinition({
+  uri: 'file:///example.rcl',
+  position: { line: 5, character: 10 }
+});
+
+// Returns definition location for:
+// - Agent references
+// - Flow references  
+// - Message references
+// - State references
+// - Variable references
+```
+
+### HoverProvider
+
+Provides rich tooltip information:
+
+```typescript
+import { HoverProvider } from '@rcs-lang/language-service';
+
+const provider = new HoverProvider(program);
+
+const hover = await provider.getHover({
+  uri: 'file:///example.rcl',
+  position: { line: 8, character: 12 }
+});
+
+// Returns hover info with:
+// - Symbol documentation
+// - Type information
+// - Usage examples
+// - Quick actions
+```
+
+### ReferencesProvider
+
+Finds all references to a symbol:
+
+```typescript
+import { ReferencesProvider } from '@rcs-lang/language-service';
+
+const provider = new ReferencesProvider(program);
+
+const references = await provider.getReferences({
+  uri: 'file:///example.rcl',
+  position: { line: 5, character: 10 },
+  includeDeclaration: true
+});
+
+// Returns all locations where symbol is used
+```
+
+### RenameProvider
+
+Safe symbol renaming across workspace:
+
+```typescript
+import { RenameProvider } from '@rcs-lang/language-service';
+
+const provider = new RenameProvider(program);
+
+// Check if rename is valid
+const prepareResult = await provider.prepareRename({
+  uri: 'file:///example.rcl',
+  position: { line: 5, character: 10 }
+});
+
+// Perform rename
+const workspaceEdit = await provider.rename({
+  uri: 'file:///example.rcl',
+  position: { line: 5, character: 10 },
+  newName: 'NewAgentName'
+});
+
+// Returns workspace edit with all necessary changes
+```
+
+## Validators
+
+Built-in validators provide real-time diagnostics:
+
+### SemanticValidator
+
+Validates semantic correctness:
+
+```typescript
+import { SemanticValidator } from '@rcs-lang/language-service';
+
+const validator = new SemanticValidator(program);
+
+const diagnostics = await validator.validate('file:///example.rcl');
+
+// Checks for:
+// - Undefined message references
+// - Unreachable flow states  
+// - Type mismatches
+// - Circular dependencies
+// - Unused symbols
+```
+
+### ImportResolver
+
+Validates imports and module resolution:
+
+```typescript
+import { ImportResolver } from '@rcs-lang/language-service';
+
+const resolver = new ImportResolver(program);
+
+// Resolve import path
+const resolved = await resolver.resolve('shared/common', 'file:///agent.rcl');
+
+// Validate all imports in file
+const diagnostics = await resolver.validateImports('file:///agent.rcl');
+```
+
+## Language Server Protocol Integration
+
+### VSCode Extension
+
+```typescript
+import { 
+  createConnection,
+  TextDocuments,
+  ProposedFeatures
+} from 'vscode-languageserver/node';
+import { LanguageService } from '@rcs-lang/language-service';
+
+const connection = createConnection(ProposedFeatures.all);
+const documents = new TextDocuments(TextDocument);
+const service = new LanguageService();
+
+// Initialize
+connection.onInitialize(async (params) => {
+  await service.initialize(params);
+  return {
+    capabilities: {
+      completionProvider: { triggerCharacters: ['.', '@', ':'] },
+      definitionProvider: true,
+      hoverProvider: true,
+      referencesProvider: true,
+      renameProvider: true,
+      diagnosticProvider: true
+    }
+  };
+});
+
+// Handle LSP requests
+connection.onCompletion(async (params) => {
+  return service.getCompletions(params);
+});
+
+connection.onDefinition(async (params) => {
+  return service.getDefinition(params);
+});
+```
+
+## Configuration
+
+### Language Service Config
+
+```typescript
+interface LanguageServiceConfig {
+  // Enable/disable specific features
+  features?: {
+    completion?: boolean;
+    hover?: boolean;
+    definition?: boolean;
+    references?: boolean;
+    rename?: boolean;
+    diagnostics?: boolean;
+    semanticHighlighting?: boolean;
+  };
+  
+  // Validation settings
+  validation?: {
+    syntaxErrors?: boolean;
+    semanticErrors?: boolean;
+    styleWarnings?: boolean;
+    unusedSymbols?: boolean;
+  };
+  
+  // Performance tuning
+  indexing?: {
+    maxFileSize?: number;
+    excludePatterns?: string[];
+    debounceMs?: number;
+  };
+}
+```
 
 ## Documentation
 

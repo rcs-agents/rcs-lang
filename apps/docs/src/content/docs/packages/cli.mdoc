@@ -1,0 +1,446 @@
+---
+title: "@rcs-lang/cli"
+description: "Command-line interface for compiling RCL files"
+---
+
+# @rcs-lang/cli
+
+Command-line interface for compiling RCL (Rich Communication Language) files into JavaScript modules and JSON configurations. Provides a simple way to compile `.rcl` files from the command line with multiple output formats and helpful development features.
+
+## Installation
+
+### Global Installation
+```bash
+bun add -g @rcs-lang/cli
+# or
+npm install -g @rcs-lang/cli
+```
+
+### Local Installation
+```bash
+bun add --dev @rcs-lang/cli
+# or
+npm install --save-dev @rcs-lang/cli
+```
+
+## Quick Start
+
+```bash
+# Compile a single file
+rcl compile agent.rcl
+
+# Compile with specific output directory
+rcl compile agent.rcl --output dist/
+
+# Compile multiple files
+rcl compile src/**/*.rcl
+
+# Watch for changes and recompile
+rcl compile agent.rcl --watch
+```
+
+## Available Commands
+
+### `compile` - Compile RCL Files
+
+Compile RCL files to JavaScript and JSON.
+
+```bash
+rcl compile <input> [options]
+```
+
+**Options:**
+- `-o, --output <dir>` - Output directory (default: same as input)
+- `-f, --format <format>` - Output format: `json`, `js`, or `both` (default: `both`)
+- `--no-pretty` - Disable pretty printing for JSON
+- `-w, --watch` - Watch files for changes and recompile
+- `-c, --config <path>` - Path to rcl.config.json
+
+**Examples:**
+```bash
+# Basic compilation
+rcl compile coffee-shop.rcl
+
+# Specify output directory
+rcl compile agent.rcl --output dist/
+
+# JSON output only
+rcl compile agent.rcl --format json
+
+# Watch mode for development
+rcl compile src/**/*.rcl --watch --output dist/
+```
+
+### `parse` - Parse and Output AST
+
+Parse RCL files and output the Abstract Syntax Tree (useful for debugging).
+
+```bash
+rcl parse <input> [output] [options]
+```
+
+**Options:**
+- `--no-pretty` - Disable pretty printing for JSON
+- `--exclude <fields>` - Comma-separated list of fields to exclude from AST
+- `--only <fields>` - Comma-separated list of fields to keep in AST
+
+**Examples:**
+```bash
+# Parse and output to stdout
+rcl parse agent.rcl
+
+# Parse and save to file
+rcl parse agent.rcl ast.json
+
+# Exclude location information
+rcl parse agent.rcl --exclude location,source
+
+# Only show structure
+rcl parse agent.rcl --only type,sections,body
+```
+
+### `diagram` - Generate Flow Diagrams
+
+Generate visual diagrams from RCL flow definitions.
+
+```bash
+rcl diagram <input> [options]
+```
+
+**Options:**
+- `-o, --output <file>` - Output file path
+- `-t, --type <type>` - Diagram type: `d2` or `mermaid` (default: `d2`)
+- `--no-error-paths` - Hide error/invalid option paths
+- `--no-separate-invalid` - Use shared InvalidOption state instead of local ones
+
+**Examples:**
+```bash
+# Generate D2 diagram
+rcl diagram coffee-shop.rcl
+
+# Generate Mermaid diagram
+rcl diagram coffee-shop.rcl --type mermaid
+
+# Custom output location
+rcl diagram agent.rcl --output diagrams/agent-flow.d2
+```
+
+### `init` - Initialize Project
+
+Initialize a new RCL project with configuration file.
+
+```bash
+rcl init
+```
+
+Creates an `rcl.config.json` file in the current directory with default settings.
+
+## Output Formats
+
+The CLI generates multiple output formats:
+
+### JSON Output
+Structured data representation suitable for runtime interpretation:
+
+```json
+{
+  "agent": {
+    "name": "CoffeeShop",
+    "displayName": "Coffee Shop Agent"
+  },
+  "flows": {
+    "OrderFlow": {
+      "start": "Welcome",
+      "states": {
+        "Welcome": {
+          "transitions": [...]
+        }
+      }
+    }
+  },
+  "messages": {
+    "Welcome": {
+      "type": "text",
+      "text": "Hello! How can I help you today?"
+    }
+  }
+}
+```
+
+### JavaScript Output
+ES6 module with convenient exports:
+
+```javascript
+// Generated from coffee-shop.rcl
+export const agent = {
+  name: "CoffeeShop",
+  displayName: "Coffee Shop Agent"
+};
+
+export const messages = {
+  Welcome: {
+    type: "text", 
+    text: "Hello! How can I help you today!"
+  }
+};
+
+export const flows = {
+  OrderFlow: {
+    start: "Welcome",
+    states: { ... }
+  }
+};
+
+// Convenience export
+export default {
+  agent,
+  messages,
+  flows
+};
+```
+
+### Diagram Formats
+
+**D2 Diagrams:**
+```d2
+# Coffee Shop Agent Flow
+Welcome -> ChooseSize: "order coffee"
+Welcome -> ShowMenu: "view menu"
+ChooseSize -> ChooseDrink: "small" | "medium" | "large"
+```
+
+**Mermaid Diagrams:**
+```mermaid
+graph TD
+    Welcome --> ChooseSize
+    Welcome --> ShowMenu
+    ChooseSize --> ChooseDrink
+```
+
+## Configuration
+
+Create an `rcl.config.json` file in your project root:
+
+```json
+{
+  "outDir": "./dist",
+  "compilerOptions": {
+    "generateSourceMap": true,
+    "preserveComments": false,
+    "strict": true,
+    "module": "esm",
+    "emit": {
+      "json": true,
+      "javascript": true,
+      "declarations": true
+    }
+  },
+  "include": ["**/*.rcl"],
+  "exclude": ["node_modules", "**/*.test.rcl"]
+}
+```
+
+**Configuration Options:**
+
+- `outDir` - Output directory for compiled files
+- `compilerOptions.generateSourceMap` - Generate source maps for debugging
+- `compilerOptions.strict` - Enable strict validation mode
+- `compilerOptions.emit` - Control which output formats to generate
+- `include` - Glob patterns for files to include
+- `exclude` - Glob patterns for files to exclude
+
+## Error Handling
+
+The CLI provides detailed error messages with source locations:
+
+```
+Error in coffee-shop.rcl:
+  Line 15, Column 8: Missing required 'displayName' in agent definition
+  
+  13 | agent CoffeeShop
+  14 |   # Missing displayName here
+> 15 |   flow OrderFlow
+     |        ^
+  16 |     start: Welcome
+```
+
+### Exit Codes
+
+The CLI uses specific exit codes for different error types:
+
+- `0` - Success
+- `1` - Compilation/syntax errors
+- `2` - Semantic/validation errors
+- `3` - File not found
+- `4` - Write permission error
+- `64` - Invalid command usage
+- `70` - Internal error
+
+## Integration with Build Tools
+
+### npm Scripts
+
+Add RCL compilation to your build process:
+
+```json
+{
+  "scripts": {
+    "build:rcl": "rcl compile src/**/*.rcl --output dist/",
+    "watch:rcl": "rcl compile src/**/*.rcl --output dist/ --watch",
+    "validate:rcl": "rcl parse src/**/*.rcl",
+    "diagram:rcl": "rcl diagram src/main.rcl --output docs/flow.d2"
+  }
+}
+```
+
+### CI/CD Integration
+
+```yaml
+# GitHub Actions example
+- name: Compile RCL files
+  run: |
+    bun add -g @rcs-lang/cli
+    rcl compile src/**/*.rcl --output dist/
+    
+- name: Validate RCL syntax
+  run: rcl parse src/**/*.rcl --exclude location,source
+```
+
+### Watch Mode
+
+For development, use watch mode to automatically recompile when files change:
+
+```bash
+rcl compile src/**/*.rcl --watch --output dist/
+```
+
+This will:
+- Watch all `.rcl` files in the `src/` directory
+- Automatically recompile when files change
+- Output compiled files to `dist/`
+- Show compilation status and errors
+
+## Programmatic Usage
+
+You can also use the CLI programmatically in Node.js:
+
+```typescript
+import { compileRCL, parseRCL, generateDiagram } from '@rcs-lang/cli';
+
+// Compile a file
+const compileResult = await compileRCL('agent.rcl', {
+  output: 'dist/',
+  format: 'both',
+  pretty: true
+});
+
+// Parse a file  
+const parseResult = await parseRCL('agent.rcl', {
+  output: 'ast.json',
+  pretty: true,
+  exclude: ['location']
+});
+
+// Generate diagram
+await generateDiagram('agent.rcl', {
+  output: 'flow.d2',
+  type: 'd2',
+  errorPaths: false
+});
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**File not found:**
+```bash
+❌ Error: Input file not found: agent.rcl
+```
+- Check the file path is correct
+- Ensure the file exists and has `.rcl` extension
+
+**Permission errors:**
+```bash
+❌ Error: Failed to write output: permission denied
+```
+- Check write permissions on the output directory
+- Try running with appropriate permissions
+
+**Java required for development:**
+If you're building from source, Java 17+ is required for ANTLR grammar generation.
+
+### Getting Help
+
+```bash
+# Show all available commands
+rcl --help
+
+# Show help for specific command
+rcl compile --help
+rcl parse --help
+rcl diagram --help
+```
+
+## Examples
+
+### Basic Agent Compilation
+
+Input file `coffee-shop.rcl`:
+```rcl
+agent CoffeeShop
+  displayName: "Coffee Shop Agent"
+  
+  flow OrderFlow
+    start: Welcome
+    
+    on Welcome
+      match @userInput
+        "order coffee" -> ChooseSize
+        "view menu" -> ShowMenu
+  
+  messages Messages
+    text Welcome "Hello! How can I help you today?"
+    text ShowMenu "Here's our menu: ..."
+```
+
+Compile:
+```bash
+rcl compile coffee-shop.rcl
+```
+
+Generates:
+- `coffee-shop.json` - Runtime configuration
+- `coffee-shop.js` - JavaScript module
+
+### Batch Processing
+
+```bash
+# Compile all RCL files in src/
+rcl compile src/**/*.rcl --output dist/
+
+# Generate diagrams for all agents
+for file in src/*.rcl; do
+  rcl diagram "$file" --output "docs/$(basename "$file" .rcl).d2"
+done
+```
+
+### Development Workflow
+
+```bash
+# Terminal 1: Watch and compile
+rcl compile src/**/*.rcl --watch --output dist/
+
+# Terminal 2: Watch and generate diagrams
+rcl diagram src/main.rcl --watch --output docs/flow.d2
+
+# Terminal 3: Your development server
+npm run dev
+```
+
+## API Reference
+
+For detailed programmatic API documentation, see:
+- [Compiler API](/docs/packages/compiler)
+- [Parser API](/docs/packages/parser)
+- [Validation API](/docs/packages/validation)
