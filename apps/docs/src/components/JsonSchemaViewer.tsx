@@ -8,8 +8,8 @@ interface Props {
   hideTopBar?: boolean;
 }
 
-export default function SchemaViewer({ name, schemaUrl, expanded = true, hideTopBar = false }: Props) {
-  const [schema, setSchema] = React.useState(null);
+export default function JsonSchemaViewerComponent({ name, schemaUrl, expanded = true, hideTopBar = false }: Props) {
+  const [schema, setSchema] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 

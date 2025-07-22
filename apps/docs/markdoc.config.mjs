@@ -1,13 +1,12 @@
-import { defineMarkdocConfig } from '@astrojs/markdoc/config';
+import { defineMarkdocConfig, component } from '@astrojs/markdoc/config';
 import starlightMarkdoc from '@astrojs/starlight-markdoc';
-import JsonSchemaViewer from './src/components/JsonSchemaViewer.tsx';
 
 // https://docs.astro.build/en/guides/integrations-guide/markdoc/
 export default defineMarkdocConfig({
 	extends: [starlightMarkdoc()],
 	tags: {
 		'schema-viewer': {
-			render: JsonSchemaViewer,
+			render: component('./src/components/JsonSchemaViewer.tsx'),
 			attributes: {
 				name: { type: String, required: true },
 				schemaUrl: { type: String, required: true },
