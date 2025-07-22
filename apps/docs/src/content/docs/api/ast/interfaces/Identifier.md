@@ -5,7 +5,7 @@ prev: false
 title: "Identifier"
 ---
 
-Defined in: [ast.ts:193](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L193)
+Defined in: [ast.ts:193](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L193)
 
 An identifier (name reference).
 
@@ -19,7 +19,7 @@ An identifier (name reference).
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/44f5638
 
 > **type**: `"Identifier"`
 
-Defined in: [ast.ts:194](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L194)
+Defined in: [ast.ts:194](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L194)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [ast.ts:194](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee4
 
 > **value**: `string`
 
-Defined in: [ast.ts:195](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L195)
+Defined in: [ast.ts:195](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L195)

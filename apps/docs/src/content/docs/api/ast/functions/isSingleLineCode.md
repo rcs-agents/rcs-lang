@@ -7,7 +7,7 @@ title: "isSingleLineCode"
 
 > **isSingleLineCode**(`node`): `node is SingleLineCode`
 
-Defined in: [guards.ts:133](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/guards.ts#L133)
+Defined in: [guards.ts:133](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/guards.ts#L133)
 
 ## Parameters
 

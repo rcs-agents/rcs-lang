@@ -5,7 +5,7 @@ prev: false
 title: "MatchCase"
 ---
 
-Defined in: [ast.ts:85](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L85)
+Defined in: [ast.ts:85](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L85)
 
 A case within a match block.
 
@@ -23,7 +23,7 @@ MatchCase ::= (STRING | NUMBER | ATOM) '->' ContextualizedValue | ':default' '->
 
 > **consequence**: [`ContextualizedValue`](/api/ast/interfaces/contextualizedvalue/)
 
-Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L88)
+Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L88)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,7 +43,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/44f5638
 
 > **type**: `"MatchCase"`
 
-Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L86)
+Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L86)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45
 
 > **value**: [`StringLiteral`](/api/ast/interfaces/stringliteral/) \| [`NumericLiteral`](/api/ast/interfaces/numericliteral/) \| [`Atom`](/api/ast/interfaces/atom/) \| `"default"`
 
-Defined in: [ast.ts:87](https://github.com/rcs-agents/rcs-lang/blob/44f56387ee45f73805b6a88a5582e17ead444456/packages/ast/src/ast.ts#L87)
+Defined in: [ast.ts:87](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L87)
