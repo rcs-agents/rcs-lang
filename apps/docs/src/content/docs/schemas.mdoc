@@ -9,69 +9,73 @@ This page documents all JSON schemas used by the RCL compiler for validation and
 
 ## Available Schemas
 
-All schemas are served from `https://rcs-agents.github.io/rcs-lang/schemas/` and can be used in `$schema` properties for validation.
+All schemas are served from `https://rcl.rcsagents.io/schemas/` and can be used in `$schema` properties for validation.
 
 ### Core Output Schemas
 
 #### RCL Output Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/rcl-output.schema.json](https://rcl.rcsagents.io/schemas/rcl-output.schema.json)
 - **Description**: Main schema for RCL compiler output combining agent, flows, and messages
 - **Usage**: Complete compilation output validation
 
 ```json
 {
-  "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json",
+  "$schema": "https://rcl.rcsagents.io/schemas/rcl-output.schema.json",
   "agent": { /* ... */ },
   "flows": { /* ... */ },
   "messages": { /* ... */ }
 }
 ```
 
+{% schema-viewer name="RCL Output Schema" schemaUrl="/schemas/rcl-output.schema.json" /%}
+
 #### Conversation State Machine (CSM) Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json](https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json)
 - **Description**: Schema for conversation state machines used in flows
 - **Usage**: Flow validation and state machine definitions
 
 ```json
 {
-  "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json",
+  "$schema": "https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json",
   "id": "MainFlow",
   "initial": "Welcome",
   "states": { /* ... */ }
 }
 ```
 
+{% schema-viewer name="CSM Machine Definition Schema" schemaUrl="/schemas/csm/machine-definition.schema.json" /%}
+
 ### Component Schemas
 
 #### Agent Configuration Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/agent-config.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/agent-config.schema.json](https://rcl.rcsagents.io/schemas/agent-config.schema.json)
 - **Description**: Schema for RCS Business Messaging agent configuration
 - **Usage**: Agent metadata and configuration validation
 
 #### Agent Message Schema  
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/agent-message.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/agent-message.schema.json](https://rcl.rcsagents.io/schemas/agent-message.schema.json)
 - **Description**: Schema for RCS Business Messaging agent messages
 - **Usage**: Message content and suggestion validation
 
 ### RCL Document Schemas
 
 #### RCL Document Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/rcl-document.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/rcl-document.schema.json](https://rcl.rcsagents.io/schemas/rcl-document.schema.json)
 - **Description**: Schema for complete RCL document structure
 - **Usage**: RCL file validation
 
 #### RCL Agent Section Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/rcl-agent-section.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/rcl-agent-section.schema.json](https://rcl.rcsagents.io/schemas/rcl-agent-section.schema.json)
 - **Description**: Schema for RCL agent section
 - **Usage**: Agent section validation in RCL files
 
 #### RCL Flow Section Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/rcl-flow-section.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/rcl-flow-section.schema.json](https://rcl.rcsagents.io/schemas/rcl-flow-section.schema.json)
 - **Description**: Schema for RCL flow section
 - **Usage**: Flow section validation in RCL files
 
 #### RCL Messages Section Schema
-- **URL**: `https://rcs-agents.github.io/rcs-lang/schemas/rcl-messages-section.schema.json`
+- **URL**: [https://rcl.rcsagents.io/schemas/rcl-messages-section.schema.json](https://rcl.rcsagents.io/schemas/rcl-messages-section.schema.json)
 - **Description**: Schema for RCL messages section
 - **Usage**: Messages section validation in RCL files
 
@@ -83,7 +87,7 @@ The RCL compiler produces output following this structure:
 
 ```json
 {
-  "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json",
+  "$schema": "https://rcl.rcsagents.io/schemas/rcl-output.schema.json",
   "agent": {
     "name": "AgentName",
     "displayName": "Display Name",
@@ -92,7 +96,7 @@ The RCL compiler produces output following this structure:
   },
   "flows": {
     "FlowId": {
-      "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json",
+      "$schema": "https://rcl.rcsagents.io/schemas/csm/machine-definition.schema.json",
       "id": "FlowId",
       "initial": "InitialState",
       "states": { /* State definitions */ }
@@ -165,7 +169,7 @@ Add `$schema` properties to your JSON files for validation and autocomplete:
 
 ```json
 {
-  "$schema": "https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json",
+  "$schema": "https://rcl.rcsagents.io/schemas/rcl-output.schema.json",
   // Your content here...
 }
 ```
@@ -176,10 +180,10 @@ Use JSON Schema validators to check compliance:
 
 ```bash
 # Using ajv-cli
-npx ajv validate -s https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json -d output.json
+npx ajv validate -s https://rcl.rcsagents.io/schemas/rcl-output.schema.json -d output.json
 
 # Using jsonschema (Python)
-jsonschema -i output.json https://rcs-agents.github.io/rcs-lang/schemas/rcl-output.schema.json
+jsonschema -i output.json https://rcl.rcsagents.io/schemas/rcl-output.schema.json
 ```
 
 ## Schema Versioning
