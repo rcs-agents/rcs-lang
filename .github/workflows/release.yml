@@ -65,7 +65,9 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: bun install -g @moonrepo/cli
+        run: |
+          curl -fsSL https://moonrepo.dev/install/moon.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Build all packages
         run: moon run :build
@@ -181,7 +183,9 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: bun install -g @moonrepo/cli
+        run: |
+          curl -fsSL https://moonrepo.dev/install/moon.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Build package
         run: |
@@ -247,7 +251,9 @@ jobs:
         run: bun install
         
       - name: Install Moon
-        run: bun install -g @moonrepo/cli
+        run: |
+          curl -fsSL https://moonrepo.dev/install/moon.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
 
       - name: Build extension
         run: |

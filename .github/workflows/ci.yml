@@ -18,13 +18,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
           
       - name: Install dependencies
-        run: npm ci
+        run: bun install
         
       - name: Install Moon
-        run: bun install -g @moonrepo/cli
+        run: |
+          curl -fsSL https://moonrepo.dev/install/moon.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
         
       - name: Build packages
         run: moon run :build
