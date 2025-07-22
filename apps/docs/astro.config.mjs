@@ -56,13 +56,42 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Package Documentation',
+					label: 'Packages',
 					items: [
-						{ label: 'AST Package', slug: 'packages/ast' },
-						{ label: 'Parser Package', slug: 'packages/parser' },
-						{ label: 'Compiler Package', slug: 'packages/compiler' },
-						{ label: 'Language Service', slug: 'packages/language-service' },
-						{ label: 'CSM Package', slug: 'packages/csm' },
+						{ label: 'Overview', slug: 'packages' },
+						{
+							label: 'Core Infrastructure',
+							collapsed: true,
+							items: [
+								{ label: '@rcs-lang/core', slug: 'packages/core' },
+								{ label: '@rcs-lang/ast', slug: 'packages/ast' },
+								{ label: '@rcs-lang/file-system', slug: 'packages/file-system' },
+							]
+						},
+						{
+							label: 'Language Processing',
+							collapsed: true,
+							items: [
+								{ label: '@rcs-lang/parser', slug: 'packages/parser' },
+								{ label: '@rcs-lang/compiler', slug: 'packages/compiler' },
+								{ label: '@rcs-lang/validation', slug: 'packages/validation' },
+							]
+						},
+						{
+							label: 'Developer Tools',
+							collapsed: true,
+							items: [
+								{ label: '@rcs-lang/cli', slug: 'packages/cli' },
+								{ label: '@rcs-lang/language-service', slug: 'packages/language-service' },
+							]
+						},
+						{
+							label: 'Runtime',
+							collapsed: true,
+							items: [
+								{ label: '@rcs-lang/csm', slug: 'packages/csm' },
+							]
+						},
 					],
 				},
 				{
