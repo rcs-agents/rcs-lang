@@ -6,8 +6,7 @@ import starlightLlmsTxt from 'starlight-llms-txt';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://rcs-agents.github.io',
-	base: '/rcs-lang',
+	site: 'https://rcl.rcsagents.io',
 	integrations: [
 		markdoc(),
 		starlight({
@@ -36,6 +35,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Formal Specification', slug: 'rcl-formal-specification' },
 						{ label: 'Output Specification', slug: 'rcl-output-specification' },
+						{ label: 'JSON Schemas', slug: 'schemas' },
 						{ label: 'API Reference', slug: 'api' },
 					],
 				},

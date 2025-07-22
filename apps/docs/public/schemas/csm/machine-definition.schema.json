@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcs-agents.github.io/rcs-lang/schemas/csm/machine-definition.schema.json",
+  "title": "CSM Machine Definition",
+  "description": "Schema for defining conversation state machines",
+  "type": "object",
+  "required": ["id", "initial", "states"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this flow/machine",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "initial": {
+      "type": "string",
+      "description": "ID of the initial state when entering this flow"
+    },
+    "states": {
+      "type": "object",
+      "description": "Map of state IDs to their definitions",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "$ref": "#/definitions/stateDefinition"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "meta": {
+      "type": "object",
+      "description": "Optional metadata for the flow",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the flow"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this flow does"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the flow definition"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorizing flows"
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom metadata for application-specific needs"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "stateDefinition": {
+      "type": "object",
+      "required": ["transitions"],
+      "additionalProperties": false,
+      "properties": {
+        "transitions": {
+          "type": "array",
+          "description": "List of possible transitions from this state",
+          "items": {
+            "$ref": "#/definitions/transition"
+          }
+        },
+        "meta": {
+          "type": "object",
+          "description": "Optional metadata for the state",
+          "properties": {
+            "messageId": {
+              "type": "string",
+              "description": "ID of the message to send when entering this state"
+            },
+            "transient": {
+              "type": "boolean",
+              "description": "Whether this is a transient state (auto-transitions)"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tags for categorizing states"
+            },
+            "custom": {
+              "type": "object",
+              "description": "Custom metadata for application-specific needs"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "required": ["target"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Pattern to match against user input. If undefined, transition is automatic (transient state). Special values: ':default' for fallback"
+        },
+        "target": {
+          "type": "string",
+          "description": "Target state ID or 'machine:FlowId' for cross-flow transitions",
+          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|machine:[a-zA-Z][a-zA-Z0-9_]*)$"
+        },
+        "context": {
+          "type": "object",
+          "description": "Context updates to apply when taking this transition",
+          "additionalProperties": true
+        },
+        "condition": {
+          "type": "string",
+          "description": "Optional JavaScript condition expression. Has access to context object."
+        },
+        "priority": {
+          "type": "number",
+          "description": "Priority for pattern matching. Higher numbers are checked first. Default: 0"
+        }
+      }
+    }
+  }
+}

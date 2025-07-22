@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/cli",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "description": "RCL command-line interface for compiling RCL files",
   "main": "dist/index.js",
   "bin": {
@@ -23,14 +23,7 @@
     "typecheck": "moon run cli:typecheck",
     "clean": "moon run cli:clean",
     "lint": "moon run cli:lint",
-    "format": "moon run cli:format",
-    "prepublish": "bun run build && bun run test",
-    "publish": "bun publish --access public",
-    "publish:dry": "bun publish --dry-run --access public",
-    "publish:beta": "bun publish --tag beta --access public",
-    "version:patch": "bun version patch",
-    "version:minor": "bun version minor",
-    "version:major": "bun version major"
+    "format": "moon run cli:format"
   },
   "dependencies": {
     "@rcs-lang/compiler": "workspace:*",
