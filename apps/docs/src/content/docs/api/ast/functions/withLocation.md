@@ -7,7 +7,7 @@ title: "withLocation"
 
 > **withLocation**\<`T`\>(`node`, `location?`): `T` & [`WithLocation`](/api/ast/interfaces/withlocation/)
 
-Defined in: [utils.ts:41](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/utils.ts#L41)
+Defined in: [utils.ts:41](https://github.com/rcs-agents/rcs-lang/blob/3e6d0013c4b9c0c5d7cd39eb149fd10244b5ea0b/packages/ast/src/utils.ts#L41)
 
 Add location to a node
 
