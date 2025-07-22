@@ -7,7 +7,7 @@ title: "getNestedSections"
 
 > **getNestedSections**(`section`): [`Section`](/api/ast/interfaces/section/)[]
 
-Defined in: [utils.ts:110](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/utils.ts#L110)
+Defined in: [utils.ts:110](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/utils.ts#L110)
 
 Get all nested sections
 

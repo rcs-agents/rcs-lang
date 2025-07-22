@@ -5,7 +5,7 @@ prev: false
 title: "Parameter"
 ---
 
-Defined in: [ast.ts:142](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L142)
+Defined in: [ast.ts:142](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L142)
 
 A single parameter, which can be positional or named.
 
@@ -23,7 +23,7 @@ Parameter ::= ATTRIBUTE_KEY ':' Value | Value
 
 > `optional` **key**: `string`
 
-Defined in: [ast.ts:144](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L144)
+Defined in: [ast.ts:144](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L144)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:144](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,7 +43,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/dae76e6
 
 > **type**: `"Parameter"`
 
-Defined in: [ast.ts:143](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L143)
+Defined in: [ast.ts:143](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L143)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:143](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05
 
 > **value**: [`Value`](/api/ast/type-aliases/value/)
 
-Defined in: [ast.ts:145](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/ast.ts#L145)
+Defined in: [ast.ts:145](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/ast.ts#L145)

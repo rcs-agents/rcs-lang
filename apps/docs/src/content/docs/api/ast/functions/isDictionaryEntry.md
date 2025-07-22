@@ -7,7 +7,7 @@ title: "isDictionaryEntry"
 
 > **isDictionaryEntry**(`node`): `node is DictionaryEntry`
 
-Defined in: [guards.ts:123](https://github.com/rcs-agents/rcs-lang/blob/dae76e6aa05b4d372009b015248dbcb36c5ae675/packages/ast/src/guards.ts#L123)
+Defined in: [guards.ts:123](https://github.com/rcs-agents/rcs-lang/blob/d67a89cedb553bfd3c4dced3f75360ae0dfac4db/packages/ast/src/guards.ts#L123)
 
 ## Parameters
 

@@ -5,7 +5,7 @@ import markdoc from '@astrojs/markdoc';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightTypeDoc from 'starlight-typedoc';
-// import starlightPackageManagers from 'starlight-package-managers'; // Disabled due to compatibility issue with current Astro version
+// import starlightPackageManagers from 'starlight-package-managers'; // Still has compatibility issues
 import react from '@astrojs/react';
 
 // https://astro.build/config
@@ -26,7 +26,7 @@ export default defineConfig({
 					includeSmall: true,
 				}),
 				starlightLinksValidator(),
-				// starlightPackageManagers(), // Disabled due to compatibility issue with current Astro version
+				// starlightPackageManagers(), // Still has compatibility issues
 				starlightTypeDoc({
 					entryPoints: ['../../packages/ast/src/index.ts'],
 					tsconfig: '../../packages/ast/tsconfig.json',
