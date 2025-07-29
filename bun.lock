@@ -79,7 +79,7 @@
     },
     "libs/diagram": {
       "name": "@rcs-lang/diagram",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "elkjs": "^0.10.0",
         "inversify": "6.2.2",
@@ -97,7 +97,7 @@
     },
     "packages/ast": {
       "name": "@rcs-lang/ast",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "devDependencies": {
         "@types/minimatch": "^6.0.0",
         "@types/node": "^24.0.13",
@@ -106,7 +106,7 @@
     },
     "packages/cli": {
       "name": "@rcs-lang/cli",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "bin": {
         "rcl-cli": "./dist/index.js",
         "rcl": "./dist/index.js",
@@ -136,7 +136,7 @@
     },
     "packages/compiler": {
       "name": "@rcs-lang/compiler",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -151,7 +151,7 @@
     },
     "packages/core": {
       "name": "@rcs-lang/core",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
       },
@@ -163,16 +163,22 @@
     },
     "packages/csm": {
       "name": "@rcs-lang/csm",
-      "version": "0.2.1",
+      "version": "0.2.2",
+      "dependencies": {
+        "json-logic-js": "^2.0.2",
+        "neverthrow": "^8.0.0",
+      },
       "devDependencies": {
+        "@types/json-logic-js": "^2.0.7",
         "@types/node": "^20.14.9",
+        "ajv": "^8.17.1",
         "tsup": "^8.1.0",
         "typescript": "^5.5.3",
       },
     },
     "packages/file-system": {
       "name": "@rcs-lang/file-system",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
       },
@@ -183,7 +189,7 @@
     },
     "packages/language-service": {
       "name": "@rcs-lang/language-service",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/compiler": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -205,7 +211,7 @@
     },
     "packages/parser": {
       "name": "@rcs-lang/parser",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -218,7 +224,7 @@
     },
     "packages/validation": {
       "name": "@rcs-lang/validation",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
         "@rcs-lang/parser": "workspace:*",
@@ -840,6 +846,8 @@
     "@types/js-cookie": ["@types/js-cookie@2.2.7", "", {}, "sha512-aLkWa0C0vO5b4Sr798E26QgOkss68Un0bLjs7u9qxzPT5CG+8DuNTffWES58YzJs3hrVAOs1wonycqEBqNJubA=="],
 
     "@types/js-yaml": ["@types/js-yaml@4.0.9", "", {}, "sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg=="],
+
+    "@types/json-logic-js": ["@types/json-logic-js@2.0.8", "", {}, "sha512-WgNsDPuTPKYXl0Jh0IfoCoJoAGGYZt5qzpmjuLSEg7r0cKp/kWtWp0HAsVepyPSPyXiHo6uXp/B/kW/2J1fa2Q=="],
 
     "@types/json-schema": ["@types/json-schema@7.0.15", "", {}, "sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA=="],
 
@@ -1863,6 +1871,8 @@
 
     "json-buffer": ["json-buffer@3.0.1", "", {}, "sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ=="],
 
+    "json-logic-js": ["json-logic-js@2.0.5", "", {}, "sha512-rTT2+lqcuUmj4DgWfmzupZqQDA64AdmYqizzMPWj3DxGdfFNsxPpcNVSaTj4l8W2tG/+hg7/mQhxjU3aPacO6g=="],
+
     "json-parse-even-better-errors": ["json-parse-even-better-errors@3.0.2", "", {}, "sha512-fi0NG4bPjCHunUJffmLd0gxssIgkNmArMvis4iNah6Owg1MCJjWhEcDLmsK6iGkJq3tHwbDkTlce70/tmXN4cQ=="],
 
     "json-schema": ["json-schema@0.4.0", "", {}, "sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA=="],
@@ -2168,6 +2178,8 @@
     "neotraverse": ["neotraverse@0.6.18", "", {}, "sha512-Z4SmBUweYa09+o6pG+eASabEpP6QkQ70yHj351pQoEXIs8uHbaU2DWVmzBANKgflPa47A50PtB2+NgRpQvr7vA=="],
 
     "netmask": ["netmask@2.0.2", "", {}, "sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg=="],
+
+    "neverthrow": ["neverthrow@8.2.0", "", { "optionalDependencies": { "@rollup/rollup-linux-x64-gnu": "^4.24.0" } }, "sha512-kOCT/1MCPAxY5iUV3wytNFUMUolzuwd/VF/1KCx7kf6CutrOsTie+84zTGTpgQycjvfLdBBdvBvFLqFD2c0wkQ=="],
 
     "next-tick": ["next-tick@1.1.0", "", {}, "sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ=="],
 
