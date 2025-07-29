@@ -137,8 +137,14 @@ export class RclSymbolExtractor {
     // Add match cases as children
     if (matchBlock.cases) {
       for (const matchCase of matchBlock.cases) {
+        const consequencePreview = matchCase.consequence.type === 'ContextualizedValue' 
+          ? this.getValuePreview(matchCase.consequence.value)
+          : matchCase.consequence.type === 'FlowTermination'
+          ? `:${matchCase.consequence.result}`
+          : 'Unknown';
+          
         children.push({
-          name: `${this.getCaseValuePreview(matchCase.value)} → ${this.getValuePreview(matchCase.consequence.value)}`,
+          name: `${this.getCaseValuePreview(matchCase.value)} → ${consequencePreview}`,
           kind: SymbolKind.EnumMember,
           range: matchCase.location?.range || {
             start: { line: 0, character: 0 },

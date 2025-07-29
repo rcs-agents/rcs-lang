@@ -39,14 +39,14 @@ export interface ImportStatement extends WithLocation {
 
 /**
  * A generic section, which is the primary building block of an RCL file.
- * @spec Section ::= SECTION_TYPE IDENTIFIER? ParameterList? (INDENT (SpreadDirective | Attribute | Section | MatchBlock | Value)* DEDENT)?
+ * @spec Section ::= SECTION_TYPE IDENTIFIER? ParameterList? (INDENT (SpreadDirective | Attribute | Section | MatchBlock | FlowInvocation | SimpleTransition | StateReference | Value)* DEDENT)?
  */
 export interface Section extends WithLocation {
   type: 'Section';
   sectionType: string;
   identifier?: Identifier;
   parameters?: ParameterList;
-  body: (SpreadDirective | Attribute | Section | MatchBlock | Value)[];
+  body: (SpreadDirective | Attribute | Section | MatchBlock | FlowInvocation | SimpleTransition | StateReference | Value)[];
 }
 
 /**
@@ -80,12 +80,12 @@ export interface MatchBlock extends WithLocation {
 
 /**
  * A case within a match block.
- * @spec MatchCase ::= (STRING | NUMBER | ATOM) '->' ContextualizedValue | ':default' '->' ContextualizedValue
+ * @spec MatchCase ::= (STRING | NUMBER | ATOM | DEFAULT_CASE) ARROW TransitionTarget
  */
 export interface MatchCase extends WithLocation {
   type: 'MatchCase';
   value: StringLiteral | NumericLiteral | Atom | 'default';
-  consequence: ContextualizedValue;
+  consequence: ContextualizedValue | FlowTermination | FlowInvocation | ContextOperationSequence;
 }
 
 // #endregion
@@ -94,7 +94,7 @@ export interface MatchCase extends WithLocation {
 
 /**
  * A union of all possible value types in RCL.
- * @spec Value ::= PrimitiveValue | IDENTIFIER | VARIABLE | PROPERTY_ACCESS | List | Dictionary | EmbeddedCode | ContextualizedValue
+ * @spec Value ::= PrimitiveValue | IDENTIFIER | VARIABLE | PROPERTY_ACCESS | List | Dictionary | EmbeddedCode | ContextualizedValue | FlowTermination
  */
 export type Value =
   | PrimitiveValue
@@ -104,7 +104,8 @@ export type Value =
   | List
   | Dictionary
   | EmbeddedCode
-  | ContextualizedValue;
+  | ContextualizedValue
+  | FlowTermination;
 
 /**
  * A union of primitive value types.
@@ -279,6 +280,138 @@ export interface MultiLineCode extends WithLocation {
   type: 'MultiLineCode';
   language?: 'js' | 'ts';
   code: string;
+}
+
+// #endregion
+
+// #region Flow Control Extensions
+
+/**
+ * A flow invocation with result handling.
+ * @spec FlowInvocation ::= START IDENTIFIER (WITH ParameterList)? (INDENT FlowResultHandler+ DEDENT)?
+ */
+export interface FlowInvocation extends WithLocation {
+  type: 'FlowInvocation';
+  flowName: Identifier;
+  parameters?: ParameterList;
+  resultHandlers: FlowResultHandler[];
+}
+
+/**
+ * A handler for flow results.
+ * @spec FlowResultHandler ::= ON FlowResult ARROW ContextOperationChain? TargetReference
+ */
+export interface FlowResultHandler extends WithLocation {
+  type: 'FlowResultHandler';
+  result: FlowResult;
+  operations?: ContextOperation[];
+  target: TargetReference;
+}
+
+/**
+ * A flow result type.
+ * @spec FlowResult ::= ':end' | ':cancel' | ':error'
+ */
+export type FlowResult = 'end' | 'cancel' | 'error';
+
+/**
+ * A context operation for manipulating flow results.
+ * @spec ContextOperation ::= APPEND RESULT TO Variable | SET Variable TO RESULT | MERGE RESULT INTO Variable
+ */
+export type ContextOperation = AppendOperation | SetOperation | MergeOperation;
+
+/**
+ * An append operation.
+ * @spec APPEND RESULT TO Variable
+ */
+export interface AppendOperation extends WithLocation {
+  type: 'AppendOperation';
+  target: Variable | PropertyAccess;
+}
+
+/**
+ * A set operation.
+ * @spec SET Variable TO RESULT
+ */
+export interface SetOperation extends WithLocation {
+  type: 'SetOperation';
+  target: Variable | PropertyAccess;
+}
+
+/**
+ * A merge operation.
+ * @spec MERGE RESULT INTO Variable
+ */
+export interface MergeOperation extends WithLocation {
+  type: 'MergeOperation';
+  target: Variable | PropertyAccess;
+}
+
+/**
+ * A target reference for transitions.
+ * @spec TargetReference ::= IDENTIFIER | Variable | PropertyAccess | FlowTermination
+ */
+export type TargetReference = Identifier | Variable | PropertyAccess | FlowTermination;
+
+/**
+ * A flow termination.
+ * @spec FlowTermination ::= ':end' | ':cancel' | ':error'
+ */
+export interface FlowTermination extends WithLocation {
+  type: 'FlowTermination';
+  result: FlowResult;
+}
+
+/**
+ * A sequence of context operations followed by a target reference.
+ * @spec ContextOperationSequence ::= ContextOperation (ARROW ContextOperation)* ARROW TargetReference
+ */
+export interface ContextOperationSequence extends WithLocation {
+  type: 'ContextOperationSequence';
+  operations: ContextOperation[];
+  target: TargetReference;
+}
+
+/**
+ * A simple transition (arrow without match).
+ * @spec SimpleTransition ::= ARROW TransitionTarget
+ */
+export interface SimpleTransition extends WithLocation {
+  type: 'SimpleTransition';
+  target: ContextualizedValue | FlowTermination | FlowInvocation | ContextOperationSequence;
+}
+
+/**
+ * A state reference (for unconditional transitions).
+ * @spec StateReference ::= (IDENTIFIER | Variable | PropertyAccess)
+ */
+export interface StateReference extends WithLocation {
+  type: 'StateReference';
+  target: Identifier | Variable | PropertyAccess;
+}
+
+/**
+ * A condition for controlling transitions.
+ * @spec Condition ::= JavaScriptCondition | JsonLogicCondition
+ */
+export type Condition = JavaScriptCondition | JsonLogicCondition;
+
+/**
+ * A JavaScript-based condition expression.
+ * @spec JavaScriptCondition ::= EmbeddedCode
+ */
+export interface JavaScriptCondition extends WithLocation {
+  type: 'JavaScriptCondition';
+  expression: EmbeddedCode;
+}
+
+/**
+ * A JSON Logic-based condition rule.
+ * @spec JsonLogicCondition ::= JsonLogicRule
+ */
+export interface JsonLogicCondition extends WithLocation {
+  type: 'JsonLogicCondition';
+  rule: Dictionary; // JSON Logic rule as a dictionary structure
 }
 
 // #endregion

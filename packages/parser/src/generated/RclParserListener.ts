@@ -7,6 +7,7 @@ import { Import_statementContext } from "./RclParser.js";
 import { Import_pathContext } from "./RclParser.js";
 import { SectionContext } from "./RclParser.js";
 import { Section_headerContext } from "./RclParser.js";
+import { Section_typeContext } from "./RclParser.js";
 import { Header_valuesContext } from "./RclParser.js";
 import { IdentifierContext } from "./RclParser.js";
 import { Section_bodyContext } from "./RclParser.js";
@@ -16,6 +17,9 @@ import { Spread_directiveContext } from "./RclParser.js";
 import { Attribute_assignmentContext } from "./RclParser.js";
 import { Match_blockContext } from "./RclParser.js";
 import { Match_caseContext } from "./RclParser.js";
+import { Transition_targetContext } from "./RclParser.js";
+import { Flow_invocation_with_handlersContext } from "./RclParser.js";
+import { Context_operation_sequenceContext } from "./RclParser.js";
 import { Simple_transitionContext } from "./RclParser.js";
 import { Contextualized_valueContext } from "./RclParser.js";
 import { Parameter_listContext } from "./RclParser.js";
@@ -41,6 +45,12 @@ import { Embedded_codeContext } from "./RclParser.js";
 import { Multi_line_codeContext } from "./RclParser.js";
 import { Multi_line_stringContext } from "./RclParser.js";
 import { Multiline_contentContext } from "./RclParser.js";
+import { Flow_invocationContext } from "./RclParser.js";
+import { Flow_result_handlerContext } from "./RclParser.js";
+import { Flow_resultContext } from "./RclParser.js";
+import { Context_operationContext } from "./RclParser.js";
+import { Target_referenceContext } from "./RclParser.js";
+import { Flow_terminationContext } from "./RclParser.js";
 
 
 /**
@@ -98,6 +108,16 @@ export class RclParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitSection_header?: (ctx: Section_headerContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.section_type`.
+     * @param ctx the parse tree
+     */
+    enterSection_type?: (ctx: Section_typeContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.section_type`.
+     * @param ctx the parse tree
+     */
+    exitSection_type?: (ctx: Section_typeContext) => void;
     /**
      * Enter a parse tree produced by `RclParser.header_values`.
      * @param ctx the parse tree
@@ -188,6 +208,36 @@ export class RclParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitMatch_case?: (ctx: Match_caseContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.transition_target`.
+     * @param ctx the parse tree
+     */
+    enterTransition_target?: (ctx: Transition_targetContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.transition_target`.
+     * @param ctx the parse tree
+     */
+    exitTransition_target?: (ctx: Transition_targetContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.flow_invocation_with_handlers`.
+     * @param ctx the parse tree
+     */
+    enterFlow_invocation_with_handlers?: (ctx: Flow_invocation_with_handlersContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.flow_invocation_with_handlers`.
+     * @param ctx the parse tree
+     */
+    exitFlow_invocation_with_handlers?: (ctx: Flow_invocation_with_handlersContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.context_operation_sequence`.
+     * @param ctx the parse tree
+     */
+    enterContext_operation_sequence?: (ctx: Context_operation_sequenceContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.context_operation_sequence`.
+     * @param ctx the parse tree
+     */
+    exitContext_operation_sequence?: (ctx: Context_operation_sequenceContext) => void;
     /**
      * Enter a parse tree produced by `RclParser.simple_transition`.
      * @param ctx the parse tree
@@ -438,6 +488,66 @@ export class RclParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitMultiline_content?: (ctx: Multiline_contentContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.flow_invocation`.
+     * @param ctx the parse tree
+     */
+    enterFlow_invocation?: (ctx: Flow_invocationContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.flow_invocation`.
+     * @param ctx the parse tree
+     */
+    exitFlow_invocation?: (ctx: Flow_invocationContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.flow_result_handler`.
+     * @param ctx the parse tree
+     */
+    enterFlow_result_handler?: (ctx: Flow_result_handlerContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.flow_result_handler`.
+     * @param ctx the parse tree
+     */
+    exitFlow_result_handler?: (ctx: Flow_result_handlerContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.flow_result`.
+     * @param ctx the parse tree
+     */
+    enterFlow_result?: (ctx: Flow_resultContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.flow_result`.
+     * @param ctx the parse tree
+     */
+    exitFlow_result?: (ctx: Flow_resultContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.context_operation`.
+     * @param ctx the parse tree
+     */
+    enterContext_operation?: (ctx: Context_operationContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.context_operation`.
+     * @param ctx the parse tree
+     */
+    exitContext_operation?: (ctx: Context_operationContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.target_reference`.
+     * @param ctx the parse tree
+     */
+    enterTarget_reference?: (ctx: Target_referenceContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.target_reference`.
+     * @param ctx the parse tree
+     */
+    exitTarget_reference?: (ctx: Target_referenceContext) => void;
+    /**
+     * Enter a parse tree produced by `RclParser.flow_termination`.
+     * @param ctx the parse tree
+     */
+    enterFlow_termination?: (ctx: Flow_terminationContext) => void;
+    /**
+     * Exit a parse tree produced by `RclParser.flow_termination`.
+     * @param ctx the parse tree
+     */
+    exitFlow_termination?: (ctx: Flow_terminationContext) => void;
 
     visitTerminal(node: TerminalNode): void {}
     visitErrorNode(node: ErrorNode): void {}

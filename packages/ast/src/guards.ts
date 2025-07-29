@@ -3,18 +3,27 @@
  */
 
 import type {
+  AppendOperation,
   Atom,
   Attribute,
   BooleanLiteral,
+  Condition,
+  ContextOperation,
   ContextualizedValue,
   Dictionary,
   DictionaryEntry,
   EmbeddedCode,
+  FlowInvocation,
+  FlowResultHandler,
+  FlowTermination,
   Identifier,
   ImportStatement,
+  JavaScriptCondition,
+  JsonLogicCondition,
   List,
   MatchBlock,
   MatchCase,
+  MergeOperation,
   MultiLineCode,
   MultiLineString,
   NullLiteral,
@@ -24,9 +33,13 @@ import type {
   PropertyAccess,
   RclFile,
   Section,
+  SetOperation,
+  SimpleTransition,
   SingleLineCode,
   SpreadDirective,
+  StateReference,
   StringLiteral,
+  TargetReference,
   TypeTag,
   Value,
   Variable,
@@ -171,4 +184,58 @@ export function isValue(node: any): node is Value {
 // Utility guard for checking if a value is an identifier
 export function isIdentifier(value: Value): value is Identifier {
   return hasType(value, 'Identifier');
+}
+
+// Flow control extensions
+export function isFlowInvocation(node: any): node is FlowInvocation {
+  return hasType(node, 'FlowInvocation');
+}
+
+export function isFlowResultHandler(node: any): node is FlowResultHandler {
+  return hasType(node, 'FlowResultHandler');
+}
+
+export function isFlowTermination(node: any): node is FlowTermination {
+  return hasType(node, 'FlowTermination');
+}
+
+export function isSimpleTransition(node: any): node is SimpleTransition {
+  return hasType(node, 'SimpleTransition');
+}
+
+export function isStateReference(node: any): node is StateReference {
+  return hasType(node, 'StateReference');
+}
+
+// Context operations
+export function isAppendOperation(node: any): node is AppendOperation {
+  return hasType(node, 'AppendOperation');
+}
+
+export function isSetOperation(node: any): node is SetOperation {
+  return hasType(node, 'SetOperation');
+}
+
+export function isMergeOperation(node: any): node is MergeOperation {
+  return hasType(node, 'MergeOperation');
+}
+
+export function isContextOperation(node: any): node is ContextOperation {
+  return isAppendOperation(node) || isSetOperation(node) || isMergeOperation(node);
+}
+
+export function isJavaScriptCondition(node: any): node is JavaScriptCondition {
+  return hasType(node, 'JavaScriptCondition');
+}
+
+export function isJsonLogicCondition(node: any): node is JsonLogicCondition {
+  return hasType(node, 'JsonLogicCondition');
+}
+
+export function isCondition(node: any): node is Condition {
+  return isJavaScriptCondition(node) || isJsonLogicCondition(node);
+}
+
+export function isTargetReference(node: any): node is TargetReference {
+  return isIdentifier(node) || isVariable(node) || isPropertyAccess(node) || isFlowTermination(node);
 }

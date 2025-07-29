@@ -10,13 +10,30 @@ AS: 'as';
 WITH: 'with';
 MATCH: 'match';
 
-// Literals
-BOOLEAN: 'True' | 'Yes' | 'On' | 'False' | 'No' | 'Off';
+// Flow control keywords
+START: 'start';
+ON: 'on';
+
+// Context operation keywords
+APPEND: 'append';
+SET: 'set';
+MERGE: 'merge';
+TO: 'to';
+INTO: 'into';
+RESULT: 'result';
+
+// Flow termination atoms (special case for flow returns)
+FLOW_END: ':end';
+FLOW_CANCEL: ':cancel';
+FLOW_ERROR: ':error';
+
+// Literals (NOTE: 'On' removed due to conflict with 'on' keyword)
+BOOLEAN: 'True' | 'Yes' | 'False' | 'No' | 'Off';
 NULL: 'Null' | 'None' | 'Void';
 NUMBER: '-'? [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)?;
 
 // Attributes and atoms with better tokenization (keeping the improvement)
-ATTRIBUTE_NAME: [a-z] [a-zA-Z0-9_]* [ \t]* ':';
+ATTRIBUTE_NAME: [a-z] [a-zA-Z0-9_]+ [ \t]* ':';  // Require at least 2 characters
 ATOM: ':' [a-zA-Z_] [a-zA-Z0-9_]*;
 DEFAULT_CASE: ':default';
 

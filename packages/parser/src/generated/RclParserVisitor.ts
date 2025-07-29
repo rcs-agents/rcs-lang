@@ -7,6 +7,7 @@ import { Import_statementContext } from "./RclParser.js";
 import { Import_pathContext } from "./RclParser.js";
 import { SectionContext } from "./RclParser.js";
 import { Section_headerContext } from "./RclParser.js";
+import { Section_typeContext } from "./RclParser.js";
 import { Header_valuesContext } from "./RclParser.js";
 import { IdentifierContext } from "./RclParser.js";
 import { Section_bodyContext } from "./RclParser.js";
@@ -16,6 +17,9 @@ import { Spread_directiveContext } from "./RclParser.js";
 import { Attribute_assignmentContext } from "./RclParser.js";
 import { Match_blockContext } from "./RclParser.js";
 import { Match_caseContext } from "./RclParser.js";
+import { Transition_targetContext } from "./RclParser.js";
+import { Flow_invocation_with_handlersContext } from "./RclParser.js";
+import { Context_operation_sequenceContext } from "./RclParser.js";
 import { Simple_transitionContext } from "./RclParser.js";
 import { Contextualized_valueContext } from "./RclParser.js";
 import { Parameter_listContext } from "./RclParser.js";
@@ -41,6 +45,12 @@ import { Embedded_codeContext } from "./RclParser.js";
 import { Multi_line_codeContext } from "./RclParser.js";
 import { Multi_line_stringContext } from "./RclParser.js";
 import { Multiline_contentContext } from "./RclParser.js";
+import { Flow_invocationContext } from "./RclParser.js";
+import { Flow_result_handlerContext } from "./RclParser.js";
+import { Flow_resultContext } from "./RclParser.js";
+import { Context_operationContext } from "./RclParser.js";
+import { Target_referenceContext } from "./RclParser.js";
+import { Flow_terminationContext } from "./RclParser.js";
 
 
 /**
@@ -81,6 +91,12 @@ export class RclParserVisitor<Result> extends AbstractParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitSection_header?: (ctx: Section_headerContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.section_type`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitSection_type?: (ctx: Section_typeContext) => Result;
     /**
      * Visit a parse tree produced by `RclParser.header_values`.
      * @param ctx the parse tree
@@ -135,6 +151,24 @@ export class RclParserVisitor<Result> extends AbstractParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitMatch_case?: (ctx: Match_caseContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.transition_target`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTransition_target?: (ctx: Transition_targetContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.flow_invocation_with_handlers`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFlow_invocation_with_handlers?: (ctx: Flow_invocation_with_handlersContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.context_operation_sequence`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitContext_operation_sequence?: (ctx: Context_operation_sequenceContext) => Result;
     /**
      * Visit a parse tree produced by `RclParser.simple_transition`.
      * @param ctx the parse tree
@@ -285,5 +319,41 @@ export class RclParserVisitor<Result> extends AbstractParseTreeVisitor<Result> {
      * @return the visitor result
      */
     visitMultiline_content?: (ctx: Multiline_contentContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.flow_invocation`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFlow_invocation?: (ctx: Flow_invocationContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.flow_result_handler`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFlow_result_handler?: (ctx: Flow_result_handlerContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.flow_result`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFlow_result?: (ctx: Flow_resultContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.context_operation`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitContext_operation?: (ctx: Context_operationContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.target_reference`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitTarget_reference?: (ctx: Target_referenceContext) => Result;
+    /**
+     * Visit a parse tree produced by `RclParser.flow_termination`.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    visitFlow_termination?: (ctx: Flow_terminationContext) => Result;
 }
 
