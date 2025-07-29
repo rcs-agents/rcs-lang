@@ -19,7 +19,8 @@
     "typecheck": "moon run csm:typecheck",
     "clean": "moon run csm:clean",
     "lint": "moon run csm:lint",
-    "format": "moon run csm:format"
+    "format": "moon run csm:format",
+    "validate-fixture": "bun run validate-fixture.ts"
   },
   "keywords": [
     "state-machine",
@@ -33,10 +34,15 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.14.9",
+    "@types/json-logic-js": "^2.0.7",
+    "ajv": "^8.17.1",
     "tsup": "^8.1.0",
     "typescript": "^5.5.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "neverthrow": "^8.0.0",
+    "json-logic-js": "^2.0.2"
+  },
   "engines": {
     "bun": ">=1.2.0"
   },

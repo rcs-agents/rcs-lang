@@ -1,254 +1,593 @@
 {
-  "id": "TopFlow",
-  "initial": "Welcome",
-  "states": {
-    "Welcome": {
-      "transitions": [
-        {
-          "pattern": "Start Order",
-          "flowInvocation": {
-            "flowId": "CreateOrder",
-            "onResult": {
-              "ok": {
-                "operations": [
-                  {
-                    "append": {
-                      "to": "orders",
-                      "value": {"var": "result"}
-                    }
+  "$schema": "../../schemas/csm.schema.json",
+  "id": "CoffeeShop",
+  "initialFlow": "TopFlow",
+  "flows": {
+    "TopFlow": {
+      "id": "TopFlow",
+      "initial": "Welcome",
+      "states": {
+        "Welcome": {
+          "transitions": [
+            {
+              "pattern": "Start Order",
+              "target": "state:ConfirmAllOrders",
+              "flowInvocation": {
+                "flowId": "CreateOrder",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orders",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:ConfirmAllOrders"
+                  },
+                  "cancel": {
+                    "target": "state:Welcome"
+                  },
+                  "error": {
+                    "target": "state:OrderError"
                   }
-                ],
-                "target": "state:ConfirmAllOrders"
-              },
-              "cancel": {
-                "target": "state:Welcome"
-              },
-              "error": {
-                "target": "state:OrderError"
+                }
+              }
+            },
+            {
+              "pattern": "View Menu",
+              "target": "state:ShowMenu"
+            },
+            {
+              "pattern": "Store Hours",
+              "target": "state:StoreInfo"
+            },
+            {
+              "pattern": ":default",
+              "target": "state:Welcome"
+            }
+          ],
+          "meta": {
+            "messageId": "Welcome"
+          }
+        },
+        "ShowMenu": {
+          "transitions": [
+            {
+              "pattern": "Start Order",
+              "target": "state:ConfirmAllOrders",
+              "flowInvocation": {
+                "flowId": "CreateOrder",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orders",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:ConfirmAllOrders"
+                  },
+                  "cancel": {
+                    "target": "state:Welcome"
+                  },
+                  "error": {
+                    "target": "state:OrderError"
+                  }
+                }
+              }
+            },
+            {
+              "pattern": "Back",
+              "target": "state:Welcome"
+            }
+          ],
+          "meta": {
+            "messageId": "ShowMenu",
+            "transient": true
+          }
+        },
+        "StoreInfo": {
+          "transitions": [
+            {
+              "pattern": "Start Order",
+              "target": "state:ConfirmAllOrders",
+              "flowInvocation": {
+                "flowId": "CreateOrder",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orders",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:ConfirmAllOrders"
+                  },
+                  "cancel": {
+                    "target": "state:Welcome"
+                  },
+                  "error": {
+                    "target": "state:OrderError"
+                  }
+                }
+              }
+            },
+            {
+              "pattern": "Back",
+              "target": "state:Welcome"
+            }
+          ],
+          "meta": {
+            "messageId": "StoreInfo",
+            "transient": true
+          }
+        },
+        "OrderError": {
+          "transitions": [
+            {
+              "pattern": "Try Again",
+              "target": "state:Welcome"
+            },
+            {
+              "pattern": "Contact Support",
+              "target": "state:ShowSupport"
+            }
+          ],
+          "meta": {
+            "messageId": "OrderError"
+          }
+        },
+        "ShowSupport": {
+          "transitions": [
+            {
+              "pattern": "Back",
+              "target": "state:Welcome"
+            }
+          ],
+          "meta": {
+            "messageId": "ShowSupport"
+          }
+        },
+        "ConfirmAllOrders": {
+          "transitions": [
+            {
+              "pattern": "Add Another Order",
+              "target": "state:ConfirmAllOrders",
+              "flowInvocation": {
+                "flowId": "CreateOrder",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orders",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:ConfirmAllOrders"
+                  },
+                  "cancel": {
+                    "target": "state:ConfirmAllOrders"
+                  },
+                  "error": {
+                    "target": "state:OrderError"
+                  }
+                }
+              }
+            },
+            {
+              "pattern": "Confirm All Orders",
+              "target": "state:ProcessPayment"
+            },
+            {
+              "pattern": "Cancel All Orders",
+              "target": "state:Welcome",
+              "context": {
+                "orders": []
               }
             }
+          ],
+          "meta": {
+            "messageId": "ConfirmAllOrders"
           }
         },
-        {
-          "pattern": "View Menu",
-          "target": "state:ShowMenu"
+        "ProcessPayment": {
+          "transitions": [
+            {
+              "target": "state:OrderComplete"
+            }
+          ],
+          "meta": {
+            "messageId": "ProcessPayment",
+            "transient": true
+          }
         },
-        {
-          "pattern": "Store Hours",
-          "target": "state:StoreInfo"
+        "OrderComplete": {
+          "transitions": [
+            {
+              "target": "state:ThankYou"
+            }
+          ],
+          "meta": {
+            "messageId": "OrderComplete",
+            "transient": true
+          }
         },
-        {
-          "pattern": ":default",
-          "target": "state:Welcome"
+        "ThankYou": {
+          "transitions": [
+            {
+              "pattern": "Start New Order",
+              "target": "state:Welcome",
+              "context": {
+                "orders": []
+              }
+            },
+            {
+              "pattern": "View Receipt",
+              "target": "state:ShowReceipt"
+            }
+          ],
+          "meta": {
+            "messageId": "ThankYou"
+          }
+        },
+        "ShowReceipt": {
+          "transitions": [
+            {
+              "pattern": "Start New Order",
+              "target": "state:Welcome",
+              "context": {
+                "orders": []
+              }
+            },
+            {
+              "pattern": "Back",
+              "target": "state:Welcome"
+            }
+          ],
+          "meta": {
+            "messageId": "ShowReceipt"
+          }
         }
-      ],
+      },
       "meta": {
-        "messageId": "Welcome"
+        "name": "Coffee Shop Top Flow",
+        "description": "Main conversation flow for coffee shop agent",
+        "version": "1.0.0"
       }
     },
-    "ShowMenu": {
-      "transitions": [
-        {
-          "pattern": "Start Order",
-          "flowInvocation": {
-            "flowId": "CreateOrder",
-            "onResult": {
-              "ok": {
-                "operations": [
-                  {
-                    "append": {
-                      "to": "orders",
-                      "value": {"var": "result"}
-                    }
+    "CreateOrder": {
+      "id": "CreateOrder",
+      "initial": "Menu",
+      "states": {
+        "Menu": {
+          "transitions": [
+            {
+              "pattern": "Order Coffee",
+              "target": "state:Menu",
+              "flowInvocation": {
+                "flowId": "OrderCoffee",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orderItems",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:Menu"
+                  },
+                  "cancel": {
+                    "target": "state:Menu"
+                  },
+                  "error": {
+                    "target": "state:Menu"
                   }
-                ],
-                "target": "state:ConfirmAllOrders"
-              },
-              "cancel": {
-                "target": "state:Welcome"
-              },
-              "error": {
-                "target": "state:OrderError"
+                }
+              }
+            },
+            {
+              "pattern": "Review Order",
+              "target": "state:ReviewOrder"
+            },
+            {
+              "pattern": "Cancel Order",
+              "target": ":cancel"
+            }
+          ],
+          "meta": {
+            "messageId": "Menu"
+          }
+        },
+        "ReviewOrder": {
+          "transitions": [
+            {
+              "pattern": "Add Another Coffee",
+              "target": "state:ReviewOrder",
+              "flowInvocation": {
+                "flowId": "OrderCoffee",
+                "parameters": {},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {
+                        "append": {
+                          "to": "orderItems",
+                          "value": {
+                            "var": "result"
+                          }
+                        }
+                      }
+                    ],
+                    "target": "state:ReviewOrder"
+                  },
+                  "cancel": {
+                    "target": "state:ReviewOrder"
+                  },
+                  "error": {
+                    "target": "state:ReviewOrder"
+                  }
+                }
+              }
+            },
+            {
+              "pattern": "Remove Last Item",
+              "target": "state:RemoveItem"
+            },
+            {
+              "pattern": "Confirm Order",
+              "target": "state:ConfirmOrder"
+            },
+            {
+              "pattern": "Cancel Order",
+              "target": ":cancel"
+            }
+          ],
+          "meta": {
+            "messageId": "ReviewOrder"
+          }
+        },
+        "RemoveItem": {
+          "transitions": [
+            {
+              "target": "state:ReviewOrder",
+              "context": {
+                "orderItems": {
+                  "slice": [
+                    {
+                      "var": "orderItems"
+                    },
+                    0,
+                    -1
+                  ]
+                }
               }
             }
+          ],
+          "meta": {
+            "transient": true
           }
         },
-        {
-          "pattern": "Back",
-          "target": "state:Welcome"
-        }
-      ],
-      "meta": {
-        "messageId": "ShowMenu"
-      }
-    },
-    "StoreInfo": {
-      "transitions": [
-        {
-          "pattern": "Start Order",
-          "flowInvocation": {
-            "flowId": "CreateOrder",
-            "onResult": {
-              "ok": {
-                "operations": [
-                  {
-                    "append": {
-                      "to": "orders",
-                      "value": {"var": "result"}
-                    }
-                  }
-                ],
-                "target": "state:ConfirmAllOrders"
-              },
-              "cancel": {
-                "target": "state:Welcome"
-              },
-              "error": {
-                "target": "state:OrderError"
-              }
+        "ConfirmOrder": {
+          "transitions": [
+            {
+              "pattern": "Yes, Confirm",
+              "target": ":end"
+            },
+            {
+              "pattern": "No, Go Back",
+              "target": "state:ReviewOrder"
+            },
+            {
+              "pattern": "Cancel Order",
+              "target": ":cancel"
             }
+          ],
+          "meta": {
+            "messageId": "ConfirmOrder"
           }
-        },
-        {
-          "pattern": "Back",
-          "target": "state:Welcome"
         }
-      ],
+      },
       "meta": {
-        "messageId": "StoreInfo"
+        "name": "Create Order Flow",
+        "description": "Flow for creating a single order with multiple items",
+        "version": "1.0.0"
       }
     },
-    "OrderError": {
-      "transitions": [
-        {
-          "pattern": "Try Again",
-          "target": "state:Welcome"
-        },
-        {
-          "pattern": "Contact Support",
-          "target": "state:ShowSupport"
-        }
-      ],
-      "meta": {
-        "messageId": "OrderError"
-      }
-    },
-    "ShowSupport": {
-      "transitions": [
-        {
-          "pattern": "Back",
-          "target": "state:Welcome"
-        }
-      ],
-      "meta": {
-        "messageId": "ShowSupport"
-      }
-    },
-    "ConfirmAllOrders": {
-      "transitions": [
-        {
-          "pattern": "Add Another Order",
-          "flowInvocation": {
-            "flowId": "CreateOrder",
-            "onResult": {
-              "ok": {
-                "operations": [
-                  {
-                    "append": {
-                      "to": "orders",
-                      "value": {"var": "result"}
-                    }
-                  }
-                ],
-                "target": "state:ConfirmAllOrders"
-              },
-              "cancel": {
-                "target": "state:ConfirmAllOrders"
-              },
-              "error": {
-                "target": "state:OrderError"
+    "OrderCoffee": {
+      "id": "OrderCoffee",
+      "initial": "ChooseDrink",
+      "states": {
+        "ChooseDrink": {
+          "transitions": [
+            {
+              "pattern": "Espresso",
+              "target": "state:Customize",
+              "context": {
+                "drink": "espresso"
               }
+            },
+            {
+              "pattern": "Cappuccino",
+              "target": "state:Customize",
+              "context": {
+                "drink": "cappuccino"
+              }
+            },
+            {
+              "pattern": "Latte",
+              "target": "state:Customize",
+              "context": {
+                "drink": "latte"
+              }
+            },
+            {
+              "pattern": "Americano",
+              "target": "state:Customize",
+              "context": {
+                "drink": "americano"
+              }
+            },
+            {
+              "pattern": ":default",
+              "target": "state:InvalidDrink"
             }
+          ],
+          "meta": {
+            "messageId": "ChooseDrink"
           }
         },
-        {
-          "pattern": "Confirm All Orders",
-          "target": "state:ProcessPayment"
-        },
-        {
-          "pattern": "Cancel All Orders",
-          "target": "state:Welcome",
-          "context": {
-            "orders": []
-          }
-        }
-      ],
-      "meta": {
-        "messageId": "ConfirmAllOrders"
-      }
-    },
-    "ProcessPayment": {
-      "transitions": [
-        {
-          "target": "state:OrderComplete"
-        }
-      ],
-      "meta": {
-        "messageId": "ProcessPayment",
-        "transient": true
-      }
-    },
-    "OrderComplete": {
-      "transitions": [
-        {
-          "target": "state:ThankYou"
-        }
-      ],
-      "meta": {
-        "messageId": "OrderComplete",
-        "transient": true
-      }
-    },
-    "ThankYou": {
-      "transitions": [
-        {
-          "pattern": "Start New Order",
-          "target": "state:Welcome",
-          "context": {
-            "orders": []
+        "InvalidDrink": {
+          "transitions": [
+            {
+              "target": "state:ChooseDrink"
+            }
+          ],
+          "meta": {
+            "messageId": "InvalidDrink",
+            "transient": true
           }
         },
-        {
-          "pattern": "View Receipt",
-          "target": "state:ShowReceipt"
-        }
-      ],
-      "meta": {
-        "messageId": "ThankYou"
-      }
-    },
-    "ShowReceipt": {
-      "transitions": [
-        {
-          "pattern": "Start New Order",
-          "target": "state:Welcome",
-          "context": {
-            "orders": []
+        "Customize": {
+          "transitions": [
+            {
+              "pattern": "Regular",
+              "target": "state:ChooseSize",
+              "context": {
+                "milk": "regular"
+              }
+            },
+            {
+              "pattern": "Skim",
+              "target": "state:ChooseSize",
+              "context": {
+                "milk": "skim"
+              }
+            },
+            {
+              "pattern": "Soy",
+              "target": "state:ChooseSize",
+              "context": {
+                "milk": "soy",
+                "extraCharge": 0.60
+              }
+            },
+            {
+              "pattern": "Oat",
+              "target": "state:ChooseSize",
+              "context": {
+                "milk": "oat",
+                "extraCharge": 0.60
+              }
+            },
+            {
+              "pattern": "No Milk",
+              "target": "state:ChooseSize",
+              "context": {
+                "milk": "none"
+              }
+            },
+            {
+              "pattern": ":default",
+              "target": "state:InvalidMilk"
+            }
+          ],
+          "meta": {
+            "messageId": "Customize"
           }
         },
-        {
-          "pattern": "Back",
-          "target": "state:Welcome"
+        "InvalidMilk": {
+          "transitions": [
+            {
+              "target": "state:Customize"
+            }
+          ],
+          "meta": {
+            "messageId": "InvalidMilk",
+            "transient": true
+          }
+        },
+        "ChooseSize": {
+          "transitions": [
+            {
+              "pattern": "Small",
+              "target": ":end",
+              "context": {
+                "size": "small",
+                "price": 3.50
+              }
+            },
+            {
+              "pattern": "Medium",
+              "target": ":end",
+              "context": {
+                "size": "medium",
+                "price": 4.50
+              }
+            },
+            {
+              "pattern": "Large",
+              "target": ":end",
+              "context": {
+                "size": "large",
+                "price": 5.50
+              }
+            },
+            {
+              "pattern": ":default",
+              "target": "state:InvalidSize"
+            }
+          ],
+          "meta": {
+            "messageId": "ChooseSize"
+          }
+        },
+        "InvalidSize": {
+          "transitions": [
+            {
+              "target": "state:ChooseSize"
+            }
+          ],
+          "meta": {
+            "messageId": "InvalidSize",
+            "transient": true
+          }
         }
-      ],
+      },
       "meta": {
-        "messageId": "ShowReceipt"
+        "name": "Order Coffee Flow",
+        "description": "Flow for ordering a single coffee item",
+        "version": "1.0.0"
       }
     }
   },
   "meta": {
-    "name": "Coffee Shop Main Flow",
-    "description": "Main flow for coffee shop ordering system",
-    "version": "2.0.0"
+    "name": "Coffee Shop Agent",
+    "description": "Conversational agent for coffee shop ordering",
+    "version": "1.0.0"
   }
 }

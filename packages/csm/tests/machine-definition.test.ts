@@ -78,7 +78,7 @@ describe('Machine Definition Validation', () => {
     };
 
     expect(() => validateMachineDefinition(definition)).toThrow(
-      'Machine definition must have an initial state',
+      'Single-flow machine definition must have an initial state',
     );
   });
 
@@ -89,7 +89,7 @@ describe('Machine Definition Validation', () => {
     };
 
     expect(() => validateMachineDefinition(definition)).toThrow(
-      'Machine definition must have states object',
+      'Single-flow machine definition must have states object',
     );
   });
 
@@ -103,7 +103,7 @@ describe('Machine Definition Validation', () => {
     };
 
     expect(() => validateMachineDefinition(definition)).toThrow(
-      "Initial state 'NonExistent' not found in states",
+      "Initial state 'NonExistent' not found in flow 'TestMachine' states",
     );
   });
 
@@ -133,7 +133,7 @@ describe('Machine Definition Validation', () => {
     };
 
     expect(() => validateMachineDefinition(definition)).toThrow(
-      "Transition 0 in state 'Start' must have a target string",
+      "Transition 0 in state 'Start' must have either a target string or flowInvocation",
     );
   });
 

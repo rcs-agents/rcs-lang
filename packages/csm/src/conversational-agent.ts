@@ -4,7 +4,8 @@
  */
 
 import { FlowMachine, type TransitionResult } from './flow-machine';
-import type { MachineDefinitionJSON } from './machine-definition';
+import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON, MultiFlowMachineDefinitionJSON } from './machine-definition';
+import { isMultiFlowMachine } from './machine-definition';
 import type {
   AgentOptions,
   Context,
@@ -16,6 +17,18 @@ import type {
   StateChangeTrigger,
   Transition,
 } from './types';
+import {
+  type FlowExecutionState,
+  type FlowStackFrame,
+  type FlowResult,
+  type ContextOperation,
+  type ScopedContext,
+  applyContextOperations,
+  serializeFlowExecutionState,
+  deserializeFlowExecutionState,
+  createFlowSuccess,
+  createFlowError,
+} from './flow-execution';
 
 /**
  * Main class for managing conversational state across multiple flows.
@@ -27,6 +40,12 @@ export class ConversationalAgent {
   private activeMachineId = '';
   private context: Context;
   private initialized = false;
+  
+  // Flow execution state for multi-flow machines
+  private flowExecutionState?: FlowExecutionState;
+  
+  // Current scoped context
+  private scopedContext: ScopedContext;
 
   /**
    * Creates a new conversational agent.
@@ -36,6 +55,13 @@ export class ConversationalAgent {
   constructor(options: AgentOptions) {
     this.options = options;
     this.context = options.initialContext || {};
+    
+    // Initialize scoped context
+    this.scopedContext = {
+      conversation: this.context,
+      flow: {},
+      params: {}
+    };
   }
 
   /**
@@ -46,12 +72,49 @@ export class ConversationalAgent {
   }
 
   /**
-   * Adds a flow to this agent.
+   * Adds a machine to this agent (supports both single-flow and multi-flow machines).
+   *
+   * @param machine - Machine definition to add
+   * @throws Error if machine with same ID already exists
+   */
+  addMachine(machine: MachineDefinitionJSON): void {
+    if (isMultiFlowMachine(machine)) {
+      // Multi-flow machine: add each flow separately
+      for (const [flowId, flowDef] of Object.entries(machine.flows)) {
+        if (this.machines.has(flowId)) {
+          throw new Error(`Flow with ID '${flowId}' already exists`);
+        }
+        const flowMachine = new FlowMachine(flowDef);
+        this.machines.set(flowId, flowMachine);
+      }
+      
+      // Initialize flow execution state for multi-flow machine
+      this.flowExecutionState = {
+        currentFlow: machine.initialFlow,
+        currentState: machine.flows[machine.initialFlow].initial,
+        flowStack: [],
+        pendingResult: undefined
+      };
+      
+      // Set active machine to the initial flow
+      this.activeMachineId = machine.initialFlow;
+      this.initialized = true;
+
+      // Emit initial state event
+      this.emitStateChange('init');
+    } else {
+      // Single-flow machine: add as single flow
+      this.addFlow(machine);
+    }
+  }
+
+  /**
+   * Adds a single flow to this agent.
    *
    * @param flow - Flow definition to add (supports both legacy and JSON formats)
    * @throws Error if flow with same ID already exists
    */
-  addFlow(flow: FlowDefinition | MachineDefinitionJSON): void {
+  addFlow(flow: FlowDefinition | SingleFlowMachineDefinitionJSON): void {
     if (this.machines.has(flow.id)) {
       throw new Error(`Flow with ID '${flow.id}' already exists`);
     }
@@ -108,6 +171,16 @@ export class ConversationalAgent {
         case 'machine':
           // Transition to different machine
           await this.handleMachineTransition(result, input, previousState, previousMachine);
+          break;
+
+        case 'flow_invocation':
+          // Flow invocation - switch to another flow
+          await this.handleFlowInvocation(result, input, previousState);
+          break;
+
+        case 'flow_termination':
+          // Flow termination - return to parent flow
+          await this.handleFlowTermination(result, input, previousState);
           break;
 
         case 'none':
@@ -315,6 +388,140 @@ export class ConversationalAgent {
 
     // Emit state change event
     await this.emitStateChange('machine', input, previousState, previousMachine, result.transition);
+  }
+
+  /**
+   * Handles flow invocation by pushing current state to stack and switching flows.
+   */
+  private async handleFlowInvocation(
+    result: TransitionResult,
+    input: string,
+    previousState: string,
+  ): Promise<void> {
+    if (!result.flowInvocation) return;
+
+    const { flowId, parameters = {} } = result.flowInvocation;
+
+    // Get the target flow machine
+    const targetFlow = this.machines.get(flowId);
+    if (!targetFlow) {
+      throw new Error(`Target flow '${flowId}' not found`);
+    }
+
+    // Initialize flow execution state if not present
+    if (!this.flowExecutionState) {
+      this.flowExecutionState = {
+        currentFlow: this.activeMachineId,
+        currentState: previousState,
+        flowStack: [],
+        pendingResult: undefined
+      };
+    }
+
+    // Push current flow state onto the stack
+    const stackFrame: FlowStackFrame = {
+      flowId: this.flowExecutionState.currentFlow,
+      stateId: this.flowExecutionState.currentState,
+      transitionIndex: 0, // TODO: Get actual transition index
+      contextSnapshot: {
+        conversation: { ...this.scopedContext.conversation },
+        flow: { ...this.scopedContext.flow },
+        params: { ...this.scopedContext.params }
+      }
+    };
+    
+    this.flowExecutionState.flowStack.push(stackFrame);
+
+    // Update context if transition has context updates
+    if (result.contextUpdates) {
+      this.updateContext(result.contextUpdates);
+      this.scopedContext.conversation = { ...this.context };
+    }
+
+    // Set up new flow context
+    this.scopedContext.flow = {}; // New flow gets fresh flow context
+    this.scopedContext.params = parameters; // Parameters become params context
+
+    // Switch to the invoked flow
+    this.flowExecutionState.currentFlow = flowId;
+    this.flowExecutionState.currentState = targetFlow.definition.initial;
+    this.activeMachineId = flowId;
+
+    // Set the target flow to its initial state
+    targetFlow.setState(targetFlow.definition.initial);
+
+    // Emit state change event
+    await this.emitStateChange('input', input, previousState, undefined, result.transition);
+  }
+
+  /**
+   * Handles flow termination by returning to parent flow and applying result handlers.
+   */
+  private async handleFlowTermination(
+    result: TransitionResult,
+    input: string,
+    previousState: string,
+  ): Promise<void> {
+    if (!result.termination || !this.flowExecutionState) return;
+
+    // Pop from flow stack
+    const stackFrame = this.flowExecutionState.flowStack.pop();
+    if (!stackFrame) {
+      // No parent flow - this is the root flow terminating
+      // TODO: Handle root flow termination
+      return;
+    }
+
+    // Create flow result
+    const flowResult = result.termination === 'end' 
+      ? createFlowSuccess(this.scopedContext.flow)
+      : createFlowError(result.termination, `Flow terminated with ${result.termination}`, this.scopedContext.flow);
+
+    // Get the parent flow machine
+    const parentFlow = this.machines.get(stackFrame.flowId);
+    if (!parentFlow) {
+      throw new Error(`Parent flow '${stackFrame.flowId}' not found`);
+    }
+
+    // Find the transition that invoked this flow
+    const parentState = parentFlow.definition.states[stackFrame.stateId];
+    if (!parentState) {
+      throw new Error(`Parent state '${stackFrame.stateId}' not found in flow '${stackFrame.flowId}'`);
+    }
+
+    // Find the flow invocation transition
+    const invokingTransition = parentState.transitions.find(t => t.flowInvocation);
+    if (!invokingTransition?.flowInvocation) {
+      throw new Error(`Flow invocation transition not found in parent state '${stackFrame.stateId}'`);
+    }
+
+    // Get the appropriate result handler
+    const resultHandler = invokingTransition.flowInvocation.onResult[result.termination];
+    if (!resultHandler) {
+      throw new Error(`No result handler found for termination '${result.termination}'`);
+    }
+
+    // Restore parent flow context
+    this.scopedContext = { ...stackFrame.contextSnapshot };
+
+    // Apply result handler operations
+    if (resultHandler.operations) {
+      this.scopedContext = applyContextOperations(this.scopedContext, resultHandler.operations);
+    }
+
+    // Update the flat context for backward compatibility
+    this.context = { ...this.scopedContext.conversation };
+
+    // Switch back to parent flow
+    this.flowExecutionState.currentFlow = stackFrame.flowId;
+    this.flowExecutionState.currentState = resultHandler.target;
+    this.activeMachineId = stackFrame.flowId;
+
+    // Set parent flow to the target state
+    parentFlow.setState(resultHandler.target);
+
+    // Emit state change event
+    await this.emitStateChange('input', input, previousState, undefined, invokingTransition);
   }
 
   /**

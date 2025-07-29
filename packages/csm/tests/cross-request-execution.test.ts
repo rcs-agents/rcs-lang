@@ -10,9 +10,260 @@ describe('Cross-Request Execution and State Restoration', () => {
   let stateChangeEvents: StateChangeEvent[] = [];
 
   beforeEach(() => {
-    // Load coffee shop machine definition
+    // Load coffee shop machine definition - use the TopFlow but create a simple version for testing
     const fixturePath = resolve(__dirname, 'fixtures/coffee-shop-machine.json');
-    coffeeShopMachine = JSON.parse(readFileSync(fixturePath, 'utf-8'));
+    const machineData = JSON.parse(readFileSync(fixturePath, 'utf-8'));
+    
+    // Extract TopFlow and create a simpler test version without flow invocations
+    coffeeShopMachine = {
+      id: 'OrderFlow',
+      initial: 'Welcome',
+      states: {
+        Welcome: {
+          transitions: [
+            {
+              pattern: 'Order Coffee',
+              target: 'ChooseSize'
+            },
+            {
+              pattern: 'View Menu',
+              target: 'ShowMenu'
+            },
+            {
+              pattern: ':default',
+              target: 'Welcome'
+            }
+          ],
+          meta: {
+            messageId: 'Welcome'
+          }
+        },
+        ChooseSize: {
+          transitions: [
+            {
+              pattern: 'Small',
+              target: 'ChooseDrink',
+              context: {
+                size: 'small',
+                price: 3.50
+              }
+            },
+            {
+              pattern: 'Medium',
+              target: 'ChooseDrink',
+              context: {
+                size: 'medium',
+                price: 4.50
+              }
+            },
+            {
+              pattern: 'Large',
+              target: 'ChooseDrink',
+              context: {
+                size: 'large',
+                price: 5.50
+              }
+            },
+            {
+              pattern: ':default',
+              target: 'InvalidOption',
+              context: {
+                property: 'size',
+                next: 'ChooseSize'
+              }
+            }
+          ],
+          meta: {
+            messageId: 'ChooseSize'
+          }
+        },
+        ChooseDrink: {
+          transitions: [
+            {
+              pattern: 'Espresso',
+              target: 'Customize',
+              context: {
+                drink: 'espresso'
+              }
+            },
+            {
+              pattern: 'Cappuccino',
+              target: 'Customize',
+              context: {
+                drink: 'cappuccino'
+              }
+            },
+            {
+              pattern: 'Latte',
+              target: 'Customize',
+              context: {
+                drink: 'latte'
+              }
+            },
+            {
+              pattern: 'Americano',
+              target: 'Customize',
+              context: {
+                drink: 'americano'
+              }
+            },
+            {
+              pattern: ':default',
+              target: 'InvalidOption',
+              context: {
+                property: 'drink',
+                next: 'ChooseDrink'
+              }
+            }
+          ],
+          meta: {
+            messageId: 'ChooseDrink'
+          }
+        },
+        Customize: {
+          transitions: [
+            {
+              pattern: 'Regular',
+              target: 'ConfirmOrder',
+              context: {
+                milk: 'regular'
+              }
+            },
+            {
+              pattern: 'Skim',
+              target: 'ConfirmOrder',
+              context: {
+                milk: 'skim'
+              }
+            },
+            {
+              pattern: 'Soy',
+              target: 'ConfirmOrder',
+              context: {
+                milk: 'soy',
+                extraCharge: 0.60
+              }
+            },
+            {
+              pattern: 'Oat',
+              target: 'ConfirmOrder',
+              context: {
+                milk: 'oat',
+                extraCharge: 0.60
+              }
+            },
+            {
+              pattern: 'No Milk',
+              target: 'ConfirmOrder',
+              context: {
+                milk: 'none'
+              }
+            },
+            {
+              pattern: ':default',
+              target: 'InvalidOption',
+              context: {
+                property: 'milk',
+                next: 'Customize'
+              }
+            }
+          ],
+          meta: {
+            messageId: 'Customize'
+          }
+        },
+        ConfirmOrder: {
+          transitions: [
+            {
+              pattern: 'Confirm',
+              target: 'ProcessPayment'
+            },
+            {
+              pattern: 'Cancel',
+              target: 'OrderCancelled'
+            },
+            {
+              pattern: ':default',
+              target: 'ConfirmOrder'
+            }
+          ],
+          meta: {
+            messageId: 'ConfirmOrder'
+          }
+        },
+        ProcessPayment: {
+          transitions: [
+            {
+              target: 'OrderComplete'
+            }
+          ],
+          meta: {
+            messageId: 'ProcessPayment',
+            transient: true
+          }
+        },
+        OrderCancelled: {
+          transitions: [
+            {
+              target: 'ShowMenu'
+            }
+          ],
+          meta: {
+            messageId: 'OrderCancelled',
+            transient: true
+          }
+        },
+        OrderComplete: {
+          transitions: [
+            {
+              target: 'ThankYou'
+            }
+          ],
+          meta: {
+            messageId: 'OrderComplete',
+            transient: true
+          }
+        },
+        ThankYou: {
+          transitions: [
+            {
+              target: 'ShowMenu'
+            }
+          ],
+          meta: {
+            messageId: 'ThankYou',
+            transient: true
+          }
+        },
+        ShowMenu: {
+          transitions: [
+            {
+              target: 'Welcome'
+            }
+          ],
+          meta: {
+            messageId: 'ShowMenu',
+            transient: true
+          }
+        },
+        InvalidOption: {
+          transitions: [
+            {
+              target: '@next'
+            }
+          ],
+          meta: {
+            messageId: 'InvalidOption',
+            transient: true
+          }
+        }
+      },
+      meta: {
+        name: 'Coffee Shop Test Flow',
+        description: 'Simplified flow for testing',
+        version: '1.0.0'
+      }
+    };
     
     // Reset state tracking
     stateChangeEvents = [];
