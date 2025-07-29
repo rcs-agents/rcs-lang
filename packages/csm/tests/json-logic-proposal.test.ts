@@ -46,8 +46,8 @@ class MockJSONLogic {
   }
 
   private static getValue(path: any, data: any): any {
-    if (typeof path === 'string' && path.startsWith('var.')) {
-      const varPath = path.substring(4);
+    if (typeof path === 'object' && path !== null && 'var' in path) {
+      const varPath = path['var'];
       return this.getNestedValue(data, varPath);
     }
     return path;
