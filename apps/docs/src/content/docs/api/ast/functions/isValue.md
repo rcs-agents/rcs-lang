@@ -7,7 +7,7 @@ title: "isValue"
 
 > **isValue**(`node`): `node is Value`
 
-Defined in: [guards.ts:158](https://github.com/rcs-agents/rcs-lang/blob/3e6d0013c4b9c0c5d7cd39eb149fd10244b5ea0b/packages/ast/src/guards.ts#L158)
+Defined in: [guards.ts:171](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/guards.ts#L171)
 
 ## Parameters
 

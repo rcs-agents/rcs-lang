@@ -5,7 +5,7 @@ prev: false
 title: "WithLocation"
 ---
 
-Defined in: [position.ts:32](https://github.com/rcs-agents/rcs-lang/blob/3e6d0013c4b9c0c5d7cd39eb149fd10244b5ea0b/packages/ast/src/position.ts#L32)
+Defined in: [position.ts:32](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/position.ts#L32)
 
 Base interface for nodes that track position
 
@@ -28,6 +28,10 @@ Base interface for nodes that track position
 - [`TypeTag`](/api/ast/interfaces/typetag/)
 - [`SingleLineCode`](/api/ast/interfaces/singlelinecode/)
 - [`MultiLineCode`](/api/ast/interfaces/multilinecode/)
+- [`AppendOperation`](/api/ast/interfaces/appendoperation/)
+- [`SetOperation`](/api/ast/interfaces/setoperation/)
+- [`MergeOperation`](/api/ast/interfaces/mergeoperation/)
+- [`ContextOperationSequence`](/api/ast/interfaces/contextoperationsequence/)
 - [`RclFile`](/api/ast/interfaces/rclfile/)
 - [`Section`](/api/ast/interfaces/section/)
 - [`Attribute`](/api/ast/interfaces/attribute/)
@@ -35,6 +39,13 @@ Base interface for nodes that track position
 - [`SpreadDirective`](/api/ast/interfaces/spreaddirective/)
 - [`MatchBlock`](/api/ast/interfaces/matchblock/)
 - [`MatchCase`](/api/ast/interfaces/matchcase/)
+- [`FlowInvocation`](/api/ast/interfaces/flowinvocation/)
+- [`FlowResultHandler`](/api/ast/interfaces/flowresulthandler/)
+- [`FlowTermination`](/api/ast/interfaces/flowtermination/)
+- [`SimpleTransition`](/api/ast/interfaces/simpletransition/)
+- [`StateReference`](/api/ast/interfaces/statereference/)
+- [`JavaScriptCondition`](/api/ast/interfaces/javascriptcondition/)
+- [`JsonLogicCondition`](/api/ast/interfaces/jsonlogiccondition/)
 
 ## Properties
 
@@ -42,4 +53,4 @@ Base interface for nodes that track position
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/3e6d0013c4b9c0c5d7cd39eb149fd10244b5ea0b/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/position.ts#L33)

@@ -1,6 +1,6 @@
 ---
 title: RCL Formal Specification
-description: Complete EBNF grammar specification for RCL
+description: Complete EBNF grammar specification for RCL including flow control extensions
 ---
 # Rich Communication Language (RCL) - Formal Specification
 
@@ -222,8 +222,37 @@ MatchBlock ::=
     DEDENT
 
 MatchCase ::=
-    (STRING | NUMBER | ATOM) '->' ContextualizedValue
-    | ':default' '->' ContextualizedValue
+    (STRING | NUMBER | ATOM) '->' Consequence
+    | ':default' '->' Consequence
+
+Consequence ::=
+    ContextualizedValue
+    | FlowInvocation
+    | FlowTermination
+
+FlowInvocation ::=
+    'start' IDENTIFIER ('with' ParameterList)?
+    ('on' FlowResult '->' ResultHandler)*
+
+FlowResult ::= ':end' | ':cancel' | ':error'
+
+ResultHandler ::=
+    ContextOperation? TargetReference
+
+ContextOperation ::=
+    'append' 'result' 'to' ContextVariable
+    | 'set' ContextVariable 'to' 'result'
+    | 'merge' 'result' 'into' ContextVariable
+
+ContextVariable ::= VARIABLE | PROPERTY_ACCESS
+
+TargetReference ::=
+    IDENTIFIER
+    | VARIABLE
+    | PROPERTY_ACCESS
+    | FlowTermination
+
+FlowTermination ::= ':end' | ':cancel' | ':error'
 ```
 
 ### 3.5 File Structure
@@ -298,6 +327,37 @@ ImportPath ::= IDENTIFIER ('/' IDENTIFIER)*
 - Variables (`@name`) reference runtime context
 - Property access (`@obj.prop`) navigates context objects
 - Context provided by runtime environment
+
+### 5.6 Flow Control Extensions
+
+#### 5.6.1 Flow Invocation Semantics
+- `start FlowName` initiates execution of another flow
+- Parameters passed with `with` clause become flow's parameter context
+- Flow invocation pushes current state onto execution stack
+- Execution continues in the invoked flow's initial state
+
+#### 5.6.2 Result Handling
+- Three flow termination outcomes: `:end`, `:cancel`, `:error`
+- `:end` indicates successful completion and returns flow context
+- `:cancel` indicates user cancellation, no context returned
+- `:error` indicates execution error, optional error context returned
+
+#### 5.6.3 Context Operations
+- `append result to @var` - Adds result to array (creates if needed)
+- `set @var to result` - Overwrites variable with result
+- `merge result into @var` - Merges result object into existing object
+- Operations applied after flow completion before transitioning
+
+#### 5.6.4 Context Scoping for Multi-Flow
+Variable resolution follows precedence order:
+1. **Flow parameters** (highest priority)
+2. **Flow context** (local to current flow)
+3. **Conversation context** (global, persistent)
+
+#### 5.6.5 Flow Termination
+- Flows terminate explicitly using `:end`, `:cancel`, or `:error`
+- Termination returns control to parent flow's result handler
+- Context isolation maintained between flows
 
 ## 6. Examples
 
@@ -374,4 +434,61 @@ code: +|+
   def process_order(item):
       return f"Processing {item}"
 |
+```
+
+### 6.4 Flow Control Examples
+
+#### Basic Flow Invocation
+```rcl
+flow MainFlow
+  on Welcome
+    match @reply.text
+      "Start Order" -> start OrderFlow
+        on :end -> append result to @orders -> ConfirmOrders
+        on :cancel -> Welcome
+        on :error -> ErrorHandler
+```
+
+#### Flow with Parameters
+```rcl
+flow PaymentFlow
+  on SelectPayment
+    "Credit Card" -> start PaymentProcessing with 
+        amount: @totalPrice, 
+        method: "card"
+      on :end -> set @receipt to result -> ShowReceipt
+      on :cancel -> SelectPayment
+      on :error -> PaymentFailed
+```
+
+#### Nested Flow Calls
+```rcl
+flow OrderFlow
+  on SelectItems
+    "Add Coffee" -> start CoffeeFlow
+      on :end -> start PaymentFlow with items: result
+        on :end -> merge result into @order -> CompleteOrder
+        on :cancel -> SelectItems
+      on :cancel -> SelectItems
+```
+
+#### Flow Termination
+```rcl
+flow CoffeeFlow
+  on Confirmation
+    match @reply.text
+      "Confirm" -> :end          # Return flow context
+      "Cancel" -> :cancel        # Cancel without changes  
+      "Error" -> :error          # Error termination
+```
+
+#### Context Operations
+```rcl
+flow MultiItemOrder
+  on AddItem
+    "Add Coffee" -> start ItemFlow
+      on :end -> append result to @cartItems -> AddItem
+    "Add Food" -> start FoodFlow  
+      on :end -> append result to @cartItems -> AddItem
+    "Checkout" -> merge @cartItems into @order -> ProcessOrder
 ```
