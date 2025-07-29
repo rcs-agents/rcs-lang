@@ -2,9 +2,9 @@ import { CharStream, CommonToken, Lexer, Token } from 'antlr4ng';
 
 export abstract class RclLexerBase extends Lexer {
   // Token type constants - these will match what's generated
-  protected static readonly NEWLINE = 39;
-  protected static readonly INDENT = 40;
-  protected static readonly DEDENT = 41;
+  protected static readonly NEWLINE = 50;
+  protected static readonly INDENT = 51;
+  protected static readonly DEDENT = 52;
 
   private indentLengths: number[] = [0];
   private tokenQueue: Token[] = [];

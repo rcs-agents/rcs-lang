@@ -15,7 +15,12 @@ import_path: IDENTIFIER (SLASH IDENTIFIER)*;
 section: section_header section_body?;
 
 section_header: 
-    LOWER_NAME IDENTIFIER? header_values? parameter_list? NEWLINE
+    section_type IDENTIFIER? header_values? parameter_list? NEWLINE
+    ;
+
+section_type:
+    LOWER_NAME
+    | ON  // Allow 'on' as a section type
     ;
 
 header_values: value+;
@@ -30,6 +35,7 @@ section_content:
     | section
     | match_block
     | simple_transition
+    | flow_invocation
     | state_reference
     | NEWLINE
     ;
@@ -51,10 +57,25 @@ attribute_assignment:
 match_block: MATCH value NEWLINE INDENT match_case+ DEDENT;
 
 match_case: 
-    (STRING | NUMBER | ATOM | REGEX | DEFAULT_CASE) ARROW contextualized_value NEWLINE;
+    (STRING | NUMBER | ATOM | REGEX | DEFAULT_CASE) ARROW transition_target NEWLINE;
+
+transition_target:
+    contextualized_value
+    | flow_termination
+    | flow_invocation_with_handlers
+    | context_operation_sequence
+    ;
+
+flow_invocation_with_handlers:
+    flow_invocation (NEWLINE INDENT flow_result_handler+ DEDENT)?
+    ;
+
+context_operation_sequence:
+    context_operation (ARROW context_operation)* ARROW target_reference
+    ;
 
 // Simple transition (arrow without match)
-simple_transition: ARROW contextualized_value NEWLINE;
+simple_transition: ARROW transition_target NEWLINE;
 
 // Values and expressions
 contextualized_value: value (WITH parameter_list)?;
@@ -152,4 +173,34 @@ multi_line_string:
     ML_END;
 
 multiline_content: ML_CONTENT ML_NEWLINE?;
+
+// Flow control extensions
+flow_invocation: 
+    START IDENTIFIER (WITH parameter_list)?
+    ;
+
+flow_result_handler:
+    ON flow_result ARROW (context_operation ARROW)* target_reference NEWLINE
+    ;
+
+flow_result:
+    COLON LOWER_NAME
+    ;
+
+context_operation:
+    APPEND (RESULT | value) TO variable_access
+    | SET variable_access TO (RESULT | value)
+    | MERGE (RESULT | value) INTO variable_access
+    ;
+
+target_reference:
+    IDENTIFIER
+    | variable_access
+    | flow_termination
+    ;
+
+// Flow termination for flow returns
+flow_termination:
+    COLON LOWER_NAME
+    ;
 

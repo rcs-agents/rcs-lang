@@ -2,6 +2,7 @@ import type { ParserConfig } from '@rcs-lang/core';
 import { CharStream, CommonTokenStream } from 'antlr4ng';
 import { RclLexer } from './generated/RclLexer';
 import { RclParser } from './generated/RclParser';
+import { ASTVisitor } from './ast-visitor.js';
 
 // Legacy function for backward compatibility with old interface
 export async function parse(source: string): Promise<{ ast: any; errors?: any[] }> {
@@ -37,13 +38,54 @@ export async function parse(source: string): Promise<{ ast: any; errors?: any[] 
 
 // Legacy function for tree-sitter compatibility
 export function parseRcl(source: string) {
-  const inputStream = CharStream.fromString(source);
-  const lexer = new RclLexer(inputStream);
-  const tokenStream = new CommonTokenStream(lexer);
-  const parser = new RclParser(tokenStream);
+  try {
+    const inputStream = CharStream.fromString(source);
+    const lexer = new RclLexer(inputStream);
+    const tokenStream = new CommonTokenStream(lexer);
+    const parser = new RclParser(tokenStream);
 
-  const tree = parser.rcl_file();
-  return tree;
+    // Collect parsing errors
+    const errors: any[] = [];
+    parser.removeErrorListeners();
+    parser.addErrorListener({
+      syntaxError: (recognizer, offendingSymbol, line, charPositionInLine, msg, e) => {
+        errors.push({
+          message: msg,
+          line,
+          column: charPositionInLine,
+        });
+      },
+      reportAmbiguity: () => {},
+      reportAttemptingFullContext: () => {},
+      reportContextSensitivity: () => {},
+    });
+
+    const tree = parser.rcl_file();
+    
+    if (errors.length > 0) {
+      return {
+        success: false,
+        errors,
+        ast: null,
+      };
+    }
+
+    // Use AST visitor to convert parse tree to AST
+    const visitor = new ASTVisitor(source);
+    const ast = visitor.visit(tree);
+
+    return {
+      success: true,
+      ast,
+      errors: [],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errors: [{ message: error instanceof Error ? error.message : String(error) }],
+      ast: null,
+    };
+  }
 }
 
 // Export the main parser class

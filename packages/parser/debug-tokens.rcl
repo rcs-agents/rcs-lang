@@ -1,0 +1,4 @@
+flow TestFlow
+  on Welcome
+    match @reply.text
+      "Start" -> start CreateOrder

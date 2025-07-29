@@ -7,17 +7,25 @@ import { RclParserVisitor } from './generated/RclParserVisitor';
 import { Rcl_fileContext } from './generated/RclParser';
 
 import {
+  type AppendOperation,
   type Atom,
   type Attribute,
   type BooleanLiteral,
+  type ContextOperation,
+  type ContextOperationSequence,
   type ContextualizedValue,
   type Dictionary,
   type DictionaryEntry,
+  type FlowInvocation,
+  type FlowResult,
+  type FlowResultHandler,
+  type FlowTermination,
   type Identifier,
   type ImportStatement,
   type List,
   type MatchBlock,
   type MatchCase,
+  type MergeOperation,
   type MultiLineCode,
   MultiLineString,
   type NullLiteral,
@@ -27,9 +35,13 @@ import {
   type PropertyAccess,
   type RclFile,
   type Section,
+  type SetOperation,
+  type SimpleTransition,
   type SingleLineCode,
   type SpreadDirective,
+  type StateReference,
   type StringLiteral,
+  type TargetReference,
   type TypeTag,
   type Value,
   type Variable,
@@ -161,7 +173,10 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     const bodyCtx = ctx.section_body();
 
     // Extract section type
-    const sectionType = headerCtx.LOWER_NAME().getText();
+    const sectionTypeCtx = headerCtx.section_type();
+    const sectionType = sectionTypeCtx.LOWER_NAME() 
+      ? sectionTypeCtx.LOWER_NAME().getText()
+      : sectionTypeCtx.ON().getText();
 
     // Extract identifier if present
     let identifier: Identifier | undefined;
@@ -212,7 +227,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     }
 
     // Extract body content
-    const body: (SpreadDirective | Attribute | Section | MatchBlock | Value)[] = [];
+    const body: (SpreadDirective | Attribute | Section | MatchBlock | FlowInvocation | SimpleTransition | StateReference | Value)[] = [];
     if (bodyCtx) {
       const contentCtxs = bodyCtx.section_content();
       for (const contentCtx of contentCtxs) {
@@ -240,7 +255,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
    */
   visitSection_content(
     ctx: any,
-  ): SpreadDirective | Attribute | Section | MatchBlock | Value | null {
+  ): SpreadDirective | Attribute | Section | MatchBlock | FlowInvocation | SimpleTransition | StateReference | Value | null {
     if (ctx.spread_directive()) {
       return this.visitSpread_directive(ctx.spread_directive()!);
     }
@@ -253,36 +268,14 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     if (ctx.match_block()) {
       return this.visitMatch_block(ctx.match_block()!);
     }
-    if (ctx.state_reference()) {
-      // State reference is just a value (identifier or variable)
-      const stateRefCtx = ctx.state_reference()!;
-
-      if (stateRefCtx.IDENTIFIER && stateRefCtx.IDENTIFIER()) {
-        const idNode = stateRefCtx.IDENTIFIER()!;
-        return withLocation<Identifier>(
-          {
-            type: 'Identifier',
-            value: idNode.getText(),
-          },
-          this.tokenToLocation(idNode.symbol, idNode.symbol).location,
-        );
-      } else if (stateRefCtx.variable_access && stateRefCtx.variable_access()) {
-        return this.visitVariable_access(stateRefCtx.variable_access()!);
-      }
+    if (ctx.flow_invocation()) {
+      return this.visitFlow_invocation(ctx.flow_invocation()!);
     }
     if (ctx.simple_transition()) {
-      // Simple transition is just the contextualized value after the arrow
-      const transCtx = ctx.simple_transition()!;
-      const contextualizedValue = this.visitContextualized_value(transCtx.contextualized_value());
-
-      // Return the value directly (could be an identifier with context)
-      if (contextualizedValue.context) {
-        // If it has context, return the full contextualized value
-        return contextualizedValue;
-      } else {
-        // If no context, just return the value
-        return contextualizedValue.value;
-      }
+      return this.visitSimple_transition(ctx.simple_transition()!);
+    }
+    if (ctx.state_reference()) {
+      return this.visitState_reference(ctx.state_reference()!);
     }
     return null;
   }
@@ -389,7 +382,8 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
       throw new Error('Invalid match case value');
     }
 
-    const consequence = this.visitContextualized_value(ctx.contextualized_value());
+    // Visit transition target
+    const consequence = this.visitTransition_target(ctx.transition_target());
 
     return withLocation<MatchCase>(
       {
@@ -1001,5 +995,302 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
   private getRuleName(ctx: ParserRuleContext): string {
     const ruleIndex = ctx.ruleIndex;
     return 'rule_' + ruleIndex; // Simple fallback
+  }
+
+  /**
+   * Visit flow invocation (basic, without result handlers)
+   */
+  visitFlow_invocation(ctx: any): FlowInvocation {
+    const flowName = withLocation<Identifier>(
+      {
+        type: 'Identifier',
+        value: ctx.IDENTIFIER().getText(),
+      },
+      this.tokenToLocation(ctx.IDENTIFIER().symbol, ctx.IDENTIFIER().symbol).location,
+    );
+
+    let parameters: ParameterList | undefined;
+    if (ctx.parameter_list()) {
+      parameters = this.visitParameter_list(ctx.parameter_list());
+    }
+
+    // Basic flow invocation doesn't have result handlers
+    // Those are handled by flow_invocation_with_handlers
+    return withLocation<FlowInvocation>(
+      {
+        type: 'FlowInvocation',
+        flowName,
+        parameters,
+        resultHandlers: [],
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit flow result handler
+   */
+  visitFlow_result_handler(ctx: any): FlowResultHandler {
+    const result = this.visitFlow_result(ctx.flow_result());
+    
+    let operations: ContextOperation[] | undefined;
+    if (ctx.context_operation_chain()) {
+      operations = this.visitContext_operation_chain(ctx.context_operation_chain());
+    }
+
+    const target = this.visitTarget_reference(ctx.target_reference());
+
+    return withLocation<FlowResultHandler>(
+      {
+        type: 'FlowResultHandler',
+        result,
+        operations,
+        target,
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit flow result
+   */
+  visitFlow_result(ctx: any): FlowResult {
+    // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
+    const lowerName = ctx.LOWER_NAME();
+    if (lowerName) {
+      const resultText = lowerName.getText();
+      if (resultText === 'end') {
+        return 'end';
+      } else if (resultText === 'cancel') {
+        return 'cancel';
+      } else if (resultText === 'error') {
+        return 'error';
+      }
+    }
+    throw new Error('Unknown flow result type');
+  }
+
+  /**
+   * Visit context operation chain
+   */
+  visitContext_operation_chain(ctx: any): ContextOperation[] {
+    const operations: ContextOperation[] = [];
+    const operationCtxs = ctx.context_operation();
+    
+    for (const operationCtx of operationCtxs) {
+      operations.push(this.visitContext_operation(operationCtx));
+    }
+
+    return operations;
+  }
+
+  /**
+   * Visit context operation
+   */
+  visitContext_operation(ctx: any): ContextOperation {
+    if (ctx.APPEND()) {
+      const target = this.visitVariable_access(ctx.variable_access());
+      return withLocation<AppendOperation>(
+        {
+          type: 'AppendOperation',
+          target,
+        },
+        this.contextToLocation(ctx).location,
+      );
+    } else if (ctx.SET()) {
+      const target = this.visitVariable_access(ctx.variable_access());
+      return withLocation<SetOperation>(
+        {
+          type: 'SetOperation',
+          target,
+        },
+        this.contextToLocation(ctx).location,
+      );
+    } else if (ctx.MERGE()) {
+      const target = this.visitVariable_access(ctx.variable_access());
+      return withLocation<MergeOperation>(
+        {
+          type: 'MergeOperation',
+          target,
+        },
+        this.contextToLocation(ctx).location,
+      );
+    }
+    throw new Error('Unknown context operation type');
+  }
+
+  /**
+   * Visit target reference
+   */
+  visitTarget_reference(ctx: any): TargetReference {
+    if (ctx.IDENTIFIER()) {
+      const idNode = ctx.IDENTIFIER();
+      return withLocation<Identifier>(
+        {
+          type: 'Identifier',
+          value: idNode.getText(),
+        },
+        this.tokenToLocation(idNode.symbol, idNode.symbol).location,
+      );
+    } else if (ctx.variable_access()) {
+      return this.visitVariable_access(ctx.variable_access());
+    } else if (ctx.flow_termination()) {
+      return this.visitFlow_termination(ctx.flow_termination());
+    }
+    throw new Error('Unknown target reference type');
+  }
+
+  /**
+   * Visit flow termination
+   */
+  visitFlow_termination(ctx: any): FlowTermination {
+    // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
+    const lowerName = ctx.LOWER_NAME();
+    let result: FlowResult;
+    if (lowerName) {
+      const resultText = lowerName.getText();
+      if (resultText === 'end') {
+        result = 'end';
+      } else if (resultText === 'cancel') {
+        result = 'cancel';
+      } else if (resultText === 'error') {
+        result = 'error';
+      } else {
+        throw new Error(`Unknown flow termination type: ${resultText}`);
+      }
+    } else {
+      throw new Error('Flow termination must have LOWER_NAME token');
+    }
+    
+    return withLocation<FlowTermination>(
+      {
+        type: 'FlowTermination',
+        result,
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit simple transition
+   */
+  visitSimple_transition(ctx: any): SimpleTransition {
+    const target = this.visitTransition_target(ctx.transition_target());
+
+    return withLocation<SimpleTransition>(
+      {
+        type: 'SimpleTransition',
+        target,
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit transition target
+   */
+  visitTransition_target(ctx: any): ContextualizedValue | FlowTermination | FlowInvocation | ContextOperationSequence {
+    if (ctx.contextualized_value()) {
+      return this.visitContextualized_value(ctx.contextualized_value());
+    } else if (ctx.flow_termination()) {
+      return this.visitFlow_termination(ctx.flow_termination());
+    } else if (ctx.flow_invocation_with_handlers()) {
+      return this.visitFlow_invocation_with_handlers(ctx.flow_invocation_with_handlers());
+    } else if (ctx.context_operation_sequence()) {
+      return this.visitContext_operation_sequence(ctx.context_operation_sequence());
+    } else {
+      throw new Error('Transition target must have one of: contextualized_value, flow_termination, flow_invocation_with_handlers, or context_operation_sequence');
+    }
+  }
+
+  /**
+   * Visit flow invocation with handlers
+   */
+  visitFlow_invocation_with_handlers(ctx: any): FlowInvocation {
+    // Visit the basic flow invocation
+    const flowInvocation = this.visitFlow_invocation(ctx.flow_invocation());
+    
+    // Visit optional result handlers
+    let resultHandlers: FlowResultHandler[] = [];
+    
+    // In ANTLR, optional groups with + return null when not present
+    // and arrays when present
+    try {
+      const resultHandlerContexts = ctx.flow_result_handler();
+      if (resultHandlerContexts && Array.isArray(resultHandlerContexts)) {
+        for (const handlerCtx of resultHandlerContexts) {
+          resultHandlers.push(this.visitFlow_result_handler(handlerCtx));
+        }
+      }
+    } catch (error) {
+      // Method doesn't exist - no result handlers present
+      // This is fine for basic flow invocations
+    }
+    
+    // Return enhanced flow invocation with handlers
+    return withLocation<FlowInvocation>(
+      {
+        type: 'FlowInvocation',
+        flowName: flowInvocation.flowName,
+        parameters: flowInvocation.parameters,
+        resultHandlers,
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit context operation sequence
+   */
+  visitContext_operation_sequence(ctx: any): ContextOperationSequence {
+    const operations: ContextOperation[] = [];
+    
+    // Get all context_operation children
+    const operationContexts = ctx.context_operation();
+    for (const operationCtx of operationContexts || []) {
+      operations.push(this.visitContext_operation(operationCtx));  
+    }
+    
+    // Get the target reference
+    const target = this.visitTarget_reference(ctx.target_reference());
+
+    return withLocation<ContextOperationSequence>(
+      {
+        type: 'ContextOperationSequence',
+        operations,
+        target,
+      },
+      this.contextToLocation(ctx).location,
+    );
+  }
+
+  /**
+   * Visit state reference
+   */
+  visitState_reference(ctx: any): StateReference {
+    let target: Identifier | Variable | PropertyAccess;
+    
+    if (ctx.IDENTIFIER()) {
+      const idNode = ctx.IDENTIFIER();
+      target = withLocation<Identifier>(
+        {
+          type: 'Identifier',
+          value: idNode.getText(),
+        },
+        this.tokenToLocation(idNode.symbol, idNode.symbol).location,
+      );
+    } else if (ctx.variable_access()) {
+      target = this.visitVariable_access(ctx.variable_access());
+    } else {
+      throw new Error('State reference must have identifier or variable access');
+    }
+
+    return withLocation<StateReference>(
+      {
+        type: 'StateReference',
+        target,
+      },
+      this.contextToLocation(ctx).location,
+    );
   }
 }
