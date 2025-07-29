@@ -18,6 +18,18 @@ export interface ICompilationOutput {
   agent: any;
   messages: Record<string, any>;
   flows: Record<string, any>;
+  csm?: {
+    id: string;
+    initialFlow: string;
+    flows: Record<string, any>;
+    meta?: {
+      name?: string;
+      description?: string;
+      version?: string;
+      tags?: string[];
+      custom?: Record<string, any>;
+    };
+  };
 }
 
 /**

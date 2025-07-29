@@ -1,8 +1,11 @@
 import type {
   Attribute,
   BooleanLiteral,
+  ContextOperation,
   Dictionary,
   DictionaryEntry,
+  FlowInvocation,
+  FlowTermination,
   Identifier,
   ImportStatement,
   List,
@@ -11,12 +14,15 @@ import type {
   NumericLiteral,
   Parameter,
   ParameterList,
+  PropertyAccess,
   RclFile,
   Section,
   SpreadDirective,
   StringLiteral,
+  TargetReference,
   TypeTag,
   Value,
+  Variable,
 } from '@rcs-lang/ast';
 import {
   isAtom,
@@ -25,11 +31,14 @@ import {
   isContextualizedValue,
   isDictionary,
   isEmbeddedCode,
+  isFlowInvocation,
+  isFlowTermination,
   isIdentifier,
   isList,
   isMatchBlock,
   isNullLiteral,
   isNumericLiteral,
+  isPropertyAccess,
   isSection,
   isStringLiteral,
   isTypeTag,
@@ -54,6 +63,7 @@ interface CSMTransition {
   context?: Record<string, any>;
   condition?: string;
   priority?: number;
+  meta?: Record<string, any>;
 }
 
 interface CSMStateDefinition {
@@ -154,15 +164,43 @@ export class TransformStage implements ICompilationStage {
    * Transform RclFile to compilation output
    */
   private transformRclFile(file: RclFile): ICompilationOutput {
+    const flows: Record<string, CSMMachineDefinition> = {};
+    let agentName = 'Agent';
+    let initialFlow = '';
+    
     const output: ICompilationOutput = {
       agent: {},
       messages: {},
       flows: {},
     };
 
+    // First pass: collect flows and agent info
+    for (const section of file.sections) {
+      if (section.sectionType === 'agent' && section.identifier) {
+        agentName = section.identifier.value;
+      }
+      if (section.sectionType === 'flow' && section.identifier) {
+        if (!initialFlow) {
+          initialFlow = section.identifier.value; // First flow becomes initial
+        }
+      }
+    }
+
     // Process all sections
     for (const section of file.sections) {
       this.processSection(section, output);
+    }
+
+    // Collect flows from output.flows into a multi-flow machine
+    if (Object.keys(output.flows).length > 0) {
+      output.csm = {
+        id: agentName,
+        initialFlow: initialFlow,
+        flows: output.flows,
+        meta: {
+          name: agentName,
+        }
+      };
     }
 
     // Apply defaults if we have them
@@ -171,6 +209,69 @@ export class TransformStage implements ICompilationStage {
     }
 
     return output;
+  }
+
+  /**
+   * Extract target reference (for flow result handlers)
+   */
+  private extractTargetReference(target: TargetReference): string {
+    if (isIdentifier(target)) {
+      return `state:${target.value}`;
+    }
+    if (isVariable(target)) {
+      return target.name;
+    }
+    if (isPropertyAccess(target)) {
+      return `${target.object.name}.${target.properties.join('.')}`;
+    }
+    if (isFlowTermination(target)) {
+      return `:${target.result}`;
+    }
+    return 'state:Unknown';
+  }
+
+  /**
+   * Process context operation for flow result handlers
+   */
+  private processContextOperation(operation: ContextOperation): any {
+    switch (operation.type) {
+      case 'AppendOperation':
+        return {
+          append: {
+            to: this.extractVariableName(operation.target),
+            value: { var: 'result' }
+          }
+        };
+      case 'SetOperation':
+        return {
+          set: {
+            variable: this.extractVariableName(operation.target),
+            value: { var: 'result' }
+          }
+        };
+      case 'MergeOperation':
+        return {
+          merge: {
+            into: this.extractVariableName(operation.target),
+            value: { var: 'result' }
+          }
+        };
+      default:
+        return {};
+    }
+  }
+
+  /**
+   * Extract variable name from variable or property access
+   */
+  private extractVariableName(target: Variable | PropertyAccess): string {
+    if (isVariable(target)) {
+      return target.name.replace('@', ''); // Remove @ prefix for CSM
+    }
+    if (isPropertyAccess(target)) {
+      return target.object.name.replace('@', '') + '.' + target.properties.join('.');
+    }
+    return 'unknown';
   }
 
   /**
@@ -399,6 +500,10 @@ export class TransformStage implements ICompilationStage {
       // Return code as string for now
       return value.code;
     }
+    if (isFlowTermination(value)) {
+      // Return flow termination as colon-prefixed string
+      return `:${value.result}`;
+    }
 
     return value;
   }
@@ -463,28 +568,170 @@ export class TransformStage implements ICompilationStage {
 
       if (caseValue === ':default') {
         // Default case - add a transition without pattern
-        const target = this.extractValue(consequence.value);
-        const contextUpdates = this.extractContextUpdates(consequence);
-
-        state.transitions.push({
+        const transitionData = this.processConsequence(consequence);
+        
+        const defaultTransition: any = {
           pattern: ':default',
-          target: target as string,
           priority: -1, // Default has lowest priority
-          ...(contextUpdates && { context: contextUpdates }),
-        });
+        };
+
+        if (transitionData.flowInvocation) {
+          defaultTransition.flowInvocation = transitionData.flowInvocation;
+        } else if (transitionData.target) {
+          defaultTransition.target = transitionData.target;
+        }
+
+        if (transitionData.context) {
+          defaultTransition.context = transitionData.context;
+        }
+
+        state.transitions.push(defaultTransition);
       } else {
         // Normal case
-        const target = this.extractValue(consequence.value);
-        const contextUpdates = this.extractContextUpdates(consequence);
+        const transitionData = this.processConsequence(consequence);
 
-        state.transitions.push({
+        const normalTransition: any = {
           pattern: caseValue as string,
-          target: target as string,
           priority: matchBlock.cases.length - index, // Higher index = lower priority
-          ...(contextUpdates && { context: contextUpdates }),
-        });
+        };
+
+        if (transitionData.flowInvocation) {
+          normalTransition.flowInvocation = transitionData.flowInvocation;
+        } else if (transitionData.target) {
+          normalTransition.target = transitionData.target;
+        }
+
+        if (transitionData.context) {
+          normalTransition.context = transitionData.context;
+        }
+
+        state.transitions.push(normalTransition);
       }
     });
+  }
+
+  /**
+   * Process different types of consequences (flow control, values, etc.)
+   */
+  private processConsequence(consequence: any): { target?: string; context?: Record<string, any>; meta?: Record<string, any>; flowInvocation?: any } {
+    // Handle flow invocation
+    if (isFlowInvocation(consequence)) {
+      const flowInvocation: any = {
+        flowId: consequence.flowName.value,
+        parameters: {},
+        onResult: {}
+      };
+
+      // Process parameters if present
+      if (consequence.parameters) {
+        const params: Record<string, any> = {};
+        for (const param of consequence.parameters) {
+          if (param.key) {
+            params[param.key] = this.extractValue(param.value);
+          }
+        }
+        flowInvocation.parameters = params;
+      }
+
+      // Process result handlers
+      if (consequence.resultHandlers && consequence.resultHandlers.length > 0) {
+        for (const handler of consequence.resultHandlers) {
+          const resultType = handler.result; // 'end', 'cancel', 'error'
+          const resultHandler: any = {
+            target: this.extractTargetReference(handler.target)
+          };
+
+          // Process operations if present
+          if (handler.operations && handler.operations.length > 0) {
+            resultHandler.operations = handler.operations.map((op: any) => {
+              return this.processContextOperation(op);
+            });
+          }
+
+          flowInvocation.onResult[resultType] = resultHandler;
+        }
+      } else {
+        // Default result handlers if none specified
+        flowInvocation.onResult = {
+          end: { target: "state:Welcome" },
+          cancel: { target: "state:Welcome" },
+          error: { target: "state:ErrorHandler" }
+        };
+      }
+
+      return {
+        flowInvocation,
+        meta: {
+          type: 'flow_invocation',
+          flowName: consequence.flowName.value,
+        }
+      };
+    }
+
+    // Handle flow termination
+    if (isFlowTermination(consequence)) {
+      return {
+        target: `:${consequence.result}`,
+        meta: {
+          type: 'flow_termination',
+          result: consequence.result,
+        }
+      };
+    }
+
+    // Handle identifiers, variables, property access
+    if (isIdentifier(consequence)) {
+      return { target: consequence.value };
+    }
+    if (isVariable(consequence)) {
+      return { target: consequence.name };
+    }
+    if (isPropertyAccess(consequence)) {
+      return { target: `${consequence.object.name}.${consequence.properties.join('.')}` };
+    }
+
+    // Handle contextualized values (legacy)
+    if (isContextualizedValue(consequence)) {
+      const target = this.extractValue(consequence.value);
+      const contextUpdates = this.extractContextUpdates(consequence);
+      return {
+        target: target as string,
+        context: contextUpdates,
+      };
+    }
+
+    // Handle simple values (including FlowTermination which is now part of Value)
+    const target = this.extractValue(consequence);
+    return {
+      target: target as string,
+    };
+  }
+
+  /**
+   * Extract parameter list into a simple object
+   */
+  private extractParameterList(paramList: ParameterList): Record<string, any> {
+    const params: Record<string, any> = {};
+    for (const param of paramList) {
+      if (param.key) {
+        params[param.key] = this.extractValue(param.value);
+      }
+    }
+    return params;
+  }
+
+
+  /**
+   * Extract context operation (append, set, merge, etc.)
+   */
+  private extractContextOperation(operation: ContextOperation): any {
+    // For now, return a simplified representation
+    // This would need to be expanded based on the actual ContextOperation types
+    return {
+      type: operation.type,
+      // Add specific fields based on operation type
+      ...(operation as any),
+    };
   }
 
   /**
