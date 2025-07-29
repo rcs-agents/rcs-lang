@@ -1,0 +1,280 @@
+---
+title: RCL Extension Specification
+description: Formal specification for RCL language extensions including flow control, sub-flows, and result handling
+---
+
+# RCL Extension Specification
+
+This document specifies the extended RCL (Rich Communication Language) syntax for advanced flow control patterns, sub-flow execution, and result handling.
+
+## Overview
+
+RCL extensions introduce powerful flow control mechanisms that enable:
+
+1. **Flow initiation** - Starting flows from within other flows
+2. **Result handling** - Explicit control over flow completion outcomes
+3. **Context aggregation** - Flexible strategies for combining flow results
+4. **Error management** - Structured handling of flow failures and cancellations
+
+## Flow Control Syntax
+
+### Basic Flow Invocation
+
+```rcl
+state_name -> start FlowName
+  on :end -> next_state
+  on :cancel -> cancel_state
+  on :error -> error_state
+```
+
+**Components:**
+- `start FlowName` - Initiates execution of another flow
+- `on :end` - Handles successful flow completion
+- `on :cancel` - Handles user cancellation (`:cancel` return)
+- `on :error` - Handles execution errors
+
+### Result Handling
+
+When a flow completes successfully (`:end`), its context is available as `result`:
+
+```rcl
+on :end -> append result to @contextVar -> NextState
+on :end -> set @singleVar to result -> NextState
+on :end -> merge result into @existingObject -> NextState
+```
+
+**Aggregation Strategies:**
+- `append result to @var` - Adds result to array (creates array if needed)
+- `set @var to result` - Overwrites variable with result
+- `merge result into @var` - Merges result object into existing object
+
+### Flow Parameters
+
+Pass parameters to initiated flows using `with` clause:
+
+```rcl
+start PaymentFlow with amount: @totalPrice, method: "card"
+  on :end -> set @receipt to result -> ShowReceipt
+  on :cancel -> PaymentCancelled
+```
+
+## Flow Return Values
+
+### Flow Termination
+
+Flows can terminate with three outcomes:
+
+1. **`:end`** - Successful completion, returns flow context
+2. **`:cancel`** - User cancellation, no context changes
+3. **`:error`** - Execution error, optional error context
+
+```rcl
+flow ExampleFlow
+  on FinalState
+    match @reply.text
+      "Complete" -> :end          # Success
+      "Cancel" -> :cancel         # Cancellation
+      "Error" -> :error          # Error
+```
+
+### Return Value Specification
+
+Flows can specify what data to return:
+
+```rcl
+flow OrderFlow
+  # Implicit: returns entire context on :end
+  
+flow ItemFlow return { item: @selectedItem, price: @calculatedPrice }
+  # Explicit return value specification
+```
+
+## Context Scoping
+
+### Variable Resolution
+
+Variables are resolved with scoping precedence:
+1. **Flow parameters** (highest priority)
+2. **Flow context** 
+3. **Parent flow context**
+4. **Conversation context** (lowest priority)
+
+```rcl
+# Parent flow context
+context: globalVar: "parent_value"
+
+# Sub-flow with parameter
+start SubFlow with globalVar: "param_value"
+  # Inside SubFlow, @globalVar resolves to "param_value"
+```
+
+### Context Isolation
+
+Each flow execution maintains isolated context:
+
+```rcl
+flow ParentFlow
+  start ChildFlow with input: @userSelection
+    on :end -> append result to @sharedData -> Continue
+    # ChildFlow cannot directly modify @sharedData of ParentFlow
+```
+
+## Advanced Patterns
+
+### Conditional Flow Execution
+
+```rcl
+match @orderType
+  "coffee" -> start CoffeeFlow
+    on :end -> append result to @orders -> ReviewOrders
+  "food" -> start FoodFlow  
+    on :end -> append result to @orders -> ReviewOrders
+  :default -> InvalidSelection
+```
+
+### Multiple Result Handling
+
+```rcl
+start ComplexFlow
+  on :end -> match result.type
+    "payment" -> ProcessPayment with transaction: result
+    "cancellation" -> HandleCancellation
+    :default -> UnknownResult
+  on :cancel -> UserCancelled
+  on :error -> SystemError with error: result
+```
+
+### Nested Flow Calls
+
+```rcl
+flow OrderFlow
+  start SelectItems
+    on :end -> start PaymentFlow with items: result
+      on :end -> merge result into @order -> CompleteOrder
+      on :cancel -> PaymentCancelled
+```
+
+## Error Handling
+
+### Error Propagation
+
+Errors can be handled at multiple levels:
+
+```rcl
+start RiskyFlow
+  on :end -> Success
+  on :error -> match result.errorType
+    "validation" -> ShowValidationError
+    "network" -> RetryPrompt
+    :default -> GenericError
+```
+
+### Error Context
+
+Error states receive error information:
+
+```rcl
+on ErrorState
+  # Error details available in context
+  text "Error: #{@error.message}"
+  match @reply.text
+    "Retry" -> start OriginalFlow
+    "Cancel" -> Welcome
+```
+
+## Implementation Notes
+
+### CSM Representation
+
+Flow control extensions map to CSM (Conversation State Machine) constructs:
+
+1. **Flow calls** → Special transition targets with result handling metadata
+2. **Result handlers** → Conditional transitions based on flow outcome
+3. **Context aggregation** → Post-transition context updates
+4. **Error handling** → Transition conditions and error state routing
+
+### Backward Compatibility
+
+All extensions are additive and maintain compatibility with existing RCL syntax.
+
+## Grammar Extensions
+
+### ANTLR4 Grammar Additions
+
+```antlr
+// Flow invocation
+flowInvocation
+    : 'start' IDENTIFIER ('with' parameterList)?
+      ('on' flowResult '->' transition)*
+    ;
+
+flowResult
+    : ':end' | ':cancel' | ':error'
+    ;
+
+// Context operations
+contextOperation
+    : 'append' 'result' 'to' contextVariable
+    | 'set' contextVariable 'to' 'result'  
+    | 'merge' 'result' 'into' contextVariable
+    ;
+
+// Flow termination
+flowTermination
+    : ':end' | ':cancel' | ':error'
+    ;
+
+// Parameters
+parameterList
+    : parameter (',' parameter)*
+    ;
+
+parameter
+    : IDENTIFIER ':' expression
+    ;
+```
+
+## Examples
+
+### Coffee Shop Multi-Item Ordering
+
+```rcl
+flow TopFlow
+  on Welcome
+    "Start Order" -> start CreateOrder
+      on :end -> append result to @orders -> ConfirmAllOrders
+      on :cancel -> Welcome
+      on :error -> OrderError
+
+flow CreateOrder  
+  on Menu
+    "Add Coffee" -> start OrderCoffee
+      on :end -> append result to @orderItems -> Menu
+      on :cancel -> Menu
+  on ReviewOrder
+    "Confirm" -> :end
+    "Cancel" -> :cancel
+```
+
+### Appointment Booking
+
+```rcl
+flow BookingFlow
+  on Welcome
+    "Schedule Appointment" -> start AppointmentFlow
+      on :end -> set @appointment to result -> ConfirmAppointment
+      on :cancel -> Welcome
+
+flow AppointmentFlow
+  # Returns single appointment object
+  on SelectDateTime
+    "Confirm Time" -> :end
+    "Cancel" -> :cancel
+```
+
+---
+
+## Version History
+
+- **v1.0** - Initial specification with flow control and result handling
+- **Future** - Planned additions: async flows, timeout handling, flow composition patterns

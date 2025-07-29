@@ -49,6 +49,17 @@ export {
   type AgentDefinitionJSON,
 } from './machine-definition';
 
+// Sub-flow support
+export { 
+  SubFlowManager, 
+  SubFlowCapableAgent,
+  type SubFlowCall,
+  type SubFlowReturnType,
+  type SubFlowMachineDefinition,
+  type SubFlowTransition,
+  type SubFlowResult
+} from './subflow-manager';
+
 // Types
 export type {
   // Core types
