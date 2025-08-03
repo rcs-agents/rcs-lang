@@ -192,8 +192,43 @@
           "additionalProperties": true
         },
         "condition": {
-          "type": "string",
-          "description": "Optional JavaScript condition expression. Has access to context object."
+          "description": "Optional condition for this transition. Supports multiple evaluation methods.",
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Legacy JavaScript expression string (deprecated)"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "code",
+                  "description": "JavaScript code evaluation"
+                },
+                "expression": {
+                  "type": "string",
+                  "description": "JavaScript expression to evaluate"
+                }
+              },
+              "required": ["type", "expression"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "jsonlogic",
+                  "description": "JSON Logic evaluation (recommended)"
+                },
+                "rule": {
+                  "type": "object",
+                  "description": "JSON Logic rule object"
+                }
+              },
+              "required": ["type", "rule"],
+              "additionalProperties": false
+            }
+          ]
         },
         "priority": {
           "type": "number",

@@ -29,23 +29,28 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
+      uses: oven-sh/setup-bun@v2
       with:
-        bun-version: 1.2
+        bun-version: 1.2.18
         
     - name: Install dependencies
       run: bun install
+    
+    - name: Install Moon
+      run: |
+        curl -fsSL https://moonrepo.dev/install/moon.sh | bash
+        echo "$HOME/.moon/bin" >> $GITHUB_PATH
         
     - name: Build packages
-      run: bun run build
+      run: moon run :build
         
     - name: Run server tests
       working-directory: apps/extension
-      run: nr test:server
+      run: bun run test:server
       
     - name: Run client unit tests
       working-directory: apps/extension
-      run: nr test:client
+      run: bun run test:client
 
   integration-tests:
     name: Integration Tests
@@ -59,16 +64,16 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
+      uses: oven-sh/setup-bun@v2
       with:
-        bun-version: 1.2
+        bun-version: 1.2.18
         
     - name: Install dependencies
       run: bun install
         
     - name: Build extension
       working-directory: apps/extension
-      run: nr compile
+      run: bun run compile
       
     - name: Run integration tests (Linux)
       if: runner.os == 'Linux'
@@ -83,7 +88,7 @@ jobs:
     - name: Run integration tests (non-Linux)
       if: runner.os != 'Linux'
       working-directory: apps/extension
-      run: nr test:integration
+      run: bun run test:integration
       env:
         VSCODE_VERSION: ${{ matrix.vscode-version }}
 
@@ -94,16 +99,16 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
+      uses: oven-sh/setup-bun@v2
       with:
-        bun-version: 1.2
+        bun-version: 1.2.18
       
     - name: Install dependencies
       run: bun install
       
     - name: Build extension
       working-directory: apps/extension
-      run: nr compile
+      run: bun run compile
       
     - name: Run E2E tests
       working-directory: apps/extension
@@ -133,16 +138,16 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
+      uses: oven-sh/setup-bun@v2
       with:
-        bun-version: 1.2
+        bun-version: 1.2.18
       
     - name: Install dependencies
       run: bun install
       
     - name: Build extension
       working-directory: apps/extension
-      run: nr compile
+      run: bun run compile
       
     - name: Run visual tests
       working-directory: apps/extension
