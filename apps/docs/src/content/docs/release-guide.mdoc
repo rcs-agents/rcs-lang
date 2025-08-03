@@ -24,19 +24,29 @@ The RCL project uses a **release branch workflow**:
    - `feat!:` or `BREAKING CHANGE:` - Breaking changes (bumps major version)
    - `docs:`, `chore:`, `test:`, etc. - Non-release changes
 
-2. **Update version** in package.json files when ready to release:
+2. **Use the automated release commands** when ready to release:
    ```bash
-   # Update version in root package.json and all packages
-   bun run version:bump patch  # or minor, major
-   git add .
-   git commit -m "chore: bump version to 1.0.1"
+   # These commands handle everything automatically:
+   bun run release:patch   # For bug fixes (1.0.0 → 1.0.1)
+   bun run release:minor   # For new features (1.0.0 → 1.1.0)
+   bun run release:major   # For breaking changes (1.0.0 → 2.0.0)
    ```
 
-3. **Push to release branch** to trigger automatic:
-   - GitHub release creation with changelog
-   - NPM package publishing
-   - VSCode extension publishing
-   - Tag creation and sync to main
+3. **The release command automatically**:
+   - Ensures you're on main branch
+   - Pulls latest changes
+   - Bumps version in all packages
+   - Creates release commit
+   - Pushes to release branch
+   - Triggers GitHub Actions workflow
+
+4. **GitHub Actions then automatically**:
+   - Builds and tests all packages
+   - Creates version tag
+   - Publishes to NPM
+   - Publishes VSCode extension
+   - Creates GitHub release with changelog
+   - Syncs tag back to main branch
 
 ### Example Workflow
 
@@ -50,21 +60,11 @@ git push origin main
 # When ready to release (one command!)
 bun run release:minor
 
-# This single command will:
-# 1. Ensure you're on main branch
-# 2. Pull latest changes
-# 3. Bump version to next minor (e.g., 1.0.0 → 1.1.0)
-# 4. Create release commit
-# 5. Push to release branch
-# 6. Trigger automatic release workflow
+# Monitor the release progress
+gh run list --limit 3
 
-# The GitHub Actions workflow then:
-# 1. Builds and tests everything
-# 2. Creates a v1.1.0 tag
-# 3. Creates GitHub release with changelog
-# 4. Publishes NPM packages
-# 5. Publishes VSCode extension
-# 6. Syncs the tag back to main
+# After release completes, pull the synced tag
+git pull origin main --tags
 ```
 
 ### Quick Release Commands
@@ -143,8 +143,20 @@ The following packages are published to NPM:
 | @rcs-lang/compiler | packages/compiler | ✅ |
 | @rcs-lang/csm | packages/csm | ✅ |
 | @rcs-lang/language-service | packages/language-service | ✅ |
-| @rcs-lang/cli | apps/cli | ✅ |
+| @rcs-lang/cli | packages/cli | ✅ |
+| @rcs-lang/core | packages/core | ✅ |
+| @rcs-lang/file-system | packages/file-system | ✅ |
+| @rcs-lang/validation | packages/validation | ✅ |
 | @rcs-lang/parser | packages/parser | ❌ (private) |
+
+### Direct Publishing is Disabled
+
+**Important**: The `publish:packages` script has been disabled to enforce the proper release workflow. Always use the release commands:
+- `bun run release:patch`
+- `bun run release:minor`
+- `bun run release:major`
+
+Attempting to use `publish:packages` will show an error directing you to use the proper release flow.
 
 ### VSCode Extension
 
