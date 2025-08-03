@@ -51,8 +51,10 @@ tasks:
       - -c
       - |
         cd $MOON_WORKSPACE_ROOT/packages/parser && \
-        find dist/generated -name "*.js" -exec sed -i.bak 's|from "../RclLexerBase.js"|from "../RclLexerBase.js"|g' {} \; && \
-        find dist/generated -name "*.js.bak" -delete
+        if [ -d dist/generated ]; then \
+          find dist -name "*.js" -exec sed -i.bak 's/\.js"/"/g' {} \; && \
+          find dist -name "*.js.bak" -delete; \
+        fi
     deps:
       - build
       
