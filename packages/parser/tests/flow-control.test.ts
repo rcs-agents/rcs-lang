@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { parseRcl } from '../src/index';
+import { parseRcl } from '../src/index.js';
 import type { FlowInvocation, FlowTermination, Section, SimpleTransition } from '@rcs-lang/ast';
 
 describe('Flow Control Parsing', () => {
@@ -148,7 +148,7 @@ flow TopFlow
   on ConfirmAllOrders
     match @reply.text
       "Confirm All Orders" -> ProcessPayment
-      "Cancel All Orders" -> set @orders to [] -> Welcome
+      "Cancel All Orders" -> set @orders to () -> Welcome
 
   on ProcessPayment
     -> :end

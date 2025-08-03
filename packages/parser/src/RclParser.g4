@@ -48,16 +48,19 @@ spread_directive: SPREAD IDENTIFIER NEWLINE;
 
 // Attribute assignment
 attribute_assignment: 
-    ATTRIBUTE_NAME value NEWLINE          // attribute: value
+    ATTRIBUTE_NAME value NEWLINE          // attribute: value (3+ chars)
     | ATTRIBUTE_NAME COMMA value NEWLINE  // attribute:, value  
     | ATTRIBUTE_NAME NEWLINE              // attribute: (no value)
+    | LOWER_NAME COLON value NEWLINE      // attr: value (2 char attributes)
+    | LOWER_NAME COLON COMMA value NEWLINE // attr:, value
+    | LOWER_NAME COLON NEWLINE            // attr: (no value)
     ;
 
 // Match blocks
 match_block: MATCH value NEWLINE INDENT match_case+ DEDENT;
 
 match_case: 
-    (STRING | NUMBER | ATOM | REGEX | DEFAULT_CASE) ARROW transition_target NEWLINE;
+    (STRING | NUMBER | ATOM | REGEX | DEFAULT_CASE) ARROW transition_target NEWLINE?;
 
 transition_target:
     contextualized_value
@@ -74,8 +77,8 @@ context_operation_sequence:
     context_operation (ARROW context_operation)* ARROW target_reference
     ;
 
-// Simple transition (arrow without match)
-simple_transition: ARROW transition_target NEWLINE;
+// Simple transition (arrow without match)  
+simple_transition: ARROW transition_target NEWLINE?;
 
 // Values and expressions
 contextualized_value: value (WITH parameter_list)?;
@@ -184,7 +187,10 @@ flow_result_handler:
     ;
 
 flow_result:
-    COLON LOWER_NAME
+    FLOW_END
+    | FLOW_CANCEL
+    | FLOW_ERROR
+    | COLON LOWER_NAME
     ;
 
 context_operation:
@@ -201,6 +207,9 @@ target_reference:
 
 // Flow termination for flow returns
 flow_termination:
-    COLON LOWER_NAME
+    FLOW_END
+    | FLOW_CANCEL
+    | FLOW_ERROR
+    | COLON LOWER_NAME
     ;
 

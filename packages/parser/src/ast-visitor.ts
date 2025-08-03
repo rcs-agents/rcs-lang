@@ -3,8 +3,8 @@
  */
 
 import { ParserRuleContext, type Token, AbstractParseTreeVisitor, ErrorNode, ParseTree, TerminalNode } from 'antlr4ng';
-import { RclParserVisitor } from './generated/RclParserVisitor';
-import { Rcl_fileContext } from './generated/RclParser';
+import { RclParserVisitor } from './generated/RclParserVisitor.js';
+import { Rcl_fileContext } from './generated/RclParser.js';
 
 import {
   type AppendOperation,
@@ -442,7 +442,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     const attributeName = ctx.ATTRIBUTE_NAME?.();
     if (attributeName) {
       // Named parameter with colon included in token
-      const valueCtx = ctx.value(0);
+      const valueCtx = ctx.value();
       if (!valueCtx) {
         throw new Error('Named parameter must have a value');
       }
@@ -450,7 +450,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
       return withLocation<Parameter>(
         {
           type: 'Parameter',
-          key: attributeName.getText().slice(0, -1), // Remove trailing colon
+          key: attributeName.getText().slice(0, -1).trim(), // Remove trailing colon and whitespace
           value: this.visitValue(valueCtx),
         },
         this.contextToLocation(ctx).location,
@@ -458,9 +458,9 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     }
 
     const lowerName = ctx.LOWER_NAME();
-    if (lowerName && ctx.COLON) {
+    if (lowerName && ctx.COLON()) {
       // key : value
-      const valueCtx = ctx.value(0);
+      const valueCtx = ctx.value();
       if (!valueCtx) {
         throw new Error('Named parameter must have a value after colon');
       }
@@ -1034,8 +1034,14 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
     const result = this.visitFlow_result(ctx.flow_result());
     
     let operations: ContextOperation[] | undefined;
-    if (ctx.context_operation_chain()) {
-      operations = this.visitContext_operation_chain(ctx.context_operation_chain());
+    // Get context operations if any
+    const contextOps = ctx.context_operation();
+    if (contextOps) {
+      operations = [];
+      const opsArray = Array.isArray(contextOps) ? contextOps : [contextOps];
+      for (const op of opsArray) {
+        operations.push(this.visitContext_operation(op));
+      }
     }
 
     const target = this.visitTarget_reference(ctx.target_reference());
@@ -1055,10 +1061,16 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
    * Visit flow result
    */
   visitFlow_result(ctx: any): FlowResult {
-    // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
-    const lowerName = ctx.LOWER_NAME();
-    if (lowerName) {
-      const resultText = lowerName.getText();
+    // Check for specific flow result tokens
+    if (ctx.FLOW_END()) {
+      return 'end';
+    } else if (ctx.FLOW_CANCEL()) {
+      return 'cancel';
+    } else if (ctx.FLOW_ERROR()) {
+      return 'error';
+    } else if (ctx.LOWER_NAME()) {
+      // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
+      const resultText = ctx.LOWER_NAME().getText();
       if (resultText === 'end') {
         return 'end';
       } else if (resultText === 'cancel') {
@@ -1090,27 +1102,48 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
   visitContext_operation(ctx: any): ContextOperation {
     if (ctx.APPEND()) {
       const target = this.visitVariable_access(ctx.variable_access());
+      let source: Value | 'result';
+      if (ctx.RESULT()) {
+        source = 'result';
+      } else {
+        source = this.visitValue(ctx.value());
+      }
       return withLocation<AppendOperation>(
         {
           type: 'AppendOperation',
+          source,
           target,
         },
         this.contextToLocation(ctx).location,
       );
     } else if (ctx.SET()) {
       const target = this.visitVariable_access(ctx.variable_access());
+      let source: Value | 'result';
+      if (ctx.RESULT()) {
+        source = 'result';
+      } else {
+        source = this.visitValue(ctx.value());
+      }
       return withLocation<SetOperation>(
         {
           type: 'SetOperation',
+          source,
           target,
         },
         this.contextToLocation(ctx).location,
       );
     } else if (ctx.MERGE()) {
       const target = this.visitVariable_access(ctx.variable_access());
+      let source: Value | 'result';
+      if (ctx.RESULT()) {
+        source = 'result';
+      } else {
+        source = this.visitValue(ctx.value());
+      }
       return withLocation<MergeOperation>(
         {
           type: 'MergeOperation',
+          source,
           target,
         },
         this.contextToLocation(ctx).location,
@@ -1144,11 +1177,18 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
    * Visit flow termination
    */
   visitFlow_termination(ctx: any): FlowTermination {
-    // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
-    const lowerName = ctx.LOWER_NAME();
     let result: FlowResult;
-    if (lowerName) {
-      const resultText = lowerName.getText();
+    
+    // Check for specific flow termination tokens
+    if (ctx.FLOW_END()) {
+      result = 'end';
+    } else if (ctx.FLOW_CANCEL()) {
+      result = 'cancel';
+    } else if (ctx.FLOW_ERROR()) {
+      result = 'error';
+    } else if (ctx.LOWER_NAME()) {
+      // Handle COLON LOWER_NAME pattern (e.g., ": end" -> "end")
+      const resultText = ctx.LOWER_NAME().getText();
       if (resultText === 'end') {
         result = 'end';
       } else if (resultText === 'cancel') {
@@ -1159,7 +1199,7 @@ export class ASTVisitor extends AbstractParseTreeVisitor<any> implements RclPars
         throw new Error(`Unknown flow termination type: ${resultText}`);
       }
     } else {
-      throw new Error('Flow termination must have LOWER_NAME token');
+      throw new Error('Flow termination must have valid token');
     }
     
     return withLocation<FlowTermination>(

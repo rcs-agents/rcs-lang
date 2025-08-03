@@ -26,7 +26,7 @@ tasks:
     command: bash
     args: 
       - -c
-      - "bunx antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && cp src/generated/RclLexer.tokens src/ && bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4 && rm src/RclLexer.tokens"
+      - "bunx antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4"
     deps:
       - prebuild
       
@@ -44,6 +44,17 @@ tasks:
         find src/generated -name "*.ts.bak" -delete
     deps:
       - build-grammar
+
+  fix-js-imports:
+    command: bash
+    args:
+      - -c
+      - |
+        cd $MOON_WORKSPACE_ROOT/packages/parser && \
+        find dist/generated -name "*.js" -exec sed -i.bak 's|from "../RclLexerBase"|from "../RclLexerBase.js"|g' {} \; && \
+        find dist/generated -name "*.js.bak" -delete
+    deps:
+      - build
       
   build:
     command: tsc

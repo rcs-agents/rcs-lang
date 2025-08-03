@@ -1,7 +1,7 @@
 import type { ParserConfig } from '@rcs-lang/core';
 import { CharStream, CommonTokenStream } from 'antlr4ng';
-import { RclLexer } from './generated/RclLexer';
-import { RclParser } from './generated/RclParser';
+import { RclLexer } from './generated/RclLexer.js';
+import { RclParser } from './generated/RclParser.js';
 import { ASTVisitor } from './ast-visitor.js';
 
 // Legacy function for backward compatibility with old interface
@@ -104,6 +104,9 @@ export type { SymbolExtractorOptions } from './symbol-extractor.js';
 
 // Export generated classes
 export { RclLexer, RclParser };
+
+// Export lexer base class
+export { RclLexerBase } from './RclLexerBase.js';
 
 // Export types from core
 export type { IParser, IParseResult, IParserCapabilities, ParserConfig } from '@rcs-lang/core';

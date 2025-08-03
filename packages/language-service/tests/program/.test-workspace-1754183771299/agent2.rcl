@@ -1,0 +1,11 @@
+agent Bot2
+  displayName "Missing colon"
+  
+  flow MainFlow
+    start: Hello
+    
+    on Hello
+      -> Hello
+    
+  messages Messages
+    text Hello "Hi"

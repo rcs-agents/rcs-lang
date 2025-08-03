@@ -18,8 +18,8 @@ import {
   type Recognizer,
 } from 'antlr4ng';
 import { AntlrAdapter } from './adapter.js';
-import { RclLexer } from './generated/RclLexer';
-import { RclParser } from './generated/RclParser';
+import { RclLexer } from './generated/RclLexer.js';
+import { RclParser } from './generated/RclParser.js';
 // import { wrapAST } from './ast-wrapper'; // No longer needed
 
 /**
