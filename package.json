@@ -1,6 +1,6 @@
 {
   "name": "rcl-monorepo",
-  "version": "0.2.3",
+  "version": "0.3.1",
   "type": "module",
   "author": {
     "name": "Saulo Vallory",

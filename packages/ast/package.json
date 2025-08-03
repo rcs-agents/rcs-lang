@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/ast",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Parser-independent AST type definitions for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
