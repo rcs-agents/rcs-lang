@@ -1,0 +1,621 @@
+{
+  "type": "RclFile",
+  "imports": [],
+  "sections": [
+    {
+      "type": "Section",
+      "sectionType": "flow",
+      "identifier": {
+        "type": "Identifier",
+        "value": "TopFlow"
+      },
+      "body": [
+        {
+          "type": "Attribute",
+          "key": "start",
+          "value": {
+            "type": "Identifier",
+            "value": "Welcome"
+          }
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier", 
+            "value": "Welcome"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Start Order"
+                  },
+                  "consequence": {
+                    "type": "FlowInvocation",
+                    "flowName": {
+                      "type": "Identifier",
+                      "value": "CreateOrder"
+                    },
+                    "resultHandlers": [
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "end",
+                        "operations": [
+                          {
+                            "type": "AppendOperation",
+                            "target": {
+                              "type": "Variable",
+                              "name": "@orders"
+                            }
+                          }
+                        ],
+                        "target": {
+                          "type": "Identifier",
+                          "value": "ConfirmAllOrders"
+                        }
+                      },
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "cancel",
+                        "target": {
+                          "type": "Identifier",
+                          "value": "Welcome"
+                        }
+                      },
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "error",
+                        "target": {
+                          "type": "Identifier",
+                          "value": "OrderError"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "View Menu"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ShowMenu"
+                    }
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": "default",
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "Welcome"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "ConfirmAllOrders"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Add Another Order"
+                  },
+                  "consequence": {
+                    "type": "FlowInvocation",
+                    "flowName": {
+                      "type": "Identifier",
+                      "value": "CreateOrder"
+                    },
+                    "resultHandlers": [
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "end",
+                        "operations": [
+                          {
+                            "type": "AppendOperation",
+                            "target": {
+                              "type": "Variable",
+                              "name": "@orders"
+                            }
+                          }
+                        ],
+                        "target": {
+                          "type": "Identifier",
+                          "value": "ConfirmAllOrders"
+                        }
+                      },
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "cancel",
+                        "target": {
+                          "type": "Identifier",
+                          "value": "ConfirmAllOrders"
+                        }
+                      },
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "error",
+                        "target": {
+                          "type": "Identifier",
+                          "value": "OrderError"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Confirm All Orders"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ProcessPayment"
+                    }
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Cancel All Orders"
+                  },
+                  "consequence": {
+                    "type": "SimpleTransition",
+                    "target": {
+                      "type": "ContextualizedValue",
+                      "value": {
+                        "type": "Identifier",
+                        "value": "Welcome"
+                      },
+                      "context": [
+                        {
+                          "type": "Parameter",
+                          "key": "orders",
+                          "value": {
+                            "type": "List",
+                            "items": []
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "ProcessPayment"
+          },
+          "body": [
+            {
+              "type": "SimpleTransition",
+              "target": {
+                "type": "FlowTermination",
+                "result": "end"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "OrderError"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Try Again"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "Welcome"
+                    }
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Cancel"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "cancel"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Section",
+      "sectionType": "flow",
+      "identifier": {
+        "type": "Identifier",
+        "value": "CreateOrder"
+      },
+      "body": [
+        {
+          "type": "Attribute",
+          "key": "start",
+          "value": {
+            "type": "Identifier",
+            "value": "Menu"
+          }
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "Menu"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Order Coffee"
+                  },
+                  "consequence": {
+                    "type": "FlowInvocation",
+                    "flowName": {
+                      "type": "Identifier",
+                      "value": "OrderCoffee"
+                    },
+                    "resultHandlers": [
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "end",
+                        "operations": [
+                          {
+                            "type": "AppendOperation",
+                            "target": {
+                              "type": "Variable",
+                              "name": "@orderItems"
+                            }
+                          }
+                        ],
+                        "target": {
+                          "type": "Identifier",
+                          "value": "Menu"
+                        }
+                      },
+                      {
+                        "type": "FlowResultHandler",
+                        "result": "cancel",
+                        "target": {
+                          "type": "Identifier",
+                          "value": "Menu"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Confirm Order"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ConfirmOrder"
+                    }
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Cancel Order"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "cancel"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "ConfirmOrder"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Yes"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "end"
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "No"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "Menu"
+                    }
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Cancel"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "cancel"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Section",
+      "sectionType": "flow",
+      "identifier": {
+        "type": "Identifier",
+        "value": "OrderCoffee"
+      },
+      "body": [
+        {
+          "type": "Attribute",
+          "key": "start",
+          "value": {
+            "type": "Identifier",
+            "value": "ChooseDrink"
+          }
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "ChooseDrink"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Espresso"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ChooseSize"
+                    },
+                    "context": [
+                      {
+                        "type": "Parameter",
+                        "key": "drink",
+                        "value": {
+                          "type": "StringLiteral",
+                          "value": "espresso"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Latte"
+                  },
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ChooseSize"
+                    },
+                    "context": [
+                      {
+                        "type": "Parameter",
+                        "key": "drink",
+                        "value": {
+                          "type": "StringLiteral",
+                          "value": "latte"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": "default",
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ChooseDrink"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "sectionType": "on",
+          "identifier": {
+            "type": "Identifier",
+            "value": "ChooseSize"
+          },
+          "body": [
+            {
+              "type": "MatchBlock",
+              "discriminant": {
+                "type": "PropertyAccess",
+                "object": {
+                  "type": "Variable",
+                  "name": "@reply"
+                },
+                "properties": ["text"]
+              },
+              "cases": [
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Small"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "end"
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": {
+                    "type": "StringLiteral",
+                    "value": "Large"
+                  },
+                  "consequence": {
+                    "type": "FlowTermination",
+                    "result": "end"
+                  }
+                },
+                {
+                  "type": "MatchCase",
+                  "value": "default",
+                  "consequence": {
+                    "type": "ContextualizedValue",
+                    "value": {
+                      "type": "Identifier",
+                      "value": "ChooseSize"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
