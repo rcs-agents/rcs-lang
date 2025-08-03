@@ -38,8 +38,8 @@ jobs:
           curl -fsSL https://moonrepo.dev/install/moon.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
         
-      - name: Clean build cache
-        run: moon clean --cache
+      - name: Clean build outputs
+        run: moon run :clean
         
       - name: Build packages
         run: moon run :build
