@@ -7,7 +7,7 @@ title: "getSectionAttributes"
 
 > **getSectionAttributes**(`section`): [`Attribute`](/api/ast/interfaces/attribute/)[]
 
-Defined in: [utils.ts:85](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/utils.ts#L85)
+Defined in: [utils.ts:85](https://github.com/rcs-agents/rcs-lang/blob/2886a07e868cf92f1e606ce6c904ff7e06f6aeb1/packages/ast/src/utils.ts#L85)
 
 Get all attributes from a section
 

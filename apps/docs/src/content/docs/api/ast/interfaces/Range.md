@@ -5,7 +5,7 @@ prev: false
 title: "Range"
 ---
 
-Defined in: [position.ts:16](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L16)
+Defined in: [position.ts:16](https://github.com/rcs-agents/rcs-lang/blob/2886a07e868cf92f1e606ce6c904ff7e06f6aeb1/packages/ast/src/position.ts#L16)
 
 Range in source text
 
@@ -15,7 +15,7 @@ Range in source text
 
 > **end**: [`Position`](/api/ast/interfaces/position/)
 
-Defined in: [position.ts:18](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L18)
+Defined in: [position.ts:18](https://github.com/rcs-agents/rcs-lang/blob/2886a07e868cf92f1e606ce6c904ff7e06f6aeb1/packages/ast/src/position.ts#L18)
 
 ***
 
@@ -23,4 +23,4 @@ Defined in: [position.ts:18](https://github.com/rcs-agents/rcs-lang/blob/87d9b51
 
 > **start**: [`Position`](/api/ast/interfaces/position/)
 
-Defined in: [position.ts:17](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L17)
+Defined in: [position.ts:17](https://github.com/rcs-agents/rcs-lang/blob/2886a07e868cf92f1e606ce6c904ff7e06f6aeb1/packages/ast/src/position.ts#L17)

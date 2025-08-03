@@ -1,7 +1,7 @@
 {
   "name": "@rcs-lang/docs",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "description": "Documentation site for RCL (Rich Communication Language)",
   "scripts": {
     "dev": "astro dev",
