@@ -30,13 +30,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
+      - name: Setup Proto
+        uses: moonrepo/setup-proto@v1
+        with:
+          version: latest
+          
+      - name: Install tools via Proto
+        run: proto install
+          
       - name: Install dependencies
         run: bun install
-        
-      - name: Install Moon
-        run: |
-          curl -fsSL https://moonrepo.dev/install/moon.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
         
       - name: Build packages
         run: moon run :build
