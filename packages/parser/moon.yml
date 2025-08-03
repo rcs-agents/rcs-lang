@@ -79,6 +79,8 @@ tasks:
   test:
     command: bun
     args: [test]
+    deps:
+      - postbuild
     inputs:
       - 'src/**/*'
       - 'tests/**/*'
