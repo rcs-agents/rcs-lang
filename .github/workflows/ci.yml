@@ -30,13 +30,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      - name: Setup Proto
-        uses: moonrepo/setup-proto@v1
+      - name: Setup toolchain
+        uses: moonrepo/setup-toolchain@v0
         with:
-          version: latest
-          
-      - name: Install tools via Proto
-        run: proto install
+          auto-install: true
           
       - name: Install dependencies
         run: bun install
