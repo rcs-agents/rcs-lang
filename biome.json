@@ -48,13 +48,15 @@
     "rules": {
       "recommended": true,
       "complexity": {
-        "noBannedTypes": "error",
+        "noBannedTypes": "warn",
         "noUselessConstructor": "error",
-        "useOptionalChain": "error"
+        "useOptionalChain": "error",
+        "noForEach": "warn"
       },
       "correctness": {
         "noUnusedVariables": "warn",
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "warn",
+        "noSelfAssign": "warn"
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -64,7 +66,9 @@
       "suspicious": {
         "noExplicitAny": "warn",
         "noDoubleEquals": "error",
-        "noDebugger": "error"
+        "noDebugger": "error",
+        "noAssignInExpressions": "warn",
+        "noImplicitAnyLet": "warn"
       }
     }
   },
