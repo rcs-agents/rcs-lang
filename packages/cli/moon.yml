@@ -45,4 +45,5 @@ tasks:
     args: [test]
     deps:
       - build
+      - '@rcs-lang/compiler:build'
       - '@rcs-lang/parser:postbuild'
