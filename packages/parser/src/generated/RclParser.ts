@@ -52,35 +52,37 @@ export class RclParser extends antlr.Parser {
     public static readonly RPAREN = 39;
     public static readonly LBRACE = 40;
     public static readonly RBRACE = 41;
-    public static readonly LANGLE = 42;
-    public static readonly RANGLE = 43;
-    public static readonly PIPE = 44;
-    public static readonly SLASH = 45;
-    public static readonly HYPHEN = 46;
-    public static readonly SPREAD = 47;
-    public static readonly WS = 48;
-    public static readonly COMMENT = 49;
-    public static readonly NEWLINE = 50;
-    public static readonly INDENT = 51;
-    public static readonly DEDENT = 52;
-    public static readonly TT_TYPE_NAME = 53;
-    public static readonly TT_WS = 54;
-    public static readonly TT_CONTENT = 55;
-    public static readonly TT_PIPE = 56;
-    public static readonly TT_RANGLE = 57;
-    public static readonly TS_TRIPLE_QUOTE_END = 58;
-    public static readonly TS_INTERPOLATION_START = 59;
-    public static readonly TS_CONTENT = 60;
-    public static readonly INT_RBRACE = 61;
-    public static readonly INT_VARIABLE = 62;
-    public static readonly INT_DOT = 63;
-    public static readonly INT_LOWER_NAME = 64;
-    public static readonly INT_WS = 65;
-    public static readonly MC_END = 66;
-    public static readonly MC_CONTENT = 67;
-    public static readonly ML_END = 68;
-    public static readonly ML_CONTENT = 69;
-    public static readonly ML_NEWLINE = 70;
+    public static readonly LBRACKET = 42;
+    public static readonly RBRACKET = 43;
+    public static readonly LANGLE = 44;
+    public static readonly RANGLE = 45;
+    public static readonly PIPE = 46;
+    public static readonly SLASH = 47;
+    public static readonly HYPHEN = 48;
+    public static readonly SPREAD = 49;
+    public static readonly WS = 50;
+    public static readonly COMMENT = 51;
+    public static readonly NEWLINE = 52;
+    public static readonly INDENT = 53;
+    public static readonly DEDENT = 54;
+    public static readonly TT_TYPE_NAME = 55;
+    public static readonly TT_WS = 56;
+    public static readonly TT_CONTENT = 57;
+    public static readonly TT_PIPE = 58;
+    public static readonly TT_RANGLE = 59;
+    public static readonly TS_TRIPLE_QUOTE_END = 60;
+    public static readonly TS_INTERPOLATION_START = 61;
+    public static readonly TS_CONTENT = 62;
+    public static readonly INT_RBRACE = 63;
+    public static readonly INT_VARIABLE = 64;
+    public static readonly INT_DOT = 65;
+    public static readonly INT_LOWER_NAME = 66;
+    public static readonly INT_WS = 67;
+    public static readonly MC_END = 68;
+    public static readonly MC_CONTENT = 69;
+    public static readonly ML_END = 70;
+    public static readonly ML_CONTENT = 71;
+    public static readonly ML_NEWLINE = 72;
     public static readonly RULE_rcl_file = 0;
     public static readonly RULE_import_statement = 1;
     public static readonly RULE_import_path = 2;
@@ -136,10 +138,10 @@ export class RclParser extends antlr.Parser {
         "'append'", "'set'", "'merge'", "'to'", "'into'", "'result'", "':end'", 
         "':cancel'", "':error'", null, null, null, null, null, "':default'", 
         null, null, null, null, null, null, null, null, null, null, null, 
-        null, "'->'", "':'", "','", null, "'('", "')'", "'{'", null, "'<'", 
-        null, null, "'/'", "'-'", "'...'", null, null, null, "'INDENT_PLACEHOLDER'", 
-        "'DEDENT_PLACEHOLDER'", null, null, null, null, null, null, "'#{'", 
-        null, null, null, null, null, null, "'<$'"
+        null, "'->'", "':'", "','", null, "'('", "')'", "'{'", null, "'['", 
+        "']'", "'<'", null, null, "'/'", "'-'", "'...'", null, null, null, 
+        "'INDENT_PLACEHOLDER'", "'DEDENT_PLACEHOLDER'", null, null, null, 
+        null, null, null, "'#{'", null, null, null, null, null, null, "'<$'"
     ];
 
     public static readonly symbolicNames = [
@@ -150,12 +152,12 @@ export class RclParser extends antlr.Parser {
         "MULTI_LINE_CODE_START", "MULTILINE_STR_CLEAN", "MULTILINE_STR_TRIM", 
         "MULTILINE_STR_PRESERVE", "MULTILINE_STR_PRESERVE_ALL", "IDENTIFIER", 
         "LOWER_NAME", "VARIABLE", "ARROW", "COLON", "COMMA", "DOT", "LPAREN", 
-        "RPAREN", "LBRACE", "RBRACE", "LANGLE", "RANGLE", "PIPE", "SLASH", 
-        "HYPHEN", "SPREAD", "WS", "COMMENT", "NEWLINE", "INDENT", "DEDENT", 
-        "TT_TYPE_NAME", "TT_WS", "TT_CONTENT", "TT_PIPE", "TT_RANGLE", "TS_TRIPLE_QUOTE_END", 
-        "TS_INTERPOLATION_START", "TS_CONTENT", "INT_RBRACE", "INT_VARIABLE", 
-        "INT_DOT", "INT_LOWER_NAME", "INT_WS", "MC_END", "MC_CONTENT", "ML_END", 
-        "ML_CONTENT", "ML_NEWLINE"
+        "RPAREN", "LBRACE", "RBRACE", "LBRACKET", "RBRACKET", "LANGLE", 
+        "RANGLE", "PIPE", "SLASH", "HYPHEN", "SPREAD", "WS", "COMMENT", 
+        "NEWLINE", "INDENT", "DEDENT", "TT_TYPE_NAME", "TT_WS", "TT_CONTENT", 
+        "TT_PIPE", "TT_RANGLE", "TS_TRIPLE_QUOTE_END", "TS_INTERPOLATION_START", 
+        "TS_CONTENT", "INT_RBRACE", "INT_VARIABLE", "INT_DOT", "INT_LOWER_NAME", 
+        "INT_WS", "MC_END", "MC_CONTENT", "ML_END", "ML_CONTENT", "ML_NEWLINE"
     ];
     public static readonly ruleNames = [
         "rcl_file", "import_statement", "import_path", "section", "section_header", 
@@ -196,7 +198,7 @@ export class RclParser extends antlr.Parser {
             this.state = 103;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while (_la === 1 || _la === 6 || _la === 32 || _la === 50) {
+            while (_la === 1 || _la === 6 || _la === 32 || _la === 52) {
                 {
                 this.state = 101;
                 this.errorHandler.sync(this);
@@ -297,7 +299,7 @@ export class RclParser extends antlr.Parser {
             this.state = 121;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while (_la === 45) {
+            while (_la === 47) {
                 {
                 {
                 this.state = 117;
@@ -337,7 +339,7 @@ export class RclParser extends antlr.Parser {
             this.state = 126;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if (_la === 51) {
+            if (_la === 53) {
                 {
                 this.state = 125;
                 this.section_body();
@@ -391,7 +393,7 @@ export class RclParser extends antlr.Parser {
             this.state = 136;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4292804608) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 525635) !== 0)) {
+            if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4292804608) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2101571) !== 0)) {
                 {
                 this.state = 135;
                 this.parameter_list();
@@ -533,7 +535,7 @@ export class RclParser extends antlr.Parser {
                 this.state = 153;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
-            } while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 2148008048) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 294919) !== 0));
+            } while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 2148008048) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 1179655) !== 0));
             this.state = 155;
             this.match(RclParser.DEDENT);
             }
@@ -557,67 +559,63 @@ export class RclParser extends antlr.Parser {
         try {
             this.state = 165;
             this.errorHandler.sync(this);
-            switch (this.tokenStream.LA(1)) {
-            case RclParser.SPREAD:
+            switch (this.interpreter.adaptivePredict(this.tokenStream, 10, this.context) ) {
+            case 1:
                 this.enterOuterAlt(localContext, 1);
                 {
                 this.state = 157;
                 this.spread_directive();
                 }
                 break;
-            case RclParser.ATTRIBUTE_NAME:
+            case 2:
                 this.enterOuterAlt(localContext, 2);
                 {
                 this.state = 158;
                 this.attribute_assignment();
                 }
                 break;
-            case RclParser.ON:
-            case RclParser.LOWER_NAME:
+            case 3:
                 this.enterOuterAlt(localContext, 3);
                 {
                 this.state = 159;
                 this.section();
                 }
                 break;
-            case RclParser.MATCH:
+            case 4:
                 this.enterOuterAlt(localContext, 4);
                 {
                 this.state = 160;
                 this.match_block();
                 }
                 break;
-            case RclParser.ARROW:
+            case 5:
                 this.enterOuterAlt(localContext, 5);
                 {
                 this.state = 161;
                 this.simple_transition();
                 }
                 break;
-            case RclParser.START:
+            case 6:
                 this.enterOuterAlt(localContext, 6);
                 {
                 this.state = 162;
                 this.flow_invocation();
                 }
                 break;
-            case RclParser.IDENTIFIER:
-            case RclParser.VARIABLE:
+            case 7:
                 this.enterOuterAlt(localContext, 7);
                 {
                 this.state = 163;
                 this.state_reference();
                 }
                 break;
-            case RclParser.NEWLINE:
+            case 8:
                 this.enterOuterAlt(localContext, 8);
                 {
                 this.state = 164;
                 this.match(RclParser.NEWLINE);
                 }
                 break;
-            default:
-                throw new antlr.NoViableAltException(this);
             }
         }
         catch (re) {
@@ -705,7 +703,7 @@ export class RclParser extends antlr.Parser {
         let localContext = new Attribute_assignmentContext(this.context, this.state);
         this.enterRule(localContext, 24, RclParser.RULE_attribute_assignment);
         try {
-            this.state = 188;
+            this.state = 202;
             this.errorHandler.sync(this);
             switch (this.interpreter.adaptivePredict(this.tokenStream, 12, this.context) ) {
             case 1:
@@ -741,6 +739,45 @@ export class RclParser extends antlr.Parser {
                 this.match(RclParser.NEWLINE);
                 }
                 break;
+            case 4:
+                this.enterOuterAlt(localContext, 4);
+                {
+                this.state = 188;
+                this.match(RclParser.LOWER_NAME);
+                this.state = 189;
+                this.match(RclParser.COLON);
+                this.state = 190;
+                this.value();
+                this.state = 191;
+                this.match(RclParser.NEWLINE);
+                }
+                break;
+            case 5:
+                this.enterOuterAlt(localContext, 5);
+                {
+                this.state = 193;
+                this.match(RclParser.LOWER_NAME);
+                this.state = 194;
+                this.match(RclParser.COLON);
+                this.state = 195;
+                this.match(RclParser.COMMA);
+                this.state = 196;
+                this.value();
+                this.state = 197;
+                this.match(RclParser.NEWLINE);
+                }
+                break;
+            case 6:
+                this.enterOuterAlt(localContext, 6);
+                {
+                this.state = 199;
+                this.match(RclParser.LOWER_NAME);
+                this.state = 200;
+                this.match(RclParser.COLON);
+                this.state = 201;
+                this.match(RclParser.NEWLINE);
+                }
+                break;
             }
         }
         catch (re) {
@@ -763,29 +800,29 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 190;
+            this.state = 204;
             this.match(RclParser.MATCH);
-            this.state = 191;
+            this.state = 205;
             this.value();
-            this.state = 192;
+            this.state = 206;
             this.match(RclParser.NEWLINE);
-            this.state = 193;
+            this.state = 207;
             this.match(RclParser.INDENT);
-            this.state = 195;
+            this.state = 209;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             do {
                 {
                 {
-                this.state = 194;
+                this.state = 208;
                 this.match_case();
                 }
                 }
-                this.state = 197;
+                this.state = 211;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             } while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 15990784) !== 0));
-            this.state = 199;
+            this.state = 213;
             this.match(RclParser.DEDENT);
             }
         }
@@ -809,7 +846,7 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 201;
+            this.state = 215;
             _la = this.tokenStream.LA(1);
             if(!((((_la) & ~0x1F) === 0 && ((1 << _la) & 15990784) !== 0))) {
             this.errorHandler.recoverInline(this);
@@ -818,12 +855,20 @@ export class RclParser extends antlr.Parser {
                 this.errorHandler.reportMatch(this);
                 this.consume();
             }
-            this.state = 202;
+            this.state = 216;
             this.match(RclParser.ARROW);
-            this.state = 203;
+            this.state = 217;
             this.transition_target();
-            this.state = 204;
-            this.match(RclParser.NEWLINE);
+            this.state = 219;
+            this.errorHandler.sync(this);
+            _la = this.tokenStream.LA(1);
+            if (_la === 52) {
+                {
+                this.state = 218;
+                this.match(RclParser.NEWLINE);
+                }
+            }
+
             }
         }
         catch (re) {
@@ -843,7 +888,7 @@ export class RclParser extends antlr.Parser {
         let localContext = new Transition_targetContext(this.context, this.state);
         this.enterRule(localContext, 30, RclParser.RULE_transition_target);
         try {
-            this.state = 210;
+            this.state = 225;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.BOOLEAN:
@@ -867,21 +912,24 @@ export class RclParser extends antlr.Parser {
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 206;
+                this.state = 221;
                 this.contextualized_value();
                 }
                 break;
+            case RclParser.FLOW_END:
+            case RclParser.FLOW_CANCEL:
+            case RclParser.FLOW_ERROR:
             case RclParser.COLON:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 207;
+                this.state = 222;
                 this.flow_termination();
                 }
                 break;
             case RclParser.START:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 208;
+                this.state = 223;
                 this.flow_invocation_with_handlers();
                 }
                 break;
@@ -890,7 +938,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.MERGE:
                 this.enterOuterAlt(localContext, 4);
                 {
-                this.state = 209;
+                this.state = 224;
                 this.context_operation_sequence();
                 }
                 break;
@@ -918,32 +966,32 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 212;
+            this.state = 227;
             this.flow_invocation();
-            this.state = 222;
+            this.state = 237;
             this.errorHandler.sync(this);
-            switch (this.interpreter.adaptivePredict(this.tokenStream, 16, this.context) ) {
+            switch (this.interpreter.adaptivePredict(this.tokenStream, 17, this.context) ) {
             case 1:
                 {
-                this.state = 213;
+                this.state = 228;
                 this.match(RclParser.NEWLINE);
-                this.state = 214;
+                this.state = 229;
                 this.match(RclParser.INDENT);
-                this.state = 216;
+                this.state = 231;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
                 do {
                     {
                     {
-                    this.state = 215;
+                    this.state = 230;
                     this.flow_result_handler();
                     }
                     }
-                    this.state = 218;
+                    this.state = 233;
                     this.errorHandler.sync(this);
                     _la = this.tokenStream.LA(1);
                 } while (_la === 6);
-                this.state = 220;
+                this.state = 235;
                 this.match(RclParser.DEDENT);
                 }
                 break;
@@ -970,29 +1018,29 @@ export class RclParser extends antlr.Parser {
             let alternative: number;
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 224;
+            this.state = 239;
             this.context_operation();
-            this.state = 229;
+            this.state = 244;
             this.errorHandler.sync(this);
-            alternative = this.interpreter.adaptivePredict(this.tokenStream, 17, this.context);
+            alternative = this.interpreter.adaptivePredict(this.tokenStream, 18, this.context);
             while (alternative !== 2 && alternative !== antlr.ATN.INVALID_ALT_NUMBER) {
                 if (alternative === 1) {
                     {
                     {
-                    this.state = 225;
+                    this.state = 240;
                     this.match(RclParser.ARROW);
-                    this.state = 226;
+                    this.state = 241;
                     this.context_operation();
                     }
                     }
                 }
-                this.state = 231;
+                this.state = 246;
                 this.errorHandler.sync(this);
-                alternative = this.interpreter.adaptivePredict(this.tokenStream, 17, this.context);
+                alternative = this.interpreter.adaptivePredict(this.tokenStream, 18, this.context);
             }
-            this.state = 232;
+            this.state = 247;
             this.match(RclParser.ARROW);
-            this.state = 233;
+            this.state = 248;
             this.target_reference();
             }
         }
@@ -1015,12 +1063,20 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 235;
+            this.state = 250;
             this.match(RclParser.ARROW);
-            this.state = 236;
+            this.state = 251;
             this.transition_target();
-            this.state = 237;
-            this.match(RclParser.NEWLINE);
+            this.state = 253;
+            this.errorHandler.sync(this);
+            switch (this.interpreter.adaptivePredict(this.tokenStream, 19, this.context) ) {
+            case 1:
+                {
+                this.state = 252;
+                this.match(RclParser.NEWLINE);
+                }
+                break;
+            }
             }
         }
         catch (re) {
@@ -1043,16 +1099,16 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 239;
+            this.state = 255;
             this.value();
-            this.state = 242;
+            this.state = 258;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (_la === 3) {
                 {
-                this.state = 240;
+                this.state = 256;
                 this.match(RclParser.WITH);
-                this.state = 241;
+                this.state = 257;
                 this.parameter_list();
                 }
             }
@@ -1079,21 +1135,21 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 244;
+            this.state = 260;
             this.parameter();
-            this.state = 249;
+            this.state = 265;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 36) {
                 {
                 {
-                this.state = 245;
+                this.state = 261;
                 this.match(RclParser.COMMA);
-                this.state = 246;
+                this.state = 262;
                 this.parameter();
                 }
                 }
-                this.state = 251;
+                this.state = 267;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1116,26 +1172,26 @@ export class RclParser extends antlr.Parser {
         let localContext = new ParameterContext(this.context, this.state);
         this.enterRule(localContext, 42, RclParser.RULE_parameter);
         try {
-            this.state = 258;
+            this.state = 274;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.ATTRIBUTE_NAME:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 252;
+                this.state = 268;
                 this.match(RclParser.ATTRIBUTE_NAME);
-                this.state = 253;
+                this.state = 269;
                 this.value();
                 }
                 break;
             case RclParser.LOWER_NAME:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 254;
+                this.state = 270;
                 this.match(RclParser.LOWER_NAME);
-                this.state = 255;
+                this.state = 271;
                 this.match(RclParser.COLON);
-                this.state = 256;
+                this.state = 272;
                 this.value();
                 }
                 break;
@@ -1160,7 +1216,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 257;
+                this.state = 273;
                 this.value();
                 }
                 break;
@@ -1185,7 +1241,7 @@ export class RclParser extends antlr.Parser {
         let localContext = new ValueContext(this.context, this.state);
         this.enterRule(localContext, 44, RclParser.RULE_value);
         try {
-            this.state = 267;
+            this.state = 283;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.BOOLEAN:
@@ -1198,28 +1254,28 @@ export class RclParser extends antlr.Parser {
             case RclParser.LANGLE:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 260;
+                this.state = 276;
                 this.primitive_value();
                 }
                 break;
             case RclParser.IDENTIFIER:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 261;
+                this.state = 277;
                 this.match(RclParser.IDENTIFIER);
                 }
                 break;
             case RclParser.VARIABLE:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 262;
+                this.state = 278;
                 this.variable_access();
                 }
                 break;
             case RclParser.LPAREN:
                 this.enterOuterAlt(localContext, 4);
                 {
-                this.state = 263;
+                this.state = 279;
                 this.parentheses_list();
                 }
                 break;
@@ -1227,7 +1283,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 5);
                 {
-                this.state = 264;
+                this.state = 280;
                 this.dictionary();
                 }
                 break;
@@ -1235,7 +1291,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.MULTI_LINE_CODE_START:
                 this.enterOuterAlt(localContext, 6);
                 {
-                this.state = 265;
+                this.state = 281;
                 this.embedded_code();
                 }
                 break;
@@ -1245,7 +1301,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.MULTILINE_STR_PRESERVE_ALL:
                 this.enterOuterAlt(localContext, 7);
                 {
-                this.state = 266;
+                this.state = 282;
                 this.multi_line_string();
                 }
                 break;
@@ -1270,62 +1326,62 @@ export class RclParser extends antlr.Parser {
         let localContext = new Primitive_valueContext(this.context, this.state);
         this.enterRule(localContext, 46, RclParser.RULE_primitive_value);
         try {
-            this.state = 277;
+            this.state = 293;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.STRING:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 269;
+                this.state = 285;
                 this.match(RclParser.STRING);
                 }
                 break;
             case RclParser.TRIPLE_QUOTE:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 270;
+                this.state = 286;
                 this.triple_quote_string();
                 }
                 break;
             case RclParser.REGEX:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 271;
+                this.state = 287;
                 this.match(RclParser.REGEX);
                 }
                 break;
             case RclParser.NUMBER:
                 this.enterOuterAlt(localContext, 4);
                 {
-                this.state = 272;
+                this.state = 288;
                 this.match(RclParser.NUMBER);
                 }
                 break;
             case RclParser.BOOLEAN:
                 this.enterOuterAlt(localContext, 5);
                 {
-                this.state = 273;
+                this.state = 289;
                 this.match(RclParser.BOOLEAN);
                 }
                 break;
             case RclParser.NULL:
                 this.enterOuterAlt(localContext, 6);
                 {
-                this.state = 274;
+                this.state = 290;
                 this.match(RclParser.NULL);
                 }
                 break;
             case RclParser.ATOM:
                 this.enterOuterAlt(localContext, 7);
                 {
-                this.state = 275;
+                this.state = 291;
                 this.match(RclParser.ATOM);
                 }
                 break;
             case RclParser.LANGLE:
                 this.enterOuterAlt(localContext, 8);
                 {
-                this.state = 276;
+                this.state = 292;
                 this.type_tag();
                 }
                 break;
@@ -1353,25 +1409,25 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 279;
+            this.state = 295;
             this.match(RclParser.TRIPLE_QUOTE);
-            this.state = 284;
+            this.state = 300;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while (_la === 59 || _la === 60) {
+            while (_la === 61 || _la === 62) {
                 {
-                this.state = 282;
+                this.state = 298;
                 this.errorHandler.sync(this);
                 switch (this.tokenStream.LA(1)) {
                 case RclParser.TS_CONTENT:
                     {
-                    this.state = 280;
+                    this.state = 296;
                     this.match(RclParser.TS_CONTENT);
                     }
                     break;
                 case RclParser.TS_INTERPOLATION_START:
                     {
-                    this.state = 281;
+                    this.state = 297;
                     this.interpolation();
                     }
                     break;
@@ -1379,11 +1435,11 @@ export class RclParser extends antlr.Parser {
                     throw new antlr.NoViableAltException(this);
                 }
                 }
-                this.state = 286;
+                this.state = 302;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 287;
+            this.state = 303;
             this.match(RclParser.TS_TRIPLE_QUOTE_END);
             }
         }
@@ -1404,20 +1460,20 @@ export class RclParser extends antlr.Parser {
         let localContext = new Triple_string_contentContext(this.context, this.state);
         this.enterRule(localContext, 50, RclParser.RULE_triple_string_content);
         try {
-            this.state = 291;
+            this.state = 307;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.TS_CONTENT:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 289;
+                this.state = 305;
                 this.match(RclParser.TS_CONTENT);
                 }
                 break;
             case RclParser.TS_INTERPOLATION_START:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 290;
+                this.state = 306;
                 this.interpolation();
                 }
                 break;
@@ -1444,11 +1500,11 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 293;
+            this.state = 309;
             this.match(RclParser.TS_INTERPOLATION_START);
-            this.state = 294;
+            this.state = 310;
             this.interpolation_expr();
-            this.state = 295;
+            this.state = 311;
             this.match(RclParser.INT_RBRACE);
             }
         }
@@ -1470,27 +1526,27 @@ export class RclParser extends antlr.Parser {
         this.enterRule(localContext, 54, RclParser.RULE_interpolation_expr);
         let _la: number;
         try {
-            this.state = 306;
+            this.state = 322;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.INT_VARIABLE:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 297;
+                this.state = 313;
                 this.match(RclParser.INT_VARIABLE);
-                this.state = 302;
+                this.state = 318;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
-                while (_la === 63) {
+                while (_la === 65) {
                     {
                     {
-                    this.state = 298;
+                    this.state = 314;
                     this.match(RclParser.INT_DOT);
-                    this.state = 299;
+                    this.state = 315;
                     this.match(RclParser.INT_LOWER_NAME);
                     }
                     }
-                    this.state = 304;
+                    this.state = 320;
                     this.errorHandler.sync(this);
                     _la = this.tokenStream.LA(1);
                 }
@@ -1517,7 +1573,7 @@ export class RclParser extends antlr.Parser {
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 305;
+                this.state = 321;
                 this.value();
                 }
                 break;
@@ -1545,21 +1601,21 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 308;
+            this.state = 324;
             this.match(RclParser.VARIABLE);
-            this.state = 313;
+            this.state = 329;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 37) {
                 {
                 {
-                this.state = 309;
+                this.state = 325;
                 this.match(RclParser.DOT);
-                this.state = 310;
+                this.state = 326;
                 this.match(RclParser.LOWER_NAME);
                 }
                 }
-                this.state = 315;
+                this.state = 331;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1585,33 +1641,33 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 316;
+            this.state = 332;
             this.match(RclParser.LANGLE);
-            this.state = 317;
+            this.state = 333;
             this.match(RclParser.TT_TYPE_NAME);
-            this.state = 319;
+            this.state = 335;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if (_la === 55) {
+            if (_la === 57) {
                 {
-                this.state = 318;
+                this.state = 334;
                 this.match(RclParser.TT_CONTENT);
                 }
             }
 
-            this.state = 323;
+            this.state = 339;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if (_la === 56) {
+            if (_la === 58) {
                 {
-                this.state = 321;
+                this.state = 337;
                 this.match(RclParser.TT_PIPE);
-                this.state = 322;
+                this.state = 338;
                 this.match(RclParser.TT_CONTENT);
                 }
             }
 
-            this.state = 325;
+            this.state = 341;
             this.match(RclParser.TT_RANGLE);
             }
         }
@@ -1632,20 +1688,20 @@ export class RclParser extends antlr.Parser {
         let localContext = new ListContext(this.context, this.state);
         this.enterRule(localContext, 60, RclParser.RULE_list);
         try {
-            this.state = 329;
+            this.state = 345;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.LPAREN:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 327;
+                this.state = 343;
                 this.parentheses_list();
                 }
                 break;
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 328;
+                this.state = 344;
                 this.block_list();
                 }
                 break;
@@ -1673,19 +1729,19 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 331;
+            this.state = 347;
             this.match(RclParser.LPAREN);
-            this.state = 333;
+            this.state = 349;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4292280320) !== 0) || ((((_la - 33)) & ~0x1F) === 0 && ((1 << (_la - 33)) & 262817) !== 0)) {
+            if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4292280320) !== 0) || ((((_la - 33)) & ~0x1F) === 0 && ((1 << (_la - 33)) & 1050785) !== 0)) {
                 {
-                this.state = 332;
+                this.state = 348;
                 this.list_elements();
                 }
             }
 
-            this.state = 335;
+            this.state = 351;
             this.match(RclParser.RPAREN);
             }
         }
@@ -1709,21 +1765,21 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 337;
+            this.state = 353;
             this.value();
-            this.state = 342;
+            this.state = 358;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 36) {
                 {
                 {
-                this.state = 338;
+                this.state = 354;
                 this.match(RclParser.COMMA);
-                this.state = 339;
+                this.state = 355;
                 this.value();
                 }
                 }
-                this.state = 344;
+                this.state = 360;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1749,23 +1805,23 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 345;
+            this.state = 361;
             this.match(RclParser.INDENT);
-            this.state = 347;
+            this.state = 363;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             do {
                 {
                 {
-                this.state = 346;
+                this.state = 362;
                 this.block_list_item();
                 }
                 }
-                this.state = 349;
+                this.state = 365;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
-            } while (_la === 46);
-            this.state = 351;
+            } while (_la === 48);
+            this.state = 367;
             this.match(RclParser.DEDENT);
             }
         }
@@ -1788,11 +1844,11 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 353;
+            this.state = 369;
             this.match(RclParser.HYPHEN);
-            this.state = 354;
+            this.state = 370;
             this.value();
-            this.state = 355;
+            this.state = 371;
             this.match(RclParser.NEWLINE);
             }
         }
@@ -1813,20 +1869,20 @@ export class RclParser extends antlr.Parser {
         let localContext = new DictionaryContext(this.context, this.state);
         this.enterRule(localContext, 70, RclParser.RULE_dictionary);
         try {
-            this.state = 359;
+            this.state = 375;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.LBRACE:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 357;
+                this.state = 373;
                 this.brace_dictionary();
                 }
                 break;
             case RclParser.INDENT:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 358;
+                this.state = 374;
                 this.block_dictionary();
                 }
                 break;
@@ -1854,35 +1910,35 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 361;
+            this.state = 377;
             this.match(RclParser.LBRACE);
-            this.state = 370;
+            this.state = 386;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (_la === 22 || _la === 32) {
                 {
-                this.state = 362;
+                this.state = 378;
                 this.dict_entry();
-                this.state = 367;
+                this.state = 383;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
                 while (_la === 36) {
                     {
                     {
-                    this.state = 363;
+                    this.state = 379;
                     this.match(RclParser.COMMA);
-                    this.state = 364;
+                    this.state = 380;
                     this.dict_entry();
                     }
                     }
-                    this.state = 369;
+                    this.state = 385;
                     this.errorHandler.sync(this);
                     _la = this.tokenStream.LA(1);
                 }
                 }
             }
 
-            this.state = 372;
+            this.state = 388;
             this.match(RclParser.RBRACE);
             }
         }
@@ -1906,23 +1962,23 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 374;
+            this.state = 390;
             this.match(RclParser.INDENT);
-            this.state = 376;
+            this.state = 392;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             do {
                 {
                 {
-                this.state = 375;
+                this.state = 391;
                 this.dict_entry();
                 }
                 }
-                this.state = 378;
+                this.state = 394;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             } while (_la === 22 || _la === 32);
-            this.state = 380;
+            this.state = 396;
             this.match(RclParser.DEDENT);
             }
         }
@@ -1946,7 +2002,7 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 382;
+            this.state = 398;
             _la = this.tokenStream.LA(1);
             if(!(_la === 22 || _la === 32)) {
             this.errorHandler.recoverInline(this);
@@ -1955,9 +2011,9 @@ export class RclParser extends antlr.Parser {
                 this.errorHandler.reportMatch(this);
                 this.consume();
             }
-            this.state = 383;
+            this.state = 399;
             this.match(RclParser.COLON);
-            this.state = 384;
+            this.state = 400;
             this.value();
             }
         }
@@ -1978,20 +2034,20 @@ export class RclParser extends antlr.Parser {
         let localContext = new Embedded_codeContext(this.context, this.state);
         this.enterRule(localContext, 78, RclParser.RULE_embedded_code);
         try {
-            this.state = 388;
+            this.state = 404;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.EMBEDDED_CODE:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 386;
+                this.state = 402;
                 this.match(RclParser.EMBEDDED_CODE);
                 }
                 break;
             case RclParser.MULTI_LINE_CODE_START:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 387;
+                this.state = 403;
                 this.multi_line_code();
                 }
                 break;
@@ -2019,23 +2075,23 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 390;
+            this.state = 406;
             this.match(RclParser.MULTI_LINE_CODE_START);
-            this.state = 394;
+            this.state = 410;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while (_la === 67) {
+            while (_la === 69) {
                 {
                 {
-                this.state = 391;
+                this.state = 407;
                 this.match(RclParser.MC_CONTENT);
                 }
                 }
-                this.state = 396;
+                this.state = 412;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 397;
+            this.state = 413;
             this.match(RclParser.MC_END);
             }
         }
@@ -2059,7 +2115,7 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 399;
+            this.state = 415;
             _la = this.tokenStream.LA(1);
             if(!((((_la) & ~0x1F) === 0 && ((1 << _la) & 2013265920) !== 0))) {
             this.errorHandler.recoverInline(this);
@@ -2068,21 +2124,21 @@ export class RclParser extends antlr.Parser {
                 this.errorHandler.reportMatch(this);
                 this.consume();
             }
-            this.state = 403;
+            this.state = 419;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while (_la === 69) {
+            while (_la === 71) {
                 {
                 {
-                this.state = 400;
+                this.state = 416;
                 this.multiline_content();
                 }
                 }
-                this.state = 405;
+                this.state = 421;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 406;
+            this.state = 422;
             this.match(RclParser.ML_END);
             }
         }
@@ -2106,14 +2162,14 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 408;
+            this.state = 424;
             this.match(RclParser.ML_CONTENT);
-            this.state = 410;
+            this.state = 426;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            if (_la === 70) {
+            if (_la === 72) {
                 {
-                this.state = 409;
+                this.state = 425;
                 this.match(RclParser.ML_NEWLINE);
                 }
             }
@@ -2140,18 +2196,18 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 412;
+            this.state = 428;
             this.match(RclParser.START);
-            this.state = 413;
+            this.state = 429;
             this.match(RclParser.IDENTIFIER);
-            this.state = 416;
+            this.state = 432;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (_la === 3) {
                 {
-                this.state = 414;
+                this.state = 430;
                 this.match(RclParser.WITH);
-                this.state = 415;
+                this.state = 431;
                 this.parameter_list();
                 }
             }
@@ -2178,31 +2234,31 @@ export class RclParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 418;
+            this.state = 434;
             this.match(RclParser.ON);
-            this.state = 419;
+            this.state = 435;
             this.flow_result();
-            this.state = 420;
+            this.state = 436;
             this.match(RclParser.ARROW);
-            this.state = 426;
+            this.state = 442;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 896) !== 0)) {
                 {
                 {
-                this.state = 421;
+                this.state = 437;
                 this.context_operation();
-                this.state = 422;
+                this.state = 438;
                 this.match(RclParser.ARROW);
                 }
                 }
-                this.state = 428;
+                this.state = 444;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 429;
+            this.state = 445;
             this.target_reference();
-            this.state = 430;
+            this.state = 446;
             this.match(RclParser.NEWLINE);
             }
         }
@@ -2223,12 +2279,41 @@ export class RclParser extends antlr.Parser {
         let localContext = new Flow_resultContext(this.context, this.state);
         this.enterRule(localContext, 90, RclParser.RULE_flow_result);
         try {
-            this.enterOuterAlt(localContext, 1);
-            {
-            this.state = 432;
-            this.match(RclParser.COLON);
-            this.state = 433;
-            this.match(RclParser.LOWER_NAME);
+            this.state = 453;
+            this.errorHandler.sync(this);
+            switch (this.tokenStream.LA(1)) {
+            case RclParser.FLOW_END:
+                this.enterOuterAlt(localContext, 1);
+                {
+                this.state = 448;
+                this.match(RclParser.FLOW_END);
+                }
+                break;
+            case RclParser.FLOW_CANCEL:
+                this.enterOuterAlt(localContext, 2);
+                {
+                this.state = 449;
+                this.match(RclParser.FLOW_CANCEL);
+                }
+                break;
+            case RclParser.FLOW_ERROR:
+                this.enterOuterAlt(localContext, 3);
+                {
+                this.state = 450;
+                this.match(RclParser.FLOW_ERROR);
+                }
+                break;
+            case RclParser.COLON:
+                this.enterOuterAlt(localContext, 4);
+                {
+                this.state = 451;
+                this.match(RclParser.COLON);
+                this.state = 452;
+                this.match(RclParser.LOWER_NAME);
+                }
+                break;
+            default:
+                throw new antlr.NoViableAltException(this);
             }
         }
         catch (re) {
@@ -2248,20 +2333,20 @@ export class RclParser extends antlr.Parser {
         let localContext = new Context_operationContext(this.context, this.state);
         this.enterRule(localContext, 92, RclParser.RULE_context_operation);
         try {
-            this.state = 456;
+            this.state = 476;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.APPEND:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 435;
+                this.state = 455;
                 this.match(RclParser.APPEND);
-                this.state = 438;
+                this.state = 458;
                 this.errorHandler.sync(this);
                 switch (this.tokenStream.LA(1)) {
                 case RclParser.RESULT:
                     {
-                    this.state = 436;
+                    this.state = 456;
                     this.match(RclParser.RESULT);
                     }
                     break;
@@ -2285,34 +2370,34 @@ export class RclParser extends antlr.Parser {
                 case RclParser.LANGLE:
                 case RclParser.INDENT:
                     {
-                    this.state = 437;
+                    this.state = 457;
                     this.value();
                     }
                     break;
                 default:
                     throw new antlr.NoViableAltException(this);
                 }
-                this.state = 440;
+                this.state = 460;
                 this.match(RclParser.TO);
-                this.state = 441;
+                this.state = 461;
                 this.variable_access();
                 }
                 break;
             case RclParser.SET:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 442;
+                this.state = 462;
                 this.match(RclParser.SET);
-                this.state = 443;
+                this.state = 463;
                 this.variable_access();
-                this.state = 444;
+                this.state = 464;
                 this.match(RclParser.TO);
-                this.state = 447;
+                this.state = 467;
                 this.errorHandler.sync(this);
                 switch (this.tokenStream.LA(1)) {
                 case RclParser.RESULT:
                     {
-                    this.state = 445;
+                    this.state = 465;
                     this.match(RclParser.RESULT);
                     }
                     break;
@@ -2336,7 +2421,7 @@ export class RclParser extends antlr.Parser {
                 case RclParser.LANGLE:
                 case RclParser.INDENT:
                     {
-                    this.state = 446;
+                    this.state = 466;
                     this.value();
                     }
                     break;
@@ -2348,14 +2433,14 @@ export class RclParser extends antlr.Parser {
             case RclParser.MERGE:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 449;
+                this.state = 469;
                 this.match(RclParser.MERGE);
-                this.state = 452;
+                this.state = 472;
                 this.errorHandler.sync(this);
                 switch (this.tokenStream.LA(1)) {
                 case RclParser.RESULT:
                     {
-                    this.state = 450;
+                    this.state = 470;
                     this.match(RclParser.RESULT);
                     }
                     break;
@@ -2379,16 +2464,16 @@ export class RclParser extends antlr.Parser {
                 case RclParser.LANGLE:
                 case RclParser.INDENT:
                     {
-                    this.state = 451;
+                    this.state = 471;
                     this.value();
                     }
                     break;
                 default:
                     throw new antlr.NoViableAltException(this);
                 }
-                this.state = 454;
+                this.state = 474;
                 this.match(RclParser.INTO);
-                this.state = 455;
+                this.state = 475;
                 this.variable_access();
                 }
                 break;
@@ -2413,27 +2498,30 @@ export class RclParser extends antlr.Parser {
         let localContext = new Target_referenceContext(this.context, this.state);
         this.enterRule(localContext, 94, RclParser.RULE_target_reference);
         try {
-            this.state = 461;
+            this.state = 481;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case RclParser.IDENTIFIER:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 458;
+                this.state = 478;
                 this.match(RclParser.IDENTIFIER);
                 }
                 break;
             case RclParser.VARIABLE:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 459;
+                this.state = 479;
                 this.variable_access();
                 }
                 break;
+            case RclParser.FLOW_END:
+            case RclParser.FLOW_CANCEL:
+            case RclParser.FLOW_ERROR:
             case RclParser.COLON:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 460;
+                this.state = 480;
                 this.flow_termination();
                 }
                 break;
@@ -2458,12 +2546,41 @@ export class RclParser extends antlr.Parser {
         let localContext = new Flow_terminationContext(this.context, this.state);
         this.enterRule(localContext, 96, RclParser.RULE_flow_termination);
         try {
-            this.enterOuterAlt(localContext, 1);
-            {
-            this.state = 463;
-            this.match(RclParser.COLON);
-            this.state = 464;
-            this.match(RclParser.LOWER_NAME);
+            this.state = 488;
+            this.errorHandler.sync(this);
+            switch (this.tokenStream.LA(1)) {
+            case RclParser.FLOW_END:
+                this.enterOuterAlt(localContext, 1);
+                {
+                this.state = 483;
+                this.match(RclParser.FLOW_END);
+                }
+                break;
+            case RclParser.FLOW_CANCEL:
+                this.enterOuterAlt(localContext, 2);
+                {
+                this.state = 484;
+                this.match(RclParser.FLOW_CANCEL);
+                }
+                break;
+            case RclParser.FLOW_ERROR:
+                this.enterOuterAlt(localContext, 3);
+                {
+                this.state = 485;
+                this.match(RclParser.FLOW_ERROR);
+                }
+                break;
+            case RclParser.COLON:
+                this.enterOuterAlt(localContext, 4);
+                {
+                this.state = 486;
+                this.match(RclParser.COLON);
+                this.state = 487;
+                this.match(RclParser.LOWER_NAME);
+                }
+                break;
+            default:
+                throw new antlr.NoViableAltException(this);
             }
         }
         catch (re) {
@@ -2481,7 +2598,7 @@ export class RclParser extends antlr.Parser {
     }
 
     public static readonly _serializedATN: number[] = [
-        4,1,70,467,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,72,491,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,
@@ -2495,161 +2612,172 @@ export class RclParser extends antlr.Parser {
         6,12,6,145,1,7,1,7,1,8,1,8,4,8,152,8,8,11,8,12,8,153,1,8,1,8,1,9,
         1,9,1,9,1,9,1,9,1,9,1,9,1,9,3,9,166,8,9,1,10,1,10,3,10,170,8,10,
         1,10,1,10,1,11,1,11,1,11,1,11,1,12,1,12,1,12,1,12,1,12,1,12,1,12,
-        1,12,1,12,1,12,1,12,3,12,189,8,12,1,13,1,13,1,13,1,13,1,13,4,13,
-        196,8,13,11,13,12,13,197,1,13,1,13,1,14,1,14,1,14,1,14,1,14,1,15,
-        1,15,1,15,1,15,3,15,211,8,15,1,16,1,16,1,16,1,16,4,16,217,8,16,11,
-        16,12,16,218,1,16,1,16,3,16,223,8,16,1,17,1,17,1,17,5,17,228,8,17,
-        10,17,12,17,231,9,17,1,17,1,17,1,17,1,18,1,18,1,18,1,18,1,19,1,19,
-        1,19,3,19,243,8,19,1,20,1,20,1,20,5,20,248,8,20,10,20,12,20,251,
-        9,20,1,21,1,21,1,21,1,21,1,21,1,21,3,21,259,8,21,1,22,1,22,1,22,
-        1,22,1,22,1,22,1,22,3,22,268,8,22,1,23,1,23,1,23,1,23,1,23,1,23,
-        1,23,1,23,3,23,278,8,23,1,24,1,24,1,24,5,24,283,8,24,10,24,12,24,
-        286,9,24,1,24,1,24,1,25,1,25,3,25,292,8,25,1,26,1,26,1,26,1,26,1,
-        27,1,27,1,27,5,27,301,8,27,10,27,12,27,304,9,27,1,27,3,27,307,8,
-        27,1,28,1,28,1,28,5,28,312,8,28,10,28,12,28,315,9,28,1,29,1,29,1,
-        29,3,29,320,8,29,1,29,1,29,3,29,324,8,29,1,29,1,29,1,30,1,30,3,30,
-        330,8,30,1,31,1,31,3,31,334,8,31,1,31,1,31,1,32,1,32,1,32,5,32,341,
-        8,32,10,32,12,32,344,9,32,1,33,1,33,4,33,348,8,33,11,33,12,33,349,
-        1,33,1,33,1,34,1,34,1,34,1,34,1,35,1,35,3,35,360,8,35,1,36,1,36,
-        1,36,1,36,5,36,366,8,36,10,36,12,36,369,9,36,3,36,371,8,36,1,36,
-        1,36,1,37,1,37,4,37,377,8,37,11,37,12,37,378,1,37,1,37,1,38,1,38,
-        1,38,1,38,1,39,1,39,3,39,389,8,39,1,40,1,40,5,40,393,8,40,10,40,
-        12,40,396,9,40,1,40,1,40,1,41,1,41,5,41,402,8,41,10,41,12,41,405,
-        9,41,1,41,1,41,1,42,1,42,3,42,411,8,42,1,43,1,43,1,43,1,43,3,43,
-        417,8,43,1,44,1,44,1,44,1,44,1,44,1,44,5,44,425,8,44,10,44,12,44,
-        428,9,44,1,44,1,44,1,44,1,45,1,45,1,45,1,46,1,46,1,46,3,46,439,8,
-        46,1,46,1,46,1,46,1,46,1,46,1,46,1,46,3,46,448,8,46,1,46,1,46,1,
-        46,3,46,453,8,46,1,46,1,46,3,46,457,8,46,1,47,1,47,1,47,3,47,462,
-        8,47,1,48,1,48,1,48,1,48,0,0,49,0,2,4,6,8,10,12,14,16,18,20,22,24,
-        26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,
-        70,72,74,76,78,80,82,84,86,88,90,92,94,96,0,4,2,0,6,6,32,32,2,0,
-        18,18,20,23,2,0,22,22,32,32,1,0,27,30,491,0,103,1,0,0,0,2,108,1,
-        0,0,0,4,116,1,0,0,0,6,124,1,0,0,0,8,128,1,0,0,0,10,140,1,0,0,0,12,
-        143,1,0,0,0,14,147,1,0,0,0,16,149,1,0,0,0,18,165,1,0,0,0,20,169,
-        1,0,0,0,22,173,1,0,0,0,24,188,1,0,0,0,26,190,1,0,0,0,28,201,1,0,
-        0,0,30,210,1,0,0,0,32,212,1,0,0,0,34,224,1,0,0,0,36,235,1,0,0,0,
-        38,239,1,0,0,0,40,244,1,0,0,0,42,258,1,0,0,0,44,267,1,0,0,0,46,277,
-        1,0,0,0,48,279,1,0,0,0,50,291,1,0,0,0,52,293,1,0,0,0,54,306,1,0,
-        0,0,56,308,1,0,0,0,58,316,1,0,0,0,60,329,1,0,0,0,62,331,1,0,0,0,
-        64,337,1,0,0,0,66,345,1,0,0,0,68,353,1,0,0,0,70,359,1,0,0,0,72,361,
-        1,0,0,0,74,374,1,0,0,0,76,382,1,0,0,0,78,388,1,0,0,0,80,390,1,0,
-        0,0,82,399,1,0,0,0,84,408,1,0,0,0,86,412,1,0,0,0,88,418,1,0,0,0,
-        90,432,1,0,0,0,92,456,1,0,0,0,94,461,1,0,0,0,96,463,1,0,0,0,98,102,
-        3,2,1,0,99,102,3,6,3,0,100,102,5,50,0,0,101,98,1,0,0,0,101,99,1,
+        1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,
+        1,12,1,12,1,12,1,12,1,12,3,12,203,8,12,1,13,1,13,1,13,1,13,1,13,
+        4,13,210,8,13,11,13,12,13,211,1,13,1,13,1,14,1,14,1,14,1,14,3,14,
+        220,8,14,1,15,1,15,1,15,1,15,3,15,226,8,15,1,16,1,16,1,16,1,16,4,
+        16,232,8,16,11,16,12,16,233,1,16,1,16,3,16,238,8,16,1,17,1,17,1,
+        17,5,17,243,8,17,10,17,12,17,246,9,17,1,17,1,17,1,17,1,18,1,18,1,
+        18,3,18,254,8,18,1,19,1,19,1,19,3,19,259,8,19,1,20,1,20,1,20,5,20,
+        264,8,20,10,20,12,20,267,9,20,1,21,1,21,1,21,1,21,1,21,1,21,3,21,
+        275,8,21,1,22,1,22,1,22,1,22,1,22,1,22,1,22,3,22,284,8,22,1,23,1,
+        23,1,23,1,23,1,23,1,23,1,23,1,23,3,23,294,8,23,1,24,1,24,1,24,5,
+        24,299,8,24,10,24,12,24,302,9,24,1,24,1,24,1,25,1,25,3,25,308,8,
+        25,1,26,1,26,1,26,1,26,1,27,1,27,1,27,5,27,317,8,27,10,27,12,27,
+        320,9,27,1,27,3,27,323,8,27,1,28,1,28,1,28,5,28,328,8,28,10,28,12,
+        28,331,9,28,1,29,1,29,1,29,3,29,336,8,29,1,29,1,29,3,29,340,8,29,
+        1,29,1,29,1,30,1,30,3,30,346,8,30,1,31,1,31,3,31,350,8,31,1,31,1,
+        31,1,32,1,32,1,32,5,32,357,8,32,10,32,12,32,360,9,32,1,33,1,33,4,
+        33,364,8,33,11,33,12,33,365,1,33,1,33,1,34,1,34,1,34,1,34,1,35,1,
+        35,3,35,376,8,35,1,36,1,36,1,36,1,36,5,36,382,8,36,10,36,12,36,385,
+        9,36,3,36,387,8,36,1,36,1,36,1,37,1,37,4,37,393,8,37,11,37,12,37,
+        394,1,37,1,37,1,38,1,38,1,38,1,38,1,39,1,39,3,39,405,8,39,1,40,1,
+        40,5,40,409,8,40,10,40,12,40,412,9,40,1,40,1,40,1,41,1,41,5,41,418,
+        8,41,10,41,12,41,421,9,41,1,41,1,41,1,42,1,42,3,42,427,8,42,1,43,
+        1,43,1,43,1,43,3,43,433,8,43,1,44,1,44,1,44,1,44,1,44,1,44,5,44,
+        441,8,44,10,44,12,44,444,9,44,1,44,1,44,1,44,1,45,1,45,1,45,1,45,
+        1,45,3,45,454,8,45,1,46,1,46,1,46,3,46,459,8,46,1,46,1,46,1,46,1,
+        46,1,46,1,46,1,46,3,46,468,8,46,1,46,1,46,1,46,3,46,473,8,46,1,46,
+        1,46,3,46,477,8,46,1,47,1,47,1,47,3,47,482,8,47,1,48,1,48,1,48,1,
+        48,1,48,3,48,489,8,48,1,48,0,0,49,0,2,4,6,8,10,12,14,16,18,20,22,
+        24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,
+        68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,0,4,2,0,6,6,32,32,2,
+        0,18,18,20,23,2,0,22,22,32,32,1,0,27,30,526,0,103,1,0,0,0,2,108,
+        1,0,0,0,4,116,1,0,0,0,6,124,1,0,0,0,8,128,1,0,0,0,10,140,1,0,0,0,
+        12,143,1,0,0,0,14,147,1,0,0,0,16,149,1,0,0,0,18,165,1,0,0,0,20,169,
+        1,0,0,0,22,173,1,0,0,0,24,202,1,0,0,0,26,204,1,0,0,0,28,215,1,0,
+        0,0,30,225,1,0,0,0,32,227,1,0,0,0,34,239,1,0,0,0,36,250,1,0,0,0,
+        38,255,1,0,0,0,40,260,1,0,0,0,42,274,1,0,0,0,44,283,1,0,0,0,46,293,
+        1,0,0,0,48,295,1,0,0,0,50,307,1,0,0,0,52,309,1,0,0,0,54,322,1,0,
+        0,0,56,324,1,0,0,0,58,332,1,0,0,0,60,345,1,0,0,0,62,347,1,0,0,0,
+        64,353,1,0,0,0,66,361,1,0,0,0,68,369,1,0,0,0,70,375,1,0,0,0,72,377,
+        1,0,0,0,74,390,1,0,0,0,76,398,1,0,0,0,78,404,1,0,0,0,80,406,1,0,
+        0,0,82,415,1,0,0,0,84,424,1,0,0,0,86,428,1,0,0,0,88,434,1,0,0,0,
+        90,453,1,0,0,0,92,476,1,0,0,0,94,481,1,0,0,0,96,488,1,0,0,0,98,102,
+        3,2,1,0,99,102,3,6,3,0,100,102,5,52,0,0,101,98,1,0,0,0,101,99,1,
         0,0,0,101,100,1,0,0,0,102,105,1,0,0,0,103,101,1,0,0,0,103,104,1,
         0,0,0,104,106,1,0,0,0,105,103,1,0,0,0,106,107,5,0,0,1,107,1,1,0,
         0,0,108,109,5,1,0,0,109,112,3,4,2,0,110,111,5,2,0,0,111,113,5,31,
-        0,0,112,110,1,0,0,0,112,113,1,0,0,0,113,114,1,0,0,0,114,115,5,50,
-        0,0,115,3,1,0,0,0,116,121,5,31,0,0,117,118,5,45,0,0,118,120,5,31,
+        0,0,112,110,1,0,0,0,112,113,1,0,0,0,113,114,1,0,0,0,114,115,5,52,
+        0,0,115,3,1,0,0,0,116,121,5,31,0,0,117,118,5,47,0,0,118,120,5,31,
         0,0,119,117,1,0,0,0,120,123,1,0,0,0,121,119,1,0,0,0,121,122,1,0,
         0,0,122,5,1,0,0,0,123,121,1,0,0,0,124,126,3,8,4,0,125,127,3,16,8,
         0,126,125,1,0,0,0,126,127,1,0,0,0,127,7,1,0,0,0,128,130,3,10,5,0,
         129,131,5,31,0,0,130,129,1,0,0,0,130,131,1,0,0,0,131,133,1,0,0,0,
         132,134,3,12,6,0,133,132,1,0,0,0,133,134,1,0,0,0,134,136,1,0,0,0,
         135,137,3,40,20,0,136,135,1,0,0,0,136,137,1,0,0,0,137,138,1,0,0,
-        0,138,139,5,50,0,0,139,9,1,0,0,0,140,141,7,0,0,0,141,11,1,0,0,0,
+        0,138,139,5,52,0,0,139,9,1,0,0,0,140,141,7,0,0,0,141,11,1,0,0,0,
         142,144,3,44,22,0,143,142,1,0,0,0,144,145,1,0,0,0,145,143,1,0,0,
         0,145,146,1,0,0,0,146,13,1,0,0,0,147,148,5,31,0,0,148,15,1,0,0,0,
-        149,151,5,51,0,0,150,152,3,18,9,0,151,150,1,0,0,0,152,153,1,0,0,
-        0,153,151,1,0,0,0,153,154,1,0,0,0,154,155,1,0,0,0,155,156,5,52,0,
+        149,151,5,53,0,0,150,152,3,18,9,0,151,150,1,0,0,0,152,153,1,0,0,
+        0,153,151,1,0,0,0,153,154,1,0,0,0,154,155,1,0,0,0,155,156,5,54,0,
         0,156,17,1,0,0,0,157,166,3,22,11,0,158,166,3,24,12,0,159,166,3,6,
         3,0,160,166,3,26,13,0,161,166,3,36,18,0,162,166,3,86,43,0,163,166,
-        3,20,10,0,164,166,5,50,0,0,165,157,1,0,0,0,165,158,1,0,0,0,165,159,
+        3,20,10,0,164,166,5,52,0,0,165,157,1,0,0,0,165,158,1,0,0,0,165,159,
         1,0,0,0,165,160,1,0,0,0,165,161,1,0,0,0,165,162,1,0,0,0,165,163,
         1,0,0,0,165,164,1,0,0,0,166,19,1,0,0,0,167,170,5,31,0,0,168,170,
         3,56,28,0,169,167,1,0,0,0,169,168,1,0,0,0,170,171,1,0,0,0,171,172,
-        5,50,0,0,172,21,1,0,0,0,173,174,5,47,0,0,174,175,5,31,0,0,175,176,
-        5,50,0,0,176,23,1,0,0,0,177,178,5,19,0,0,178,179,3,44,22,0,179,180,
-        5,50,0,0,180,189,1,0,0,0,181,182,5,19,0,0,182,183,5,36,0,0,183,184,
-        3,44,22,0,184,185,5,50,0,0,185,189,1,0,0,0,186,187,5,19,0,0,187,
-        189,5,50,0,0,188,177,1,0,0,0,188,181,1,0,0,0,188,186,1,0,0,0,189,
-        25,1,0,0,0,190,191,5,4,0,0,191,192,3,44,22,0,192,193,5,50,0,0,193,
-        195,5,51,0,0,194,196,3,28,14,0,195,194,1,0,0,0,196,197,1,0,0,0,197,
-        195,1,0,0,0,197,198,1,0,0,0,198,199,1,0,0,0,199,200,5,52,0,0,200,
-        27,1,0,0,0,201,202,7,1,0,0,202,203,5,34,0,0,203,204,3,30,15,0,204,
-        205,5,50,0,0,205,29,1,0,0,0,206,211,3,38,19,0,207,211,3,96,48,0,
-        208,211,3,32,16,0,209,211,3,34,17,0,210,206,1,0,0,0,210,207,1,0,
-        0,0,210,208,1,0,0,0,210,209,1,0,0,0,211,31,1,0,0,0,212,222,3,86,
-        43,0,213,214,5,50,0,0,214,216,5,51,0,0,215,217,3,88,44,0,216,215,
-        1,0,0,0,217,218,1,0,0,0,218,216,1,0,0,0,218,219,1,0,0,0,219,220,
-        1,0,0,0,220,221,5,52,0,0,221,223,1,0,0,0,222,213,1,0,0,0,222,223,
-        1,0,0,0,223,33,1,0,0,0,224,229,3,92,46,0,225,226,5,34,0,0,226,228,
-        3,92,46,0,227,225,1,0,0,0,228,231,1,0,0,0,229,227,1,0,0,0,229,230,
-        1,0,0,0,230,232,1,0,0,0,231,229,1,0,0,0,232,233,5,34,0,0,233,234,
-        3,94,47,0,234,35,1,0,0,0,235,236,5,34,0,0,236,237,3,30,15,0,237,
-        238,5,50,0,0,238,37,1,0,0,0,239,242,3,44,22,0,240,241,5,3,0,0,241,
-        243,3,40,20,0,242,240,1,0,0,0,242,243,1,0,0,0,243,39,1,0,0,0,244,
-        249,3,42,21,0,245,246,5,36,0,0,246,248,3,42,21,0,247,245,1,0,0,0,
-        248,251,1,0,0,0,249,247,1,0,0,0,249,250,1,0,0,0,250,41,1,0,0,0,251,
-        249,1,0,0,0,252,253,5,19,0,0,253,259,3,44,22,0,254,255,5,32,0,0,
-        255,256,5,35,0,0,256,259,3,44,22,0,257,259,3,44,22,0,258,252,1,0,
-        0,0,258,254,1,0,0,0,258,257,1,0,0,0,259,43,1,0,0,0,260,268,3,46,
-        23,0,261,268,5,31,0,0,262,268,3,56,28,0,263,268,3,62,31,0,264,268,
-        3,70,35,0,265,268,3,78,39,0,266,268,3,82,41,0,267,260,1,0,0,0,267,
-        261,1,0,0,0,267,262,1,0,0,0,267,263,1,0,0,0,267,264,1,0,0,0,267,
-        265,1,0,0,0,267,266,1,0,0,0,268,45,1,0,0,0,269,278,5,22,0,0,270,
-        278,3,48,24,0,271,278,5,23,0,0,272,278,5,18,0,0,273,278,5,16,0,0,
-        274,278,5,17,0,0,275,278,5,20,0,0,276,278,3,58,29,0,277,269,1,0,
-        0,0,277,270,1,0,0,0,277,271,1,0,0,0,277,272,1,0,0,0,277,273,1,0,
-        0,0,277,274,1,0,0,0,277,275,1,0,0,0,277,276,1,0,0,0,278,47,1,0,0,
-        0,279,284,5,24,0,0,280,283,5,60,0,0,281,283,3,52,26,0,282,280,1,
-        0,0,0,282,281,1,0,0,0,283,286,1,0,0,0,284,282,1,0,0,0,284,285,1,
-        0,0,0,285,287,1,0,0,0,286,284,1,0,0,0,287,288,5,58,0,0,288,49,1,
-        0,0,0,289,292,5,60,0,0,290,292,3,52,26,0,291,289,1,0,0,0,291,290,
-        1,0,0,0,292,51,1,0,0,0,293,294,5,59,0,0,294,295,3,54,27,0,295,296,
-        5,61,0,0,296,53,1,0,0,0,297,302,5,62,0,0,298,299,5,63,0,0,299,301,
-        5,64,0,0,300,298,1,0,0,0,301,304,1,0,0,0,302,300,1,0,0,0,302,303,
-        1,0,0,0,303,307,1,0,0,0,304,302,1,0,0,0,305,307,3,44,22,0,306,297,
-        1,0,0,0,306,305,1,0,0,0,307,55,1,0,0,0,308,313,5,33,0,0,309,310,
-        5,37,0,0,310,312,5,32,0,0,311,309,1,0,0,0,312,315,1,0,0,0,313,311,
-        1,0,0,0,313,314,1,0,0,0,314,57,1,0,0,0,315,313,1,0,0,0,316,317,5,
-        42,0,0,317,319,5,53,0,0,318,320,5,55,0,0,319,318,1,0,0,0,319,320,
-        1,0,0,0,320,323,1,0,0,0,321,322,5,56,0,0,322,324,5,55,0,0,323,321,
-        1,0,0,0,323,324,1,0,0,0,324,325,1,0,0,0,325,326,5,57,0,0,326,59,
-        1,0,0,0,327,330,3,62,31,0,328,330,3,66,33,0,329,327,1,0,0,0,329,
-        328,1,0,0,0,330,61,1,0,0,0,331,333,5,38,0,0,332,334,3,64,32,0,333,
-        332,1,0,0,0,333,334,1,0,0,0,334,335,1,0,0,0,335,336,5,39,0,0,336,
-        63,1,0,0,0,337,342,3,44,22,0,338,339,5,36,0,0,339,341,3,44,22,0,
-        340,338,1,0,0,0,341,344,1,0,0,0,342,340,1,0,0,0,342,343,1,0,0,0,
-        343,65,1,0,0,0,344,342,1,0,0,0,345,347,5,51,0,0,346,348,3,68,34,
-        0,347,346,1,0,0,0,348,349,1,0,0,0,349,347,1,0,0,0,349,350,1,0,0,
-        0,350,351,1,0,0,0,351,352,5,52,0,0,352,67,1,0,0,0,353,354,5,46,0,
-        0,354,355,3,44,22,0,355,356,5,50,0,0,356,69,1,0,0,0,357,360,3,72,
-        36,0,358,360,3,74,37,0,359,357,1,0,0,0,359,358,1,0,0,0,360,71,1,
-        0,0,0,361,370,5,40,0,0,362,367,3,76,38,0,363,364,5,36,0,0,364,366,
-        3,76,38,0,365,363,1,0,0,0,366,369,1,0,0,0,367,365,1,0,0,0,367,368,
-        1,0,0,0,368,371,1,0,0,0,369,367,1,0,0,0,370,362,1,0,0,0,370,371,
-        1,0,0,0,371,372,1,0,0,0,372,373,5,41,0,0,373,73,1,0,0,0,374,376,
-        5,51,0,0,375,377,3,76,38,0,376,375,1,0,0,0,377,378,1,0,0,0,378,376,
-        1,0,0,0,378,379,1,0,0,0,379,380,1,0,0,0,380,381,5,52,0,0,381,75,
-        1,0,0,0,382,383,7,2,0,0,383,384,5,35,0,0,384,385,3,44,22,0,385,77,
-        1,0,0,0,386,389,5,25,0,0,387,389,3,80,40,0,388,386,1,0,0,0,388,387,
-        1,0,0,0,389,79,1,0,0,0,390,394,5,26,0,0,391,393,5,67,0,0,392,391,
-        1,0,0,0,393,396,1,0,0,0,394,392,1,0,0,0,394,395,1,0,0,0,395,397,
-        1,0,0,0,396,394,1,0,0,0,397,398,5,66,0,0,398,81,1,0,0,0,399,403,
-        7,3,0,0,400,402,3,84,42,0,401,400,1,0,0,0,402,405,1,0,0,0,403,401,
-        1,0,0,0,403,404,1,0,0,0,404,406,1,0,0,0,405,403,1,0,0,0,406,407,
-        5,68,0,0,407,83,1,0,0,0,408,410,5,69,0,0,409,411,5,70,0,0,410,409,
-        1,0,0,0,410,411,1,0,0,0,411,85,1,0,0,0,412,413,5,5,0,0,413,416,5,
-        31,0,0,414,415,5,3,0,0,415,417,3,40,20,0,416,414,1,0,0,0,416,417,
-        1,0,0,0,417,87,1,0,0,0,418,419,5,6,0,0,419,420,3,90,45,0,420,426,
-        5,34,0,0,421,422,3,92,46,0,422,423,5,34,0,0,423,425,1,0,0,0,424,
-        421,1,0,0,0,425,428,1,0,0,0,426,424,1,0,0,0,426,427,1,0,0,0,427,
-        429,1,0,0,0,428,426,1,0,0,0,429,430,3,94,47,0,430,431,5,50,0,0,431,
-        89,1,0,0,0,432,433,5,35,0,0,433,434,5,32,0,0,434,91,1,0,0,0,435,
-        438,5,7,0,0,436,439,5,12,0,0,437,439,3,44,22,0,438,436,1,0,0,0,438,
-        437,1,0,0,0,439,440,1,0,0,0,440,441,5,10,0,0,441,457,3,56,28,0,442,
-        443,5,8,0,0,443,444,3,56,28,0,444,447,5,10,0,0,445,448,5,12,0,0,
-        446,448,3,44,22,0,447,445,1,0,0,0,447,446,1,0,0,0,448,457,1,0,0,
-        0,449,452,5,9,0,0,450,453,5,12,0,0,451,453,3,44,22,0,452,450,1,0,
-        0,0,452,451,1,0,0,0,453,454,1,0,0,0,454,455,5,11,0,0,455,457,3,56,
-        28,0,456,435,1,0,0,0,456,442,1,0,0,0,456,449,1,0,0,0,457,93,1,0,
-        0,0,458,462,5,31,0,0,459,462,3,56,28,0,460,462,3,96,48,0,461,458,
-        1,0,0,0,461,459,1,0,0,0,461,460,1,0,0,0,462,95,1,0,0,0,463,464,5,
-        35,0,0,464,465,5,32,0,0,465,97,1,0,0,0,50,101,103,112,121,126,130,
-        133,136,145,153,165,169,188,197,210,218,222,229,242,249,258,267,
-        277,282,284,291,302,306,313,319,323,329,333,342,349,359,367,370,
-        378,388,394,403,410,416,426,438,447,452,456,461
+        5,52,0,0,172,21,1,0,0,0,173,174,5,49,0,0,174,175,5,31,0,0,175,176,
+        5,52,0,0,176,23,1,0,0,0,177,178,5,19,0,0,178,179,3,44,22,0,179,180,
+        5,52,0,0,180,203,1,0,0,0,181,182,5,19,0,0,182,183,5,36,0,0,183,184,
+        3,44,22,0,184,185,5,52,0,0,185,203,1,0,0,0,186,187,5,19,0,0,187,
+        203,5,52,0,0,188,189,5,32,0,0,189,190,5,35,0,0,190,191,3,44,22,0,
+        191,192,5,52,0,0,192,203,1,0,0,0,193,194,5,32,0,0,194,195,5,35,0,
+        0,195,196,5,36,0,0,196,197,3,44,22,0,197,198,5,52,0,0,198,203,1,
+        0,0,0,199,200,5,32,0,0,200,201,5,35,0,0,201,203,5,52,0,0,202,177,
+        1,0,0,0,202,181,1,0,0,0,202,186,1,0,0,0,202,188,1,0,0,0,202,193,
+        1,0,0,0,202,199,1,0,0,0,203,25,1,0,0,0,204,205,5,4,0,0,205,206,3,
+        44,22,0,206,207,5,52,0,0,207,209,5,53,0,0,208,210,3,28,14,0,209,
+        208,1,0,0,0,210,211,1,0,0,0,211,209,1,0,0,0,211,212,1,0,0,0,212,
+        213,1,0,0,0,213,214,5,54,0,0,214,27,1,0,0,0,215,216,7,1,0,0,216,
+        217,5,34,0,0,217,219,3,30,15,0,218,220,5,52,0,0,219,218,1,0,0,0,
+        219,220,1,0,0,0,220,29,1,0,0,0,221,226,3,38,19,0,222,226,3,96,48,
+        0,223,226,3,32,16,0,224,226,3,34,17,0,225,221,1,0,0,0,225,222,1,
+        0,0,0,225,223,1,0,0,0,225,224,1,0,0,0,226,31,1,0,0,0,227,237,3,86,
+        43,0,228,229,5,52,0,0,229,231,5,53,0,0,230,232,3,88,44,0,231,230,
+        1,0,0,0,232,233,1,0,0,0,233,231,1,0,0,0,233,234,1,0,0,0,234,235,
+        1,0,0,0,235,236,5,54,0,0,236,238,1,0,0,0,237,228,1,0,0,0,237,238,
+        1,0,0,0,238,33,1,0,0,0,239,244,3,92,46,0,240,241,5,34,0,0,241,243,
+        3,92,46,0,242,240,1,0,0,0,243,246,1,0,0,0,244,242,1,0,0,0,244,245,
+        1,0,0,0,245,247,1,0,0,0,246,244,1,0,0,0,247,248,5,34,0,0,248,249,
+        3,94,47,0,249,35,1,0,0,0,250,251,5,34,0,0,251,253,3,30,15,0,252,
+        254,5,52,0,0,253,252,1,0,0,0,253,254,1,0,0,0,254,37,1,0,0,0,255,
+        258,3,44,22,0,256,257,5,3,0,0,257,259,3,40,20,0,258,256,1,0,0,0,
+        258,259,1,0,0,0,259,39,1,0,0,0,260,265,3,42,21,0,261,262,5,36,0,
+        0,262,264,3,42,21,0,263,261,1,0,0,0,264,267,1,0,0,0,265,263,1,0,
+        0,0,265,266,1,0,0,0,266,41,1,0,0,0,267,265,1,0,0,0,268,269,5,19,
+        0,0,269,275,3,44,22,0,270,271,5,32,0,0,271,272,5,35,0,0,272,275,
+        3,44,22,0,273,275,3,44,22,0,274,268,1,0,0,0,274,270,1,0,0,0,274,
+        273,1,0,0,0,275,43,1,0,0,0,276,284,3,46,23,0,277,284,5,31,0,0,278,
+        284,3,56,28,0,279,284,3,62,31,0,280,284,3,70,35,0,281,284,3,78,39,
+        0,282,284,3,82,41,0,283,276,1,0,0,0,283,277,1,0,0,0,283,278,1,0,
+        0,0,283,279,1,0,0,0,283,280,1,0,0,0,283,281,1,0,0,0,283,282,1,0,
+        0,0,284,45,1,0,0,0,285,294,5,22,0,0,286,294,3,48,24,0,287,294,5,
+        23,0,0,288,294,5,18,0,0,289,294,5,16,0,0,290,294,5,17,0,0,291,294,
+        5,20,0,0,292,294,3,58,29,0,293,285,1,0,0,0,293,286,1,0,0,0,293,287,
+        1,0,0,0,293,288,1,0,0,0,293,289,1,0,0,0,293,290,1,0,0,0,293,291,
+        1,0,0,0,293,292,1,0,0,0,294,47,1,0,0,0,295,300,5,24,0,0,296,299,
+        5,62,0,0,297,299,3,52,26,0,298,296,1,0,0,0,298,297,1,0,0,0,299,302,
+        1,0,0,0,300,298,1,0,0,0,300,301,1,0,0,0,301,303,1,0,0,0,302,300,
+        1,0,0,0,303,304,5,60,0,0,304,49,1,0,0,0,305,308,5,62,0,0,306,308,
+        3,52,26,0,307,305,1,0,0,0,307,306,1,0,0,0,308,51,1,0,0,0,309,310,
+        5,61,0,0,310,311,3,54,27,0,311,312,5,63,0,0,312,53,1,0,0,0,313,318,
+        5,64,0,0,314,315,5,65,0,0,315,317,5,66,0,0,316,314,1,0,0,0,317,320,
+        1,0,0,0,318,316,1,0,0,0,318,319,1,0,0,0,319,323,1,0,0,0,320,318,
+        1,0,0,0,321,323,3,44,22,0,322,313,1,0,0,0,322,321,1,0,0,0,323,55,
+        1,0,0,0,324,329,5,33,0,0,325,326,5,37,0,0,326,328,5,32,0,0,327,325,
+        1,0,0,0,328,331,1,0,0,0,329,327,1,0,0,0,329,330,1,0,0,0,330,57,1,
+        0,0,0,331,329,1,0,0,0,332,333,5,44,0,0,333,335,5,55,0,0,334,336,
+        5,57,0,0,335,334,1,0,0,0,335,336,1,0,0,0,336,339,1,0,0,0,337,338,
+        5,58,0,0,338,340,5,57,0,0,339,337,1,0,0,0,339,340,1,0,0,0,340,341,
+        1,0,0,0,341,342,5,59,0,0,342,59,1,0,0,0,343,346,3,62,31,0,344,346,
+        3,66,33,0,345,343,1,0,0,0,345,344,1,0,0,0,346,61,1,0,0,0,347,349,
+        5,38,0,0,348,350,3,64,32,0,349,348,1,0,0,0,349,350,1,0,0,0,350,351,
+        1,0,0,0,351,352,5,39,0,0,352,63,1,0,0,0,353,358,3,44,22,0,354,355,
+        5,36,0,0,355,357,3,44,22,0,356,354,1,0,0,0,357,360,1,0,0,0,358,356,
+        1,0,0,0,358,359,1,0,0,0,359,65,1,0,0,0,360,358,1,0,0,0,361,363,5,
+        53,0,0,362,364,3,68,34,0,363,362,1,0,0,0,364,365,1,0,0,0,365,363,
+        1,0,0,0,365,366,1,0,0,0,366,367,1,0,0,0,367,368,5,54,0,0,368,67,
+        1,0,0,0,369,370,5,48,0,0,370,371,3,44,22,0,371,372,5,52,0,0,372,
+        69,1,0,0,0,373,376,3,72,36,0,374,376,3,74,37,0,375,373,1,0,0,0,375,
+        374,1,0,0,0,376,71,1,0,0,0,377,386,5,40,0,0,378,383,3,76,38,0,379,
+        380,5,36,0,0,380,382,3,76,38,0,381,379,1,0,0,0,382,385,1,0,0,0,383,
+        381,1,0,0,0,383,384,1,0,0,0,384,387,1,0,0,0,385,383,1,0,0,0,386,
+        378,1,0,0,0,386,387,1,0,0,0,387,388,1,0,0,0,388,389,5,41,0,0,389,
+        73,1,0,0,0,390,392,5,53,0,0,391,393,3,76,38,0,392,391,1,0,0,0,393,
+        394,1,0,0,0,394,392,1,0,0,0,394,395,1,0,0,0,395,396,1,0,0,0,396,
+        397,5,54,0,0,397,75,1,0,0,0,398,399,7,2,0,0,399,400,5,35,0,0,400,
+        401,3,44,22,0,401,77,1,0,0,0,402,405,5,25,0,0,403,405,3,80,40,0,
+        404,402,1,0,0,0,404,403,1,0,0,0,405,79,1,0,0,0,406,410,5,26,0,0,
+        407,409,5,69,0,0,408,407,1,0,0,0,409,412,1,0,0,0,410,408,1,0,0,0,
+        410,411,1,0,0,0,411,413,1,0,0,0,412,410,1,0,0,0,413,414,5,68,0,0,
+        414,81,1,0,0,0,415,419,7,3,0,0,416,418,3,84,42,0,417,416,1,0,0,0,
+        418,421,1,0,0,0,419,417,1,0,0,0,419,420,1,0,0,0,420,422,1,0,0,0,
+        421,419,1,0,0,0,422,423,5,70,0,0,423,83,1,0,0,0,424,426,5,71,0,0,
+        425,427,5,72,0,0,426,425,1,0,0,0,426,427,1,0,0,0,427,85,1,0,0,0,
+        428,429,5,5,0,0,429,432,5,31,0,0,430,431,5,3,0,0,431,433,3,40,20,
+        0,432,430,1,0,0,0,432,433,1,0,0,0,433,87,1,0,0,0,434,435,5,6,0,0,
+        435,436,3,90,45,0,436,442,5,34,0,0,437,438,3,92,46,0,438,439,5,34,
+        0,0,439,441,1,0,0,0,440,437,1,0,0,0,441,444,1,0,0,0,442,440,1,0,
+        0,0,442,443,1,0,0,0,443,445,1,0,0,0,444,442,1,0,0,0,445,446,3,94,
+        47,0,446,447,5,52,0,0,447,89,1,0,0,0,448,454,5,13,0,0,449,454,5,
+        14,0,0,450,454,5,15,0,0,451,452,5,35,0,0,452,454,5,32,0,0,453,448,
+        1,0,0,0,453,449,1,0,0,0,453,450,1,0,0,0,453,451,1,0,0,0,454,91,1,
+        0,0,0,455,458,5,7,0,0,456,459,5,12,0,0,457,459,3,44,22,0,458,456,
+        1,0,0,0,458,457,1,0,0,0,459,460,1,0,0,0,460,461,5,10,0,0,461,477,
+        3,56,28,0,462,463,5,8,0,0,463,464,3,56,28,0,464,467,5,10,0,0,465,
+        468,5,12,0,0,466,468,3,44,22,0,467,465,1,0,0,0,467,466,1,0,0,0,468,
+        477,1,0,0,0,469,472,5,9,0,0,470,473,5,12,0,0,471,473,3,44,22,0,472,
+        470,1,0,0,0,472,471,1,0,0,0,473,474,1,0,0,0,474,475,5,11,0,0,475,
+        477,3,56,28,0,476,455,1,0,0,0,476,462,1,0,0,0,476,469,1,0,0,0,477,
+        93,1,0,0,0,478,482,5,31,0,0,479,482,3,56,28,0,480,482,3,96,48,0,
+        481,478,1,0,0,0,481,479,1,0,0,0,481,480,1,0,0,0,482,95,1,0,0,0,483,
+        489,5,13,0,0,484,489,5,14,0,0,485,489,5,15,0,0,486,487,5,35,0,0,
+        487,489,5,32,0,0,488,483,1,0,0,0,488,484,1,0,0,0,488,485,1,0,0,0,
+        488,486,1,0,0,0,489,97,1,0,0,0,54,101,103,112,121,126,130,133,136,
+        145,153,165,169,202,211,219,225,233,237,244,253,258,265,274,283,
+        293,298,300,307,318,322,329,335,339,345,349,358,365,375,383,386,
+        394,404,410,419,426,432,442,453,458,467,472,476,481,488
     ];
 
     private static __ATN: antlr.ATN;
@@ -3159,8 +3287,8 @@ export class Attribute_assignmentContext extends antlr.ParserRuleContext {
     public constructor(parent: antlr.ParserRuleContext | null, invokingState: number) {
         super(parent, invokingState);
     }
-    public ATTRIBUTE_NAME(): antlr.TerminalNode {
-        return this.getToken(RclParser.ATTRIBUTE_NAME, 0)!;
+    public ATTRIBUTE_NAME(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.ATTRIBUTE_NAME, 0);
     }
     public value(): ValueContext | null {
         return this.getRuleContext(0, ValueContext);
@@ -3170,6 +3298,12 @@ export class Attribute_assignmentContext extends antlr.ParserRuleContext {
     }
     public COMMA(): antlr.TerminalNode | null {
         return this.getToken(RclParser.COMMA, 0);
+    }
+    public LOWER_NAME(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.LOWER_NAME, 0);
+    }
+    public COLON(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.COLON, 0);
     }
     public override get ruleIndex(): number {
         return RclParser.RULE_attribute_assignment;
@@ -3255,9 +3389,6 @@ export class Match_caseContext extends antlr.ParserRuleContext {
     public transition_target(): Transition_targetContext {
         return this.getRuleContext(0, Transition_targetContext)!;
     }
-    public NEWLINE(): antlr.TerminalNode {
-        return this.getToken(RclParser.NEWLINE, 0)!;
-    }
     public STRING(): antlr.TerminalNode | null {
         return this.getToken(RclParser.STRING, 0);
     }
@@ -3272,6 +3403,9 @@ export class Match_caseContext extends antlr.ParserRuleContext {
     }
     public DEFAULT_CASE(): antlr.TerminalNode | null {
         return this.getToken(RclParser.DEFAULT_CASE, 0);
+    }
+    public NEWLINE(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.NEWLINE, 0);
     }
     public override get ruleIndex(): number {
         return RclParser.RULE_match_case;
@@ -3441,8 +3575,8 @@ export class Simple_transitionContext extends antlr.ParserRuleContext {
     public transition_target(): Transition_targetContext {
         return this.getRuleContext(0, Transition_targetContext)!;
     }
-    public NEWLINE(): antlr.TerminalNode {
-        return this.getToken(RclParser.NEWLINE, 0)!;
+    public NEWLINE(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.NEWLINE, 0);
     }
     public override get ruleIndex(): number {
         return RclParser.RULE_simple_transition;
@@ -4569,11 +4703,20 @@ export class Flow_resultContext extends antlr.ParserRuleContext {
     public constructor(parent: antlr.ParserRuleContext | null, invokingState: number) {
         super(parent, invokingState);
     }
-    public COLON(): antlr.TerminalNode {
-        return this.getToken(RclParser.COLON, 0)!;
+    public FLOW_END(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_END, 0);
     }
-    public LOWER_NAME(): antlr.TerminalNode {
-        return this.getToken(RclParser.LOWER_NAME, 0)!;
+    public FLOW_CANCEL(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_CANCEL, 0);
+    }
+    public FLOW_ERROR(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_ERROR, 0);
+    }
+    public COLON(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.COLON, 0);
+    }
+    public LOWER_NAME(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.LOWER_NAME, 0);
     }
     public override get ruleIndex(): number {
         return RclParser.RULE_flow_result;
@@ -4689,11 +4832,20 @@ export class Flow_terminationContext extends antlr.ParserRuleContext {
     public constructor(parent: antlr.ParserRuleContext | null, invokingState: number) {
         super(parent, invokingState);
     }
-    public COLON(): antlr.TerminalNode {
-        return this.getToken(RclParser.COLON, 0)!;
+    public FLOW_END(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_END, 0);
     }
-    public LOWER_NAME(): antlr.TerminalNode {
-        return this.getToken(RclParser.LOWER_NAME, 0)!;
+    public FLOW_CANCEL(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_CANCEL, 0);
+    }
+    public FLOW_ERROR(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.FLOW_ERROR, 0);
+    }
+    public COLON(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.COLON, 0);
+    }
+    public LOWER_NAME(): antlr.TerminalNode | null {
+        return this.getToken(RclParser.LOWER_NAME, 0);
     }
     public override get ruleIndex(): number {
         return RclParser.RULE_flow_termination;

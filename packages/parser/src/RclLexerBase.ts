@@ -2,9 +2,9 @@ import { CharStream, CommonToken, Lexer, Token } from 'antlr4ng';
 
 export abstract class RclLexerBase extends Lexer {
   // Token type constants - these will match what's generated
-  protected static readonly NEWLINE = 50;
-  protected static readonly INDENT = 51;
-  protected static readonly DEDENT = 52;
+  protected static readonly NEWLINE = 52;
+  protected static readonly INDENT = 53;
+  protected static readonly DEDENT = 54;
 
   private indentLengths: number[] = [0];
   private tokenQueue: Token[] = [];
@@ -12,103 +12,105 @@ export abstract class RclLexerBase extends Lexer {
   private pendingNewline = false;
 
   nextToken(): Token {
+    // Return queued tokens first
     if (this.tokenQueue.length > 0) {
       return this.tokenQueue.shift()!;
     }
 
     const next = super.nextToken();
 
-    // Track if we just saw a newline
+    // Handle newlines - this is where we check for indentation changes
     if (next.type === RclLexerBase.NEWLINE) {
       this.pendingNewline = true;
       this.tokenQueue.push(next);
 
-      // Look ahead to find the next significant token
-      const savedQueue = [...this.tokenQueue];
+      // Collect all tokens until we find a significant one or EOF
       const peekedTokens: Token[] = [];
-      let significantToken: Token | null = null;
+      let firstSignificantToken: Token | null = null;
 
-      // Peek ahead to find next significant token
       while (true) {
         const peeked = super.nextToken();
         peekedTokens.push(peeked);
 
-        if (peeked.type === Token.EOF || this.isSignificantToken(peeked)) {
-          if (peeked.type !== Token.EOF) {
-            significantToken = peeked;
-          }
+        if (peeked.type === Token.EOF) {
+          // EOF reached - handle it and stop
+          this.handleEOF(peeked);
+          this.pendingNewline = false;
+          return this.tokenQueue.shift()!;
+        }
+
+        // Check if this is a significant token (not whitespace, comment, newline, etc.)
+        if (this.isSignificantToken(peeked)) {
+          firstSignificantToken = peeked;
           break;
         }
       }
 
-      // Process indentation if we found a significant token
-      if (significantToken) {
-        const indentLength = significantToken.column;
-        const previousIndent = this.indentLengths[this.indentLengths.length - 1];
+      // Now we have found a significant token after the newline
+      // Check if indentation changed
+      if (firstSignificantToken) {
+        const newIndent = firstSignificantToken.column;
+        const currentIndent = this.indentLengths[this.indentLengths.length - 1];
 
-        if (indentLength > previousIndent) {
-          this.indentLengths.push(indentLength);
+        if (newIndent > currentIndent) {
+          // Increased indentation - emit INDENT
+          this.indentLengths.push(newIndent);
           this.tokenQueue.push(this.createToken(RclLexerBase.INDENT, '<indent>'));
-        } else if (indentLength < previousIndent) {
-          while (
-            this.indentLengths.length > 1 &&
-            indentLength < this.indentLengths[this.indentLengths.length - 1]
-          ) {
+        } else if (newIndent < currentIndent) {
+          // Decreased indentation - emit one or more DEDENTs
+          while (this.indentLengths.length > 1 && 
+                 this.indentLengths[this.indentLengths.length - 1] > newIndent) {
             this.indentLengths.pop();
             this.tokenQueue.push(this.createToken(RclLexerBase.DEDENT, '<dedent>'));
           }
-          // Adjust to the correct indentation level if needed
-          if (
-            this.indentLengths.length > 0 &&
-            indentLength > this.indentLengths[this.indentLengths.length - 1]
-          ) {
-            this.indentLengths.push(indentLength);
+          
+          // If the new indentation doesn't match any previous level exactly,
+          // and it's greater than the current level after popping, push it
+          if (this.indentLengths.length > 0 && 
+              newIndent > this.indentLengths[this.indentLengths.length - 1]) {
+            this.indentLengths.push(newIndent);
             this.tokenQueue.push(this.createToken(RclLexerBase.INDENT, '<indent>'));
           }
         }
+        // If newIndent === currentIndent, no change needed
       }
 
-      // Add all peeked tokens to queue
+      // Add all peeked tokens to the queue
       for (const tok of peekedTokens) {
-        if (tok.type !== Token.EOF) {
-          this.tokenQueue.push(tok);
-        } else {
-          // Handle EOF
-          this.handleEOF(tok);
-          break;
-        }
+        this.tokenQueue.push(tok);
       }
 
       this.pendingNewline = false;
       return this.tokenQueue.shift()!;
     }
 
-    // For non-newline tokens
-    if (next.type !== Token.EOF) {
-      this.tokenQueue.push(next);
-    } else {
+    // Handle EOF
+    if (next.type === Token.EOF) {
       this.handleEOF(next);
+      return this.tokenQueue.length > 0 ? this.tokenQueue.shift()! : next;
     }
 
-    // Update last significant token
+    // Track last significant token
     if (this.isSignificantToken(next)) {
       this.lastSignificantToken = next;
     }
 
-    return this.tokenQueue.length > 0 ? this.tokenQueue.shift()! : next;
+    // Return the token
+    return next;
   }
 
   private handleEOF(eofToken: Token): void {
-    // Emit a final NEWLINE if needed
+    // Emit a final NEWLINE if the last significant token wasn't followed by one
     if (this.lastSignificantToken && !this.pendingNewline) {
       this.tokenQueue.push(this.createToken(RclLexerBase.NEWLINE, '\n'));
     }
 
-    // Emit remaining DEDENT tokens
+    // Emit DEDENT tokens for all remaining indentation levels
     while (this.indentLengths.length > 1) {
       this.indentLengths.pop();
       this.tokenQueue.push(this.createToken(RclLexerBase.DEDENT, '<dedent>'));
     }
+    
     this.tokenQueue.push(eofToken);
   }
 
@@ -127,28 +129,52 @@ export abstract class RclLexerBase extends Lexer {
     return count;
   }
 
-  private createToken(type: number, text: string): Token {
-    // For now, return any valid token as a placeholder
-    // This is just for synthetic INDENT/DEDENT tokens
-    return {
-      type: type,
-      text: text,
-      line: 1,
-      column: 0,
-      tokenIndex: 0,
-      channel: Token.DEFAULT_CHANNEL,
-      start: 0,
-      stop: 0
-    } as Token;
+  private createToken(type: number, text: string, referenceToken?: Token): Token {
+    // Create a synthetic token for INDENT/DEDENT
+    const factory = this.tokenFactory;
+    
+    // Use reference token's position if provided, otherwise use current position
+    const tokenLine = referenceToken ? referenceToken.line : this.line;
+    const tokenColumn = referenceToken ? referenceToken.column : this.column;
+    const tokenCharIndex = referenceToken ? referenceToken.start : this.getCharIndex();
+    
+    const token = factory.create(
+      [this, this.inputStream],
+      type,
+      text,
+      Token.DEFAULT_CHANNEL,
+      tokenCharIndex,
+      tokenCharIndex,
+      tokenLine,
+      tokenColumn
+    );
+    return token;
   }
 
   private isSignificantToken(token: Token): boolean {
     // These token types should trigger indentation calculation
     // Skip whitespace, comments, newlines, and other structural tokens
-    const WS = 38; // from generated lexer
-    const COMMENT = 39; // from generated lexer
-    const NEWLINE = 40; // from generated lexer
+    const WS = 50; // from generated lexer - check RclLexer.ts
+    const COMMENT = 51; // from generated lexer
+    const NEWLINE = 52; // from generated lexer  
+    const INDENT = RclLexerBase.INDENT;
+    const DEDENT = RclLexerBase.DEDENT;
 
-    return token.type !== WS && token.type !== COMMENT && token.type !== NEWLINE;
+    return token.type !== WS && 
+           token.type !== COMMENT && 
+           token.type !== NEWLINE &&
+           token.type !== INDENT &&
+           token.type !== DEDENT &&
+           token.type !== Token.EOF;
+  }
+
+  protected isKeyword(text: string): boolean {
+    // List of all keywords that should not be matched as attribute names
+    const keywords = [
+      'import', 'as', 'with', 'match',
+      'start', 'on',
+      'append', 'set', 'merge', 'to', 'into', 'result'
+    ];
+    return keywords.includes(text.toLowerCase());
   }
 }

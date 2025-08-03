@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { AntlrRclParser } from '../src/parser';
+import { AntlrRclParser } from '../src/parser.js';
 
 // Helper function to parse RCL content
 async function parseRcl(input: string) {

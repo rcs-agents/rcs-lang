@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/file-system",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": false,
   "description": "File system abstraction for RCL",
   "main": "dist/index.js",

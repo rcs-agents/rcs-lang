@@ -1,0 +1,9 @@
+agent Bot1
+  flow MainFlow
+    start: Hello
+    
+    on Hello
+      -> Hello
+    
+  messages Messages
+    text Hello "Hi"

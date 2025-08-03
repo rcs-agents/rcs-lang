@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/csm",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Lightweight conversation state machine for RCS agents",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

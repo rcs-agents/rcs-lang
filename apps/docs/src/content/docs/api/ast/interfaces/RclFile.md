@@ -5,7 +5,7 @@ prev: false
 title: "RclFile"
 ---
 
-Defined in: [ast.ts:19](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L19)
+Defined in: [ast.ts:19](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L19)
 
 The root node of an RCL file.
 
@@ -23,7 +23,7 @@ RclFile ::= (ImportStatement)* (Section)*
 
 > **imports**: [`ImportStatement`](/api/ast/interfaces/importstatement/)[]
 
-Defined in: [ast.ts:21](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L21)
+Defined in: [ast.ts:21](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L21)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:21](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,7 +43,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb
 
 > **sections**: [`Section`](/api/ast/interfaces/section/)[]
 
-Defined in: [ast.ts:22](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L22)
+Defined in: [ast.ts:22](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L22)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:22](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc
 
 > **type**: `"RclFile"`
 
-Defined in: [ast.ts:20](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L20)
+Defined in: [ast.ts:20](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L20)

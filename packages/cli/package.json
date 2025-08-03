@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/cli",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "RCL command-line interface for compiling RCL files",
   "main": "dist/index.js",
   "bin": {

@@ -5,7 +5,7 @@ prev: false
 title: "Attribute"
 ---
 
-Defined in: [ast.ts:56](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L56)
+Defined in: [ast.ts:56](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L56)
 
 An attribute, which is a key-value pair within a section.
 
@@ -23,7 +23,7 @@ Attribute ::= ATTRIBUTE_KEY ':' Value
 
 > **key**: `string`
 
-Defined in: [ast.ts:58](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L58)
+Defined in: [ast.ts:58](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L58)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:58](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,7 +43,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb
 
 > **type**: `"Attribute"`
 
-Defined in: [ast.ts:57](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L57)
+Defined in: [ast.ts:57](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L57)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:57](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc
 
 > **value**: [`Value`](/api/ast/type-aliases/value/)
 
-Defined in: [ast.ts:59](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L59)
+Defined in: [ast.ts:59](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L59)

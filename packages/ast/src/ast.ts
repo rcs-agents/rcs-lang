@@ -322,28 +322,31 @@ export type ContextOperation = AppendOperation | SetOperation | MergeOperation;
 
 /**
  * An append operation.
- * @spec APPEND RESULT TO Variable
+ * @spec APPEND (RESULT | Value) TO Variable
  */
 export interface AppendOperation extends WithLocation {
   type: 'AppendOperation';
+  source: Value | 'result';
   target: Variable | PropertyAccess;
 }
 
 /**
  * A set operation.
- * @spec SET Variable TO RESULT
+ * @spec SET Variable TO (RESULT | Value)
  */
 export interface SetOperation extends WithLocation {
   type: 'SetOperation';
+  source: Value | 'result';
   target: Variable | PropertyAccess;
 }
 
 /**
  * A merge operation.
- * @spec MERGE RESULT INTO Variable
+ * @spec MERGE (RESULT | Value) INTO Variable
  */
 export interface MergeOperation extends WithLocation {
   type: 'MergeOperation';
+  source: Value | 'result';
   target: Variable | PropertyAccess;
 }
 

@@ -4,7 +4,11 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "types": [],
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "paths": {
+      "@parser/*": ["./src/*"],
+      "@parser/generated/*": ["./src/generated/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts", "tests/**/*"]

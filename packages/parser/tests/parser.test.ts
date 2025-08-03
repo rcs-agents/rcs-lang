@@ -2,9 +2,9 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CharStream, CommonTokenStream } from 'antlr4ng';
 import { describe, expect, test } from 'bun:test';
-import { RclLexer } from '../src/generated/RclLexer';
-import { RclParser } from '../src/generated/RclParser';
-import { ASTVisitor } from '../src/ast-visitor';
+import { RclLexer } from '../src/generated/RclLexer.js';
+import { RclParser } from '../src/generated/RclParser.js';
+import { ASTVisitor } from '../src/ast-visitor.js';
 
 describe('RCL ANTLR Parser', () => {
   test('should parse a simple RCL file correctly', () => {
@@ -51,7 +51,7 @@ describe('RCL ANTLR Parser', () => {
   });
 
   test('should parse the coffee-shop.rcl example and produce expected AST structure', () => {
-    const coffeeShopPath = resolve(__dirname, '../../..', 'examples', 'coffee-shop.rcl');
+    const coffeeShopPath = resolve(__dirname, 'fixtures', 'coffee-shop.rcl');
     const source = readFileSync(coffeeShopPath, 'utf-8');
 
     const inputStream = CharStream.fromString(source);
@@ -86,7 +86,7 @@ describe('RCL ANTLR Parser', () => {
     const agentSection = ast.sections[0];
     expect(agentSection.type).toBe('Section');
     expect(agentSection.sectionType).toBe('agent');
-    expect(agentSection.identifier?.value).toBe('CoffeeShop');
+    expect(agentSection.identifier?.value).toBe('Coffee Shop');
     
     // Check displayName attribute
     const displayNameAttr = agentSection.body.find((item: any) => 
@@ -112,7 +112,7 @@ describe('RCL ANTLR Parser', () => {
       item.type === 'Section' && item.sectionType === 'flow'
     );
     expect(flowSection).toBeDefined();
-    expect(flowSection.identifier?.value).toBe('OrderFlow');
+    expect(flowSection.identifier?.value).toBe('Order Flow');
 
     // Check messages section (nested in agent)
     const messagesSection = agentSection.body.find((item: any) => 

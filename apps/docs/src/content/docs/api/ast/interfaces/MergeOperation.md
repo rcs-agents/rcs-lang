@@ -5,13 +5,13 @@ prev: false
 title: "MergeOperation"
 ---
 
-Defined in: [ast.ts:345](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L345)
+Defined in: [ast.ts:347](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L347)
 
 A merge operation.
 
 ## Spec
 
-MERGE RESULT INTO Variable
+MERGE (RESULT | Value) INTO Variable
 
 ## Extends
 
@@ -23,7 +23,7 @@ MERGE RESULT INTO Variable
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,11 +31,19 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb
 
 ***
 
+### source
+
+> **source**: [`Value`](/api/ast/type-aliases/value/) \| `"result"`
+
+Defined in: [ast.ts:349](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L349)
+
+***
+
 ### target
 
 > **target**: [`Variable`](/api/ast/interfaces/variable/) \| [`PropertyAccess`](/api/ast/interfaces/propertyaccess/)
 
-Defined in: [ast.ts:347](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L347)
+Defined in: [ast.ts:350](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L350)
 
 ***
 
@@ -43,4 +51,4 @@ Defined in: [ast.ts:347](https://github.com/rcs-agents/rcs-lang/blob/89258eb41db
 
 > **type**: `"MergeOperation"`
 
-Defined in: [ast.ts:346](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L346)
+Defined in: [ast.ts:348](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L348)

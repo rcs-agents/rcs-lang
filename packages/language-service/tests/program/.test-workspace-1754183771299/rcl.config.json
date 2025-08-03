@@ -1,0 +1,10 @@
+{
+  "outDir": "./dist",
+  "compilerOptions": {
+    "emit": {
+      "json": true,
+      "javascript": true,
+      "declarations": true
+    }
+  }
+}

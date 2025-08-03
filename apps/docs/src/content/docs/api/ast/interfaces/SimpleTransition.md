@@ -5,7 +5,7 @@ prev: false
 title: "SimpleTransition"
 ---
 
-Defined in: [ast.ts:379](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L379)
+Defined in: [ast.ts:382](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L382)
 
 A simple transition (arrow without match).
 
@@ -23,7 +23,7 @@ SimpleTransition ::= ARROW TransitionTarget
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb
 
 > **target**: [`FlowInvocation`](/api/ast/interfaces/flowinvocation/) \| [`ContextualizedValue`](/api/ast/interfaces/contextualizedvalue/) \| [`FlowTermination`](/api/ast/interfaces/flowtermination/) \| [`ContextOperationSequence`](/api/ast/interfaces/contextoperationsequence/)
 
-Defined in: [ast.ts:381](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L381)
+Defined in: [ast.ts:384](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L384)
 
 ***
 
@@ -43,4 +43,4 @@ Defined in: [ast.ts:381](https://github.com/rcs-agents/rcs-lang/blob/89258eb41db
 
 > **type**: `"SimpleTransition"`
 
-Defined in: [ast.ts:380](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L380)
+Defined in: [ast.ts:383](https://github.com/rcs-agents/rcs-lang/blob/87d9b510946a70cf66b4d271e76c67f8499b8d1d/packages/ast/src/ast.ts#L383)
