@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/language-service",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Advanced language service providers for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,9 @@
     "typescript": "^5.0.0",
     "vitest": "^3.2.4"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

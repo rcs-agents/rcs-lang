@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "RCL command-line interface for compiling RCL files",
   "main": "dist/index.js",
   "bin": {
@@ -10,7 +10,10 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "type": "module",
-  "files": ["dist", "demo.js"],
+  "files": [
+    "dist",
+    "demo.js"
+  ],
   "scripts": {
     "build": "moon run cli:build",
     "dev": "moon run cli:dev",
