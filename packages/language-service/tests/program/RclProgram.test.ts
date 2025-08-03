@@ -263,8 +263,8 @@ describe('RclProgram', () => {
       const diagnostics = program.getDiagnostics();
       expect(diagnostics.length).toBeGreaterThanOrEqual(2);
 
-      const semanticDiagnostics = program.getSemanticDiagnostics();
-      const syntacticDiagnostics = program.getSyntacticDiagnostics();
+      const _semanticDiagnostics = program.getSemanticDiagnostics();
+      const _syntacticDiagnostics = program.getSyntacticDiagnostics();
 
       // At least one file should have diagnostics
       expect(diagnostics.length).toBeGreaterThan(0);
