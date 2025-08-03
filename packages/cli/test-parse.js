@@ -69,7 +69,7 @@ Module.prototype.require = function (id) {
       },
     };
   }
-  return originalRequire.apply(this, arguments);
+  return originalRequire.apply(this, [...arguments]);
 };
 
 // Test the parse function

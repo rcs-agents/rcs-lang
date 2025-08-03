@@ -51,7 +51,8 @@
         "noBannedTypes": "warn",
         "noUselessConstructor": "error",
         "useOptionalChain": "error",
-        "noForEach": "warn"
+        "noForEach": "warn",
+        "noStaticOnlyClass": "warn"
       },
       "correctness": {
         "noUnusedVariables": "warn",
@@ -61,7 +62,8 @@
       "style": {
         "noNonNullAssertion": "warn",
         "useConst": "error",
-        "useTemplate": "error"
+        "useTemplate": "error",
+        "noArguments": "warn"
       },
       "suspicious": {
         "noExplicitAny": "warn",
