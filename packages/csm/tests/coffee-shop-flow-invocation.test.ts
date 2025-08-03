@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { ConversationalAgent } from '../src/conversational-agent';
-import type { MachineDefinitionJSON } from '../src/machine-definition';
-import type { StateChangeEvent } from '../src/types';
+import { ConversationalAgent } from '../src/conversational-agent.js';
+import type { MachineDefinitionJSON } from '../src/machine-definition.js';
+import type { StateChangeEvent } from '../src/types.js';
 
 describe('Coffee Shop Flow Invocation Integration', () => {
   let agent: ConversationalAgent;

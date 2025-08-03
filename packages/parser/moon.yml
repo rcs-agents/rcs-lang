@@ -45,7 +45,21 @@ tasks:
     deps:
       - build-grammar
 
-  fix-js-imports:
+  build:
+    command: tsc
+    deps:
+      - '@rcs-lang/ast:build'
+      - '@rcs-lang/core:build'
+      - fix-imports
+    inputs:
+      - 'src/**/*.g4'
+      - 'src/**/*.ts'
+      - 'tsconfig.json'
+      - 'package.json'
+    outputs:
+      - 'dist'
+      
+  postbuild:
     command: bash
     args:
       - -c
@@ -63,27 +77,6 @@ tasks:
         fi
     deps:
       - build
-      
-  build:
-    command: tsc
-    deps:
-      - '@rcs-lang/ast:build'
-      - '@rcs-lang/core:build'
-      - fix-imports
-    inputs:
-      - 'src/**/*.g4'
-      - 'src/**/*.ts'
-      - 'tsconfig.json'
-      - 'package.json'
-    outputs:
-      - 'dist'
-    
-  postbuild:
-    command: echo
-    args: ["Build complete"]
-    deps:
-      - build
-      - fix-js-imports
 
   test:
     command: bun

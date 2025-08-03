@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { parseRCL } from '../src/compiler';
+import { parseRCL } from '../src/compiler.js';
 
 describe('Parse Command', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');

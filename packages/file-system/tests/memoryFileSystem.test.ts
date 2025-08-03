@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { MemoryFileSystem } from '../src/memoryFileSystem';
+import { MemoryFileSystem } from '../src/memoryFileSystem.js';
 
 describe('MemoryFileSystem', () => {
   let fs: MemoryFileSystem;

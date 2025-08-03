@@ -1,10 +1,10 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import { FlowCompiler } from './compilers/flowCompiler';
-import { AgentExtractor } from './extractors/agentExtractor';
-import { OutputGenerator } from './generators/outputGenerator';
-import { MessageNormalizer } from './normalizers/messageNormalizer';
-import { RCLParser } from './utils/parserWrapper';
+import { FlowCompiler } from './compilers/flowCompiler.js';
+import { AgentExtractor } from './extractors/agentExtractor.js';
+import { OutputGenerator } from './generators/outputGenerator.js';
+import { MessageNormalizer } from './normalizers/messageNormalizer.js';
+import { RCLParser } from './utils/parserWrapper.js';
 
 export interface CompileOptions {
   output?: string;

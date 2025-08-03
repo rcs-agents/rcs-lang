@@ -6,7 +6,7 @@ import {
   TransformStage,
   ValidateStage,
 } from '@rcs-lang/compiler';
-import type { AgentData, CompiledAgent, Diagnostic } from '../program/types';
+import type { AgentData, CompiledAgent, Diagnostic } from '../program/types.js';
 
 /**
  * Compiles an RCL AST into the output format

@@ -20,7 +20,7 @@ import {
 import { AntlrAdapter } from './adapter.js';
 import { RclLexer } from './generated/RclLexer.js';
 import { RclParser } from './generated/RclParser.js';
-// import { wrapAST } from './ast-wrapper'; // No longer needed
+// import { wrapAST } from './ast-wrapper.js'; // No longer needed
 
 /**
  * Custom error listener to collect syntax errors

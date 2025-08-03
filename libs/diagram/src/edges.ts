@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom';
 import { SEdgeImpl, SRoutingHandleImpl } from 'sprotty';
 import type { Point } from 'sprotty-protocol';
-import type { RCLEdge } from './types';
+import type { RCLEdge } from './types.js';
 
 export interface EdgeRouting {
   type: 'smooth' | 'orthogonal';

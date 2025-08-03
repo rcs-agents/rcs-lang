@@ -1,8 +1,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getOutputPath, loadConfig } from '../../src/config/loader';
-import type { RclConfig } from '../../src/config/types';
+import { getOutputPath, loadConfig } from '../../src/config/loader.js';
+import type { RclConfig } from '../../src/config/types.js';
 
 describe('Config Loader', () => {
   const testDir = path.join(__dirname, `.test-workspace-${Date.now()}`);

@@ -3,10 +3,10 @@ import os from 'node:os';
 import path from 'node:path';
 import type { IParser } from '@rcs-lang/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ImportResolver } from '../src/import-resolver/ImportResolver';
-import { Reference, ReferencesProvider } from '../src/providers/ReferencesProvider';
-import type { Position, TextDocument } from '../src/providers/types';
-import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex';
+import { ImportResolver } from '../src/import-resolver/ImportResolver.js';
+import { Reference, ReferencesProvider } from '../src/providers/ReferencesProvider.js';
+import type { Position, TextDocument } from '../src/providers/types.js';
+import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex.js';
 
 // Mock TextDocument implementation
 class MockTextDocument implements TextDocument {

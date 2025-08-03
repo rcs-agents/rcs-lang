@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
-import { FlowMachine } from '../src/flow-machine';
-import type { MachineDefinitionJSON } from '../src/machine-definition';
+import { FlowMachine } from '../src/flow-machine.js';
+import type { MachineDefinitionJSON } from '../src/machine-definition.js';
 
 describe('JSON Logic Conditions', () => {
   test('should support legacy string conditions (with deprecation warning)', () => {

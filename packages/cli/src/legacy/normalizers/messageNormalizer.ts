@@ -1,4 +1,4 @@
-import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper';
+import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper.js';
 
 export interface AgentMessage {
   contentMessage: AgentContentMessage;

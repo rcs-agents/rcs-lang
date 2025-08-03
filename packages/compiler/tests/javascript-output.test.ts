@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { RCLCompiler } from '../src/compiler';
+import { RCLCompiler } from '../src/compiler.js';
 
 describe('JavaScript Output Generation', () => {
   test('should generate valid JavaScript from RCL', async () => {

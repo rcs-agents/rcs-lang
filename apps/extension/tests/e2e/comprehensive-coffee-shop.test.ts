@@ -1,8 +1,8 @@
 import * as path from 'node:path';
 import { browser } from '@wdio/globals';
 import { expect } from 'chai';
-import { TestClient } from '../utils/testHelpers';
-import { WebviewHelpers } from '../utils/webviewHelpers';
+import { TestClient } from '../utils/testHelpers.js';
+import { WebviewHelpers } from '../utils/webviewHelpers.js';
 
 describe('Coffee Shop Example - Comprehensive Tests', () => {
   let client: TestClient;

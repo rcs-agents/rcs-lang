@@ -4,7 +4,7 @@
  */
 
 import jsonLogic from 'json-logic-js';
-import type { MachineDefinitionJSON } from './machine-definition';
+import type { MachineDefinitionJSON } from './machine-definition.js';
 import type {
   Context,
   FlowDefinition,
@@ -12,7 +12,7 @@ import type {
   ProcessResult,
   StateDefinition,
   Transition,
-} from './types';
+} from './types.js';
 
 /**
  * Result of a transition attempt within a flow.

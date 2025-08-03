@@ -1,6 +1,6 @@
 import { browser } from '@wdio/globals';
 import { expect } from 'chai';
-import * as webviewHelpers from '../../utils/webviewHelpers';
+import * as webviewHelpers from '../../utils/webviewHelpers.js';
 
 describe('Interactive Diagram Basic Features', () => {
   let workbench: any;
