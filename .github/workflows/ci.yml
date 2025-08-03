@@ -41,14 +41,15 @@ jobs:
       - name: Build packages
         run: moon run :build
         
-      - name: Ensure parser is built
+      - name: Ensure parser is properly built
         run: |
           cd packages/parser
-          if [ ! -d dist ]; then
-            echo "Parser dist directory missing, building..."
-            bun run tsc
-          fi
-          ls -la dist/ | head -10
+          echo "Force rebuilding parser to ensure imports are fixed..."
+          rm -rf dist
+          bun run tsc
+          moon run parser:fix-js-imports
+          echo "Checking RclLexer.js imports:"
+          grep "import.*from" dist/generated/RclLexer.js | head -5
         
       - name: Run all tests
         run: moon run :test
