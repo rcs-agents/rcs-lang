@@ -1,4 +1,4 @@
-import type { ExportedSymbol } from '../import-resolver/types';
+import type { ExportedSymbol } from '../import-resolver/types.js';
 
 /**
  * Represents a symbol location in the workspace

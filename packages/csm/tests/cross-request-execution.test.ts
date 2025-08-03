@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, test, beforeEach } from 'bun:test';
-import { ConversationalAgent } from '../src/conversational-agent';
-import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition';
-import type { StateChangeEvent } from '../src/types';
+import { ConversationalAgent } from '../src/conversational-agent.js';
+import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition.js';
+import type { StateChangeEvent } from '../src/types.js';
 
 describe('Cross-Request Execution and State Restoration', () => {
   let coffeeShopMachine: MachineDefinitionJSON;

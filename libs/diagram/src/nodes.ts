@@ -1,5 +1,5 @@
 import { FeatureSet, SNodeImpl, type SRoutableElementImpl } from 'sprotty';
-import { type Point, RCLNode } from './types';
+import { type Point, RCLNode } from './types.js';
 
 export interface NodeConnectionPoints {
   top: Point;

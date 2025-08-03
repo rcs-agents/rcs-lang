@@ -2,9 +2,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { ensureOldAST } from '../ast-adapter';
-import type { ASTNode } from '../ast-compatibility';
-import type { Diagnostic } from '../program/types';
+import { ensureOldAST } from '../ast-adapter.js';
+import type { ASTNode } from '../ast-compatibility.js';
+import type { Diagnostic } from '../program/types.js';
 
 export interface SemanticValidationResult {
   diagnostics: Diagnostic[];

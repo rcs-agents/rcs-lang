@@ -1,10 +1,10 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { parse } from '@rcs-lang/parser';
-import { Compiler } from '../compiler/compiler';
-import { Emitter } from '../compiler/emitter';
-import { loadConfig } from '../config/loader';
-import type { RclConfig } from '../config/types';
+import { Compiler } from '../compiler/compiler.js';
+import { Emitter } from '../compiler/emitter.js';
+import { loadConfig } from '../config/loader.js';
+import type { RclConfig } from '../config/types.js';
 import type {
   CompilationResult,
   Diagnostic,

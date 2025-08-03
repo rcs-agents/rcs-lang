@@ -1,4 +1,4 @@
-import type { RCLFlowModel, RCLNode } from './types';
+import type { RCLFlowModel, RCLNode } from './types.js';
 
 export class LayoutEngine {
   constructor(private nodeSpacing: { x: number; y: number }) {}

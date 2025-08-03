@@ -92,7 +92,7 @@ parameter:
     ;
 
 value:
-    primitive_value
+    primitive_value  // Invalid!
     | IDENTIFIER
     | variable_access
     | parentheses_list

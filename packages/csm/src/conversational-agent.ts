@@ -3,9 +3,9 @@
  * Main orchestrator for managing multiple conversation flows.
  */
 
-import { FlowMachine, type TransitionResult } from './flow-machine';
-import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON, MultiFlowMachineDefinitionJSON } from './machine-definition';
-import { isMultiFlowMachine } from './machine-definition';
+import { FlowMachine, type TransitionResult } from './flow-machine.js';
+import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON, MultiFlowMachineDefinitionJSON } from './machine-definition.js';
+import { isMultiFlowMachine } from './machine-definition.js';
 import type {
   AgentOptions,
   Context,
@@ -16,7 +16,7 @@ import type {
   StateChangeEvent,
   StateChangeTrigger,
   Transition,
-} from './types';
+} from './types.js';
 import {
   type FlowExecutionState,
   type FlowStackFrame,
@@ -28,7 +28,7 @@ import {
   deserializeFlowExecutionState,
   createFlowSuccess,
   createFlowError,
-} from './flow-execution';
+} from './flow-execution.js';
 
 /**
  * Main class for managing conversational state across multiple flows.

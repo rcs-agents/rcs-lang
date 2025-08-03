@@ -2,8 +2,8 @@ import type Parser from 'tree-sitter';
 import type { Location, TextEdit, WorkspaceEdit } from 'vscode-languageserver';
 import type { Position, Range, TextDocument } from 'vscode-languageserver-textdocument';
 import { URI } from 'vscode-uri';
-import type { ImportResolver } from '../import-resolver';
-import type { WorkspaceIndex } from '../workspace-index';
+import type { ImportResolver } from '../import-resolver/index.js';
+import type { WorkspaceIndex } from '../workspace-index/index.js';
 import type { DefinitionProvider } from './DefinitionProvider.js';
 import type { ReferencesProvider } from './ReferencesProvider.js';
 

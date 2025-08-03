@@ -9,7 +9,7 @@
  */
 
 import { describe, test, expect, beforeEach } from 'bun:test';
-import type { MachineDefinitionJSON } from '../src/machine-definition';
+import type { MachineDefinitionJSON } from '../src/machine-definition.js';
 
 // Extended transition interface supporting sub-flow calls
 interface SubFlowTransition {

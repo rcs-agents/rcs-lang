@@ -1,5 +1,5 @@
 import { VNode, h } from 'snabbdom';
-import type { NodePropertyDefinition, PropertyFormData, RCLNode } from './types';
+import type { NodePropertyDefinition, PropertyFormData, RCLNode } from './types.js';
 
 export class PropertyEditor {
   private node: RCLNode;

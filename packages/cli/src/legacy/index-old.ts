@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import { version } from '../package.json';
-import { compileRCL } from './compiler';
+import { compileRCL } from './compiler.js';
 
 const program = new Command();
 

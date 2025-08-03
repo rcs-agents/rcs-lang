@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition';
+import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition.js';
 
 describe('Flow Control Extensions', () => {
   let validFlowControlMachine: MachineDefinitionJSON;

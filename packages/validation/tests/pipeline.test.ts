@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
-import { ValidationPipeline } from '../src/pipeline';
-import { SemanticValidator } from '../src/validators/semanticValidator';
-import { SyntaxValidator } from '../src/validators/syntaxValidator';
+import { ValidationPipeline } from '../src/pipeline.js';
+import { SemanticValidator } from '../src/validators/semanticValidator.js';
+import { SyntaxValidator } from '../src/validators/syntaxValidator.js';
 
 describe('Validation Pipeline', () => {
   test('should add and execute validators', async () => {

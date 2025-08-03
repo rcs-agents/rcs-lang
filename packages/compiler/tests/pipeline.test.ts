@@ -1,7 +1,7 @@
 import type { ICompilationStage, ICompiler } from '@rcs-lang/core';
 import { err, ok } from '@rcs-lang/core';
 import { describe, expect, test } from 'bun:test';
-import { CompilationPipeline } from '../src/pipeline';
+import { CompilationPipeline } from '../src/pipeline.js';
 
 describe('CompilationPipeline', () => {
   // Mock stage that transforms data

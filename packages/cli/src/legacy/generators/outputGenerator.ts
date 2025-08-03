@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import type { CompileOptions, CompiledOutput } from '../compiler';
+import type { CompileOptions, CompiledOutput } from '../compiler.js';
 
 export class OutputGenerator {
   async generate(

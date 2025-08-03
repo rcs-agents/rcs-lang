@@ -2,8 +2,8 @@ import { injectable } from 'inversify';
 import { type VNode, h } from 'snabbdom';
 import type { IView, RenderingContext, SEdgeImpl, SNodeImpl, SRoutingHandleImpl } from 'sprotty';
 import type { Point } from 'sprotty-protocol';
-import { edgeLayoutManager } from './edges';
-import { MatchBlockNode, MatchOptionNode, type RCLNodeImpl } from './nodes';
+import { edgeLayoutManager } from './edges.js';
+import { MatchBlockNode, MatchOptionNode, type RCLNodeImpl } from './nodes.js';
 
 @injectable()
 export class RCLNodeView implements IView {

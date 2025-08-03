@@ -1,6 +1,6 @@
 import type { RCLDocument, RCLParser, RCLSettings } from '@rcs-lang/parser';
 import type { Diagnostic } from 'vscode-languageserver/node';
-import type { SyntaxValidator } from '../syntaxValidator';
+import type { SyntaxValidator } from '../syntaxValidator.js';
 
 export class DiagnosticsProvider {
   constructor(

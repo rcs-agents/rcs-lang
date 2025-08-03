@@ -1,6 +1,6 @@
-import { vi } from './test-utils';
+import { vi } from './test-utils.js';
 import { describe, expect, test } from 'bun:test';
-import { ConversationalAgent, type FlowDefinition } from '../src';
+import { ConversationalAgent, type FlowDefinition } from '../src/index.js';
 
 describe('ConversationalAgent', () => {
   const createTestFlow = (): FlowDefinition => ({

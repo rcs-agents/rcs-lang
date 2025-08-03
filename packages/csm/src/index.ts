@@ -37,8 +37,8 @@
  */
 
 // Core classes
-export { ConversationalAgent } from './conversational-agent';
-export { FlowMachine, type TransitionResult } from './flow-machine';
+export { ConversationalAgent } from './conversational-agent.js';
+export { FlowMachine, type TransitionResult } from './flow-machine.js';
 
 // Machine definition format
 export {
@@ -47,7 +47,7 @@ export {
   type StateDefinitionJSON,
   type TransitionJSON,
   type AgentDefinitionJSON,
-} from './machine-definition';
+} from './machine-definition.js';
 
 // Sub-flow support
 export { 
@@ -58,7 +58,7 @@ export {
   type SubFlowMachineDefinition,
   type SubFlowTransition,
   type SubFlowResult
-} from './subflow-manager';
+} from './subflow-manager.js';
 
 // Types
 export type {
@@ -80,7 +80,7 @@ export type {
   // Internal types
   SerializedAgentState,
   MachineState,
-} from './types';
+} from './types.js';
 
 // Version for compatibility checking
 export const VERSION = '0.1.0';

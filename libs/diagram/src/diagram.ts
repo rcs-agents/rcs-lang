@@ -22,13 +22,13 @@ import {
   loadDefaultModules,
 } from 'sprotty';
 import type { Action } from 'sprotty-protocol';
-import { RCLCodeGenerator } from './codeGenerator';
-import { type EdgeLayoutInfo, edgeLayoutManager } from './edges';
-import { LayoutEngine } from './layout';
-import { ConnectionValidator, MatchBlockNode, NodeFactory, RCLNodeImpl } from './nodes';
-import { PropertyManager } from './properties';
-import type { DiagramConfig, DiagramState, PropertyFormData, RCLFlowModel } from './types';
-import { RCLEdgeView, RCLNodeView, RCLRoutingHandleView } from './views';
+import { RCLCodeGenerator } from './codeGenerator.js';
+import { type EdgeLayoutInfo, edgeLayoutManager } from './edges.js';
+import { LayoutEngine } from './layout.js';
+import { ConnectionValidator, MatchBlockNode, NodeFactory, RCLNodeImpl } from './nodes.js';
+import { PropertyManager } from './properties.js';
+import type { DiagramConfig, DiagramState, PropertyFormData, RCLFlowModel } from './types.js';
+import { RCLEdgeView, RCLNodeView, RCLRoutingHandleView } from './views.js';
 
 export class RCLDiagramEngine {
   private container: Container;

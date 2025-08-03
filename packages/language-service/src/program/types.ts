@@ -1,4 +1,4 @@
-import type { RclConfig } from '../config/types';
+import type { RclConfig } from '../config/types.js';
 
 /**
  * Represents a diagnostic message (error, warning, etc.)

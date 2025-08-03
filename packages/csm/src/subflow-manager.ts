@@ -3,9 +3,9 @@
  * Implementation of sub-flow execution with return types and aggregation strategies.
  */
 
-import { ConversationalAgent } from './conversational-agent';
-import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON } from './machine-definition';
-import type { Context, StateChangeEvent } from './types';
+import { ConversationalAgent } from './conversational-agent.js';
+import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON } from './machine-definition.js';
+import type { Context, StateChangeEvent } from './types.js';
 
 /**
  * Configuration for sub-flow execution.

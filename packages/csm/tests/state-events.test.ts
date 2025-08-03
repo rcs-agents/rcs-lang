@@ -1,6 +1,6 @@
-import { vi } from './test-utils';
+import { vi } from './test-utils.js';
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { ConversationalAgent, type MachineDefinitionJSON, type StateChangeEvent } from '../src';
+import { ConversationalAgent, type MachineDefinitionJSON, type StateChangeEvent } from '../src/index.js';
 
 describe('State Change Events', () => {
   let events: StateChangeEvent[];
