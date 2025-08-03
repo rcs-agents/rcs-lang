@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import { assert } from 'chai';
 import * as vscode from 'vscode';
 
@@ -61,10 +61,10 @@ suite('Diagnostics Output Integration Tests', () => {
     const outputChannels = (vscode.window as any).outputChannels || [];
 
     // Look for RCL-related output channels
-    let rclOutputFound = false;
+    let _rclOutputFound = false;
     for (const channel of outputChannels) {
-      if (channel.name && channel.name.toLowerCase().includes('rcl')) {
-        rclOutputFound = true;
+      if (channel.name?.toLowerCase().includes('rcl')) {
+        _rclOutputFound = true;
         console.log(`Found RCL output channel: ${channel.name}`);
         break;
       }

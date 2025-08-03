@@ -1,5 +1,5 @@
-import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, test } from 'bun:test';
+import { RCLCompiler } from '@rcs-lang/compiler';
 
 describe('Parser Error Handling', () => {
   const compiler = new RCLCompiler();
@@ -132,7 +132,7 @@ agent TestAgent
       expect(result.diagnostics.length).toBeGreaterThan(0);
 
       // Should have error codes
-      const hasErrorCodes = result.diagnostics.some((error) => error.code !== undefined);
+      const _hasErrorCodes = result.diagnostics.some((error) => error.code !== undefined);
       // Note: Not all diagnostics have codes yet, this is a known limitation
       // For now, we just check that the diagnostic structure is correct
       result.diagnostics.forEach((error) => {

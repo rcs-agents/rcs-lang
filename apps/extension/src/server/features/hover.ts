@@ -3,7 +3,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { type Hover, MarkupKind, type Position } from 'vscode-languageserver/node';
 
 export class HoverProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   public async getHover(document: TextDocument, position: Position): Promise<Hover | null> {
     const line = document.getText({

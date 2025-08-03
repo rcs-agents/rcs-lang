@@ -6,7 +6,7 @@ export class DiagnosticsProvider {
   constructor(
     private parser: RCLParser,
     private syntaxValidator: SyntaxValidator,
-  ) { }
+  ) {}
 
   public async getDiagnostics(
     document: RCLDocument,

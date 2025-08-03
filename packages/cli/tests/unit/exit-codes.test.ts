@@ -1,7 +1,7 @@
-import { exec } from 'child_process';
-import * as path from 'path';
-import { promisify } from 'util';
 import { describe, expect, test } from 'bun:test';
+import { exec } from 'node:child_process';
+import * as path from 'node:path';
+import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 
@@ -52,7 +52,7 @@ describe.skip('CLI Exit Code Validation', () => {
       const invalidContent = 'completely invalid rcl content that makes no sense';
 
       try {
-        const result = await execAsync(
+        const _result = await execAsync(
           `echo "${invalidContent}" | bun ${cliPath} compile /dev/stdin`,
         );
         throw new Error('CLI should have failed with non-zero exit code');
@@ -74,7 +74,7 @@ messages Messages
 `;
 
       try {
-        const result = await execAsync(
+        const _result = await execAsync(
           `echo "${noAgentContent}" | bun ${cliPath} compile /dev/stdin`,
         );
         throw new Error('CLI should have failed with non-zero exit code');
@@ -116,7 +116,7 @@ agent IncompleteAgent
 `;
 
       try {
-        const result = await execAsync(
+        const _result = await execAsync(
           `echo "${missingRequiredContent}" | bun ${cliPath} compile /dev/stdin`,
         );
         throw new Error('CLI should have failed with non-zero exit code');
@@ -156,7 +156,7 @@ agent IncompleteAgent
           // Clean up - restore permissions and delete
           await execAsync(`chmod 644 ${testFile} && rm -f ${testFile}`).catch(() => {});
         }
-      } catch (setupError) {
+      } catch (_setupError) {
         // Skip this test if we can't set up the permission scenario
         console.warn('Skipping permission test due to setup limitations');
       }

@@ -83,9 +83,9 @@ export class SignatureHelpProvider {
       const nextLine =
         position.line + 1 < document.lineCount
           ? document.getText({
-            start: { line: position.line + 1, character: 0 },
-            end: { line: position.line + 1, character: 100 },
-          })
+              start: { line: position.line + 1, character: 0 },
+              end: { line: position.line + 1, character: 100 },
+            })
           : '';
 
       if (

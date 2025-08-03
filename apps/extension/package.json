@@ -16,30 +16,15 @@
   "engines": {
     "vscode": "^1.89.0"
   },
-  "categories": [
-    "Programming Languages",
-    "Snippets",
-    "Linters"
-  ],
-  "keywords": [
-    "rcl",
-    "rich communication language",
-    "rcs",
-    "chatbot",
-    "language server"
-  ],
+  "categories": ["Programming Languages", "Snippets", "Linters"],
+  "keywords": ["rcl", "rich communication language", "rcs", "chatbot", "language server"],
   "main": "./dist/client/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "rcl",
-        "aliases": [
-          "RCL",
-          "Rich Communication Language"
-        ],
-        "extensions": [
-          ".rcl"
-        ],
+        "aliases": ["RCL", "Rich Communication Language"],
+        "extensions": [".rcl"],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -174,11 +159,7 @@
         "rcl.trace.server": {
           "scope": "window",
           "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
+          "enum": ["off", "messages", "verbose"],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
         }

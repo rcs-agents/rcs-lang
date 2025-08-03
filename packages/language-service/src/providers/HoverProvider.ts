@@ -476,7 +476,7 @@ export class HoverProvider {
   /**
    * Create hover content for property definitions
    */
-  private createPropertyHover(definition: BaseNode): string {
+  private createPropertyHover(_definition: BaseNode): string {
     let content = '';
 
     // For properties in the current AST structure, we need to extract value info

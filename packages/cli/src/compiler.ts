@@ -194,7 +194,9 @@ async function emitOutput(
     const writeResult = await fileSystem.writeFile(jsPath, jsContent);
 
     if (!writeResult.success) {
-      const error = new Error(`Failed to write JavaScript output: ${(writeResult as any).error.message}`);
+      const error = new Error(
+        `Failed to write JavaScript output: ${(writeResult as any).error.message}`,
+      );
       (error as any).code = 'OUTPUT_ERROR';
       throw error;
     }
@@ -344,7 +346,8 @@ export async function parseRCL(
 function filterFields(obj: any, fields: string[], mode: 'exclude' | 'only'): any {
   if (Array.isArray(obj)) {
     return obj.map((item) => filterFields(item, fields, mode));
-  } else if (obj !== null && typeof obj === 'object') {
+  }
+  if (obj !== null && typeof obj === 'object') {
     const filtered: any = {};
 
     // Essential structural fields that should always be preserved

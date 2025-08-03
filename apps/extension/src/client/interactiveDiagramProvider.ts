@@ -298,7 +298,7 @@ export class InteractiveDiagramProvider {
 
       const layoutedNodes = this._layoutFlowNodes(flow, compiledData.messages);
 
-      console.log(`📐 InteractiveDiagram: Layouted nodes:`, {
+      console.log('📐 InteractiveDiagram: Layouted nodes:', {
         count: layoutedNodes.length,
         nodeIds: layoutedNodes.map((n) => n.id),
       });
@@ -824,13 +824,19 @@ export class InteractiveDiagramProvider {
   private _getHtmlForWebview(webview: vscode.Webview): string {
     // Get URIs for resources
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css'),
+      ),
     );
     const sprottyStyleUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'sprotty-diagram.css')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'sprotty-diagram.css'),
+      ),
     );
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.js')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.js'),
+      ),
     );
 
     // Get version info

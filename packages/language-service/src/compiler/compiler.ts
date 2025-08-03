@@ -1,3 +1,4 @@
+import type * as AST from '@rcs-lang/ast';
 import {
   CompilationPipeline,
   ParseStage,
@@ -5,7 +6,6 @@ import {
   TransformStage,
   ValidateStage,
 } from '@rcs-lang/compiler';
-import type * as AST from '@rcs-lang/ast';
 import type { AgentData, CompiledAgent, Diagnostic } from '../program/types';
 
 /**
@@ -18,7 +18,7 @@ export class Compiler {
    * Compile an AST into agent data
    */
   async compile(
-    ast: AST.RclFile | any,
+    _ast: AST.RclFile | any,
     sourceContent: string,
     fileName?: string,
   ): Promise<CompiledAgent | null> {
@@ -47,9 +47,9 @@ export class Compiler {
       if (!result.value.success) {
         // Add validation diagnostics
         if (result.value.diagnostics) {
-          result.value.diagnostics.forEach((diag) => {
+          for (const diag of result.value.diagnostics) {
             this.addError(diag.message, fileName);
-          });
+          }
         }
         return null;
       }

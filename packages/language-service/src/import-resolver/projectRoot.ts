@@ -16,7 +16,8 @@ export class ProjectRootDetector {
     // Check cache first
     const dir = path.dirname(filePath);
     if (ProjectRootDetector.cache.has(dir)) {
-      return ProjectRootDetector.cache.get(dir)!;
+      const cached = ProjectRootDetector.cache.get(dir);
+      if (cached) return cached;
     }
 
     const projectRoot = ProjectRootDetector.findProjectRoot(dir);

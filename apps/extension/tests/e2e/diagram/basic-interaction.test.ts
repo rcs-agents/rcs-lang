@@ -107,7 +107,7 @@ describe('Interactive Diagram Basic Features', () => {
       const node = await webviewHelpers.getNodeById(nodeId);
 
       // Check for selection styling
-      const stroke = await node.getCSSProperty('stroke');
+      const _stroke = await node.getCSSProperty('stroke');
       const strokeWidth = await node.getCSSProperty('stroke-width');
 
       // Selected nodes typically have different stroke

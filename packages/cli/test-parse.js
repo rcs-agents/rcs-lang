@@ -22,11 +22,11 @@ const mockFileSystem = {
   resolve: (path) => path,
   exists: async () => ({ success: true, value: true }),
   readFile: async () => ({ success: true, value: testContent }),
-  basename: (path) => 'test.rcl',
+  basename: (_path) => 'test.rcl',
 };
 
 // Monkey patch the FileSystemFactory
-const Module = require('module');
+const Module = require('node:module');
 const originalRequire = Module.prototype.require;
 
 Module.prototype.require = function (id) {
@@ -46,7 +46,7 @@ Module.prototype.require = function (id) {
         async initialize() {
           this.isInitialized = true;
         }
-        async parse(content) {
+        async parse(_content) {
           // Return a simple mock AST
           return {
             success: true,

@@ -1,12 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { type FullConfig, chromium } from '@playwright/test';
 
 /**
  * Global setup for Playwright tests
  * Sets up VS Code extension testing environment
  */
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('🔧 Setting up Playwright test environment...');
 
   // Build extension if needed
@@ -15,7 +15,7 @@ async function globalSetup(config: FullConfig) {
 
   if (!fs.existsSync(outPath)) {
     console.log('📦 Building extension...');
-    const { spawn } = require('child_process');
+    const { spawn } = require('node:child_process');
 
     await new Promise((resolve, reject) => {
       const build = spawn('npm', ['run', 'compile'], {

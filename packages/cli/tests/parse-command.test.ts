@@ -1,6 +1,6 @@
+import { beforeAll, describe, expect, test } from 'bun:test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { beforeAll, describe, expect, test } from 'bun:test';
 import { parseRCL } from '../src/compiler';
 
 describe('Parse Command', () => {

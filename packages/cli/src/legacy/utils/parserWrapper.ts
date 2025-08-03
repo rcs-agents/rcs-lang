@@ -78,19 +78,19 @@ export const schemaValidator = mockSchemaValidator;
 export const RCLParser = parserAvailable
   ? RealRCLParser
   : class MockRCLParser {
-    parseDocument(content: string, uri: string) {
-      console.warn('Using mock parser - real parsing not available');
-      return {
-        uri,
-        version: 1,
-        content,
-        ast: null,
-        imports: [],
-        symbols: [],
-        diagnostics: [],
-      };
-    }
-  };
+      parseDocument(content: string, uri: string) {
+        console.warn('Using mock parser - real parsing not available');
+        return {
+          uri,
+          version: 1,
+          content,
+          ast: null,
+          imports: [],
+          symbols: [],
+          diagnostics: [],
+        };
+      }
+    };
 
 // Mock ASTWalker since ANTLR parser doesn't have this interface yet
 export const ASTWalker = {

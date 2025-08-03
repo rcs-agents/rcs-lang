@@ -103,12 +103,6 @@ export function convertNewASTToOld(ast: AST.RclFile | IASTNode): ASTNode {
 /**
  * Convert IASTNode to BaseNode for compatibility
  */
-/**
- * Type guard for new AST nodes
- */
-function isNewASTNode(node: any): node is AST.RclFile | AST.Section | AST.ImportStatement {
-  return node && typeof node === 'object' && 'type' in node && 'location' in node;
-}
 
 export function toBaseNode(node: IASTNode | AST.RclFile | any): BaseNode {
   // Handle new AST nodes

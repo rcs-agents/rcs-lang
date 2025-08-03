@@ -695,7 +695,7 @@
     return `M ${points.x1} ${points.y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${points.x2} ${points.y2}`;
   }
 
-  function calculateEdgePoints(source, target, edge) {
+  function calculateEdgePoints(source, target, _edge) {
     // Get node centers
     const sx = source.position.x + (source.width || 100) / 2;
     const sy = source.position.y + (source.height || 50) / 2;
@@ -767,10 +767,10 @@
       const radius = i % 2 === 0 ? outerRadius : innerRadius;
       const x = cx + radius * Math.cos(i * angle - Math.PI / 2);
       const y = cy + radius * Math.sin(i * angle - Math.PI / 2);
-      path += (i === 0 ? 'M' : 'L') + x + ',' + y;
+      path += `${(i === 0 ? 'M' : 'L') + x},${y}`;
     }
 
-    return path + 'Z';
+    return `${path}Z`;
   }
 
   function makeNodeDraggable(nodeElement, node) {
