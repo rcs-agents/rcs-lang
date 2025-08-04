@@ -28,14 +28,11 @@ export default defineConfig({
 				starlightLinksValidator(),
 				// starlightPackageManagers(), // Still has compatibility issues
 				starlightTypeDoc({
-					entryPoints: [
-						'../../packages/ast/src/index.ts',
-						'../../packages/types/src/index.ts'
-					],
-					tsconfig: '../../tsconfig.base.json',
-					output: 'api',
+					entryPoints: ['../../packages/ast/src/index.ts'],
+					tsconfig: '../../packages/ast/tsconfig.json',
+					output: 'api/ast',
 					sidebar: {
-						label: 'API Reference',
+						label: 'AST API Reference',
 						collapsed: false,
 					},
 				}),
