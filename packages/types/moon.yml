@@ -42,7 +42,7 @@ tasks:
     outputs:
       - docs/**/*
   
-  docs:markdown:
+  docs-markdown:
     command: node scripts/generate-docs.js
     deps:
       - build
