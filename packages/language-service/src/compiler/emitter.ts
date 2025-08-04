@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { getOutputPath } from '../config/loader.js';
 import type { RclConfig } from '../config/types.js';
 import type { CompiledAgent, Diagnostic } from '../program/types.js';
+import type { AgentMessage } from '@rcs-lang/types';
 
 /**
  * Emits compiled RCL output to files
@@ -251,15 +252,7 @@ module.exports = {
     await fs.promises.mkdir(dir, { recursive: true });
 
     const dts = `// Generated TypeScript declarations for RCL agent
-
-export interface AgentMessage {
-  contentMessage: {
-    text?: string;
-    richCard?: any;
-    uploadedRbmFile?: any;
-  };
-  messageTrafficType: 'TRANSACTION' | 'PROMOTIONAL';
-}
+import type { AgentMessage } from '@rcs-lang/types';
 
 export interface FlowState {
   on: Record<string, string>;

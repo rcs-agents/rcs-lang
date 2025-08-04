@@ -24,7 +24,7 @@ tasks:
   # Override typescript tag to add deps
   build:
     deps:
-      - '@rcs-lang/parser:postbuild'
+      - '@rcs-lang/parser:build'
       - '@rcs-lang/language-service:build'
     env:
       NODE_ENV: "production"
@@ -32,7 +32,7 @@ tasks:
   # Override typescript tag to add deps  
   typecheck:
     deps:
-      - '@rcs-lang/parser:postbuild'
+      - '@rcs-lang/parser:build'
       - '@rcs-lang/language-service:build'
 
   # Extension tests require VSCode environment - just verify TypeScript compiles

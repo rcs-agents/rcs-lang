@@ -46,4 +46,4 @@ tasks:
     deps:
       - build
       - '@rcs-lang/compiler:build'
-      - '@rcs-lang/parser:postbuild'
+      - '@rcs-lang/parser:build'

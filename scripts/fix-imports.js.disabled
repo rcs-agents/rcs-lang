@@ -1,0 +1,6 @@
+# DISABLED - This script is no longer needed with rewriteRelativeImportExtensions
+# Original script moved to fix-imports.js.backup
+
+echo "This script has been disabled because TypeScript now handles import extension rewriting automatically."
+echo "See typescript-esm-analysis.md for details on the new approach."
+exit 0

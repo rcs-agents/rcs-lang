@@ -4,7 +4,7 @@
  */
 
 import { Result, ok, err } from 'neverthrow';
-import type { Context } from './types.js';
+import type { Context } from './unified-types.js';
 
 /**
  * Scoped context system for proper variable resolution and isolation.

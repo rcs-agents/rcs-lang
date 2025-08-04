@@ -16,9 +16,13 @@ describe('Cross-Request Execution and State Restoration', () => {
     
     // Extract TopFlow and create a simpler test version without flow invocations
     coffeeShopMachine = {
-      id: 'OrderFlow',
-      initial: 'Welcome',
-      states: {
+      id: 'CoffeeShopMachine',
+      initialFlow: 'OrderFlow',
+      flows: {
+        OrderFlow: {
+          id: 'OrderFlow',
+          initial: 'Welcome',
+          states: {
         Welcome: {
           transitions: [
             {
@@ -256,14 +260,21 @@ describe('Cross-Request Execution and State Restoration', () => {
             messageId: 'InvalidOption',
             transient: true
           }
+          }
+        },
+        meta: {
+          name: 'Coffee Shop Test Flow',
+          description: 'Simplified flow for testing',
+          version: '1.0.0'
         }
-      },
-      meta: {
-        name: 'Coffee Shop Test Flow',
-        description: 'Simplified flow for testing',
-        version: '1.0.0'
       }
-    };
+    },
+    meta: {
+      name: 'Coffee Shop Machine',
+      description: 'Test machine for coffee ordering',
+      version: '1.0.0'
+    }
+  };
     
     // Reset state tracking
     stateChangeEvents = [];
@@ -285,26 +296,28 @@ describe('Cross-Request Execution and State Restoration', () => {
     });
 
     test('should have required properties', () => {
-      expect(coffeeShopMachine.id).toBe('OrderFlow');
-      expect(coffeeShopMachine.initial).toBe('Welcome');
-      expect(Object.keys(coffeeShopMachine.states)).toContain('Welcome');
-      expect(Object.keys(coffeeShopMachine.states)).toContain('ChooseSize');
+      expect(coffeeShopMachine.id).toBe('CoffeeShopMachine');
+      expect(coffeeShopMachine.initialFlow).toBe('OrderFlow');
+      expect(coffeeShopMachine.flows.OrderFlow).toBeDefined();
+      expect(coffeeShopMachine.flows.OrderFlow.initial).toBe('Welcome');
+      expect(Object.keys(coffeeShopMachine.flows.OrderFlow.states)).toContain('Welcome');
+      expect(Object.keys(coffeeShopMachine.flows.OrderFlow.states)).toContain('ChooseSize');
     });
   });
 
   describe('Basic Flow Execution', () => {
     test('should start in Welcome state', () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       const state = agent.getCurrentState();
-      expect(state.machine).toBe('OrderFlow');
+      expect(state.machine).toBe('OrderFlow'); // The active machine is the initial flow
       expect(state.state).toBe('Welcome');
     });
 
     test('should transition through ordering flow', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       // User says "Order Coffee"
       let result = await agent.processInput('Order Coffee');
@@ -331,7 +344,7 @@ describe('Cross-Request Execution and State Restoration', () => {
 
     test('should handle invalid options and return to correct state', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       // Go to ChooseSize
       await agent.processInput('Order Coffee');
@@ -350,7 +363,7 @@ describe('Cross-Request Execution and State Restoration', () => {
   describe('State Serialization and Restoration', () => {
     test('should serialize agent state to URL hash', () => {
       const agent = createAgent('coffee-123');
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       const hash = agent.toURLHash();
       expect(hash).toBeTruthy();
@@ -362,7 +375,7 @@ describe('Cross-Request Execution and State Restoration', () => {
     test('should restore agent state from URL hash', async () => {
       // Create first agent and progress through flow
       const agent1 = createAgent('coffee-123');
-      agent1.addFlow(coffeeShopMachine);
+      agent1.addMachine(coffeeShopMachine);
 
       await agent1.processInput('Order Coffee');
       await agent1.processInput('Large');
@@ -379,7 +392,7 @@ describe('Cross-Request Execution and State Restoration', () => {
         },
       });
 
-      agent2.addFlow(coffeeShopMachine);
+      agent2.addMachine(coffeeShopMachine);
       agent2.setState('OrderFlow', 'Customize');
 
       const state2 = agent2.getCurrentState();
@@ -394,7 +407,7 @@ describe('Cross-Request Execution and State Restoration', () => {
 
     test('should maintain context across requests', async () => {
       const agent1 = createAgent('session-456');
-      agent1.addFlow(coffeeShopMachine);
+      agent1.addMachine(coffeeShopMachine);
 
       // Build up context through multiple inputs
       await agent1.processInput('Order Coffee');
@@ -408,7 +421,7 @@ describe('Cross-Request Execution and State Restoration', () => {
         id: 'session-456',
         onStateChange: () => {},
       });
-      agent2.addFlow(coffeeShopMachine);
+      agent2.addMachine(coffeeShopMachine);
       agent2.setState('OrderFlow', 'Customize');
 
       // Continue conversation
@@ -425,7 +438,7 @@ describe('Cross-Request Execution and State Restoration', () => {
   describe('Transient State Processing', () => {
     test('should automatically process transient states', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       // Complete full order flow
       await agent.processInput('Order Coffee');
@@ -447,7 +460,7 @@ describe('Cross-Request Execution and State Restoration', () => {
   describe('Context Variable Handling', () => {
     test('should accumulate context correctly', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       await agent.processInput('Order Coffee');
       
@@ -476,7 +489,7 @@ describe('Cross-Request Execution and State Restoration', () => {
   describe('Pattern Matching', () => {
     test('should match exact patterns case-insensitively', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       await agent.processInput('order coffee'); // lowercase
       expect(agent.getCurrentState().state).toBe('ChooseSize');
@@ -487,7 +500,7 @@ describe('Cross-Request Execution and State Restoration', () => {
 
     test('should use :default pattern for unmatched input', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       // At Welcome, invalid input should default back to Welcome
       await agent.processInput('random text');
@@ -498,7 +511,7 @@ describe('Cross-Request Execution and State Restoration', () => {
   describe('Known Issues and Limitations', () => {
     test('SUCCESS: @next context variable resolution now works', async () => {
       const agent = createAgent();
-      agent.addFlow(coffeeShopMachine);
+      agent.addMachine(coffeeShopMachine);
 
       await agent.processInput('Order Coffee');
       await agent.processInput('Invalid Size');
@@ -515,18 +528,24 @@ describe('Cross-Request Execution and State Restoration', () => {
     test('SUCCESS: Context variable interpolation in targets now supported', () => {
       // Create a valid machine with @variable syntax
       const validMachine: MachineDefinitionJSON = {
-        id: 'TestFlow',
-        initial: 'Start',
-        states: {
-          Start: {
-            transitions: [
-              {
-                target: '@nextState'
+        id: 'TestMachine',
+        initialFlow: 'TestFlow',
+        flows: {
+          TestFlow: {
+            id: 'TestFlow',
+            initial: 'Start',
+            states: {
+              Start: {
+                transitions: [
+                  {
+                    target: '@nextState'
+                  }
+                ]
+              },
+              End: {
+                transitions: []
               }
-            ]
-          },
-          End: {
-            transitions: []
+            }
           }
         }
       };
@@ -540,26 +559,32 @@ describe('Cross-Request Execution and State Restoration', () => {
       // of complex context-dependent conditions
       
       const machineWithCondition: MachineDefinitionJSON = {
-        id: 'TestFlow',
-        initial: 'Start',
-        states: {
-          Start: {
-            transitions: [
-              {
-                pattern: 'test',
-                target: 'End',
-                condition: 'context.size === \"large\"'
+        id: 'TestMachine',
+        initialFlow: 'TestFlow',
+        flows: {
+          TestFlow: {
+            id: 'TestFlow',
+            initial: 'Start',
+            states: {
+              Start: {
+                transitions: [
+                  {
+                    pattern: 'test',
+                    target: 'End',
+                    condition: 'context.size === \"large\"'
+                  }
+                ]
+              },
+              End: {
+                transitions: []
               }
-            ]
-          },
-          End: {
-            transitions: []
+            }
           }
         }
       };
 
       const agent = createAgent();
-      agent.addFlow(machineWithCondition);
+      agent.addMachine(machineWithCondition);
       agent.updateContext({ size: 'small' });
 
       await agent.processInput('test');
