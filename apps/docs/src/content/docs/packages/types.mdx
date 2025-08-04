@@ -1,0 +1,405 @@
+---
+title: "@rcs-lang/types"
+description: TypeScript type definitions for RCS Business Messaging (RBM) based on Google's official API reference
+---
+# @rcs-lang/types
+
+The `@rcs-lang/types` package provides comprehensive TypeScript type definitions for working with RCS Business Messaging APIs. All types are based on the official Google RBM API reference documentation.
+
+## Installation
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @rcs-lang/types
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @rcs-lang/types
+    ```
+  </TabItem>
+  <TabItem label="Yarn">
+    ```bash
+    yarn add @rcs-lang/types
+    ```
+  </TabItem>
+  <TabItem label="Bun">
+    ```bash
+    bun add @rcs-lang/types
+    ```
+  </TabItem>
+</Tabs>
+
+## Overview
+
+This package provides comprehensive TypeScript types for working with RCS Business Messaging APIs. All types are based on the official Google RBM API reference documentation.
+
+### Key Features
+
+- 🎯 **Complete Type Coverage** - All RBM API types including agents, messages, brands, testers, events, files, and integrations
+- 📘 **Fully Documented** - Extensive TSDoc comments with links to official documentation
+- 🔒 **Type Safety** - Branded types for enhanced type safety (PhoneNumber, EmailAddress, etc.)
+- 🚀 **Zero Runtime** - Pure TypeScript types with no runtime overhead
+- ✅ **Official Spec** - Based directly on Google's RBM API reference
+
+## Basic Usage
+
+### Importing Types
+
+```typescript
+import type {
+  AgentMessage,
+  RcsBusinessMessagingAgent,
+  Brand,
+  Tester,
+  AgentEvent,
+} from '@rcs-lang/types';
+```
+
+### Creating Messages
+
+The package provides types for all RCS message types:
+
+```typescript
+import type { AgentMessage, AgentContentMessage, Suggestion } from '@rcs-lang/types';
+
+// Create a text message with suggestions
+const message: AgentMessage = {
+  contentMessage: {
+    text: 'Hello! How can I help you today?',
+    suggestions: [
+      {
+        reply: {
+          text: 'Check order status',
+          postbackData: 'CHECK_ORDER_STATUS',
+        },
+      },
+      {
+        action: {
+          text: 'Call support',
+          postbackData: 'CALL_SUPPORT',
+          dialAction: {
+            phoneNumber: '+1234567890',
+          },
+        },
+      },
+    ],
+  },
+  messageTrafficType: 'TRANSACTION',
+};
+```
+
+## Working with Rich Cards
+
+### Standalone Cards
+
+```typescript
+import type { RichCard, StandaloneCard } from '@rcs-lang/types';
+
+const standaloneCard: RichCard = {
+  standaloneCard: {
+    cardOrientation: 'VERTICAL',
+    cardContent: {
+      title: 'Product Name',
+      description: 'Product description here',
+      media: {
+        height: 'MEDIUM',
+        contentInfo: {
+          fileUrl: 'https://example.com/image.jpg',
+        },
+      },
+      suggestions: [
+        {
+          reply: {
+            text: 'Buy now',
+            postbackData: 'BUY_PRODUCT_123',
+          },
+        },
+      ],
+    },
+  },
+};
+```
+
+### Carousel Cards
+
+```typescript
+import type { RichCard, CarouselCard } from '@rcs-lang/types';
+
+const carousel: RichCard = {
+  carouselCard: {
+    cardWidth: 'MEDIUM',
+    cardContents: [
+      {
+        title: 'Product 1',
+        description: 'Description 1',
+        media: {
+          height: 'MEDIUM',
+          contentInfo: {
+            fileUrl: 'https://example.com/product1.jpg',
+          },
+        },
+      },
+      {
+        title: 'Product 2',
+        description: 'Description 2',
+        media: {
+          height: 'MEDIUM',
+          contentInfo: {
+            fileUrl: 'https://example.com/product2.jpg',
+          },
+        },
+      },
+    ],
+  },
+};
+```
+
+## Agent Configuration
+
+Configure RCS agents with full type safety:
+
+```typescript
+import type { RcsBusinessMessagingAgent, HostingRegion, AgentUseCase } from '@rcs-lang/types';
+
+const agent: RcsBusinessMessagingAgent = {
+  description: 'Customer support agent for ACME Corp',
+  logoUri: 'https://example.com/logo.png',
+  heroUri: 'https://example.com/hero.jpg',
+  phoneNumbers: [
+    {
+      phoneNumber: '+1234567890',
+      label: 'Support',
+    },
+  ],
+  emails: [
+    {
+      address: 'support@example.com',
+      label: 'Customer Support',
+    },
+  ],
+  websites: [
+    {
+      uri: 'https://example.com',
+      label: 'Main Website',
+    },
+  ],
+  privacy: {
+    uri: 'https://example.com/privacy',
+    label: 'Privacy Policy',
+  },
+  termsConditions: {
+    uri: 'https://example.com/terms',
+    label: 'Terms of Service',
+  },
+  color: '#0000FF',
+  billingConfig: {
+    billingCategory: 'CONVERSATIONAL',
+  },
+  agentUseCase: 'MULTI_USE',
+  hostingRegion: 'NORTH_AMERICA',
+};
+```
+
+## Suggestions and Actions
+
+### Reply Suggestions
+
+```typescript
+import type { Suggestion, SuggestedReply } from '@rcs-lang/types';
+
+const replySuggestion: Suggestion = {
+  reply: {
+    text: 'Yes, please!',
+    postbackData: 'USER_RESPONSE_YES',
+  },
+};
+```
+
+### Action Suggestions
+
+```typescript
+import type { Suggestion, SuggestedAction } from '@rcs-lang/types';
+
+// Dial action
+const dialSuggestion: Suggestion = {
+  action: {
+    text: 'Call us',
+    postbackData: 'DIAL_SUPPORT',
+    dialAction: {
+      phoneNumber: '+1234567890',
+    },
+  },
+};
+
+// Open URL action
+const urlSuggestion: Suggestion = {
+  action: {
+    text: 'Visit website',
+    postbackData: 'OPEN_WEBSITE',
+    openUrlAction: {
+      url: 'https://example.com',
+    },
+  },
+};
+
+// Location actions
+const viewLocationSuggestion: Suggestion = {
+  action: {
+    text: 'View on map',
+    postbackData: 'VIEW_LOCATION',
+    viewLocationAction: {
+      latLong: {
+        latitude: 37.4220579,
+        longitude: -122.0840897,
+      },
+      label: 'Our Office',
+    },
+  },
+};
+```
+
+## Branded Types
+
+The package includes branded types for enhanced type safety:
+
+```typescript
+import type { PhoneNumber, EmailAddress, Url, HexColor } from '@rcs-lang/types';
+
+// These provide compile-time type safety
+const phone: PhoneNumber = '+1234567890' as PhoneNumber;
+const email: EmailAddress = 'user@example.com' as EmailAddress;
+const url: Url = 'https://example.com' as Url;
+const color: HexColor = '#FF0000' as HexColor;
+
+// TypeScript will prevent mixing up types
+function sendToPhone(number: PhoneNumber) {
+  // Implementation
+}
+
+// This would cause a TypeScript error:
+// sendToPhone(email); // Error: EmailAddress is not assignable to PhoneNumber
+```
+
+## Type Categories
+
+### Agent Types
+- `RcsBusinessMessagingAgent` - Complete agent configuration
+- `AgentUseCase` - Agent use case enumeration
+- `HostingRegion` - Hosting region enumeration
+- `BillingCategory` - Billing category enumeration
+
+### Message Types
+- `AgentMessage` - Complete agent message structure
+- `AgentContentMessage` - Message content with various formats
+- `MessageTrafficType` - Message traffic type enumeration
+- `Suggestion` - Reply suggestions and actions
+- `RichCard` - Rich card messages (standalone or carousel)
+
+### Action Types
+- `DialAction` - Phone dialing action
+- `ViewLocationAction` - Location viewing action
+- `CreateCalendarEventAction` - Calendar event creation
+- `OpenUrlAction` - URL opening action
+- `ShareLocationAction` - Location sharing request
+
+### Event Types
+- `AgentEvent` - Agent-initiated events (typing, read receipts)
+- `EventType` - Event type enumeration
+
+### Brand & Testing
+- `Brand` - Brand configuration
+- `BrandState` - Brand state enumeration
+- `Tester` - Tester configuration
+- `InvitationStatus` - Tester invitation status
+
+### Integration Types
+- `Integration` - Dialogflow integration configuration
+- `IntegrationType` - Integration type enumeration
+
+## Integration with RCL
+
+When using with RCL compiler and runtime:
+
+```typescript
+import { RCLCompiler } from '@rcs-lang/compiler';
+import type { AgentMessage } from '@rcs-lang/types';
+
+// Compile RCL to get messages
+const compiler = new RCLCompiler();
+const result = await compiler.compile(rclSource);
+
+if (result.success) {
+  // Access typed messages
+  const messages: Record<string, AgentMessage> = result.data.messages;
+  
+  // Use with full type safety
+  Object.entries(messages).forEach(([name, message]) => {
+    console.log(`Message ${name}:`, message.contentMessage?.text);
+  });
+}
+```
+
+## Type Safety Best Practices
+
+### Using Discriminated Unions
+
+Many types use discriminated unions for type safety:
+
+```typescript
+import type { Suggestion } from '@rcs-lang/types';
+
+function processSuggestion(suggestion: Suggestion) {
+  if ('reply' in suggestion) {
+    // TypeScript knows this is a SuggestedReply
+    console.log('Reply text:', suggestion.reply.text);
+  } else {
+    // TypeScript knows this is a SuggestedAction
+    console.log('Action text:', suggestion.action.text);
+    
+    if (suggestion.action.dialAction) {
+      console.log('Dial number:', suggestion.action.dialAction.phoneNumber);
+    }
+  }
+}
+```
+
+### Exhaustive Type Checking
+
+```typescript
+import type { MessageTrafficType } from '@rcs-lang/types';
+
+function getMessagePriority(trafficType: MessageTrafficType): number {
+  switch (trafficType) {
+    case 'TRANSACTION':
+      return 1;
+    case 'UPDATE':
+      return 2;
+    case 'OTP':
+      return 0;
+    case 'PROMOTION':
+      return 3;
+    default:
+      // TypeScript will error if we miss a case
+      const exhaustive: never = trafficType;
+      throw new Error(`Unhandled traffic type: ${exhaustive}`);
+  }
+}
+```
+
+## API Reference
+
+For detailed API documentation of all interfaces, types, and enums, see the [API Reference](/api/types/).
+
+## Official Google RBM References
+
+- [Agent Messages](https://developers.google.com/business-communications/rcs-business-messaging/reference/rest/v1/phones.agentMessages)
+- [Agent Configuration](https://developers.google.com/business-communications/rcs-business-messaging/reference/business-communications/rest/v1/brands.agents)
+- [Brands](https://developers.google.com/business-communications/rcs-business-messaging/reference/business-communications/rest/v1/brands)
+- [Testers](https://developers.google.com/business-communications/rcs-business-messaging/reference/rest/v1/phones.testers)
+- [Agent Events](https://developers.google.com/business-communications/rcs-business-messaging/reference/rest/v1/phones.agentEvents)
+- [File Operations](https://developers.google.com/business-communications/rcs-business-messaging/reference/rest/v1/files)
+- [Integrations](https://developers.google.com/business-communications/rcs-business-messaging/reference/business-communications/rest/v1/brands.agents.integrations)
