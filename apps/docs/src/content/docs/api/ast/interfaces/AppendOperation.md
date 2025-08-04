@@ -5,7 +5,7 @@ prev: false
 title: "AppendOperation"
 ---
 
-Defined in: [ast.ts:327](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L327)
+Defined in: [ast.ts:327](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L327)
 
 An append operation.
 
@@ -23,7 +23,7 @@ APPEND (RESULT | Value) TO Variable
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/2c0291a
 
 > **source**: [`Value`](/api/ast/type-aliases/value/) \| `"result"`
 
-Defined in: [ast.ts:329](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L329)
+Defined in: [ast.ts:329](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L329)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:329](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209
 
 > **target**: [`Variable`](/api/ast/interfaces/variable/) \| [`PropertyAccess`](/api/ast/interfaces/propertyaccess/)
 
-Defined in: [ast.ts:330](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L330)
+Defined in: [ast.ts:330](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L330)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:330](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209
 
 > **type**: `"AppendOperation"`
 
-Defined in: [ast.ts:328](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L328)
+Defined in: [ast.ts:328](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L328)

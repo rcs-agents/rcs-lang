@@ -7,7 +7,7 @@ title: "isBooleanLiteral"
 
 > **isBooleanLiteral**(`node`): `node is BooleanLiteral`
 
-Defined in: [guards.ts:106](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/guards.ts#L106)
+Defined in: [guards.ts:106](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/guards.ts#L106)
 
 ## Parameters
 
