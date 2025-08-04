@@ -30,6 +30,7 @@
     "@rcs-lang/core": "workspace:*",
     "@rcs-lang/file-system": "workspace:*",
     "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/types": "workspace:*",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "commander": "^9.4.1",

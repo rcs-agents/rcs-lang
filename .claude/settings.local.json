@@ -31,5 +31,9 @@
       "Bash(cp:*)"
     ],
     "deny": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "moon"
+  ],
+  "enableAllProjectMcpServers": true
 }

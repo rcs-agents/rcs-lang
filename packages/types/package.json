@@ -1,0 +1,39 @@
+{
+  "name": "@rcs-lang/types",
+  "version": "0.2.0",
+  "author": "RCS Language Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rcs-lang/rcl",
+    "directory": "packages/types"
+  },
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "typedoc": "^0.28.9",
+    "typedoc-plugin-markdown": "^4.8.0",
+    "typescript": "5.3.3"
+  },
+  "description": "TypeScript types generated from RCS JSON schemas",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "moon run types:build",
+    "typecheck": "moon run types:typecheck",
+    "test": "moon run types:test",
+    "clean": "moon run types:clean",
+    "lint": "moon run types:lint",
+    "format": "moon run types:format",
+    "docs": "typedoc",
+    "docs:watch": "typedoc --watch"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
+}

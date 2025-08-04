@@ -20,6 +20,7 @@
     "@rcs-lang/parser": "workspace:*",
     "@rcs-lang/compiler": "workspace:*",
     "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/types": "workspace:*",
     "@rcs-lang/validation": "workspace:*",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",

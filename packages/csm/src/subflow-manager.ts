@@ -4,8 +4,13 @@
  */
 
 import { ConversationalAgent } from './conversational-agent.js';
-import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON } from './machine-definition.js';
-import type { Context, StateChangeEvent } from './types.js';
+import type {
+  MachineDefinition,
+  FlowDefinition,
+  Context,
+  StateChangeEvent,
+  TransitionTarget,
+} from './unified-types.js';
 
 /**
  * Configuration for sub-flow execution.
@@ -41,7 +46,7 @@ export interface SubFlowReturnType {
 /**
  * Enhanced machine definition supporting sub-flow returns.
  */
-export interface SubFlowMachineDefinition extends SingleFlowMachineDefinitionJSON {
+export interface SubFlowMachineDefinition extends FlowDefinition {
   /** Return type configuration for this flow */
   returnType?: SubFlowReturnType;
 }
@@ -209,18 +214,43 @@ export class SubFlowManager {
   }
 
   /**
+   * Converts TransitionTarget to string safely.
+   */
+  private targetToString(target: TransitionTarget): string {
+    if (typeof target === 'string') {
+      return target;
+    }
+    
+    if (target.type === 'state') {
+      return target.stateId;
+    }
+    
+    if (target.type === 'flow') {
+      return `flow:${target.flowId}`;
+    }
+    
+    if (target.type === 'terminal') {
+      return `:${target.reason || 'end'}`;
+    }
+    
+    return 'unknown';
+  }
+
+  /**
    * Checks if a target is a sub-flow call.
    */
-  isSubFlowCall(target: string): boolean {
-    return target.startsWith('call:');
+  isSubFlowCall(target: TransitionTarget): boolean {
+    const targetString = this.targetToString(target);
+    return targetString.startsWith('call:');
   }
 
   /**
    * Parses sub-flow call from target string.
    */
-  parseSubFlowCall(target: string): SubFlowCall | null {
+  parseSubFlowCall(target: TransitionTarget): SubFlowCall | null {
+    const targetString = this.targetToString(target);
     // Example format: "call:BeverageFlow:append:orderItems"
-    const parts = target.split(':');
+    const parts = targetString.split(':');
     if (parts.length !== 4 || parts[0] !== 'call') {
       return null;
     }

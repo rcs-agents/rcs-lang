@@ -49,5 +49,14 @@
     "*.yml": "${basename}.*.yml"
   },
   "references.preferredLocation": "peek",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#dd0531",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#fa1b49",
+    "statusBarItem.remoteBackground": "#dd0531",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "sash.hoverBorder": "#fa1b49"
+  },
+  "peacock.color": "#dd0531"
 }

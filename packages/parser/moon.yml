@@ -37,10 +37,10 @@ tasks:
       - |
         cd $MOON_WORKSPACE_ROOT/packages/parser && \
         if ! grep -q "import { RclLexerBase }" src/generated/RclLexer.ts; then \
-          echo 'import { RclLexerBase } from "../RclLexerBase";' | cat - src/generated/RclLexer.ts > temp && \
+          echo 'import { RclLexerBase } from "../RclLexerBase.ts";' | cat - src/generated/RclLexer.ts > temp && \
           mv temp src/generated/RclLexer.ts; \
         fi && \
-        find src/generated -name "*.ts" -exec sed -i.bak 's/\.js"$/"/g' {} \; && \
+        find src/generated -name "*.ts" -exec sed -i.bak 's/\.js"$/.ts"/g' {} \; && \
         find src/generated -name "*.ts.bak" -delete
     deps:
       - build-grammar
@@ -59,30 +59,13 @@ tasks:
     outputs:
       - 'dist'
       
-  postbuild:
-    command: bash
-    args:
-      - -c
-      - |
-        cd $MOON_WORKSPACE_ROOT/packages/parser && \
-        if [ -d dist ]; then \
-          echo "Fixing imports in dist directory..." && \
-          find dist -name "*.js" -exec sed -i.bak -E 's/from "(\.\.[^"]+)"/from "\1.js"/g' {} \; && \
-          find dist -name "*.js" -exec sed -i.bak -E 's/from "(\.\/[^"]+)"/from "\1.js"/g' {} \; && \
-          find dist -name "*.js" -exec sed -i.bak 's/\.js\.js"/\.js"/g' {} \; && \
-          find dist -name "*.js.bak" -delete && \
-          echo "Fixed imports in $(find dist -name "*.js" | wc -l) files"; \
-        else \
-          echo "Warning: dist directory not found"; \
-        fi
-    deps:
-      - build
+  # postbuild task removed - TypeScript now handles import extension rewriting
 
   test:
     command: bun
     args: [test]
     deps:
-      - postbuild
+      - build
     inputs:
       - 'src/**/*'
       - 'tests/**/*'
