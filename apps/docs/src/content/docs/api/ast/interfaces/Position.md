@@ -5,7 +5,7 @@ prev: false
 title: "Position"
 ---
 
-Defined in: [position.ts:8](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/position.ts#L8)
+Defined in: [position.ts:8](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/position.ts#L8)
 
 Position in source text
 
@@ -15,7 +15,7 @@ Position in source text
 
 > **character**: `number`
 
-Defined in: [position.ts:10](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/position.ts#L10)
+Defined in: [position.ts:10](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/position.ts#L10)
 
 ***
 
@@ -23,4 +23,4 @@ Defined in: [position.ts:10](https://github.com/rcs-agents/rcs-lang/blob/81d1714
 
 > **line**: `number`
 
-Defined in: [position.ts:9](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/position.ts#L9)
+Defined in: [position.ts:9](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/position.ts#L9)
