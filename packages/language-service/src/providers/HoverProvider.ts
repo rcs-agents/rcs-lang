@@ -12,11 +12,11 @@ import type {
   StringNode,
   TransitionNode,
   ValueNode,
-} from '../ast-compatibility';
-import { walkAST } from '../ast-compatibility';
-import type { ImportResolver } from '../import-resolver';
-import { SymbolType } from '../import-resolver/types';
-import type { WorkspaceIndex } from '../workspace-index';
+} from '../ast-compatibility.js';
+import { walkAST } from '../ast-compatibility.js';
+import type { ImportResolver } from '../import-resolver/index.js';
+import { SymbolType } from '../import-resolver/types.js';
+import type { WorkspaceIndex } from '../workspace-index/index.js';
 import type { Position, TextDocument } from './types.js';
 
 /**
@@ -284,7 +284,7 @@ export class HoverProvider {
   ): Promise<MarkupContent | null> {
     // Get symbol from workspace index
     const symbolLocations = this.workspaceIndex.findSymbol(symbol);
-    const externalSymbols = symbolLocations.filter((loc) => loc.uri !== document.uri);
+    const externalSymbols = symbolLocations.filter((loc: any) => loc.uri !== document.uri);
 
     if (externalSymbols.length === 0) {
       return null;

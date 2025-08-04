@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test';
-import { RCLCompiler } from '../src/compiler';
-import { CompilationPipeline } from '../src/pipeline/compilationPipeline';
-import { ParseStage, TransformStage, ValidateStage } from '../src/stages';
+import { RCLCompiler } from '../src/compiler.js';
+import { CompilationPipeline } from '../src/pipeline/compilationPipeline.js';
+import { ParseStage, TransformStage, ValidateStage } from '../src/stages/index.js';
 
 describe('Semantic Validation', () => {
   let compiler: RCLCompiler;

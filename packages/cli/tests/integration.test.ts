@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { FlowCompiler } from '../src/legacy/compilers/flowCompiler';
-import { AgentExtractor } from '../src/legacy/extractors/agentExtractor';
-import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';
+import { FlowCompiler } from '../src/legacy/compilers/flowCompiler.js';
+import { AgentExtractor } from '../src/legacy/extractors/agentExtractor.js';
+import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer.js';
 
 // Note: This test file uses mock AST structures instead of real parser
 // No conditional import needed as it doesn't directly use tree-sitter

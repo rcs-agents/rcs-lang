@@ -1,6 +1,6 @@
-import { vi } from './test-utils';
+import { vi } from './test-utils.js';
 import { describe, expect, test } from 'bun:test';
-import { ConversationalAgent, type MachineDefinitionJSON } from '../src';
+import { ConversationalAgent, type MachineDefinitionJSON } from '../src/index.js';
 
 describe('Serialization', () => {
   const createTestFlow = (): MachineDefinitionJSON => ({

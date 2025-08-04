@@ -65,6 +65,7 @@ export default defineConfig({
 							items: [
 								{ label: '@rcs-lang/core', slug: 'packages/core' },
 								{ label: '@rcs-lang/ast', slug: 'packages/ast' },
+								{ label: '@rcs-lang/types', slug: 'packages/types' },
 								{ label: '@rcs-lang/file-system', slug: 'packages/file-system' },
 							]
 						},

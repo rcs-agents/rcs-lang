@@ -38,19 +38,19 @@ import {
 import { RCLParser } from '@rcs-lang/parser';
 import type { RCLSettings } from '@rcs-lang/parser';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { CodeActionProvider } from './features/codeActions';
-import { CompletionProvider } from './features/completion';
-import { DefinitionProvider } from './features/definition';
-import { DiagnosticsProvider } from './features/diagnostics';
-import { FoldingProvider } from './features/folding';
-import { FormattingProvider } from './features/formatting';
-import { HoverProvider } from './features/hover';
-import { ReferencesProvider } from './features/references';
-import { RenameProvider } from './features/rename';
-import { SemanticTokensProvider } from './features/semanticTokens';
-import { SignatureHelpProvider } from './features/signatureHelp';
-import { SymbolsProvider } from './features/symbols';
-import { SyntaxValidator } from './syntaxValidator';
+import { CodeActionProvider } from './features/codeActions.js';
+import { CompletionProvider } from './features/completion.js';
+import { DefinitionProvider } from './features/definition.js';
+import { DiagnosticsProvider } from './features/diagnostics.js';
+import { FoldingProvider } from './features/folding.js';
+import { FormattingProvider } from './features/formatting.js';
+import { HoverProvider } from './features/hover.js';
+import { ReferencesProvider } from './features/references.js';
+import { RenameProvider } from './features/rename.js';
+import { SemanticTokensProvider } from './features/semanticTokens.js';
+import { SignatureHelpProvider } from './features/signatureHelp.js';
+import { SymbolsProvider } from './features/symbols.js';
+import { SyntaxValidator } from './syntaxValidator.js';
 
 // Create a connection for the server, using Node's IPC as a transport
 const connection = createConnection(ProposedFeatures.all);

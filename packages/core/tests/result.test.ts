@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { err, isErr, isOk, map, ok, unwrap } from '../src/result';
+import { err, isErr, isOk, map, ok, unwrap } from '../src/result.js';
 
 describe('Result Type', () => {
   test('should create successful results', () => {

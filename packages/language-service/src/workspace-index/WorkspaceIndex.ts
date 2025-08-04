@@ -1,8 +1,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { IParser } from '@rcs-lang/core';
-import { ImportResolver } from '../import-resolver';
-import { ExportedSymbol, type SymbolType } from '../import-resolver/types';
+import { ImportResolver } from '../import-resolver/index.js';
+import { ExportedSymbol, type SymbolType } from '../import-resolver/types.js';
 import {
   FileChangeEvent,
   FileChangeType,
@@ -259,7 +259,7 @@ export class WorkspaceIndex {
       content,
       ast: document.ast,
       symbols,
-      imports: imports.map((imp) => imp.path),
+      imports: imports.map((imp: any) => imp.path),
       version: Date.now(),
     };
   }

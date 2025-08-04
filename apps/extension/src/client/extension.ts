@@ -17,10 +17,10 @@ import {
   type ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
-import { CompilationService } from './compilationService';
-import { DebugWebviewProvider } from './debugWebviewProvider';
-import { InteractiveDiagramProvider } from './interactiveDiagramProvider';
-import { getBuildHash, getExtensionVersion } from './utils';
+import { CompilationService } from './compilationService.js';
+import { DebugWebviewProvider } from './debugWebviewProvider.js';
+import { InteractiveDiagramProvider } from './interactiveDiagramProvider.js';
+import { getBuildHash, getExtensionVersion } from './utils.js';
 
 let client: LanguageClient;
 let statusBarItem: StatusBarItem;

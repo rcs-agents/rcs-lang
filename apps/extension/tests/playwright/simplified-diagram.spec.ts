@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DiagramTestHelpers, TestRclContent } from './helpers/diagram-helpers';
+import { DiagramTestHelpers, TestRclContent } from './helpers/diagram-helpers.js';
 
 /**
  * Simplified Playwright tests for Interactive Diagram functionality

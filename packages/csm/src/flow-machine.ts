@@ -4,15 +4,15 @@
  */
 
 import jsonLogic from 'json-logic-js';
-import type { MachineDefinitionJSON } from './machine-definition';
 import type {
-  Context,
   FlowDefinition,
+  Context,
   MachineState,
   ProcessResult,
   StateDefinition,
   Transition,
-} from './types';
+  TransitionTarget,
+} from './unified-types.js';
 
 /**
  * Result of a transition attempt within a flow.
@@ -65,7 +65,7 @@ export interface TransitionResult {
  * Each flow in an RCL document becomes one FlowMachine instance.
  */
 export class FlowMachine {
-  public definition: MachineDefinitionJSON;
+  public definition: FlowDefinition;
   private currentState: string;
   private compiledPatterns: Map<string, RegExp> = new Map();
 
@@ -75,18 +75,9 @@ export class FlowMachine {
    * @param definition - The flow definition (typically from compiled RCL)
    * @param initialState - Optional initial state (defaults to flow's initial)
    */
-  constructor(definition: FlowDefinition | MachineDefinitionJSON, initialState?: string) {
-    // Support both old and new formats
-    this.definition = definition as MachineDefinitionJSON;
-    
-    // Handle both single-flow and multi-flow formats
-    if ('initial' in definition) {
-      this.currentState = initialState || definition.initial;
-    } else if ('initialFlow' in definition) {
-      throw new Error('FlowMachine expects a single flow definition, not a multi-flow machine');
-    } else {
-      this.currentState = initialState || 'start';
-    }
+  constructor(definition: FlowDefinition, initialState?: string) {
+    this.definition = definition;
+    this.currentState = initialState || definition.initial;
 
     // Pre-compile regex patterns for performance
     this.compilePatterns();
@@ -213,7 +204,8 @@ export class FlowMachine {
     if (!('states' in this.definition)) return;
     
     for (const [stateId, stateDef] of Object.entries(this.definition.states)) {
-      for (const transition of stateDef.transitions) {
+      const typedStateDef = stateDef as StateDefinition;
+      for (const transition of typedStateDef.transitions) {
         if (
           transition.pattern &&
           !transition.pattern.startsWith(':') &&
@@ -297,7 +289,7 @@ export class FlowMachine {
    * @returns Result of evaluation
    */
   private evaluateCondition(
-    condition: string | { type: "code"; expression: string } | { type: "jsonlogic"; rule: any },
+    condition: string | { type: "code" | "legacy" | "jsonlogic"; expression?: string; rule?: any },
     context: Context
   ): boolean {
     try {
@@ -310,6 +302,12 @@ export class FlowMachine {
 
       // Handle explicit code type
       if (condition.type === 'code') {
+        const fn = new Function('context', `return ${condition.expression}`);
+        return !!fn(context);
+      }
+
+      // Handle legacy condition type
+      if (condition.type === 'legacy') {
         const fn = new Function('context', `return ${condition.expression}`);
         return !!fn(context);
       }
@@ -328,6 +326,29 @@ export class FlowMachine {
   }
 
   /**
+   * Gets the string representation of a target.
+   */
+  private getTargetString(target: TransitionTarget): string {
+    if (typeof target === 'string') {
+      return target;
+    }
+    
+    if (target.type === 'state') {
+      return target.stateId;
+    }
+    
+    if (target.type === 'flow') {
+      return `flow:${target.flowId}`;
+    }
+    
+    if (target.type === 'terminal') {
+      return `:${target.reason || 'end'}`;
+    }
+    
+    return 'unknown';
+  }
+
+  /**
    * Creates a transition result from a transition definition.
    */
   private createTransitionResult(transition: Transition, context?: Context): TransitionResult {
@@ -337,29 +358,26 @@ export class FlowMachine {
         type: 'flow_invocation',
         transition,
         contextUpdates: transition.context,
-        flowInvocation: {
-          ...transition.flowInvocation,
-          parameters: transition.flowInvocation.parameters || {}
-        }
+        flowInvocation: transition.flowInvocation as any
       };
     }
 
-    let target = transition.target;
+    let targetString = this.getTargetString(transition.target);
 
     // Resolve context variables in target (e.g., @next -> context.next)
-    if (target.startsWith('@')) {
-      const varName = target.substring(1);
+    if (targetString.startsWith('@')) {
+      const varName = targetString.substring(1);
       const resolvedTarget = context?.[varName];
       if (typeof resolvedTarget === 'string') {
-        target = resolvedTarget;
+        targetString = resolvedTarget;
       } else {
         throw new Error(`Context variable '${varName}' not found or not a string: ${resolvedTarget}`);
       }
     }
 
     // Check if this is a flow termination
-    if (target.startsWith(':')) {
-      const termination = target.substring(1);
+    if (targetString.startsWith(':')) {
+      const termination = targetString.substring(1);
       if (['end', 'cancel', 'error'].includes(termination)) {
         return {
           type: 'flow_termination',
@@ -370,9 +388,9 @@ export class FlowMachine {
       }
     }
 
-    // Check if this is a machine transition
-    if (target.startsWith('machine:')) {
-      const machineId = target.substring(8);
+    // Check if this is a machine transition (legacy support)
+    if (targetString.startsWith('machine:')) {
+      const machineId = targetString.substring(8);
       return {
         type: 'machine',
         machineId,
@@ -381,11 +399,22 @@ export class FlowMachine {
       };
     }
 
+    // Check if this is a flow transition
+    if (targetString.startsWith('flow:')) {
+      const flowId = targetString.substring(5);
+      return {
+        type: 'machine', // Map to machine for backward compatibility
+        machineId: flowId,
+        transition,
+        contextUpdates: transition.context,
+      };
+    }
+
     // Regular state transition
-    this.currentState = target;
+    this.currentState = targetString;
     return {
       type: 'state',
-      stateId: target,
+      stateId: targetString,
       transition,
       contextUpdates: transition.context,
     };

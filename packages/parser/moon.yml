@@ -35,35 +35,17 @@ tasks:
     args:
       - -c
       - |
-        cd $MOON_WORKSPACE_ROOT/packages/parser && \
-        if ! grep -q "import { RclLexerBase }" src/generated/RclLexer.ts; then \
-          echo 'import { RclLexerBase } from "../RclLexerBase";' | cat - src/generated/RclLexer.ts > temp && \
-          mv temp src/generated/RclLexer.ts; \
+        cd $MOON_WORKSPACE_ROOT/packages/parser/src/generated && \
+        if ! grep -q "import { RclLexerBase }" RclLexer.ts; then \
+          sed -i.bak '1s/^/import { RclLexerBase } from "..\/RclLexerBase.ts";\n/' RclLexer.ts; \
         fi && \
-        find src/generated -name "*.ts" -exec sed -i.bak 's/\.js"$/"/g' {} \; && \
-        find src/generated -name "*.ts.bak" -delete
+        for file in *.ts; do \
+          sed -i.bak 's/from "\(\.\.[^"]*\)\([^.]\)"/from "\1\2.ts"/g' "$file"; \
+        done && \
+        rm -f *.ts.bak
     deps:
       - build-grammar
 
-  fix-js-imports:
-    command: bash
-    args:
-      - -c
-      - |
-        cd $MOON_WORKSPACE_ROOT/packages/parser && \
-        if [ -d dist ]; then \
-          echo "Fixing imports in dist directory..." && \
-          find dist -name "*.js" -exec sed -i.bak -E 's/from "(\.\.[^"]+)"/from "\1.js"/g' {} \; && \
-          find dist -name "*.js" -exec sed -i.bak -E 's/from "(\.\/[^"]+)"/from "\1.js"/g' {} \; && \
-          find dist -name "*.js" -exec sed -i.bak 's/\.js\.js"/\.js"/g' {} \; && \
-          find dist -name "*.js.bak" -delete && \
-          echo "Fixed imports in $(find dist -name "*.js" | wc -l) files"; \
-        else \
-          echo "Warning: dist directory not found"; \
-        fi
-    deps:
-      - build
-      
   build:
     command: tsc
     deps:
@@ -77,19 +59,23 @@ tasks:
       - 'package.json'
     outputs:
       - 'dist'
-    
+      
   postbuild:
-    command: echo
-    args: ["Build complete"]
+    command: bash
+    args:
+      - -c
+      - |
+        cd dist/generated && \
+        sed -i.bak 's/from "\(\.\.[^"]*\)"/from "\1.js"/g' *.js && \
+        rm -f *.js.bak
     deps:
       - build
-      - fix-js-imports
 
   test:
     command: bun
     args: [test]
     deps:
-      - postbuild
+      - build
     inputs:
       - 'src/**/*'
       - 'tests/**/*'

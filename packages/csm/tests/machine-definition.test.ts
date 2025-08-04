@@ -1,6 +1,6 @@
-import { vi } from './test-utils';
+import { vi } from './test-utils.js';
 import { describe, expect, test } from 'bun:test';
-import { type MachineDefinitionJSON, validateMachineDefinition } from '../src';
+import { type MachineDefinitionJSON, validateMachineDefinition } from '../src/index.js';
 
 describe('Machine Definition Validation', () => {
   test('should validate a correct machine definition', () => {

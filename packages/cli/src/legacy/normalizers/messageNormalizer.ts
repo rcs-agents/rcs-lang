@@ -1,113 +1,24 @@
-import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper';
-
-export interface AgentMessage {
-  contentMessage: AgentContentMessage;
-  messageTrafficType: MessageTrafficType;
-  expireTime?: string;
-  ttl?: string;
-}
-
-export interface AgentContentMessage {
-  text?: string;
-  suggestions?: Suggestion[];
-  uploadedRbmFile?: UploadedRbmFile;
-  richCard?: RichCard;
-  contentInfo?: ContentInfo;
-}
-
-export type MessageTrafficType =
-  | 'MESSAGE_TRAFFIC_TYPE_UNSPECIFIED'
-  | 'AUTHENTICATION'
-  | 'TRANSACTION'
-  | 'PROMOTION'
-  | 'SERVICEREQUEST'
-  | 'ACKNOWLEDGEMENT';
-
-export interface Suggestion {
-  reply?: SuggestedReply;
-  action?: SuggestedAction;
-}
-
-export interface SuggestedReply {
-  text: string;
-  postbackData: string;
-}
-
-export interface SuggestedAction {
-  text: string;
-  postbackData: string;
-  fallbackUrl?: string;
-  dialAction?: DialAction;
-  viewLocationAction?: ViewLocationAction;
-  createCalendarEventAction?: CreateCalendarEventAction;
-  openUrlAction?: OpenUrlAction;
-  shareLocationAction?: ShareLocationAction;
-}
-
-export interface DialAction {
-  phoneNumber: string;
-}
-
-export interface ViewLocationAction {
-  label?: string;
-  latLong?: { latitude: number; longitude: number };
-  query?: string;
-}
-
-export interface CreateCalendarEventAction {
-  startTime: string;
-  endTime: string;
-  title: string;
-  description: string;
-}
-
-export interface OpenUrlAction {
-  url: string;
-}
-
-export type ShareLocationAction = {};
-
-export interface UploadedRbmFile {
-  fileName: string;
-  thumbnailUrl?: string;
-  thumbnailName?: string;
-}
-
-export interface RichCard {
-  carouselCard?: CarouselCard;
-  standaloneCard?: StandaloneCard;
-}
-
-export interface CarouselCard {
-  cardWidth: 'CARD_WIDTH_UNSPECIFIED' | 'SMALL' | 'MEDIUM';
-  cardContents: CardContent[];
-}
-
-export interface StandaloneCard {
-  cardOrientation: 'CARD_ORIENTATION_UNSPECIFIED' | 'HORIZONTAL' | 'VERTICAL';
-  thumbnailImageAlignment?: 'THUMBNAIL_IMAGE_ALIGNMENT_UNSPECIFIED' | 'LEFT' | 'RIGHT';
-  cardContent: CardContent;
-}
-
-export interface CardContent {
-  title?: string;
-  description?: string;
-  media?: Media;
-  suggestions?: Suggestion[];
-}
-
-export interface Media {
-  height: 'HEIGHT_UNSPECIFIED' | 'SHORT' | 'MEDIUM' | 'TALL';
-  file?: UploadedRbmFile;
-  contentInfo?: ContentInfo;
-}
-
-export interface ContentInfo {
-  fileUrl: string;
-  thumbnailUrl?: string;
-  forceRefresh?: boolean;
-  altText?: string;
-}
+import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper.js';
+import type {
+  AgentMessage,
+  AgentContentMessage,
+  MessageTrafficType,
+  Suggestion,
+  SuggestedReply,
+  SuggestedAction,
+  DialAction,
+  ViewLocationAction,
+  CreateCalendarEventAction,
+  OpenUrlAction,
+  ShareLocationAction,
+  UploadedRbmFile,
+  RichCard,
+  CarouselCard,
+  StandaloneCard,
+  CardContent,
+  Media,
+  ContentInfo
+} from '@rcs-lang/types';
 
 export class MessageNormalizer {
   extractAndNormalize(ast: RCLNode | null | undefined): Record<string, AgentMessage> {

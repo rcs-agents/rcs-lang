@@ -3,10 +3,9 @@
  * Main orchestrator for managing multiple conversation flows.
  */
 
-import { FlowMachine, type TransitionResult } from './flow-machine';
-import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON, MultiFlowMachineDefinitionJSON } from './machine-definition';
-import { isMultiFlowMachine } from './machine-definition';
+import { FlowMachine, type TransitionResult } from './flow-machine.js';
 import type {
+  MachineDefinition,
   AgentOptions,
   Context,
   ErrorContext,
@@ -16,7 +15,7 @@ import type {
   StateChangeEvent,
   StateChangeTrigger,
   Transition,
-} from './types';
+} from './unified-types.js';
 import {
   type FlowExecutionState,
   type FlowStackFrame,
@@ -28,7 +27,7 @@ import {
   deserializeFlowExecutionState,
   createFlowSuccess,
   createFlowError,
-} from './flow-execution';
+} from './flow-execution.js';
 
 /**
  * Main class for managing conversational state across multiple flows.
@@ -77,35 +76,30 @@ export class ConversationalAgent {
    * @param machine - Machine definition to add
    * @throws Error if machine with same ID already exists
    */
-  addMachine(machine: MachineDefinitionJSON): void {
-    if (isMultiFlowMachine(machine)) {
-      // Multi-flow machine: add each flow separately
-      for (const [flowId, flowDef] of Object.entries(machine.flows)) {
-        if (this.machines.has(flowId)) {
-          throw new Error(`Flow with ID '${flowId}' already exists`);
-        }
-        const flowMachine = new FlowMachine(flowDef);
-        this.machines.set(flowId, flowMachine);
+  addMachine(machine: MachineDefinition): void {
+    // Machine: add each flow separately
+    for (const [flowId, flowDef] of Object.entries(machine.flows)) {
+      if (this.machines.has(flowId)) {
+        throw new Error(`Flow with ID '${flowId}' already exists`);
       }
-      
-      // Initialize flow execution state for multi-flow machine
-      this.flowExecutionState = {
-        currentFlow: machine.initialFlow,
-        currentState: machine.flows[machine.initialFlow].initial,
-        flowStack: [],
-        pendingResult: undefined
-      };
-      
-      // Set active machine to the initial flow
-      this.activeMachineId = machine.initialFlow;
-      this.initialized = true;
-
-      // Emit initial state event
-      this.emitStateChange('init');
-    } else {
-      // Single-flow machine: add as single flow
-      this.addFlow(machine);
+      const flowMachine = new FlowMachine(flowDef);
+      this.machines.set(flowId, flowMachine);
     }
+    
+    // Initialize flow execution state for multi-flow machine
+    this.flowExecutionState = {
+      currentFlow: machine.initialFlow,
+      currentState: machine.flows[machine.initialFlow].initial,
+      flowStack: [],
+      pendingResult: undefined
+    };
+    
+    // Set active machine to the initial flow
+    this.activeMachineId = machine.initialFlow;
+    this.initialized = true;
+
+    // Emit initial state event
+    this.emitStateChange('init');
   }
 
   /**
@@ -114,7 +108,7 @@ export class ConversationalAgent {
    * @param flow - Flow definition to add (supports both legacy and JSON formats)
    * @throws Error if flow with same ID already exists
    */
-  addFlow(flow: FlowDefinition | SingleFlowMachineDefinitionJSON): void {
+  addFlow(flow: FlowDefinition): void {
     if (this.machines.has(flow.id)) {
       throw new Error(`Flow with ID '${flow.id}' already exists`);
     }

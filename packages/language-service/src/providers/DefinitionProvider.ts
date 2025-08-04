@@ -1,7 +1,7 @@
 import type { IParser } from '@rcs-lang/core';
-import type { ImportResolver } from '../import-resolver';
-import { SymbolType } from '../import-resolver/types';
-import type { WorkspaceIndex } from '../workspace-index';
+import type { ImportResolver } from '../import-resolver/index.js';
+import { SymbolType } from '../import-resolver/types.js';
+import type { WorkspaceIndex } from '../workspace-index/index.js';
 
 /**
  * Represents a definition location
@@ -225,7 +225,7 @@ export class DefinitionProvider {
     const symbolLocations = this.workspaceIndex.findSymbol(symbol);
 
     // Filter out the current file
-    const externalSymbols = symbolLocations.filter((loc) => loc.uri !== document.uri);
+    const externalSymbols = symbolLocations.filter((loc: any) => loc.uri !== document.uri);
 
     if (externalSymbols.length > 0) {
       // Return the first external definition found

@@ -2,8 +2,8 @@ import {
   AgentMessage,
   MessageNormalizer,
   MessageTrafficType,
-} from '../../src/legacy/normalizers/messageNormalizer';
-import { TestUtils } from '../testUtils';
+} from '../../src/legacy/normalizers/messageNormalizer.js';
+import { TestUtils } from '../testUtils.js';
 
 // Conditional import for tree-sitter dependency
 let _RCLNode: any;

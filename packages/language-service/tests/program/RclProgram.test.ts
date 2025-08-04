@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { RclProgram } from '../../src/program/RclProgram';
+import { RclProgram } from '../../src/program/RclProgram.js';
 
 describe('RclProgram', () => {
   const testDir = path.join(__dirname, `.test-workspace-${Date.now()}`);

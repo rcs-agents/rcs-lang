@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { browser } from '@wdio/globals';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
-import * as webviewHelpers from '../utils/webviewHelpers';
+import * as webviewHelpers from '../utils/webviewHelpers.js';
 
 // Use global expect from Jest/browser environment
 declare const expect: any;

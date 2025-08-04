@@ -1,0 +1,13 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "readme": "README.md",
+  "name": "@rcs-lang/types",
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "sort": ["source-order"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/rcs-lang/rcl",
+    "NPM": "https://www.npmjs.com/package/@rcs-lang/types"
+  }
+}
