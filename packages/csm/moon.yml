@@ -5,6 +5,9 @@ project:
 type: library
 language: typescript
 
+dependsOn:
+  - core
+
 tags:
   - tsup
   - test
@@ -13,6 +16,10 @@ tags:
   - common
 
 tasks:
+  build:
+    deps:
+      - core:build
+      
   clean:
     command: rm -rf dist coverage
     platform: system

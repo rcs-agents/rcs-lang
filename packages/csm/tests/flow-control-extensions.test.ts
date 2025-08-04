@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition';
+import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition.js';
 
 describe('Flow Control Extensions', () => {
   let validFlowControlMachine: MachineDefinitionJSON;
@@ -374,7 +374,7 @@ describe('Flow Control Extensions', () => {
 describe('Flow Control Integration', () => {
   test('should validate complete coffee shop example', async () => {
     const { default: coffeeShopMachine } = await import('./fixtures/coffee-shop-machine.json');
-    const { extractSingleFlow } = await import('../src/schema-validator');
+    const { extractSingleFlow } = await import('../src/schema-validator.ts');
     
     // Extract single-flow structure for CSM compatibility
     const singleFlowMachine = extractSingleFlow(coffeeShopMachine);
@@ -385,7 +385,7 @@ describe('Flow Control Integration', () => {
 
   test('should validate flow invocation patterns in coffee shop', async () => {
     const { default: coffeeShopMachine } = await import('./fixtures/coffee-shop-machine.json');
-    const { extractSingleFlow } = await import('../src/schema-validator');
+    const { extractSingleFlow } = await import('../src/schema-validator.ts');
     
     // Extract single-flow structure for CSM compatibility
     const machine = extractSingleFlow(coffeeShopMachine) as MachineDefinitionJSON;

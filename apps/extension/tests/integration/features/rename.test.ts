@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import * as vscode from 'vscode';
-import * as testHelpers from '../../utils/testHelpers';
+import * as testHelpers from '../../utils/testHelpers.js';
 
 describe('Rename Provider', () => {
   let document: vscode.TextDocument;

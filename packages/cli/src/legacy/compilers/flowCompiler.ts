@@ -1,4 +1,4 @@
-import type { RCLNode } from '../utils/parserWrapper';
+import type { RCLNode } from '../utils/parserWrapper.js';
 
 export interface XStateConfig {
   id: string;

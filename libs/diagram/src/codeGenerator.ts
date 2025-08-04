@@ -1,4 +1,4 @@
-import type { PropertyFormData, RCLEdge, RCLFlowModel, RCLNode } from './types';
+import type { PropertyFormData, RCLEdge, RCLFlowModel, RCLNode } from './types.js';
 
 /**
  * Code generator for converting diagram models back to RCL source code

@@ -2,8 +2,8 @@ import { ValidationPipeline } from './pipeline.js';
 import { RequiredFieldsValidator } from './validators/requiredFieldsValidator.js';
 import { SyntaxValidator } from './validators/syntaxValidator.js';
 import { RcsAgentValidator } from './validators/rcsAgentValidator.js';
-// import { SemanticValidator } from './validators/semanticValidator';
-// import { NamingValidator } from './validators/namingValidator';
+// import { SemanticValidator } from './validators/semanticValidator.js';
+// import { NamingValidator } from './validators/namingValidator.js';
 
 /**
  * Create a default validation pipeline with all standard validators

@@ -1,4 +1,4 @@
-import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper';
+import { type RCLNode, ValidationResult, schemaValidator } from '../utils/parserWrapper.js';
 
 // Import the schema type if available
 type SchemaAgentConfig = any; // Will be properly typed when parser is available

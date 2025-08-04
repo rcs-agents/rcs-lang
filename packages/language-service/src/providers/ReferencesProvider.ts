@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import type { IParser } from '@rcs-lang/core';
-import type { ImportResolver } from '../import-resolver';
-import { SymbolType } from '../import-resolver/types';
-import type { WorkspaceIndex } from '../workspace-index';
+import type { ImportResolver } from '../import-resolver/index.js';
+import { SymbolType } from '../import-resolver/types.js';
+import type { WorkspaceIndex } from '../workspace-index/index.js';
 
 /**
  * Represents a reference location

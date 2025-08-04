@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { CompilerImpl } from '../src/compiler';
+import { CompilerImpl } from '../src/compiler.js';
 
 describe('CompilerImpl', () => {
   describe('compile', () => {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';
-import { schemaValidator } from '../src/utils/parserWrapper';
-import { TestUtils } from './testUtils';
+import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer.js';
+import { schemaValidator } from '../src/utils/parserWrapper.js';
+import { TestUtils } from './testUtils.js';
 
 describe('Schema Validation Integration', () => {
   let messageNormalizer: MessageNormalizer;

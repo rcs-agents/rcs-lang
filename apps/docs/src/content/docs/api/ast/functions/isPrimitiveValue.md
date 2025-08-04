@@ -7,7 +7,7 @@ title: "isPrimitiveValue"
 
 > **isPrimitiveValue**(`node`): `node is PrimitiveValue`
 
-Defined in: [guards.ts:159](https://github.com/rcs-agents/rcs-lang/blob/2886a07e868cf92f1e606ce6c904ff7e06f6aeb1/packages/ast/src/guards.ts#L159)
+Defined in: [guards.ts:159](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/guards.ts#L159)
 
 ## Parameters
 

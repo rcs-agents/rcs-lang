@@ -134,9 +134,8 @@ export function extractSingleFlow(machineDefinition: any): any {
     throw new Error(`Flow "${targetFlowName}" not found in machine definition`);
   }
 
-  // Create single-flow compatible structure
+  // Create single-flow compatible structure (legacy format)
   return {
-    ...machineDefinition,
     id: machineDefinition.id || targetFlow.id,
     initial: targetFlow.initial,
     states: targetFlow.states,

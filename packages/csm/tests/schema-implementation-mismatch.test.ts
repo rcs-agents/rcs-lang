@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
-import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition';
-import type { StateMeta } from '../src/types';
+import { validateMachineDefinition, type MachineDefinitionJSON } from '../src/machine-definition.js';
+import type { StateMeta } from '../src/types.js';
 
 describe('Schema vs Implementation Mismatches', () => {
   describe('Schema Completeness Issues', () => {

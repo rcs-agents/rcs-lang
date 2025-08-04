@@ -1,211 +1,68 @@
 /**
  * @module machine-definition
- * Standard machine definition format for CSM.
- * This is the interchange format between compilers and the runtime.
+ * Validation functions for machine definitions.
+ * All type definitions have been moved to unified-types.ts
  */
+
+import type {
+  MachineDefinition,
+  AgentDefinition,
+  FlowDefinition,
+  StateDefinition,
+  TransitionDefinition,
+} from './unified-types.js';
 
 /**
- * Single-flow machine definition in JSON-serializable format.
+ * Type alias for backward compatibility.
+ * Can represent either the new machine format (with flows) or legacy single-flow format.
  */
-export interface SingleFlowMachineDefinitionJSON {
-  /** Unique identifier for this flow/machine */
-  id: string;
+export type MachineDefinitionJSON = MachineDefinition | LegacySingleFlowMachine;
 
-  /** ID of the initial state when entering this flow */
+/**
+ * Legacy single-flow machine format for backward compatibility.
+ */
+export interface LegacySingleFlowMachine {
+  id: string;
   initial: string;
-
-  /** Map of state IDs to their definitions */
-  states: Record<string, StateDefinitionJSON>;
-
-  /** Optional metadata for the flow */
+  states: Record<string, StateDefinition>;
   meta?: {
-    /** Display name for the flow */
     name?: string;
-
-    /** Description of what this flow does */
     description?: string;
-
-    /** Version of the flow definition */
     version?: string;
-
-    /** Tags for categorizing flows */
     tags?: string[];
-
-    /** Custom metadata for application-specific needs */
     custom?: Record<string, any>;
   };
 }
 
-/**
- * Multi-flow machine definition in JSON-serializable format.
- */
-export interface MultiFlowMachineDefinitionJSON {
-  /** Unique identifier for this machine */
-  id: string;
-
-  /** ID of the initial flow when starting this machine */
-  initialFlow: string;
-
-  /** Map of flow IDs to their definitions */
-  flows: Record<string, SingleFlowMachineDefinitionJSON>;
-
-  /** Optional metadata for the machine */
-  meta?: {
-    /** Display name for the machine */
-    name?: string;
-
-    /** Description of what this machine does */
-    description?: string;
-
-    /** Version of the machine definition */
-    version?: string;
-
-    /** Tags for categorizing machines */
-    tags?: string[];
-
-    /** Custom metadata for application-specific needs */
-    custom?: Record<string, any>;
-  };
-}
 
 /**
- * Machine definition in JSON-serializable format.
- * Supports both single-flow and multi-flow machines.
+ * Helper function to create a machine from a single flow.
+ * This is a convenience function for simple use cases.
+ * 
+ * @param flow - The flow definition
+ * @returns A machine containing the single flow
  */
-export type MachineDefinitionJSON = SingleFlowMachineDefinitionJSON | MultiFlowMachineDefinitionJSON;
-
-/**
- * Type guard to check if a machine definition is multi-flow.
- */
-export function isMultiFlowMachine(machine: MachineDefinitionJSON): machine is MultiFlowMachineDefinitionJSON {
-  return 'flows' in machine;
-}
-
-/**
- * Type guard to check if a machine definition is single-flow.
- */
-export function isSingleFlowMachine(machine: MachineDefinitionJSON): machine is SingleFlowMachineDefinitionJSON {
-  return 'states' in machine;
-}
-
-/**
- * State definition in JSON format.
- */
-export interface StateDefinitionJSON {
-  /** List of possible transitions from this state */
-  transitions: TransitionJSON[];
-
-  /** Optional metadata for the state */
-  meta?: {
-    /** ID of the message to send when entering this state */
-    messageId?: string;
-
-    /** Whether this is a transient state (auto-transitions) */
-    transient?: boolean;
-
-    /** Tags for categorizing states */
-    tags?: string[];
-
-    /** Custom metadata for application-specific needs */
-    custom?: Record<string, any>;
-  };
-}
-
-/**
- * Transition definition in JSON format.
- */
-export interface TransitionJSON {
-  /** Pattern to match against user input. If undefined, transition is automatic */
-  pattern?: string;
-
-  /** Target state ID or reference using type:ID format */
-  target: string;
-
-  /** Context updates to apply when taking this transition */
-  context?: Record<string, any>;
-
-  /** Optional JavaScript condition expression */
-  condition?: string;
-
-  /** Priority for pattern matching. Higher numbers are checked first */
-  priority?: number;
-
-  /** Flow invocation configuration */
-  flowInvocation?: {
-    /** ID of the flow to invoke */
-    flowId: string;
-    
-    /** Parameters to pass to the invoked flow */
-    parameters?: Record<string, any>;
-    
-    /** Result handlers for different flow outcomes */
-    onResult: {
-      end?: {
-        operations?: Array<{
-          set?: { variable: string; value: any };
-          append?: { to: string; value: any };
-          merge?: { into: string; value: any };
-        }>;
-        target: string;
-      };
-      cancel?: {
-        operations?: Array<{
-          set?: { variable: string; value: any };
-          append?: { to: string; value: any };
-          merge?: { into: string; value: any };
-        }>;
-        target: string;
-      };
-      error?: {
-        operations?: Array<{
-          set?: { variable: string; value: any };
-          append?: { to: string; value: any };
-          merge?: { into: string; value: any };
-        }>;
-        target: string;
-      };
-    };
-  };
-}
-
-/**
- * Collection of machines for an agent.
- */
-export interface AgentDefinitionJSON {
-  /** Agent identifier */
-  id: string;
-
-  /** ID of the initial machine to start with */
-  initial: string;
-
-  /** Map of machine IDs to their definitions */
-  machines: Record<string, MachineDefinitionJSON>;
-
-  /** Optional agent metadata */
-  meta?: {
-    /** Display name for the agent */
-    name?: string;
-
-    /** Description of the agent */
-    description?: string;
-
-    /** Version of the agent definition */
-    version?: string;
-
-    /** Custom metadata */
-    custom?: Record<string, any>;
+export function createSingleFlowMachine(flow: FlowDefinition): MachineDefinition {
+  return {
+    id: flow.id,
+    initialFlow: flow.id,
+    flows: {
+      [flow.id]: flow
+    },
+    meta: flow.meta
   };
 }
 
 /**
  * Validates a machine definition against the schema.
+ * Supports both new format (with flows) and legacy single-flow format (for backward compatibility).
  * @param definition - The definition to validate
  * @returns True if valid
  * @throws Error with validation details if invalid
  */
 export function validateMachineDefinition(
   definition: unknown,
-): definition is MachineDefinitionJSON {
+): definition is MachineDefinition {
   // Basic runtime validation (full JSON schema validation could be added)
   if (!definition || typeof definition !== 'object') {
     throw new Error('Machine definition must be an object');
@@ -217,46 +74,90 @@ export function validateMachineDefinition(
     throw new Error('Machine definition must have an id string');
   }
 
-  // Check if this is a multi-flow or single-flow machine
-  if (def.flows) {
-    // Multi-flow machine validation
-    if (!def.initialFlow || typeof def.initialFlow !== 'string') {
-      throw new Error('Multi-flow machine definition must have an initialFlow string');
-    }
+  // Check if this is the new format (with flows) or legacy single-flow format
+  const hasFlows = def.flows && typeof def.flows === 'object';
+  const hasStates = def.states && typeof def.states === 'object';
+  const hasInitial = def.initial && typeof def.initial === 'string';
+  const hasInitialFlow = def.initialFlow && typeof def.initialFlow === 'string';
 
-    if (typeof def.flows !== 'object') {
-      throw new Error('Multi-flow machine definition must have flows object');
+  if (hasFlows && hasInitialFlow && !hasStates && !hasInitial) {
+    // New format validation: machines have flows
+    if (Object.keys(def.flows).length === 0) {
+      throw new Error('Machine definition must have at least one flow');
     }
 
     // Validate each flow
     for (const [flowId, flow] of Object.entries(def.flows)) {
-      validateSingleFlow(flowId, flow);
+      validateFlow(flowId, flow);
     }
 
     // Check that initialFlow exists
     if (!def.flows[def.initialFlow]) {
       throw new Error(`Initial flow '${def.initialFlow}' not found in flows`);
     }
-  } else {
-    // Single-flow machine validation
-    if (!def.initial || typeof def.initial !== 'string') {
+  } else if ((hasStates || hasInitial) && !hasFlows) {
+    // Legacy format validation: single flow with states directly on machine
+    if (!hasInitial) {
       throw new Error('Single-flow machine definition must have an initial state');
     }
 
-    if (!def.states || typeof def.states !== 'object') {
+    if (!hasStates) {
       throw new Error('Single-flow machine definition must have states object');
     }
 
-    validateSingleFlow(def.id, def);
+    // Validate as a single flow (use machine id as flow id)
+    validateFlow(def.id, {
+      id: def.id,
+      initial: def.initial,
+      states: def.states,
+      meta: def.meta
+    });
+  } else {
+    // Invalid format - unclear what format this is supposed to be
+    if (!hasFlows && !hasStates && !hasInitial) {
+      throw new Error('Machine definition must have either flows (new format) or initial/states (legacy format)');
+    } else {
+      // Mixed format - has some properties from both formats
+      throw new Error('Machine definition cannot mix new format (flows) and legacy format (initial/states) properties');
+    }
   }
 
   return true;
 }
 
 /**
- * Validates a single flow definition.
+ * Validates an agent definition.
+ * @param definition - The definition to validate
+ * @returns True if valid
+ * @throws Error with validation details if invalid
  */
-function validateSingleFlow(flowId: string, flow: any): void {
+export function validateAgentDefinition(
+  definition: unknown,
+): definition is AgentDefinition {
+  if (!definition || typeof definition !== 'object') {
+    throw new Error('Agent definition must be an object');
+  }
+
+  const def = definition as any;
+
+  if (!def.id || typeof def.id !== 'string') {
+    throw new Error('Agent definition must have an id string');
+  }
+
+  if (!def.machine || typeof def.machine !== 'object') {
+    throw new Error('Agent definition must have a machine object');
+  }
+
+  // Validate the machine
+  validateMachineDefinition(def.machine);
+
+  return true;
+}
+
+/**
+ * Validates a flow definition.
+ */
+function validateFlow(flowId: string, flow: any): void {
   if (!flow.states || typeof flow.states !== 'object') {
     throw new Error(`Flow '${flowId}' must have states object`);
   }

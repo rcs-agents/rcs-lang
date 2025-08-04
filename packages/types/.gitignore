@@ -1,0 +1,12 @@
+# Generated files
+src/generated/
+schemas/
+
+# Build output
+dist/
+
+# Documentation
+docs/
+
+# Dependencies
+node_modules/

@@ -1,8 +1,8 @@
 import { browser } from '@wdio/globals';
 import { expect } from 'chai';
 import * as vscode from 'vscode';
-import * as testHelpers from '../../utils/testHelpers';
-import * as webviewHelpers from '../../utils/webviewHelpers';
+import * as testHelpers from '../../utils/testHelpers.js';
+import * as webviewHelpers from '../../utils/webviewHelpers.js';
 
 describe('Cursor Synchronization', () => {
   let workbench: any;
