@@ -5,7 +5,7 @@ prev: false
 title: "JsonLogicCondition"
 ---
 
-Defined in: [ast.ts:415](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/ast.ts#L415)
+Defined in: [ast.ts:415](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L415)
 
 A JSON Logic-based condition rule.
 
@@ -23,7 +23,7 @@ JsonLogicCondition ::= JsonLogicRule
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/81d1714
 
 > **rule**: [`Dictionary`](/api/ast/interfaces/dictionary/)
 
-Defined in: [ast.ts:417](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/ast.ts#L417)
+Defined in: [ast.ts:417](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L417)
 
 ***
 
@@ -43,4 +43,4 @@ Defined in: [ast.ts:417](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf
 
 > **type**: `"JsonLogicCondition"`
 
-Defined in: [ast.ts:416](https://github.com/rcs-agents/rcs-lang/blob/81d17140acf0fdf5d22c6fbab7c85de9a28f20ae/packages/ast/src/ast.ts#L416)
+Defined in: [ast.ts:416](https://github.com/rcs-agents/rcs-lang/blob/2c0291a4209143052b64b2c6ec7573ef29bacea2/packages/ast/src/ast.ts#L416)

@@ -40,6 +40,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@rcs-lang/core": "workspace:*",
     "neverthrow": "^8.0.0",
     "json-logic-js": "^2.0.2"
   },
