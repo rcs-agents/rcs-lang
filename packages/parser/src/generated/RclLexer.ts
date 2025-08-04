@@ -1,4 +1,4 @@
-import { RclLexerBase } from "../RclLexerBase.ts";
+import { RclLexerBase } from "../RclLexerBase";
 
 import * as antlr from "antlr4ng";
 import { Token } from "antlr4ng";
