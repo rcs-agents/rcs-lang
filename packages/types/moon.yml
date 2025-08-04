@@ -32,3 +32,22 @@ tasks:
       - build
     inputs:
       - src/**/*.test.ts
+  
+  docs:
+    command: typedoc
+    inputs:
+      - src/**/*.ts
+      - typedoc.json
+      - README.md
+    outputs:
+      - docs/**/*
+  
+  docs:markdown:
+    command: node scripts/generate-docs.js
+    deps:
+      - build
+    inputs:
+      - src/**/*.ts
+      - README.md
+    outputs:
+      - ../../apps/docs/src/content/docs/api/types/**/*

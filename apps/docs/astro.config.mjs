@@ -28,11 +28,14 @@ export default defineConfig({
 				starlightLinksValidator(),
 				// starlightPackageManagers(), // Still has compatibility issues
 				starlightTypeDoc({
-					entryPoints: ['../../packages/ast/src/index.ts'],
-					tsconfig: '../../packages/ast/tsconfig.json',
-					output: 'api/ast',
+					entryPoints: [
+						'../../packages/ast/src/index.ts',
+						'../../packages/types/src/index.ts'
+					],
+					tsconfig: '../../tsconfig.base.json',
+					output: 'api',
 					sidebar: {
-						label: 'AST API Reference',
+						label: 'API Reference',
 						collapsed: false,
 					},
 				}),
@@ -65,6 +68,7 @@ export default defineConfig({
 							items: [
 								{ label: '@rcs-lang/core', slug: 'packages/core' },
 								{ label: '@rcs-lang/ast', slug: 'packages/ast' },
+								{ label: '@rcs-lang/types', slug: 'packages/types' },
 								{ label: '@rcs-lang/file-system', slug: 'packages/file-system' },
 							]
 						},

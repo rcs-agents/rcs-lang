@@ -10,7 +10,7 @@
   "main": "dist/index.js",
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "typedoc": "^0.28.9",
+    "typedoc": "^0.28.7",
     "typedoc-plugin-markdown": "^4.8.0",
     "typescript": "5.3.3"
   },
@@ -32,7 +32,8 @@
     "lint": "moon run types:lint",
     "format": "moon run types:format",
     "docs": "typedoc",
-    "docs:watch": "typedoc --watch"
+    "docs:watch": "typedoc --watch",
+    "docs:markdown": "node scripts/generate-docs.js"
   },
   "type": "module",
   "types": "dist/index.d.ts"

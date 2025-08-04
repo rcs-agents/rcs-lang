@@ -36,6 +36,7 @@ bun add @rcs-lang/language-service
 |---------|---------|-------------|
 | **[@rcs-lang/core](/packages/core)** | Shared types, interfaces, and abstractions | Building any RCL tool - required foundation |
 | **[@rcs-lang/ast](/packages/ast)** | Type-safe AST definitions and utilities | Working with parsed RCL syntax trees |
+| **[@rcs-lang/types](/packages/types)** | RCS Business Messaging type definitions | Working with RBM APIs and message formats |
 | **[@rcs-lang/file-system](/packages/file-system)** | Cross-platform file operations | Building tools that read/write files |
 
 ### ⚙️ **Language Processing**
@@ -120,6 +121,7 @@ graph TB
     subgraph "🏗️ Foundation"
         AST[AST Types]
         Core[Core Interfaces]
+        Types[RBM Types]
         FileSystem[File System]
     end
     
