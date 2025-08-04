@@ -38,13 +38,8 @@ tasks:
         cd $MOON_WORKSPACE_ROOT/packages/parser/src/generated && \
         if [ -f RclLexer.ts ]; then \
           if ! grep -q "import { RclLexerBase }" RclLexer.ts; then \
-            sed -i.bak '1s/^/import { RclLexerBase } from "..\/RclLexerBase.ts";\n/' RclLexer.ts; \
+            sed -i.bak '1s/^/import { RclLexerBase } from "..\/RclLexerBase";\n/' RclLexer.ts; \
           fi && \
-          for file in *.ts; do \
-            if [ -f "$file" ]; then \
-              sed -i.bak 's/from "\(\.\.[^"]*\)\([^.]\)"/from "\1\2.ts"/g' "$file"; \
-            fi; \
-          done && \
           rm -f *.ts.bak; \
         else \
           echo "No generated files found, skipping fix-imports"; \
