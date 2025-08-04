@@ -49,5 +49,3 @@ tasks:
     inputs:
       - src/**/*.ts
       - README.md
-    outputs:
-      - ../../apps/docs/src/content/docs/api/types/**/*
