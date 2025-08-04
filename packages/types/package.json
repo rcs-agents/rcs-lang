@@ -33,7 +33,7 @@
     "format": "moon run types:format",
     "docs": "typedoc",
     "docs:watch": "typedoc --watch",
-    "docs:markdown": "node scripts/generate-docs.js"
+    "docs-markdown": "node scripts/generate-docs.js"
   },
   "type": "module",
   "types": "dist/index.d.ts"
