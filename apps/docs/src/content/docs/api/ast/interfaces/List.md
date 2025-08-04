@@ -5,7 +5,7 @@ prev: false
 title: "List"
 ---
 
-Defined in: [ast.ts:220](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L220)
+Defined in: [ast.ts:220](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L220)
 
 A list of values.
 
@@ -23,7 +23,7 @@ List ::= ParenthesesList | InlineList | BlockList
 
 > **items**: [`Value`](/api/ast/type-aliases/value/)[]
 
-Defined in: [ast.ts:222](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L222)
+Defined in: [ast.ts:222](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L222)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:222](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,4 +43,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/469fcdf
 
 > **type**: `"List"`
 
-Defined in: [ast.ts:221](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/ast.ts#L221)
+Defined in: [ast.ts:221](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L221)
