@@ -7,7 +7,7 @@ title: "createPosition"
 
 > **createPosition**(`line`, `character`): [`Position`](/api/ast/interfaces/position/)
 
-Defined in: [utils.ts:20](https://github.com/rcs-agents/rcs-lang/blob/469fcdfdc8e17c47e6157264f59d88421628e7a2/packages/ast/src/utils.ts#L20)
+Defined in: [utils.ts:20](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/utils.ts#L20)
 
 Create a position object
 
