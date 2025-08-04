@@ -59,7 +59,16 @@ tasks:
     outputs:
       - 'dist'
       
-  # postbuild task removed - TypeScript now handles import extension rewriting
+  postbuild:
+    command: bash
+    args:
+      - -c
+      - |
+        cd dist/generated && \
+        sed -i.bak 's/from "\(\.\.[^"]*\)"/from "\1.js"/g' *.js && \
+        rm -f *.js.bak
+    deps:
+      - build
 
   test:
     command: bun

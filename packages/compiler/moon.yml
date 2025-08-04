@@ -21,14 +21,14 @@ tasks:
   build:
     deps:
       - '@rcs-lang/core:build'
-      - '@rcs-lang/parser:build'
+      - 'parser:postbuild'
       - '@rcs-lang/validation:build'
       - '@rcs-lang/file-system:build'
 
   typecheck:
     deps:
       - '@rcs-lang/core:build'
-      - '@rcs-lang/parser:build'
+      - 'parser:postbuild'
       - '@rcs-lang/validation:build'
       - '@rcs-lang/file-system:build'
 
