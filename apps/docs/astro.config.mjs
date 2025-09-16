@@ -29,7 +29,7 @@ export default defineConfig({
 				// starlightPackageManagers(), // Still has compatibility issues
 				starlightTypeDoc({
 					entryPoints: ['../../packages/ast/src/index.ts'],
-					tsconfig: '../../packages/ast/tsconfig.json',
+					tsconfig: './typedoc.tsconfig.json',
 					output: 'api/ast',
 					sidebar: {
 						label: 'AST API Reference',

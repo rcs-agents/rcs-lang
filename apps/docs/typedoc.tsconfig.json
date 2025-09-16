@@ -1,0 +1,11 @@
+{
+  "extends": "../../packages/ast/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["../../packages/ast/src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+}

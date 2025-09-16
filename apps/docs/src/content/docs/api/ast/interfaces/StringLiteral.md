@@ -5,7 +5,7 @@ prev: false
 title: "StringLiteral"
 ---
 
-Defined in: [ast.ts:154](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L154)
+Defined in: [ast.ts:154](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L154)
 
 A double-quoted string literal. May contain interpolations.
 
@@ -19,7 +19,7 @@ A double-quoted string literal. May contain interpolations.
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/68cb652
 
 > **type**: `"StringLiteral"`
 
-Defined in: [ast.ts:155](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L155)
+Defined in: [ast.ts:155](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L155)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [ast.ts:155](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba69
 
 > **value**: `string`
 
-Defined in: [ast.ts:156](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L156)
+Defined in: [ast.ts:156](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L156)

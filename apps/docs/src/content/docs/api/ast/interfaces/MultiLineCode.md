@@ -5,7 +5,7 @@ prev: false
 title: "MultiLineCode"
 ---
 
-Defined in: [ast.ts:279](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L279)
+Defined in: [ast.ts:279](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L279)
 
 A multi-line embedded code block.
 
@@ -23,7 +23,7 @@ MultiLineCode ::= MULTI_LINE_CODE_START INDENT CodeContent DEDENT MULTI_LINE_COD
 
 > **code**: `string`
 
-Defined in: [ast.ts:282](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L282)
+Defined in: [ast.ts:282](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L282)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:282](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba69
 
 > `optional` **language**: `"js"` \| `"ts"`
 
-Defined in: [ast.ts:281](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L281)
+Defined in: [ast.ts:281](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L281)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [ast.ts:281](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba69
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -51,4 +51,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/68cb652
 
 > **type**: `"MultiLineCode"`
 
-Defined in: [ast.ts:280](https://github.com/rcs-agents/rcs-lang/blob/68cb652ba691370490e2f22c44219c82067584e3/packages/ast/src/ast.ts#L280)
+Defined in: [ast.ts:280](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L280)
