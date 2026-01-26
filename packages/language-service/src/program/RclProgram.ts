@@ -1,17 +1,18 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { RclConfig } from '../config/types';
-import { loadConfig } from '../config/loader';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { parse } from '@rcl/parser';
 import { Compiler } from '../compiler/compiler';
 import { Emitter } from '../compiler/emitter';
-import { 
-  RclProgram as IRclProgram, 
-  CompilationResult, 
-  Diagnostic, 
+import { loadConfig } from '../config/loader';
+import type { RclConfig } from '../config/types';
+import { SemanticValidator } from '../semantic/SemanticValidator';
+import type {
+  CompilationResult,
+  Diagnostic,
   EmitResult,
-  SourceFile 
+  RclProgram as IRclProgram,
+  SourceFile,
 } from './types';
-import { parse as parseRcl } from '@rcl/parser';
 
 /**
  * Implementation of RclProgram interface
@@ -23,24 +24,26 @@ export class RclProgram implements IRclProgram {
   private semanticDiagnostics: Map<string, Diagnostic[]> = new Map();
   private compiler: Compiler;
   private emitter: Emitter;
+  private semanticValidator: SemanticValidator;
 
   constructor(configPath?: string) {
     // Load configuration
     const loadResult = loadConfig(configPath || process.cwd());
     this.config = loadResult.config;
-    
+
     if (loadResult.errors.length > 0) {
       this.diagnostics.push(
-        ...loadResult.errors.map(error => ({
+        ...loadResult.errors.map((error) => ({
           message: error,
           severity: 'error' as const,
-        }))
+        })),
       );
     }
 
-    // Initialize compiler and emitter
+    // Initialize compiler, emitter, and semantic validator
     this.compiler = new Compiler();
     this.emitter = new Emitter(this.config);
+    this.semanticValidator = new SemanticValidator();
   }
 
   /**
@@ -57,10 +60,10 @@ export class RclProgram implements IRclProgram {
     try {
       // Read file
       const content = await fs.promises.readFile(filePath, 'utf-8');
-      
+
       // Parse the file
-      const parseResult = await parseRcl(content);
-      
+      const parseResult = await parse(content);
+
       // Store source file
       const sourceFile: SourceFile = {
         path: filePath,
@@ -69,7 +72,8 @@ export class RclProgram implements IRclProgram {
         parseErrors: [],
       };
 
-      // Check for parse errors
+      // Check for parse errors but don't fail immediately
+      // Allow semantic validation to run even with parse errors
       if (parseResult.errors && parseResult.errors.length > 0) {
         sourceFile.parseErrors = parseResult.errors.map((error: any) => ({
           message: error.message || 'Parse error',
@@ -78,34 +82,39 @@ export class RclProgram implements IRclProgram {
           line: error.line,
           column: error.column,
         }));
-        
-        this.sourceFiles.set(filePath, sourceFile);
-        
-        return {
-          success: false,
-          diagnostics: sourceFile.parseErrors || [],
-        };
       }
 
       this.sourceFiles.set(filePath, sourceFile);
 
-      // Compile AST
-      const compiledAgent = this.compiler.compile(parseResult.ast, content, filePath);
-      const compilerDiagnostics = this.compiler.getDiagnostics();
-      
-      // Store semantic diagnostics for this file
-      this.semanticDiagnostics.set(filePath, compilerDiagnostics);
+      // Perform semantic validation
+      const validationResult = this.semanticValidator.validate(parseResult.ast);
 
-      if (!compiledAgent || compilerDiagnostics.some(d => d.severity === 'error')) {
+      // Validation diagnostics are already in the correct format
+      const semanticDiagnostics: Diagnostic[] = validationResult.diagnostics.map((d) => ({
+        ...d,
+        file: filePath,
+      }));
+
+      // Compile AST
+      const compiledAgent = await this.compiler.compile(parseResult.ast, content, filePath);
+      const compilerDiagnostics = this.compiler.getDiagnostics();
+
+      // Combine semantic validation diagnostics with compiler diagnostics
+      const allDiagnostics = [...semanticDiagnostics, ...compilerDiagnostics];
+
+      // Store semantic diagnostics for this file
+      this.semanticDiagnostics.set(filePath, allDiagnostics);
+
+      if (!compiledAgent || allDiagnostics.some((d) => d.severity === 'error')) {
         return {
           success: false,
-          diagnostics: compilerDiagnostics,
+          diagnostics: allDiagnostics,
         };
       }
 
       return {
         success: true,
-        diagnostics: compilerDiagnostics,
+        diagnostics: allDiagnostics,
         data: compiledAgent,
       };
     } catch (error) {
@@ -114,7 +123,7 @@ export class RclProgram implements IRclProgram {
         severity: 'error',
         file: filePath,
       };
-      
+
       return {
         success: false,
         diagnostics: [diagnostic],
@@ -127,19 +136,19 @@ export class RclProgram implements IRclProgram {
    */
   getDiagnostics(): Diagnostic[] {
     const allDiagnostics: Diagnostic[] = [...this.diagnostics];
-    
+
     // Add parse errors from all source files
     for (const sourceFile of this.sourceFiles.values()) {
       if (sourceFile.parseErrors) {
         allDiagnostics.push(...sourceFile.parseErrors);
       }
     }
-    
+
     // Add semantic diagnostics from all source files
     for (const diagnostics of this.semanticDiagnostics.values()) {
       allDiagnostics.push(...diagnostics);
     }
-    
+
     return allDiagnostics;
   }
 
@@ -159,13 +168,13 @@ export class RclProgram implements IRclProgram {
    */
   getSyntacticDiagnostics(): Diagnostic[] {
     const syntacticDiagnostics: Diagnostic[] = [];
-    
+
     for (const sourceFile of this.sourceFiles.values()) {
       if (sourceFile.parseErrors) {
         syntacticDiagnostics.push(...sourceFile.parseErrors);
       }
     }
-    
+
     return syntacticDiagnostics;
   }
 
@@ -185,7 +194,7 @@ export class RclProgram implements IRclProgram {
 
       // Compile the file
       const compilationResult = await this.compileFile(sourceFile.path);
-      
+
       if (!compilationResult.success || !compilationResult.data) {
         diagnostics.push(...compilationResult.diagnostics);
         continue;
@@ -198,7 +207,7 @@ export class RclProgram implements IRclProgram {
     }
 
     return {
-      success: diagnostics.filter(d => d.severity === 'error').length === 0,
+      success: diagnostics.filter((d) => d.severity === 'error').length === 0,
       emittedFiles,
       diagnostics,
     };

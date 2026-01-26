@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCL IDE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .ide-container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+        }
+
+        .ide-header {
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+        }
+
+        .ide-title {
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ide-main {
+            display: flex;
+            overflow: hidden;
+        }
+
+        .editor-panel {
+            flex: 1;
+            border-right: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 8px 16px;
+            border-bottom: 1px solid #444;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #252526;
+        }
+
+        .tabs-container {
+            display: flex;
+            background: #2d2d30;
+            border-bottom: 1px solid #444;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .tab:hover {
+            background: #3e3e42;
+        }
+
+        .tab.active {
+            border-bottom-color: #007acc;
+            background: #252526;
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .tab-panel {
+            display: none;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .tab-panel.active {
+            display: block;
+            z-index: 10;
+        }
+
+        .diagram-container {
+            height: 100%;
+            background: #1e1e1e;
+            border-radius: 4px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            contain: layout style paint;
+        }
+        
+        .diagram-container svg {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .code-output {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 4px;
+            height: 100%;
+            overflow: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .code-content {
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .export-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .export-section {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 4px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .export-header {
+            padding: 8px 16px;
+            background: #2d2d30;
+            border-bottom: 1px solid #444;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .export-content {
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .error {
+            color: #f85c5c;
+            background: #4c1a1a;
+            padding: 16px;
+            border-radius: 4px;
+            margin: 16px;
+        }
+
+        /* Monaco editor overrides */
+        .monaco-editor {
+            background: #1e1e1e !important;
+        }
+
+        .monaco-editor .margin {
+            background: #1e1e1e !important;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2d2d30;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        .preview-container {
+            flex: 1;
+            overflow: auto;
+            background: #1e1e1e;
+            border-radius: 4px;
+            position: relative;
+            height: 100%;
+            z-index: 1;
+            contain: layout style paint;
+        }
+        
+        .preview-container svg {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .preview-container pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .error-panel {
+            background: #3a1a1a;
+            border: 1px solid #ff4444;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 4px;
+            color: #ff6666;
+        }
+
+        .error-panel h3 {
+            margin: 0 0 10px 0;
+            color: #ff4444;
+        }
+
+        .d2-diagram {
+            height: 100%;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .d2-diagram pre {
+            margin: 0;
+            padding: 16px;
+            background: #2d2d30;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            white-space: pre;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="ide-container">
+        <!-- IDE Header with Title and Toolbar -->
+        <div class="ide-header">
+            <div class="ide-title">
+                <span>🚀</span>
+                <span>RCL IDE</span>
+            </div>
+            <div id="toolbar-container"></div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="ide-main">
+            <!-- Left Panel - Monaco Editor -->
+            <div class="editor-panel">
+                <div class="editor-header">
+                    📝 coffee-shop.rcl
+                </div>
+                <div class="editor-container" id="editor-container">
+                    <div class="loading">Loading Monaco Editor...</div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Tabs -->
+            <div class="right-panel">
+            <div class="tabs-container">
+                <div class="tab active" data-tab="preview">👁️ Preview</div>
+                <div class="tab" data-tab="code">📄 Code</div>
+                <div class="tab" data-tab="export">📤 Export</div>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Preview Tab -->
+                <div class="tab-panel active" id="preview-panel">
+                    <div class="preview-container" id="preview-container">
+                        <div class="loading">Compile RCL to see D2 diagram preview...</div>
+                    </div>
+                </div>
+
+                <!-- Flow Tab -->
+                <div class="tab-panel" id="flow-panel">
+                    <div class="diagram-container" id="diagram-container">
+                        <div class="loading">Loading Flow Diagram...</div>
+                    </div>
+                </div>
+
+                <!-- Code Tab -->
+                <div class="tab-panel" id="code-panel">
+                    <div class="code-output">
+                        <div class="code-content" id="code-content">
+                            <div class="loading">Compile RCL to see JavaScript output...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Tab -->
+                <div class="tab-panel" id="export-panel">
+                    <div class="export-container">
+                        <div class="export-section">
+                            <div class="export-header">JSON Output</div>
+                            <div class="export-content" id="json-content">
+                                <div class="loading">Compile RCL to see JSON output...</div>
+                            </div>
+                        </div>
+                        <div class="export-section">
+                            <div class="export-header">Agent Config</div>
+                            <div class="export-content" id="config-content">
+                                <div class="loading">Compile RCL to see agent configuration...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        // Global polyfills for browser environment
+        window.assert = function(condition, message) {
+            if (!condition) {
+                throw new Error(message || 'Assertion failed');
+            }
+        };
+        window.process = { env: { NODE_ENV: 'production' } };
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

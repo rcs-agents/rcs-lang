@@ -1,0 +1,95 @@
+agent ComplexAgent
+  displayName: "Complex Test Agent"
+  
+  config
+    description: "A comprehensive test agent"
+    logoUri: <url https://example.com/logo.png>
+    color: "#FF5733"
+    phoneNumber: <phone +1-555-0123>
+    phoneLabel: "Call Support"
+  
+  defaults
+    fallbackMessage: "I didn't understand that. Please try again."
+    messageTrafficType: :transactional
+  
+  flow MainFlow
+    start: Welcome
+    
+    on Welcome
+      match @reply.text
+        "start" -> Menu
+        "help" -> Help
+        :default -> Welcome
+    
+    on Menu
+      match @reply.text
+        "option1" -> Option1
+        "option2" -> Option2
+        "back" -> Welcome
+        :default -> Menu
+    
+    on Option1
+      match @reply.text
+        "confirm" -> Confirmed
+        "cancel" -> Menu
+        :default -> Option1
+    
+    on Option2
+      match @reply.text
+        "proceed" -> Processing
+        "cancel" -> Menu
+        :default -> Option2
+    
+    on Confirmed
+      -> ThankYou
+    
+    on Processing
+      -> Complete
+    
+    on Complete
+      -> ThankYou
+    
+    on ThankYou
+      -> Welcome
+    
+    on Help
+      -> Welcome
+  
+  messages Messages
+    richCard Welcome "Welcome!" :large
+      description: "Welcome to our service. How can we help you today?"
+      suggestions
+        reply "start"
+        reply "help"
+    
+    text Menu "Please choose an option:"
+      suggestions
+        reply "option1" "First Option"
+        reply "option2" "Second Option"
+        reply "back" "Go Back"
+    
+    richCard Option1 "Option 1 Selected" :medium
+      description: "You've selected option 1. Would you like to confirm?"
+      suggestions
+        reply "confirm"
+        reply "cancel"
+    
+    text Option2 "You selected option 2. Ready to proceed?"
+      suggestions
+        reply "proceed"
+        reply "cancel"
+    
+    text Confirmed "Great! Your selection has been confirmed."
+    
+    text Processing "Processing your request..."
+    
+    richCard Complete "Request Complete!" :large
+      description: "Your request has been processed successfully."
+    
+    text ThankYou "Thank you for using our service!"
+      suggestions
+        reply "start" "Start Over"
+    
+    text Help "I'm here to help! Use the menu options to navigate."
+      suggestions
+        reply "start" "Get Started"

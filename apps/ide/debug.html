@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDE Debug</title>
+</head>
+<body>
+    <h1>Checking IDE Status...</h1>
+    <div id="status"></div>
+    
+    <script>
+        const status = document.getElementById('status');
+        
+        // Check if we can load the main module
+        status.innerHTML += '<p>Attempting to load main module...</p>';
+        
+        // Check Vite connection
+        if (window.__vite_is_modern_browser) {
+            status.innerHTML += '<p>✅ Vite is connected</p>';
+        } else {
+            status.innerHTML += '<p>❌ Vite not detected</p>';
+        }
+        
+        // Try loading the module
+        import('/src/main.ts')
+            .then(() => {
+                status.innerHTML += '<p>✅ Module loaded successfully</p>';
+            })
+            .catch(err => {
+                status.innerHTML += '<p>❌ Module load failed: ' + err.message + '</p>';
+                console.error('Module load error:', err);
+            });
+            
+        // Check if Monaco is available
+        setTimeout(() => {
+            if (window.monaco) {
+                status.innerHTML += '<p>✅ Monaco Editor loaded</p>';
+            } else {
+                status.innerHTML += '<p>❌ Monaco Editor not loaded</p>';
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

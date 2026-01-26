@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
-import { loadConfig, getOutputPath } from '../../src/config/loader';
-import { RclConfig } from '../../src/config/types';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { getOutputPath, loadConfig } from '../../src/config/loader';
+import type { RclConfig } from '../../src/config/types';
 
 describe('Config Loader', () => {
-  const testDir = path.join(__dirname, '.test-workspace-' + Date.now());
+  const testDir = path.join(__dirname, `.test-workspace-${Date.now()}`);
   const configPath = path.join(testDir, 'rcl.config.json');
 
   beforeEach(() => {
@@ -28,12 +28,12 @@ describe('Config Loader', () => {
       // the config system works correctly regardless
       const isolatedDir = path.join(testDir, 'isolated');
       fs.mkdirSync(isolatedDir, { recursive: true });
-      
+
       const result = loadConfig(isolatedDir);
-      
+
       expect(result.errors).toHaveLength(0);
       expect(result.config.compilerOptions?.strict).toBe(true);
-      
+
       // The config should have valid settings whether from parent or defaults
       expect(result.config.compilerOptions?.generateSourceMap).toBeDefined();
       expect(result.config.compilerOptions?.emit?.json).toBe(true);
@@ -52,7 +52,7 @@ describe('Config Loader', () => {
       fs.writeFileSync(configPath, JSON.stringify(testConfig, null, 2));
 
       const result = loadConfig(testDir);
-      
+
       expect(result.configFilePath).toBe(configPath);
       expect(result.errors).toHaveLength(0);
       expect(result.config.outDir).toBe(path.join(testDir, 'dist'));
@@ -71,7 +71,7 @@ describe('Config Loader', () => {
       fs.writeFileSync(configPath, JSON.stringify(testConfig, null, 2));
 
       const result = loadConfig(subDir);
-      
+
       expect(result.configFilePath).toBe(configPath);
       expect(result.config.rootDir).toBe(testDir);
       expect(result.config.outDir).toBe(path.join(testDir, 'build'));
@@ -81,7 +81,7 @@ describe('Config Loader', () => {
       fs.writeFileSync(configPath, 'invalid json content');
 
       const result = loadConfig(testDir);
-      
+
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0]).toContain('Failed to load config');
       expect(result.config.rootDir).toBe(testDir);
@@ -101,7 +101,7 @@ describe('Config Loader', () => {
       fs.writeFileSync(configPath, JSON.stringify(testConfig, null, 2));
 
       const result = loadConfig(testDir);
-      
+
       expect(result.config.compilerOptions?.emit?.javascript).toBe(false);
       expect(result.config.compilerOptions?.emit?.json).toBe(true);
       expect(result.config.compilerOptions?.emit?.declarations).toBe(true);
@@ -128,7 +128,7 @@ describe('Config Loader', () => {
       };
 
       const jsonPath = getOutputPath(sourceFile, config, '.json');
-      
+
       expect(jsonPath).toBe(path.join(testDir, 'dist', 'src', 'agents', 'bot.json'));
     });
 
@@ -140,7 +140,7 @@ describe('Config Loader', () => {
       };
 
       const jsPath = getOutputPath(sourceFile, config, '.js');
-      
+
       expect(jsPath).toBe(path.join(testDir, 'build', 'agents', 'travel', 'bot.js'));
     });
   });

@@ -1,0 +1,229 @@
+title: Quick Coffee
+
+# Flow: OrderFlow
+
+start: {shape: circle}
+start -> Welcome
+
+# State: Welcome
+Welcome: {
+  shape: hexagon
+  style.fill: "#e1f5fe"
+}
+
+Welcome -> ChooseSize: "Order Coffee" {
+  style.stroke-width: 2
+}
+Welcome -> ShowMenu: "View Menu" {
+  style.stroke-width: 2
+}
+Welcome -> StoreInfo: "Store Hours" {
+  style.stroke-width: 2
+}
+Welcome -> Welcome: ":default" {
+  style.stroke-width: 2
+}
+
+
+# State: ChooseSize
+ChooseSize: {
+  shape: hexagon
+  style.fill: "#e1f5fe"
+}
+
+ChooseSize -> ChooseDrink: "Small" {
+  style.stroke-width: 2
+}
+ChooseSize -> ChooseDrink: "Medium" {
+  style.stroke-width: 2
+}
+ChooseSize -> ChooseDrink: "Large" {
+  style.stroke-width: 2
+}
+
+ChooseSize_Invalid: {
+  shape: rectangle
+  near: ChooseSize
+  style.fill: "#ffcdd2"
+  label: "Invalid Option"
+}
+
+ChooseSize -> ChooseSize_Invalid: ":default" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+ChooseSize_Invalid -> ChooseSize: "retry" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+
+
+# State: ChooseDrink
+ChooseDrink: {
+  shape: hexagon
+  style.fill: "#e1f5fe"
+}
+
+ChooseDrink -> Customize: "Espresso" {
+  style.stroke-width: 2
+}
+ChooseDrink -> Customize: "Cappuccino" {
+  style.stroke-width: 2
+}
+ChooseDrink -> Customize: "Latte" {
+  style.stroke-width: 2
+}
+ChooseDrink -> Customize: "Americano" {
+  style.stroke-width: 2
+}
+
+ChooseDrink_Invalid: {
+  shape: rectangle
+  near: ChooseDrink
+  style.fill: "#ffcdd2"
+  label: "Invalid Option"
+}
+
+ChooseDrink -> ChooseDrink_Invalid: ":default" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+ChooseDrink_Invalid -> ChooseDrink: "retry" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+
+
+# State: Customize
+Customize: {
+  shape: hexagon
+  style.fill: "#e1f5fe"
+}
+
+Customize -> ConfirmOrder: "Regular" {
+  style.stroke-width: 2
+}
+Customize -> ConfirmOrder: "Skim" {
+  style.stroke-width: 2
+}
+Customize -> ConfirmOrder: "Soy" {
+  style.stroke-width: 2
+}
+Customize -> ConfirmOrder: "Oat" {
+  style.stroke-width: 2
+}
+Customize -> ConfirmOrder: "No Milk" {
+  style.stroke-width: 2
+}
+
+Customize_Invalid: {
+  shape: rectangle
+  near: Customize
+  style.fill: "#ffcdd2"
+  label: "Invalid Option"
+}
+
+Customize -> Customize_Invalid: ":default" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+Customize_Invalid -> Customize: "retry" {
+  style.stroke-dash: 3
+  style.stroke: "#ff5252"
+}
+
+
+# State: ConfirmOrder
+ConfirmOrder: {
+  shape: hexagon
+  style.fill: "#e1f5fe"
+}
+
+ConfirmOrder -> ProcessPayment: "Confirm" {
+  style.stroke-width: 2
+}
+ConfirmOrder -> OrderCancelled: "Cancel" {
+  style.stroke-width: 2
+}
+ConfirmOrder -> ConfirmOrder: ":default" {
+  style.stroke-width: 2
+}
+
+
+# State: ProcessPayment
+ProcessPayment: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+
+ProcessPayment -> OrderComplete: always {
+  style.stroke-dash: 3
+}
+
+# State: OrderCancelled
+OrderCancelled: {
+  shape: rectangle
+  style.fill: "#ffcdd2"
+}
+
+OrderCancelled -> ShowMenu: always {
+  style.stroke-dash: 3
+}
+
+# State: OrderComplete
+OrderComplete: {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+}
+
+OrderComplete -> ThankYou: always {
+  style.stroke-dash: 3
+}
+
+# State: ThankYou
+ThankYou: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+
+ThankYou -> ShowMenu: always {
+  style.stroke-dash: 3
+}
+
+# State: ShowMenu
+ShowMenu: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+
+ShowMenu -> Welcome: always {
+  style.stroke-dash: 3
+}
+
+# State: StoreInfo
+StoreInfo: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+
+StoreInfo -> Welcome: always {
+  style.stroke-dash: 3
+}
+
+
+# Legend
+legend: {
+  shape: rectangle
+  style.fill: "#f5f5f5"
+  label: |md
+    # Legend
+    - **Circle**: Start state
+    - **Rectangle**: Simple state
+    - **Hexagon**: State with match conditions
+    - **Red**: Error/Invalid states
+    - **Green**: Success states
+    - **Solid arrow**: Valid transition
+    - **Dashed red arrow**: Error path
+    - **Dashed gray arrow**: Default/other
+  |
+}

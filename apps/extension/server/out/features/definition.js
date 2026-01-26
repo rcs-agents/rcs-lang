@@ -5,7 +5,7 @@ class DefinitionProvider {
     constructor(parser) {
         this.parser = parser;
     }
-    async getDefinition(document, position) {
+    async getDefinition(_document, _position) {
         // Basic implementation - can be enhanced later
         return null;
     }

@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcl-lang.org/schemas/messages-section.json",
+  "title": "RCL Messages Section Schema",
+  "description": "Schema for validating messages sections in RCL's generic syntax",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "messages",
+      "description": "Section type must be 'messages'"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9_-]*$",
+      "description": "Messages section identifier in Title Case"
+    },
+    "attributes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-zA-Z0-9_]*$": {
+          "$ref": "#/definitions/MessageAttribute"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MessageSubSection"
+      }
+    }
+  },
+  "required": ["type"],
+  "definitions": {
+    "MessageAttribute": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Simple text message"
+        },
+        {
+          "type": "object",
+          "description": "Message with metadata or complex content"
+        }
+      ]
+    },
+    "MessageSubSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "card", "carousel", "file", "suggestions", "rich"],
+          "description": "Type of message content"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_-]*$"
+        },
+        "attributes": {
+          "type": "object",
+          "description": "Message-specific attributes"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessageSubSection"
+          }
+        }
+      },
+      "required": ["type"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "text" } }
+          },
+          "then": {
+            "properties": {
+              "attributes": {
+                "$ref": "#/definitions/TextMessageAttributes"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "suggestions" } }
+          },
+          "then": {
+            "properties": {
+              "sections": {
+                "items": {
+                  "$ref": "#/definitions/SuggestionSection"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "card" } }
+          },
+          "then": {
+            "properties": {
+              "attributes": {
+                "$ref": "#/definitions/CardAttributes"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "carousel" } }
+          },
+          "then": {
+            "properties": {
+              "attributes": {
+                "$ref": "#/definitions/CarouselAttributes"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TextMessageAttributes": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The message text content"
+        },
+        "messageTrafficType": {
+          "type": "string",
+          "enum": [
+            "AUTHENTICATION",
+            "TRANSACTION",
+            "PROMOTION",
+            "SERVICEREQUEST",
+            "ACKNOWLEDGEMENT"
+          ],
+          "description": "Type of message traffic"
+        },
+        "ttl": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]{1,9})?s$",
+          "description": "Time to live duration"
+        },
+        "expireTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Expiration timestamp"
+        }
+      }
+    },
+    "SuggestionSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["reply", "action"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_-]*$"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "maxLength": 25
+            },
+            "postbackData": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          "required": ["text"]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ActionSection"
+          }
+        }
+      },
+      "required": ["type"]
+    },
+    "ActionSection": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["dial", "view", "calendar", "open", "share"]
+        },
+        "attributes": {
+          "type": "object"
+        }
+      },
+      "required": ["type"]
+    },
+    "CardAttributes": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "orientation": {
+          "type": "string",
+          "enum": ["HORIZONTAL", "VERTICAL"]
+        }
+      }
+    },
+    "CarouselAttributes": {
+      "type": "object",
+      "properties": {
+        "cardWidth": {
+          "type": "string",
+          "enum": ["SMALL", "MEDIUM"]
+        }
+      }
+    }
+  }
+}

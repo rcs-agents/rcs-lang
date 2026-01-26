@@ -11,11 +11,6 @@
       "declarations": true
     }
   },
-  "include": [
-    "examples/**/*.rcl"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.test.rcl"
-  ]
+  "include": ["examples/**/*.rcl"],
+  "exclude": ["node_modules", "**/*.test.rcl"]
 }

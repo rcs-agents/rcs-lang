@@ -1,0 +1,290 @@
+agent CoffeeShop
+INDENT__
+displayName: "Quick Coffee"
+start: OrderFlow
+
+config
+    # defines the properties of the RcsBusinessMessagingAgent object from agent.schema.json
+INDENT__
+description: "Order your favorite coffee for pickup"
+logoUri: <url https://quickcoffee.com/logo.png>
+color: "#6F4E37"
+
+phoneNumber: <phone +1-555-0123>
+phoneLabel: "Call Store"
+
+DEDENT__
+defaults
+    # override the values in the rcl.config.json file
+INDENT__
+fallbackMessage: "I didn't understand that. Please choose from the available options."
+messageTrafficType: :promotion
+postbackData: $js> (suggestion) => suggestion?.text?.toLowerCase().replace(/[^a-z0-9]/g, '_')
+
+DEDENT__
+flow OrderFlow
+    # the `start` attribute is required and must be the ID of a state
+INDENT__
+start: Welcome
+
+    # states are now sections of type `on`
+on InvalidOption
+      # This state returns to the state specified in the 'next' context variable
+INDENT__
+@next
+
+DEDENT__
+on Welcome
+      # the `match` section is a list of Ma
+INDENT__
+match @reply.text
+INDENT__
+"Order Coffee" -> ChooseSize
+"View Menu" -> ShowMenu
+"Store Hours" -> StoreInfo
+:default -> Welcome
+
+DEDENT__
+DEDENT__
+on ChooseSize
+INDENT__
+match @reply.text
+INDENT__
+"Small" -> ChooseDrink with size: "small", price: <money 3.50>
+"Medium" -> ChooseDrink with size: "medium", price: <money 4.50>
+"Large" -> ChooseDrink with size: "large", price: <money 5.50>
+:default -> InvalidOption with property: "size", next: ChooseSize
+
+DEDENT__
+DEDENT__
+on ChooseDrink
+INDENT__
+match @reply.text
+INDENT__
+"Espresso" -> Customize with drink: "espresso"
+"Cappuccino" -> Customize with drink: "cappuccino"
+"Latte" -> Customize with drink: "latte"
+"Americano" -> Customize with drink: "americano"
+:default -> InvalidOption with property: "drink", next: ChooseDrink
+
+DEDENT__
+DEDENT__
+on Customize
+INDENT__
+match @reply.text
+INDENT__
+"Regular" -> ConfirmOrder with milk: "regular"
+"Skim" -> ConfirmOrder with milk: "skim"
+"Soy" -> ConfirmOrder with milk: "soy", extraCharge: 0.60
+"Oat" -> ConfirmOrder with milk: "oat", extraCharge: 0.60
+"No Milk" -> ConfirmOrder with milk: "none"
+:default -> InvalidOption with property: "milk", next: Customize
+
+DEDENT__
+DEDENT__
+on ConfirmOrder
+INDENT__
+match @reply.text
+INDENT__
+"Confirm" -> ProcessPayment
+"Cancel" -> OrderCancelled
+:default -> ConfirmOrder
+
+DEDENT__
+DEDENT__
+on ProcessPayment
+INDENT__
+-> OrderComplete
+
+DEDENT__
+on OrderCancelled
+INDENT__
+-> ShowMenu
+
+DEDENT__
+on OrderComplete
+INDENT__
+-> ThankYou
+
+DEDENT__
+on ThankYou
+INDENT__
+-> ShowMenu
+
+DEDENT__
+on ShowMenu
+INDENT__
+-> Welcome
+
+DEDENT__
+on StoreInfo
+INDENT__
+Welcome
+
+DEDENT__
+DEDENT__
+messages Messages
+INDENT__
+richCard Welcome "Welcome to Quick Coffee!" :large
+INDENT__
+description: "Get your favorite coffee ready for pickup in minutes!"
+media: <url https://quickcoffee.com/welcome.jpg>
+suggestions
+INDENT__
+reply "Order Coffee"
+reply "View Menu"
+reply "Store Hours"
+
+DEDENT__
+DEDENT__
+text ChooseSize "What size would you like?"
+INDENT__
+suggestions
+INDENT__
+reply "Small $3.50"
+reply "Medium $4.50"
+reply "Large $5.50"
+
+DEDENT__
+DEDENT__
+text Invalid Size "Please choose a valid size."
+INDENT__
+suggestions
+INDENT__
+reply "Small $3.50"
+reply "Medium $4.50"
+reply "Large $5.50"
+
+    # String interpolation is now supported in any string using the #{variable} syntax
+    # The `@` symbol is used to reference the current state's context properties
+DEDENT__
+DEDENT__
+text ChooseDrink "Great! A #{@size} coffee. What type would you like?"
+INDENT__
+suggestions
+INDENT__
+reply "Espresso"
+reply "Cappuccino"
+reply "Latte"
+reply "Americano"
+
+DEDENT__
+DEDENT__
+text Invalid Drink "Please choose from our available drinks."
+INDENT__
+suggestions
+INDENT__
+reply "Espresso"
+reply "Cappuccino"
+reply "Latte"
+reply "Americano"
+
+DEDENT__
+DEDENT__
+text Customize "Perfect! A #{context.size} #{context.drink}. How would you like your milk?"
+INDENT__
+suggestions
+INDENT__
+reply "Regular"
+reply "Skim"
+reply "Soy +$0.60"
+reply "Oat +$0.60"
+reply "No Milk"
+
+DEDENT__
+DEDENT__
+text Invalid Milk "Please choose a valid milk option."
+INDENT__
+suggestions
+INDENT__
+reply "Regular"
+reply "Skim"
+reply "Soy +$0.60"
+reply "Oat +$0.60"
+reply "No Milk"
+
+DEDENT__
+DEDENT__
+richCard ConfirmOrder "Confirm Your Order" :medium
+INDENT__
+description: "#{context.size} #{context.drink} with #{context.milk} milk\nTotal: $#{(context.price + (context.extraCharge || 0)).toFixed(2)}"
+media: <url https://quickcoffee.com/coffee.jpg>
+suggestions
+INDENT__
+reply "Confirm"
+reply "Cancel"
+
+DEDENT__
+DEDENT__
+text ProcessPayment "Processing your payment..."
+
+richCard OrderComplete "Order Confirmed!" :large
+INDENT__
+description: """
+INDENT__
+Your order will be ready for pickup in 5-7 minutes.
+Show this confirmation at the counter.
+DEDENT__
+"""
+media: <url https://quickcoffee.com/confirmed.jpg>
+suggestions
+INDENT__
+saveEvent "Add to Calendar"
+INDENT__
+title: "Coffee Pickup"
+startTime: <datetime +5m>
+endTime: <datetime +15m>
+description: "Pick up #{@size} #{@drink}"
+
+DEDENT__
+DEDENT__
+DEDENT__
+text OrderCancelled "Your order has been cancelled. Thank you!"
+
+text ThankYou """
+INDENT__
+Thank you for your order!
+Your order will be ready for pickup in 5-7 minutes.
+Show this confirmation at the counter.
+DEDENT__
+"""
+
+carousel ShowMenu "Our Coffee Menu" :medium
+INDENT__
+richCard EspressoCard "Espresso" :compact
+INDENT__
+description: "Rich, bold shot of coffee"
+media: <url https://quickcoffee.com/espresso.jpg>
+
+DEDENT__
+richCard CappuccinoCard "Cappuccino" :compact
+INDENT__
+description: "Espresso with steamed milk foam"
+media: <url https://quickcoffee.com/cappuccino.jpg>
+
+DEDENT__
+richCard LatteCard "Latte" :compact
+INDENT__
+description: "Espresso with steamed milk"
+media: <url https://quickcoffee.com/latte.jpg>
+
+DEDENT__
+richCard AmericanoCard "Americano" :compact
+INDENT__
+description: "Espresso with hot water"
+media: <url https://quickcoffee.com/americano.jpg>
+
+DEDENT__
+DEDENT__
+text StoreInfo "We're open Monday-Friday 6am-7pm, weekends 7am-6pm."
+
+    # multi-line strings can now be defined with """
+text InvalidOption """
+INDENT__
+Sorry, that's not a valid option for #{@property}.
+Please choose from the available options.
+DEDENT__
+"""
+
+DEDENT__
+DEDENT__

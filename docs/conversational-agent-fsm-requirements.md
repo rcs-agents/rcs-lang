@@ -1,0 +1,321 @@
+# Conversational Agent FSM Requirements Analysis
+
+## Overview
+
+This document analyzes the requirements for a Finite State Machine (FSM) implementation to power the backend of RCS conversational agents, and evaluates whether XState is the appropriate solution or if a simpler alternative would be more suitable.
+
+## Core Requirements
+
+### 1. State Persistence and Restoration
+- **Requirement**: Ability to save and restore machine state between requests
+- **Use Case**: HTTP-based conversations where each request is stateless
+- **Details**: 
+  - Serialize current state, context variables, and history
+  - Deserialize and resume from any point in the conversation
+
+### 2. URL-Safe State Representation
+- **Requirement**: Generate a hash representation of state that can be appended to URLs
+- **Use Case**: Server-side state restoration from URL parameters
+- **Details**:
+  - Compact, URL-safe encoding of state + context
+  - Deterministic hash generation
+  - Ability to decode and reconstruct full state
+
+### 3. User Response Processing
+- **Requirement**: Process user responses to determine next state
+- **Use Case**: Handle text messages, button clicks, and other user inputs
+- **Details**:
+  - Pattern matching on user input
+  - Default/fallback handling
+  - Context-aware transitions
+
+### 4. State Entry Actions
+- **Requirement**: Execute actions upon entering a state
+- **Use Case**: Send messages, log events, call APIs
+- **Details**:
+  - Side effects on state entry
+  - Access to context variables
+  - Async action support
+
+### 5. Transient States
+- **Requirement**: States that automatically transition when their action completes
+- **Use Case**: Processing states, validation states, intermediate logic
+- **Details**:
+  - Parameterized target states (e.g., InvalidOption → @next)
+  - No user interaction required
+  - Immediate transition after action
+
+## Additional Requirements (Discovered)
+
+### 6. Context Management
+- **Requirement**: Accumulate and access conversation context
+- **Use Case**: Collect user choices throughout conversation
+- **Details**:
+  - Hierarchical context (state-specific + global)
+  - Variable interpolation in messages
+  - Context persistence across state transitions
+
+### 7. Message Templating
+- **Requirement**: Dynamic message generation with context variables
+- **Use Case**: Personalized responses using collected data
+- **Details**:
+  - String interpolation: `#{context.size}`, `#{@price}`
+  - JavaScript expressions: `${(context.price + extraCharge).toFixed(2)}`
+  - Conditional content based on context
+
+### 8. Multi-Machine Architecture
+- **Requirement**: Each flow generates a separate FSM, multiple machines per agent
+- **Use Case**: Modular conversation flows, separation of concerns
+- **Details**:
+  - One machine per flow definition
+  - Agent coordinates multiple machines
+  - Clean flow boundaries
+
+### 9. Flow Composition and Reusability
+- **Requirement**: Connect machines and compose agents from reusable flows
+- **Use Case**: "Contact Support" flow reused across different agents/verticals
+- **Details**:
+  - Import and compose existing flows
+  - Machine-to-machine transitions
+  - Share context between machines
+  - Library of reusable flows
+
+### 10. Agent-Level State Management
+- **Requirement**: Hash representation must encode agent state (current machine + state)
+- **Use Case**: Restore conversation spanning multiple flows
+- **Details**:
+  - Track which machine is active
+  - Preserve context across machine transitions
+  - URL hash format: `agentId:machineId:stateId:contextHash`
+
+### 11. Event Logging and Analytics
+- **Requirement**: Track state transitions and user interactions
+- **Use Case**: Analytics, debugging, conversation optimization
+- **Details**:
+  - Transition history
+  - Timing information
+  - User input logging
+
+### 12. Error Recovery
+- **Requirement**: Graceful handling of invalid states or errors
+- **Use Case**: Network failures, corrupted state, invalid input
+- **Details**:
+  - Fallback to known good state
+  - Error state handling
+  - Recovery mechanisms
+
+## Solution Evaluation
+
+### Option 1: XState (Current Approach)
+
+**Pros:**
+- Industry-standard state machine implementation
+- Built-in state persistence (state.toJSON())
+- Hierarchical states support
+- Robust action/service system
+- TypeScript support
+- Visualization tools
+- Active community and ecosystem
+
+**Cons:**
+- Large bundle size (~50KB min+gzip per machine)
+- Complex API for simple use cases
+- Overhead for features we don't use (actors, parallel states, history states)
+- Difficult to implement simple machine-to-machine transitions
+- XState's composition model (invoke, spawn) is complex for our needs
+- Learning curve for team members
+- Overkill when each flow is a simple linear FSM
+
+**Verdict**: Even more overkill with multi-machine architecture
+
+### Option 2: Custom Lightweight FSM
+
+**Pros:**
+- Tailored exactly to our needs
+- Minimal bundle size (<5KB)
+- Simple, clear API
+- Easy to understand and maintain
+- Direct control over serialization format
+- Optimized for conversational flows
+
+**Cons:**
+- Need to implement core features ourselves
+- Less battle-tested
+- No ecosystem/tooling
+- Potential for bugs in edge cases
+
+**Example Implementation:**
+```typescript
+// Individual Flow Machine
+interface FlowMachine {
+  id: string;
+  states: Map<string, State>;
+  currentState: string;
+  context: Record<string, any>;
+  
+  transition(input: string): TransitionResult;
+  serialize(): MachineState;
+}
+
+// Agent orchestrating multiple machines
+interface Agent {
+  machines: Map<string, FlowMachine>;
+  activeMachine: string;
+  globalContext: Record<string, any>;
+  
+  processInput(input: string): Promise<Response>;
+  switchMachine(machineId: string, initialState?: string): void;
+  toURLHash(): string;
+  static fromURLHash(hash: string): Agent;
+}
+
+// Simple machine-to-machine transition
+// In flow A: -> ContactSupport
+// Switches to ContactSupport machine with shared context
+```
+
+### Option 3: Lighter State Machine Libraries
+
+**robot3** (~2KB)
+- Pros: Tiny, functional API, TypeScript support
+- Cons: Less features, smaller community
+
+**nanostate** (~3KB)  
+- Pros: Simple API, event emitter based
+- Cons: No TypeScript, less maintained
+
+**javascript-state-machine** (~7KB)
+- Pros: Simple, well-documented
+- Cons: Class-based API, less modern
+
+## Recommendation
+
+**Implement a custom lightweight FSM tailored for conversational agents.**
+
+### Rationale:
+
+1. **Specific Use Case**: Conversational flows have specific patterns (linear progression, context accumulation, message-driven) that don't require XState's advanced features
+
+2. **Performance**: A custom solution will be 10x smaller and faster, important for server-side execution
+
+3. **Simplicity**: Our requirements are well-defined and limited - a 200-300 line implementation can cover everything
+
+4. **Control**: Direct control over serialization format, URL encoding, and state structure
+
+5. **Learning Curve**: Team can understand and modify a simple FSM vs learning XState's complex mental model
+
+### Proposed Architecture:
+
+```typescript
+// Individual Flow Machine (lightweight, ~50 lines)
+export class FlowMachine {
+  constructor(
+    public id: string,
+    private definition: FlowDefinition
+  ) {}
+
+  transition(input: string, context: Context): TransitionResult {
+    // Simple pattern matching, return next state or machine
+  }
+}
+
+// Agent coordinating multiple machines
+export class ConversationalAgent {
+  private machines = new Map<string, FlowMachine>();
+  private activeMachineId: string;
+  private activeStateId: string;
+  private context: Context;
+
+  // Add a flow (can be imported from a library)
+  addFlow(flow: FlowDefinition): void {
+    this.machines.set(flow.id, new FlowMachine(flow.id, flow));
+  }
+
+  // Process user input
+  async processInput(input: string): Promise<AgentResponse> {
+    const machine = this.machines.get(this.activeMachineId);
+    const result = machine.transition(input, this.context);
+    
+    if (result.type === 'state') {
+      this.activeStateId = result.stateId;
+      return this.executeState(result.stateId);
+    } else if (result.type === 'machine') {
+      // Transition to different flow
+      this.activeMachineId = result.machineId;
+      this.activeStateId = result.stateId || 'start';
+      return this.executeState(this.activeStateId);
+    }
+  }
+
+  // URL-safe serialization
+  toURLHash(): string {
+    // Format: base64url(agent:machine:state:context)
+    const state = {
+      a: this.id,
+      m: this.activeMachineId,
+      s: this.activeStateId,
+      c: this.context
+    };
+    return base64url.encode(JSON.stringify(state));
+  }
+}
+
+// Usage - Composing an agent from reusable flows
+import { ContactSupportFlow } from '@rcl/common-flows';
+import { FAQFlow } from '@rcl/common-flows';
+
+const agent = new ConversationalAgent('RetailBot');
+agent.addFlow(WelcomeFlow); // Custom flow
+agent.addFlow(ContactSupportFlow); // Reusable
+agent.addFlow(FAQFlow); // Reusable
+
+// In WelcomeFlow definition:
+// on ShowMenu
+//   match @reply.text
+//     "Contact Support" -> machine ContactSupport
+//     "FAQ" -> machine FAQ
+```
+
+### Migration Path:
+
+1. Build the lightweight FSM alongside XState output
+2. Add a compiler flag to choose output format  
+3. Gradually migrate services to use lightweight FSM
+4. Remove XState dependency once stable
+
+## Conclusion
+
+The multi-machine architecture fundamentally changes our requirements. Instead of one complex state machine per agent, we need:
+
+1. **Multiple simple FSMs** - One per flow, each focused on a specific conversation path
+2. **Agent-level orchestration** - Coordinate between machines, manage shared context
+3. **Flow composition** - Import and reuse flows across agents and verticals
+
+This architecture strongly favors a custom lightweight solution because:
+
+- **XState's complexity is wasted** on simple, linear conversation flows
+- **Machine composition** is simpler with explicit machine switching vs XState's actor model
+- **Flow reusability** is cleaner with standalone machines vs hierarchical states
+- **Bundle size matters more** when potentially loading many flow definitions
+
+A custom solution of ~300 lines can handle the agent orchestration, while each flow machine can be just ~50 lines of simple pattern matching. This is far more maintainable than wrestling XState into this specific use case.
+
+### Example RCL for machine composition:
+```rcl
+agent CustomerService
+  start: MainMenu
+  
+  # Import reusable flows
+  import ContactSupportFlow from "@rcl/common-flows/contact-support"
+  import FAQFlow from "@rcl/common-flows/faq"
+  import StoreLocatorFlow from "./store-locator"
+  
+  flow MainMenu
+    on Welcome
+      match @reply.text
+        "Contact Support" -> machine ContactSupportFlow
+        "FAQ" -> machine FAQFlow  
+        "Find Store" -> machine StoreLocatorFlow
+```
+
+This approach enables a marketplace of reusable conversation flows while keeping each flow simple and testable.

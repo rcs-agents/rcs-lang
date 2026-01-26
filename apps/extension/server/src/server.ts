@@ -1,50 +1,56 @@
 import {
-  createConnection,
-  TextDocuments,
-  Diagnostic,
-  DiagnosticSeverity,
-  ProposedFeatures,
-  InitializeParams,
-  DidChangeConfigurationNotification,
-  CompletionItem,
+  type CodeAction,
+  type CodeActionParams,
+  type CompletionItem,
   CompletionItemKind,
-  TextDocumentPositionParams,
-  TextDocumentSyncKind,
-  InitializeResult,
-  DocumentDiagnosticReportKind,
+  type Definition,
+  type DefinitionParams,
+  type Diagnostic,
+  DiagnosticSeverity,
+  DidChangeConfigurationNotification,
   type DocumentDiagnosticReport,
-  HoverParams,
-  Hover,
-  DefinitionParams,
-  Definition,
-  ReferenceParams,
-  Location,
-  DocumentSymbolParams,
-  DocumentSymbol,
+  DocumentDiagnosticReportKind,
+  type DocumentFormattingParams,
+  type DocumentSymbol,
+  type DocumentSymbolParams,
+  type FoldingRange,
+  type FoldingRangeParams,
+  type Hover,
+  type HoverParams,
+  type InitializeParams,
+  type InitializeResult,
+  type Location,
+  type PrepareRenameParams,
+  ProposedFeatures,
+  type ReferenceParams,
+  type RenameParams,
+  type SemanticTokens,
+  type SemanticTokensParams,
+  type SignatureHelpParams,
   SymbolKind,
-  DocumentFormattingParams,
-  TextEdit,
-  FoldingRangeParams,
-  FoldingRange,
-  SemanticTokensParams,
-  SemanticTokens,
-  CodeActionParams,
-  CodeAction,
+  type TextDocumentPositionParams,
+  TextDocumentSyncKind,
+  TextDocuments,
+  type TextEdit,
+  createConnection,
 } from 'vscode-languageserver/node';
 
-import { TextDocument } from 'vscode-languageserver-textdocument';
 import { RCLParser } from '@rcl/parser';
-import { SyntaxValidator } from './syntaxValidator';
+import type { RCLSettings } from '@rcl/parser';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { CodeActionProvider } from './features/codeActions';
 import { CompletionProvider } from './features/completion';
-import { HoverProvider } from './features/hover';
 import { DefinitionProvider } from './features/definition';
-import { ReferencesProvider } from './features/references';
-import { SymbolsProvider } from './features/symbols';
-import { FormattingProvider } from './features/formatting';
-import { FoldingProvider } from './features/folding';
-import { SemanticTokensProvider } from './features/semanticTokens';
 import { DiagnosticsProvider } from './features/diagnostics';
-import { RCLSettings } from '@rcl/parser';
+import { FoldingProvider } from './features/folding';
+import { FormattingProvider } from './features/formatting';
+import { HoverProvider } from './features/hover';
+import { ReferencesProvider } from './features/references';
+import { RenameProvider } from './features/rename';
+import { SemanticTokensProvider } from './features/semanticTokens';
+import { SignatureHelpProvider } from './features/signatureHelp';
+import { SymbolsProvider } from './features/symbols';
+import { SyntaxValidator } from './syntaxValidator';
 
 // Create a connection for the server, using Node's IPC as a transport
 const connection = createConnection(ProposedFeatures.all);
@@ -64,10 +70,13 @@ const formattingProvider = new FormattingProvider(parser);
 const foldingProvider = new FoldingProvider(parser);
 const semanticTokensProvider = new SemanticTokensProvider(parser);
 const diagnosticsProvider = new DiagnosticsProvider(parser, syntaxValidator);
+const renameProvider = new RenameProvider(parser);
+const codeActionProvider = new CodeActionProvider(parser);
+const signatureHelpProvider = new SignatureHelpProvider(parser);
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
+let _hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
   console.log('Initializing RCL Language Server');
@@ -79,11 +88,8 @@ connection.onInitialize((params: InitializeParams) => {
   hasWorkspaceFolderCapability = !!(
     capabilities.workspace && !!capabilities.workspace.workspaceFolders
   );
-  hasDiagnosticRelatedInformationCapability = !!(
-    capabilities.textDocument &&
-    capabilities.textDocument.publishDiagnostics &&
-    capabilities.textDocument.publishDiagnostics.relatedInformation
-  );
+  _hasDiagnosticRelatedInformationCapability =
+    !!capabilities.textDocument?.publishDiagnostics?.relatedInformation;
 
   const result: InitializeResult = {
     capabilities: {
@@ -95,12 +101,21 @@ connection.onInitialize((params: InitializeParams) => {
       },
       // Hover information
       hoverProvider: true,
+      // Signature help
+      signatureHelpProvider: {
+        triggerCharacters: [':', ' ', '"'],
+        retriggerCharacters: [','],
+      },
       // Go to definition
       definitionProvider: true,
       // Find references
       referencesProvider: true,
       // Document symbols
       documentSymbolProvider: true,
+      // Rename
+      renameProvider: {
+        prepareProvider: true,
+      },
       // Workspace symbols
       workspaceSymbolProvider: true,
       // Code actions
@@ -224,12 +239,11 @@ connection.languages.diagnostics.on(async (params) => {
       kind: DocumentDiagnosticReportKind.Full,
       items: await validateTextDocument(document),
     } satisfies DocumentDiagnosticReport;
-  } else {
-    return {
-      kind: DocumentDiagnosticReportKind.Full,
-      items: [],
-    } satisfies DocumentDiagnosticReport;
   }
+  return {
+    kind: DocumentDiagnosticReportKind.Full,
+    items: [],
+  } satisfies DocumentDiagnosticReport;
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
@@ -255,7 +269,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<Diagnos
       {
         severity: DiagnosticSeverity.Error,
         range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
-        message: 'Internal validation error: ' + (error as Error).message,
+        message: `Internal validation error: ${(error as Error).message}`,
         source: 'rcl',
       },
     ];
@@ -301,6 +315,21 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
   }
 });
 
+// Signature help
+connection.onSignatureHelp(async (params: SignatureHelpParams) => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+
+  try {
+    return await signatureHelpProvider.getSignatureHelp(document, params.position);
+  } catch (error) {
+    console.error('Error providing signature help:', error);
+    return null;
+  }
+});
+
 // Go to definition
 connection.onDefinition(async (params: DefinitionParams): Promise<Definition | null> => {
   const document = documents.get(params.textDocument.uri);
@@ -328,6 +357,36 @@ connection.onReferences(async (params: ReferenceParams): Promise<Location[]> => 
   } catch (error) {
     console.error('Error providing references:', error);
     return [];
+  }
+});
+
+// Prepare rename
+connection.onPrepareRename(async (params: PrepareRenameParams) => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+
+  try {
+    return await renameProvider.prepareRename(document, params.position);
+  } catch (error) {
+    console.error('Error preparing rename:', error);
+    return null;
+  }
+});
+
+// Rename
+connection.onRenameRequest(async (params: RenameParams) => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+
+  try {
+    return await renameProvider.provideRenameEdits(document, params.position, params.newName);
+  } catch (error) {
+    console.error('Error performing rename:', error);
+    return null;
   }
 });
 
@@ -406,8 +465,7 @@ connection.onCodeAction(async (params: CodeActionParams): Promise<CodeAction[]> 
   }
 
   try {
-    // Code actions will be implemented in Phase 4
-    return [];
+    return await codeActionProvider.getCodeActions(document, params);
   } catch (error) {
     console.error('Error providing code actions:', error);
     return [];

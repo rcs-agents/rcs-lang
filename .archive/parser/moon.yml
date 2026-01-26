@@ -1,0 +1,107 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+project:
+  name: '@rcl/antlr'
+  description: 'RCL parser with tree-sitter'
+
+id: parser
+
+type: library
+language: typescript
+platform: node
+
+dependsOn:
+  - '@rcl/core'
+
+tasks:
+  build:
+    command: npm run build
+    deps:
+      - '@rcl/core:build'
+    inputs:
+      - "src/**/*"
+      - "grammar.js"
+      - "tsconfig.json"
+    outputs:
+      - "dist"
+      - "src/parser.c"
+    env:
+      NODE_ENV: "production"
+
+  build-grammar:
+    command: tree-sitter generate
+    inputs:
+      - "grammar.js"
+    outputs:
+      - "generated/parser.c"
+      - "generated/grammar.json"
+
+  build-ts:
+    command: tsc
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"
+    outputs:
+      - "dist"
+
+  build-wasm:
+    command: tree-sitter build --wasm
+    inputs:
+      - "grammar.js"
+      - "tree-sitter.json"
+    outputs:
+      - "tree-sitter-rcl.wasm"
+
+  dev:
+    command: npm run dev
+    local: true
+
+  test:
+    command: npm run test
+    inputs:
+      - "src/**/*"
+      - "grammar-test/**/*"
+      - "grammar.js"
+      - "*.wasm"
+    env:
+      NODE_ENV: "test"
+
+  test-grammar:
+    command: tree-sitter test
+    inputs:
+      - "grammar.js"
+      - "tests/fixtures/**/*"
+
+  test-unit:
+    command: NODE_ENV=test npm run test
+    inputs:
+      - "src/**/*"
+      - "tests/**/*"
+    env:
+      NODE_ENV: "test"
+
+  playground:
+    command: tree-sitter playground
+    local: true
+
+  clean:
+    command: npm run clean
+    local: true
+
+  lint:
+    command: npm run lint
+    inputs:
+      - "src/**/*"
+
+  format:
+    command: npm run format
+    inputs:
+      - "src/**/*"
+      - "*.md"
+      - "*.json"
+    
+  typecheck:
+    command: npm run typecheck
+    inputs:
+      - "src/**/*"
+      - "tsconfig.json"

@@ -46,7 +46,7 @@ class SemanticTokensProvider {
     getLegend() {
         return this.legend;
     }
-    async getSemanticTokens(document) {
+    async getSemanticTokens(_document) {
         // Basic semantic tokens - return empty for now
         return { data: [] };
     }

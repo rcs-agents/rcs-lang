@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 /**
  * Detects the project root directory for RCL files
@@ -15,12 +15,12 @@ export class ProjectRootDetector {
   static getProjectRoot(filePath: string): string {
     // Check cache first
     const dir = path.dirname(filePath);
-    if (this.cache.has(dir)) {
-      return this.cache.get(dir)!;
+    if (ProjectRootDetector.cache.has(dir)) {
+      return ProjectRootDetector.cache.get(dir)!;
     }
 
-    const projectRoot = this.findProjectRoot(dir);
-    this.cache.set(dir, projectRoot);
+    const projectRoot = ProjectRootDetector.findProjectRoot(dir);
+    ProjectRootDetector.cache.set(dir, projectRoot);
     return projectRoot;
   }
 
@@ -28,12 +28,12 @@ export class ProjectRootDetector {
    * Clear the project root cache
    */
   static clearCache(): void {
-    this.cache.clear();
+    ProjectRootDetector.cache.clear();
   }
 
   private static findProjectRoot(startDir: string): string {
     let currentDir = startDir;
-    
+
     while (currentDir !== path.dirname(currentDir)) {
       // Check for RCL config files
       const configFiles = [
@@ -42,7 +42,7 @@ export class ProjectRootDetector {
         'config/rcl.yml',
         'config/rcl.yaml',
         '.rclrc',
-        'package.json' // fallback to package.json
+        'package.json', // fallback to package.json
       ];
 
       for (const configFile of configFiles) {
@@ -71,11 +71,9 @@ export class ProjectRootDetector {
       'rclconfig.yaml',
       'config/rcl.yml',
       'config/rcl.yaml',
-      '.rclrc'
+      '.rclrc',
     ];
 
-    return indicators.some(indicator => 
-      fs.existsSync(path.join(dir, indicator))
-    );
+    return indicators.some((indicator) => fs.existsSync(path.join(dir, indicator)));
   }
 }

@@ -2,10 +2,10 @@ import * as assert from 'node:assert';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { CompletionProvider } from '../features/completion';
 import { DiagnosticsProvider } from '../features/diagnostics';
-import { HoverProvider } from '../features/hover';
-import { SymbolsProvider } from '../features/symbols';
-import { SemanticTokensProvider } from '../features/semanticTokens';
 import { FormattingProvider } from '../features/formatting';
+import { HoverProvider } from '../features/hover';
+import { SemanticTokensProvider } from '../features/semanticTokens';
+import { SymbolsProvider } from '../features/symbols';
 import { SyntaxValidator } from '../syntaxValidator';
 
 describe('Language Service Integration', () => {
@@ -52,7 +52,10 @@ describe('Language Service Integration', () => {
       const document = TextDocument.create('test://comprehensive.rcl', 'rcl', 1, sampleRclContent);
 
       // Test completion provider
-      const completions = await completionProvider.getCompletions(document, { line: 0, character: 0 });
+      const completions = await completionProvider.getCompletions(document, {
+        line: 0,
+        character: 0,
+      });
       assert.ok(Array.isArray(completions), 'Should provide completions');
       assert.ok(completions.length > 0, 'Should have completion items');
 
@@ -63,8 +66,8 @@ describe('Language Service Integration', () => {
       // Test symbols provider
       const symbols = await symbolsProvider.getDocumentSymbols(document);
       assert.ok(Array.isArray(symbols), 'Should provide document symbols');
-      const agentSymbol = symbols.find(s => s.name === 'TestAgent');
-      const flowSymbol = symbols.find(s => s.name === 'MainFlow');
+      const agentSymbol = symbols.find((s) => s.name === 'TestAgent');
+      const flowSymbol = symbols.find((s) => s.name === 'MainFlow');
       assert.ok(agentSymbol, 'Should extract agent symbol');
       assert.ok(flowSymbol, 'Should extract flow symbol');
 
@@ -90,20 +93,23 @@ describe('Language Service Integration', () => {
     it('should handle RCL-specific language constructs', async () => {
       // Test specific RCL features
       const rclFeatures = [
-        'agent TravelAgent',          // Agent definition
-        'flow BookingFlow',           // Flow definition  
-        'messages Messages',          // Messages section
-        'text Welcome "Hello"',       // Text shortcut
-        'richCard Info "Details"',    // Rich card shortcut
-        ':start -> Welcome',          // Flow transition
-        'displayName: "Agent"',       // Agent property
+        'agent TravelAgent', // Agent definition
+        'flow BookingFlow', // Flow definition
+        'messages Messages', // Messages section
+        'text Welcome "Hello"', // Text shortcut
+        'richCard Info "Details"', // Rich card shortcut
+        ':start -> Welcome', // Flow transition
+        'displayName: "Agent"', // Agent property
       ];
 
       for (const feature of rclFeatures) {
         const document = TextDocument.create('test://feature.rcl', 'rcl', 1, feature);
-        
+
         // Each feature should be handled gracefully by all providers
-        const completions = await completionProvider.getCompletions(document, { line: 0, character: 0 });
+        const completions = await completionProvider.getCompletions(document, {
+          line: 0,
+          character: 0,
+        });
         assert.ok(Array.isArray(completions), `Should handle completions for: ${feature}`);
 
         const symbols = await symbolsProvider.getDocumentSymbols(document);
@@ -121,11 +127,17 @@ describe('Language Service Integration', () => {
       const document = TextDocument.create('test://invalid.rcl', 'rcl', 1, invalidRcl);
 
       // All providers should handle invalid syntax without throwing
-      const completions = await completionProvider.getCompletions(document, { line: 0, character: 5 });
-      const hover = await hoverProvider.getHover(document, { line: 0, character: 5 });
+      const completions = await completionProvider.getCompletions(document, {
+        line: 0,
+        character: 5,
+      });
+      const _hover = await hoverProvider.getHover(document, { line: 0, character: 5 });
       const symbols = await symbolsProvider.getDocumentSymbols(document);
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
-      const formatEdits = await formattingProvider.formatDocument(document, { tabSize: 2, insertSpaces: true });
+      const formatEdits = await formattingProvider.formatDocument(document, {
+        tabSize: 2,
+        insertSpaces: true,
+      });
 
       assert.ok(Array.isArray(completions), 'Completions should handle invalid syntax');
       // hover can be null for invalid syntax, that's fine
@@ -137,11 +149,17 @@ describe('Language Service Integration', () => {
     it('should handle empty documents', async () => {
       const document = TextDocument.create('test://empty.rcl', 'rcl', 1, '');
 
-      const completions = await completionProvider.getCompletions(document, { line: 0, character: 0 });
-      const hover = await hoverProvider.getHover(document, { line: 0, character: 0 });
+      const completions = await completionProvider.getCompletions(document, {
+        line: 0,
+        character: 0,
+      });
+      const _hover = await hoverProvider.getHover(document, { line: 0, character: 0 });
       const symbols = await symbolsProvider.getDocumentSymbols(document);
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
-      const formatEdits = await formattingProvider.formatDocument(document, { tabSize: 2, insertSpaces: true });
+      const formatEdits = await formattingProvider.formatDocument(document, {
+        tabSize: 2,
+        insertSpaces: true,
+      });
 
       assert.ok(Array.isArray(completions), 'Should provide completions for empty documents');
       // hover can be null for empty documents
@@ -159,7 +177,7 @@ describe('Language Service Integration', () => {
 
       // Providers should handle out-of-bounds positions gracefully
       const completions = await completionProvider.getCompletions(document, outOfBoundsPosition);
-      const hover = await hoverProvider.getHover(document, outOfBoundsPosition);
+      const _hover = await hoverProvider.getHover(document, outOfBoundsPosition);
 
       assert.ok(Array.isArray(completions), 'Should handle out-of-bounds positions in completions');
       // hover can be null for out-of-bounds positions
@@ -176,7 +194,7 @@ describe('Language Service Integration', () => {
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
 
       // Should extract the agent symbol
-      const agentSymbol = symbols.find(s => s.name === 'ConsistentAgent');
+      const agentSymbol = symbols.find((s) => s.name === 'ConsistentAgent');
       assert.ok(agentSymbol, 'Should consistently extract agent symbol');
       assert.ok(agentSymbol.kind >= 0, 'Agent should have a valid symbol kind');
 
@@ -186,26 +204,33 @@ describe('Language Service Integration', () => {
 
     it('should maintain performance with larger documents', async () => {
       // Create a larger RCL document
-      const largeContent = Array(100).fill(0).map((_, i) => 
-        `text Message${i} "This is message number ${i}"`
-      ).join('\n');
-      
+      const largeContent = Array(100)
+        .fill(0)
+        .map((_, i) => `text Message${i} "This is message number ${i}"`)
+        .join('\n');
+
       const document = TextDocument.create('test://large.rcl', 'rcl', 1, largeContent);
 
       const startTime = Date.now();
 
       // Test all providers with larger content
-      const completions = await completionProvider.getCompletions(document, { line: 50, character: 0 });
+      const completions = await completionProvider.getCompletions(document, {
+        line: 50,
+        character: 0,
+      });
       const symbols = await symbolsProvider.getDocumentSymbols(document);
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
-      const formatEdits = await formattingProvider.formatDocument(document, { tabSize: 2, insertSpaces: true });
+      const formatEdits = await formattingProvider.formatDocument(document, {
+        tabSize: 2,
+        insertSpaces: true,
+      });
 
       const endTime = Date.now();
       const duration = endTime - startTime;
 
       // Should complete within reasonable time (less than 1 second for basic operations)
       assert.ok(duration < 1000, `Language services should be performant (took ${duration}ms)`);
-      
+
       assert.ok(Array.isArray(completions), 'Should handle large documents');
       assert.ok(Array.isArray(symbols), 'Should extract symbols from large documents');
       assert.ok(tokens && Array.isArray(tokens.data), 'Should tokenize large documents');

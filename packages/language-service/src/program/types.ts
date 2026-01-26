@@ -1,4 +1,4 @@
-import { RclConfig } from '../config/types';
+import type { RclConfig } from '../config/types';
 
 /**
  * Represents a diagnostic message (error, warning, etc.)

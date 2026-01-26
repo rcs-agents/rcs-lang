@@ -5,56 +5,70 @@ on:
     branches: [ main, develop ]
     paths:
       - 'apps/extension/**'
-      - 'packages/parser/**'
-      - 'packages/language-service/**'
+      - 'packages/**'
+      - 'libs/**'
       - '.github/workflows/extension-tests.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'apps/extension/**'
-      - 'packages/parser/**'
-      - 'packages/language-service/**'
+      - 'packages/**'
+      - 'libs/**'
       - '.github/workflows/extension-tests.yml'
 
 jobs:
-  test:
-    name: VS Code Extension Tests
+  unit-tests:
+    name: Unit Tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
         
     steps:
     - uses: actions/checkout@v4
       
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        bun-version: 1.2
         
     - name: Install dependencies
-      run: |
-        npm install
-        npm run build:parser
+      run: bun install
         
-    - name: Build parser native bindings
-      working-directory: packages/parser
-      run: |
-        npm run build-native
-        npm run build-wasm
+    - name: Build packages
+      run: bun run build
+        
+    - name: Run server tests
+      working-directory: apps/extension
+      run: nr test:server
+      
+    - name: Run client unit tests
+      working-directory: apps/extension
+      run: nr test:client
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        vscode-version: [stable, insiders]
+        
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: 1.2
+        
+    - name: Install dependencies
+      run: bun install
         
     - name: Build extension
       working-directory: apps/extension
-      run: npm run build
-      
-    - name: Run server tests
-      working-directory: apps/extension/server
-      run: npm test
-      
-    - name: Run client unit tests
-      working-directory: apps/extension/client
-      run: npm test
+      run: nr compile
       
     - name: Run integration tests (Linux)
       if: runner.os == 'Linux'
@@ -62,9 +76,119 @@ jobs:
       run: |
         export DISPLAY=:99.0
         /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        npm run test:integration
+        nr test:integration
+      env:
+        VSCODE_VERSION: ${{ matrix.vscode-version }}
         
     - name: Run integration tests (non-Linux)
       if: runner.os != 'Linux'
       working-directory: apps/extension
-      run: npm run test:integration
+      run: nr test:integration
+      env:
+        VSCODE_VERSION: ${{ matrix.vscode-version }}
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: 1.2
+      
+    - name: Install dependencies
+      run: bun install
+      
+    - name: Build extension
+      working-directory: apps/extension
+      run: nr compile
+      
+    - name: Run E2E tests
+      working-directory: apps/extension
+      run: |
+        export DISPLAY=:99.0
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        nr test:e2e
+      
+    - name: Run Coffee Shop example tests
+      working-directory: apps/extension
+      run: |
+        export DISPLAY=:99.0
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        nr test:e2e:coffee-shop
+      
+    - name: Upload test screenshots
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-screenshots
+        path: apps/extension/tests/screenshots/
+
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: 1.2
+      
+    - name: Install dependencies
+      run: bun install
+      
+    - name: Build extension
+      working-directory: apps/extension
+      run: nr compile
+      
+    - name: Run visual tests
+      working-directory: apps/extension
+      run: |
+        export DISPLAY=:99.0
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        nr test:visual
+      
+    - name: Upload visual diffs
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: visual-diffs
+        path: apps/extension/tests/__image_snapshots__/__diff_output__/
+      
+    - name: Upload snapshots
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: visual-snapshots
+        path: apps/extension/tests/__image_snapshots__/
+
+  test-summary:
+    name: Test Summary
+    needs: [unit-tests, integration-tests, e2e-tests, visual-regression]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.unit-tests.result }}" != "success" ] || \
+             [ "${{ needs.integration-tests.result }}" != "success" ] || \
+             [ "${{ needs.e2e-tests.result }}" != "success" ]; then
+            echo "❌ Tests failed!"
+            exit 1
+          else
+            echo "✅ All tests passed!"
+          fi
+      
+      - name: Create summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Visual Tests | ${{ needs.visual-regression.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY

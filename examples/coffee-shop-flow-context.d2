@@ -1,0 +1,371 @@
+# Coffee Shop Order Flow with Context State
+title: Quick Coffee Order Flow - Context State Visualization
+
+# Start state
+start: {shape: circle}
+start -> Welcome
+
+# Welcome state
+Welcome: {
+  shape: rectangle
+  label: "Welcome"
+}
+
+Welcome -> ChooseSize: Order Coffee
+
+Welcome -> ShowMenu: View Menu
+Welcome -> StoreInfo: Store Hours
+Welcome -> Welcome: default {
+  style.stroke-dash: 3
+}
+
+# Context box after Welcome
+ctx_welcome_to_size: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    (empty)
+  |
+}
+Welcome -> ctx_welcome_to_size -> ChooseSize
+
+# ChooseSize state
+ChooseSize: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+  label: "ChooseSize"
+}
+
+# Context boxes from ChooseSize
+ctx_size_small: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: "small"
+    • price: $3.50
+  |
+}
+ChooseSize -> ctx_size_small -> ChooseDrink: Small
+
+ctx_size_medium: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: "medium"
+    • price: $4.50
+  |
+}
+ChooseSize -> ctx_size_medium -> ChooseDrink: Medium
+
+ctx_size_large: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: "large"
+    • price: $5.50
+  |
+}
+ChooseSize -> ctx_size_large -> ChooseDrink: Large
+
+# Invalid size handling
+ChooseSize -> InvalidOption_size: default {
+  style.stroke-dash: 3
+}
+InvalidOption_size: {
+  shape: rectangle
+  label: "InvalidOption\nproperty: size\nnext: ChooseSize"
+  style.fill: "#ffcdd2"
+}
+InvalidOption_size -> ChooseSize
+
+# ChooseDrink state
+ChooseDrink: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+  label: "ChooseDrink"
+}
+
+# Context boxes from ChooseDrink to Customize
+ctx_drink_espresso: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: "espresso"
+  |
+}
+ChooseDrink -> ctx_drink_espresso -> Customize: Espresso
+
+ctx_drink_cappuccino: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: "cappuccino"
+  |
+}
+ChooseDrink -> ctx_drink_cappuccino -> Customize: Cappuccino
+
+ctx_drink_latte: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: "latte"
+  |
+}
+ChooseDrink -> ctx_drink_latte -> Customize: Latte
+
+ctx_drink_americano: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: "americano"
+  |
+}
+ChooseDrink -> ctx_drink_americano -> Customize: Americano
+
+# Invalid drink handling
+ChooseDrink -> InvalidOption_drink: default {
+  style.stroke-dash: 3
+}
+InvalidOption_drink: {
+  shape: rectangle
+  label: "InvalidOption\nproperty: drink\nnext: ChooseDrink"
+  style.fill: "#ffcdd2"
+}
+InvalidOption_drink -> ChooseDrink
+
+# Customize state
+Customize: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+  label: "Customize"
+}
+
+# Context boxes from Customize to ConfirmOrder
+ctx_milk_regular: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: "regular"
+  |
+}
+Customize -> ctx_milk_regular -> ConfirmOrder: Regular
+
+ctx_milk_skim: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: "skim"
+  |
+}
+Customize -> ctx_milk_skim -> ConfirmOrder: Skim
+
+ctx_milk_soy: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: "soy"
+    • extraCharge: 0.60
+  |
+}
+Customize -> ctx_milk_soy -> ConfirmOrder: "Soy +$0.60"
+
+ctx_milk_oat: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: "oat"
+    • extraCharge: 0.60
+  |
+}
+Customize -> ctx_milk_oat -> ConfirmOrder: "Oat +$0.60"
+
+ctx_milk_none: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: "none"
+  |
+}
+Customize -> ctx_milk_none -> ConfirmOrder: "No Milk"
+
+# Invalid milk handling
+Customize -> InvalidOption_milk: default {
+  style.stroke-dash: 3
+}
+InvalidOption_milk: {
+  shape: rectangle
+  label: "InvalidOption\nproperty: milk\nnext: Customize"
+  style.fill: "#ffcdd2"
+}
+InvalidOption_milk -> Customize
+
+# ConfirmOrder state
+ConfirmOrder: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+  label: "ConfirmOrder"
+}
+
+# Final context for confirmed order
+ctx_order_confirmed: {
+  shape: rectangle
+  style: {
+    fill: "#fff3e0"
+    stroke: "#ff9800"
+    border-radius: 8
+  }
+  label: |md
+    **Context:**
+    • size: (inherited)
+    • price: (inherited)
+    • drink: (inherited)
+    • milk: (inherited)
+    • extraCharge: (if applicable)
+  |
+}
+ConfirmOrder -> ctx_order_confirmed -> ProcessPayment: Confirm
+
+ConfirmOrder -> OrderCancelled: Cancel
+ConfirmOrder -> ConfirmOrder: default {
+  style.stroke-dash: 3
+}
+
+# Simple states with direct transitions
+ProcessPayment: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+ProcessPayment -> OrderComplete
+
+OrderComplete: {
+  shape: rectangle
+  style.fill: "#c8e6c9"
+}
+OrderComplete -> ThankYou
+
+ThankYou: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+ThankYou -> ShowMenu
+
+ShowMenu: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+ShowMenu -> Welcome
+
+OrderCancelled: {
+  shape: rectangle
+  style.fill: "#ffcdd2"
+}
+OrderCancelled -> ShowMenu
+
+StoreInfo: {
+  shape: rectangle
+  style.fill: "#e1f5fe"
+}
+StoreInfo -> Welcome
+
+# Legend
+legend: {
+  shape: rectangle
+  style.fill: "#f5f5f5"
+  near: bottom-right
+  label: |md
+    # Legend
+    - **Rectangle**: State
+    - **Orange Box**: Context State
+    - **Blue**: Messages
+    - **Red**: Transient States
+    - **Dashed**: Default transitions
+  |
+}

@@ -52,7 +52,11 @@ describe('DiagnosticsProvider', () => {
       const diagnostics = await diagnosticsProvider.getDiagnostics(mockDocument, mockSettings);
 
       assert.equal(diagnostics.length, 1, 'Should return one diagnostic');
-      assert.deepEqual(diagnostics[0], mockSyntaxError, 'Should include syntax validation diagnostic');
+      assert.deepEqual(
+        diagnostics[0],
+        mockSyntaxError,
+        'Should include syntax validation diagnostic',
+      );
     });
   });
 
@@ -98,9 +102,9 @@ describe('DiagnosticsProvider', () => {
       const mockSettings = {} as any;
 
       const mockDiagnostic = {
-        range: { 
-          start: { line: 0, character: 0 }, 
-          end: { line: 0, character: 4 } 
+        range: {
+          start: { line: 0, character: 0 },
+          end: { line: 0, character: 4 },
         },
         message: 'Test diagnostic',
         severity: DiagnosticSeverity.Information,
@@ -114,7 +118,7 @@ describe('DiagnosticsProvider', () => {
 
       assert.equal(diagnostics.length, 1);
       const diagnostic = diagnostics[0];
-      
+
       assert.ok(diagnostic.range, 'Should have range');
       assert.ok(diagnostic.range.start, 'Should have start position');
       assert.ok(diagnostic.range.end, 'Should have end position');
@@ -141,7 +145,10 @@ describe('DiagnosticsProvider', () => {
       try {
         const diagnostics = await diagnosticsProvider.getDiagnostics(mockDocument, mockSettings);
         // If it doesn't throw, it should at least return an empty array
-        assert.ok(Array.isArray(diagnostics), 'Should still return an array even with validator errors');
+        assert.ok(
+          Array.isArray(diagnostics),
+          'Should still return an array even with validator errors',
+        );
       } catch (error) {
         // If it throws, that's also acceptable - the test is to ensure it's handled appropriately
         assert.ok(error instanceof Error, 'Should throw a proper error if not handled');

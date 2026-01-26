@@ -1,0 +1,39 @@
+project:
+  name: '@rcl/core'
+  description: 'Core types and interfaces for RCL'
+
+type: library
+language: typescript
+
+tasks:
+  build:
+    command: tsc
+    inputs:
+      - src/**/*
+      - tsconfig.json
+    outputs:
+      - dist/**/*
+
+  clean:
+    command: rm -rf dist
+    local: true
+
+  typecheck:
+    command: tsc --noEmit
+    inputs:
+      - src/**/*
+      - tsconfig.json
+
+  test:
+    command: vitest run
+    deps:
+      - build
+    inputs:
+      - src/**/*
+      - tests/**/*
+
+  test-watch:
+    command: vitest
+    local: true
+    deps:
+      - build

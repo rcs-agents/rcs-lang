@@ -1,0 +1,45 @@
+{
+  "name": "@rcl/diagram",
+  "version": "0.1.0",
+  "description": "Interactive Sprotty-based diagram component for RCL flows",
+  "type": "module",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./web": {
+      "import": "./src/web-diagram.js"
+    },
+    "./styles": "./src/styles/diagram.css"
+  },
+  "scripts": {
+    "build": "tsc && bun run build:styles",
+    "build:styles": "cp src/styles/*.css dist/",
+    "dev": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist",
+    "lint": "biome lint src",
+    "format": "biome format src --write",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "elkjs": "^0.10.0",
+    "inversify": "6.2.2",
+    "reflect-metadata": "^0.2.2",
+    "sprotty": "^1.4.0",
+    "sprotty-protocol": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@rcl/compiler": "workspace:*"
+  }
+}

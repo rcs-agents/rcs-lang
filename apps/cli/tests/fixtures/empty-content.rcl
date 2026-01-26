@@ -1,0 +1,8 @@
+agent EmptyAgent
+  displayName: "Empty Content Test"
+  
+  flow EmptyFlow
+    # No start, no states
+  
+  messages Messages
+    # No messages defined

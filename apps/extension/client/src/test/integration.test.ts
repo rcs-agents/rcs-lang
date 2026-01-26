@@ -1,32 +1,32 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
 
 // Helper to wait for language server to be ready
 async function waitForLanguageServer(maxWaitTime = 10000): Promise<boolean> {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < maxWaitTime) {
     // Try to get diagnostics for a simple file to check if server is ready
     const testUri = vscode.Uri.parse('untitled:test.rcl');
     const testDoc = await vscode.workspace.openTextDocument(testUri);
     await vscode.window.showTextDocument(testDoc);
-    
+
     // Give server time to process
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const diagnostics = vscode.languages.getDiagnostics(testUri);
     if (diagnostics.length >= 0) {
       // Server responded (even if no diagnostics)
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
       return true;
     }
-    
+
     await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  
+
   return false;
 }
 
@@ -68,13 +68,13 @@ describe('RCL Extension Integration Tests', () => {
 
     it('should register all commands', async () => {
       const commands = await vscode.commands.getCommands();
-      
+
       const expectedCommands = [
         'rcl.showAgentOutput',
         'rcl.showPreview',
         'rcl.showJSONOutput',
         'rcl.exportCompiled',
-        'rcl.openInteractiveDiagram'
+        'rcl.openInteractiveDiagram',
       ];
 
       for (const cmd of expectedCommands) {
@@ -94,14 +94,14 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       // Check that the document is recognized as RCL
       assert.equal(doc.languageId, 'rcl');
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
 
@@ -111,20 +111,20 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content: invalidContent
+        content: invalidContent,
       });
 
-      const editor = await vscode.window.showTextDocument(doc);
-      
+      const _editor = await vscode.window.showTextDocument(doc);
+
       // Wait for diagnostics
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const diagnostics = vscode.languages.getDiagnostics(doc.uri);
-      
+
       // Should have diagnostics for invalid syntax
       // Note: The exact diagnostics depend on the parser implementation
       console.log('Diagnostics:', diagnostics);
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
 
@@ -138,21 +138,21 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       // Try to get hover info for "agent" keyword
       const position = new vscode.Position(0, 2); // Inside "agent"
       const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
         'vscode.executeHoverProvider',
         doc.uri,
-        position
+        position,
       );
 
       console.log('Hover results:', hovers);
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
 
@@ -162,28 +162,31 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       // Try to get completions after "disp"
       const position = new vscode.Position(1, 6);
       const completions = await vscode.commands.executeCommand<vscode.CompletionList>(
         'vscode.executeCompletionItemProvider',
         doc.uri,
-        position
+        position,
       );
 
-      console.log('Completions:', completions?.items.map(i => i.label));
-      
+      console.log(
+        'Completions:',
+        completions?.items.map((i) => i.label),
+      );
+
       // Should suggest "displayName"
       const displayNameCompletion = completions?.items.find(
-        item => typeof item.label === 'string' && item.label.includes('displayName')
+        (item) => typeof item.label === 'string' && item.label.includes('displayName'),
       );
-      
+
       assert.ok(displayNameCompletion, 'Should suggest displayName');
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
 
@@ -205,24 +208,27 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
         'vscode.executeDocumentSymbolProvider',
-        doc.uri
+        doc.uri,
       );
 
-      console.log('Document symbols:', symbols?.map(s => ({ name: s.name, kind: s.kind })));
-      
+      console.log(
+        'Document symbols:',
+        symbols?.map((s) => ({ name: s.name, kind: s.kind })),
+      );
+
       // Should find agent, flows, and messages
       assert.ok(symbols && symbols.length > 0, 'Should have document symbols');
-      
-      const agentSymbol = symbols?.find(s => s.name === 'CustomerServiceBot');
+
+      const agentSymbol = symbols?.find((s) => s.name === 'CustomerServiceBot');
       assert.ok(agentSymbol, 'Should find agent symbol');
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
 
@@ -236,21 +242,21 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       // Try to go to definition of "greeting" in the flow
       const position = new vscode.Position(3, 15); // Inside "greeting" in flow
       const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
         'vscode.executeDefinitionProvider',
         doc.uri,
-        position
+        position,
       );
 
       console.log('Definitions:', definitions);
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
   });
@@ -266,18 +272,18 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content
+        content,
       });
 
       const editor = await vscode.window.showTextDocument(doc);
-      
+
       // Execute the command
       try {
         await vscode.commands.executeCommand('rcl.showJSONOutput');
-        
+
         // Command should create a new JSON document
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         // Check if a new editor was opened
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor && activeEditor !== editor) {
@@ -286,7 +292,7 @@ describe('RCL Extension Integration Tests', () => {
       } catch (error) {
         console.log('Command error:', error);
       }
-      
+
       // Close all editors
       await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     });
@@ -302,10 +308,10 @@ describe('RCL Extension Integration Tests', () => {
     text Welcome "Welcome!"`;
 
       fs.writeFileSync(testFile, content);
-      
+
       const doc = await vscode.workspace.openTextDocument(testFile);
       await vscode.window.showTextDocument(doc);
-      
+
       // Note: This command typically shows a save dialog, which we can't automate
       // We'll just verify it doesn't crash
       try {
@@ -315,7 +321,7 @@ describe('RCL Extension Integration Tests', () => {
         // Expected in test environment
         console.log('Export command expected error:', error);
       }
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
   });
@@ -338,18 +344,18 @@ describe('RCL Extension Integration Tests', () => {
 
       const doc = await vscode.workspace.openTextDocument({
         language: 'rcl',
-        content: complexContent
+        content: complexContent,
       });
 
       await vscode.window.showTextDocument(doc);
-      
+
       // Give time for parsing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Extension should still be active
       const extension = vscode.extensions.getExtension('tokilabs.rcl-language-support');
       assert.ok(extension?.isActive, 'Extension should remain active despite errors');
-      
+
       await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
     });
   });
@@ -359,42 +365,48 @@ describe('RCL Extension Integration Tests', () => {
       // Create multiple test files
       const file1 = path.join(testWorkspace, 'agent1.rcl');
       const file2 = path.join(testWorkspace, 'agent2.rcl');
-      
-      fs.writeFileSync(file1, `agent FirstAgent
+
+      fs.writeFileSync(
+        file1,
+        `agent FirstAgent
   displayName: "First Agent"
   flow MainFlow
     :start -> end
   messages Messages
-    text Welcome "Hello from first!"`;
-      
-      fs.writeFileSync(file2, `agent SecondAgent
+    text Welcome "Hello from first!"`,
+      );
+
+      fs.writeFileSync(
+        file2,
+        `agent SecondAgent
   displayName: "Second Agent"
   flow MainFlow
     :start -> end
   messages Messages
-    text Welcome "Hello from second!"`;
-      
+    text Welcome "Hello from second!"`,
+      );
+
       // Open both files
       const doc1 = await vscode.workspace.openTextDocument(file1);
       const doc2 = await vscode.workspace.openTextDocument(file2);
-      
+
       await vscode.window.showTextDocument(doc1);
       await vscode.window.showTextDocument(doc2, vscode.ViewColumn.Two);
-      
+
       // Both should be recognized as RCL
       assert.equal(doc1.languageId, 'rcl');
       assert.equal(doc2.languageId, 'rcl');
-      
+
       // Wait for parsing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Both should have diagnostics available
       const diag1 = vscode.languages.getDiagnostics(doc1.uri);
       const diag2 = vscode.languages.getDiagnostics(doc2.uri);
-      
+
       console.log('File 1 diagnostics:', diag1);
       console.log('File 2 diagnostics:', diag2);
-      
+
       await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     });
   });
@@ -406,7 +418,7 @@ export function run(): Promise<void> {
   const runner = new mocha({
     ui: 'bdd',
     color: true,
-    timeout: 60000
+    timeout: 60000,
   });
 
   runner.addFile(__filename);

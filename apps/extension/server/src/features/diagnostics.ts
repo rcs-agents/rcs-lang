@@ -1,6 +1,6 @@
-import { Diagnostic } from 'vscode-languageserver/node';
-import { RCLParser, RCLDocument, RCLSettings } from '@rcl/parser';
-import { SyntaxValidator } from '../syntaxValidator';
+import type { RCLDocument, RCLParser, RCLSettings } from '@rcl/parser';
+import type { Diagnostic } from 'vscode-languageserver/node';
+import type { SyntaxValidator } from '../syntaxValidator';
 
 export class DiagnosticsProvider {
   constructor(
@@ -8,7 +8,10 @@ export class DiagnosticsProvider {
     private syntaxValidator: SyntaxValidator,
   ) {}
 
-  public async getDiagnostics(document: RCLDocument, settings: RCLSettings): Promise<Diagnostic[]> {
+  public async getDiagnostics(
+    document: RCLDocument,
+    _settings: RCLSettings,
+  ): Promise<Diagnostic[]> {
     const diagnostics: Diagnostic[] = [];
 
     // Syntax validation

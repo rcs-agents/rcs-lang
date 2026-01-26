@@ -1,8 +1,8 @@
-import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver/node';
-import { RCLDocument } from '@rcl/parser';
+import type { RCLDocument } from '@rcl/parser';
+import { type Diagnostic, DiagnosticSeverity } from 'vscode-languageserver/node';
 
 export class SyntaxValidator {
-  validateDocument(document: RCLDocument): Diagnostic[] {
+  validateDocument(_document: RCLDocument): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 
     // Basic syntax validation can be added here

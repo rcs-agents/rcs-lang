@@ -20,12 +20,12 @@ describe('HoverProvider', () => {
 
       assert.ok(hover, 'Should provide hover information');
       assert.ok(hover.contents, 'Should have contents');
-      
+
       if (typeof hover.contents === 'string') {
         assert.ok(hover.contents.includes('agent'), 'Should mention agent in hover content');
       } else if (Array.isArray(hover.contents)) {
-        const hasAgentInfo = hover.contents.some(content => 
-          typeof content === 'string' ? content.includes('agent') : content.value.includes('agent')
+        const hasAgentInfo = hover.contents.some((content) =>
+          typeof content === 'string' ? content.includes('agent') : content.value.includes('agent'),
         );
         assert.ok(hasAgentInfo, 'Should mention agent in hover content');
       } else {
@@ -102,7 +102,7 @@ describe('HoverProvider', () => {
     it('should provide hover for keywords on different lines', async () => {
       const text = 'agent TestAgent\n  displayName: "Test"\n  flow MainFlow';
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
-      
+
       // Test hover on line 2 for 'flow'
       const position = { line: 2, character: 2 };
       const hover = await hoverProvider.getHover(document, position);
@@ -122,7 +122,7 @@ describe('HoverProvider', () => {
 
       if (hover) {
         assert.ok(hover.contents, 'Should have contents');
-        
+
         // Verify contents structure
         if (typeof hover.contents === 'string') {
           assert.ok(hover.contents.length > 0, 'String content should not be empty');
@@ -132,8 +132,9 @@ describe('HoverProvider', () => {
           assert.ok(hover.contents.value, 'Markup content should have value');
           if (hover.contents.kind) {
             assert.ok(
-              hover.contents.kind === MarkupKind.Markdown || hover.contents.kind === MarkupKind.PlainText,
-              'Should use valid markup kind'
+              hover.contents.kind === MarkupKind.Markdown ||
+                hover.contents.kind === MarkupKind.PlainText,
+              'Should use valid markup kind',
             );
           }
         }

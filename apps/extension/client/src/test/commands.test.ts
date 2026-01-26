@@ -1,7 +1,7 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
 
 suite('Extension Commands Test Suite', () => {
   const testContent = `agent TestAgent
@@ -19,7 +19,7 @@ messages Messages
 
   setup(async () => {
     // Create a test file
-    const workspaceFolder = vscode.workspace.workspaceFolders![0];
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     testUri = vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, 'test-commands.rcl'));
     await vscode.workspace.fs.writeFile(testUri, Buffer.from(testContent));
   });
@@ -31,9 +31,15 @@ messages Messages
       // Clean up generated files
       const jsonUri = vscode.Uri.file(testUri.fsPath.replace('.rcl', '.json'));
       const jsUri = vscode.Uri.file(testUri.fsPath.replace('.rcl', '.js'));
-      await vscode.workspace.fs.delete(jsonUri).then(() => {}, () => {});
-      await vscode.workspace.fs.delete(jsUri).then(() => {}, () => {});
-    } catch (e) {
+      await vscode.workspace.fs.delete(jsonUri).then(
+        () => {},
+        () => {},
+      );
+      await vscode.workspace.fs.delete(jsUri).then(
+        () => {},
+        () => {},
+      );
+    } catch (_e) {
       // Ignore cleanup errors
     }
   });
@@ -47,7 +53,7 @@ messages Messages
     await vscode.commands.executeCommand('rcl.showJSONOutput');
 
     // Wait a bit for file generation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Check if JSON file was created
     const jsonPath = testUri.fsPath.replace('.rcl', '.json');
@@ -70,12 +76,12 @@ messages Messages
     await vscode.commands.executeCommand('rcl.showAgentOutput');
 
     // Wait a bit for file generation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Check if files were created
     const jsPath = testUri.fsPath.replace('.rcl', '.js');
     const jsonPath = testUri.fsPath.replace('.rcl', '.json');
-    
+
     assert.ok(fs.existsSync(jsPath), 'JS file should be created');
     assert.ok(fs.existsSync(jsonPath), 'JSON file should be created');
 
@@ -127,7 +133,9 @@ flow MainFlow
 messages Messages
 `;
 
-    const invalidUri = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test-invalid.rcl'));
+    const invalidUri = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test-invalid.rcl'),
+    );
     await vscode.workspace.fs.writeFile(invalidUri, Buffer.from(invalidContent));
 
     try {
@@ -138,7 +146,7 @@ messages Messages
       await vscode.commands.executeCommand('rcl.showJSONOutput');
 
       // Wait a bit
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // JSON file should not be created
       const jsonPath = invalidUri.fsPath.replace('.rcl', '.json');

@@ -5,7 +5,7 @@ class ReferencesProvider {
     constructor(parser) {
         this.parser = parser;
     }
-    async getReferences(document, position, context) {
+    async getReferences(_document, _position, _context) {
         // Basic implementation - can be enhanced later
         return [];
     }

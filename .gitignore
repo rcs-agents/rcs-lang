@@ -61,3 +61,4 @@ node_modules
 # moon
 .moon/cache
 .moon/docker
+apps/extension/.wdio-vscode-service

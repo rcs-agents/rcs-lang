@@ -1,10 +1,26 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
+project:
+  name: '@rcl/language-service'
+  description: 'RCL language service'
+
+type: library
 language: typescript
+
+dependsOn:
+  - '@rcl/parser'
+  - '@rcl/core'
+  - '@rcl/validation'
+  - '@rcl/compiler'
 
 tasks:
   build:
-    command: npm run build
+    command: bun run build
+    deps:
+      - '@rcl/parser:build'
+      - '@rcl/core:build'
+      - '@rcl/validation:build'
+      - '@rcl/compiler:build'
     inputs:
       - src/**/*
       - tsconfig.json
@@ -13,13 +29,13 @@ tasks:
       - dist
 
   dev:
-    command: npm run dev
+    command: bun run dev
     inputs:
       - src/**/*
       - tsconfig.json
 
   test:
-    command: npm test
+    command: bun test
     inputs:
       - src/**/*
       - tests/**/*
@@ -27,23 +43,21 @@ tasks:
       - package.json
 
   typecheck:
-    command: npm run typecheck
+    command: bun run typecheck
     inputs:
       - src/**/*
       - tsconfig.json
 
   lint:
-    command: npm run lint
+    command: bun run lint
     inputs:
       - src/**/*
 
   format:
-    command: npm run format
+    command: bun run format
     inputs:
       - src/**/*
 
   clean:
-    command: npm run clean
+    command: bun run clean
 
-dependsOn:
-  - parser

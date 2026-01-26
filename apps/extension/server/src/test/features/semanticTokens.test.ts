@@ -16,10 +16,10 @@ describe('SemanticTokensProvider', () => {
       assert.ok(legend, 'Should provide a semantic tokens legend');
       assert.ok(Array.isArray(legend.tokenTypes), 'Should have token types array');
       assert.ok(Array.isArray(legend.tokenModifiers), 'Should have token modifiers array');
-      
+
       // Check for common RCL token types
       const expectedTokenTypes = ['keyword', 'string', 'number', 'property'];
-      expectedTokenTypes.forEach(tokenType => {
+      expectedTokenTypes.forEach((tokenType) => {
         if (legend.tokenTypes.includes(tokenType)) {
           assert.ok(true, `Should include ${tokenType} token type`);
         }
@@ -28,9 +28,9 @@ describe('SemanticTokensProvider', () => {
 
     it('should have non-empty token types', () => {
       const legend = semanticTokensProvider.getLegend();
-      
+
       assert.ok(legend.tokenTypes.length > 0, 'Should have at least one token type');
-      legend.tokenTypes.forEach(tokenType => {
+      legend.tokenTypes.forEach((tokenType) => {
         assert.ok(typeof tokenType === 'string', 'Token type should be a string');
         assert.ok(tokenType.length > 0, 'Token type should not be empty');
       });
@@ -46,7 +46,7 @@ describe('SemanticTokensProvider', () => {
 
       assert.ok(tokens, 'Should return semantic tokens');
       assert.ok(Array.isArray(tokens.data), 'Should have data array');
-      
+
       // Semantic tokens are encoded as an array of integers
       // Each token is represented by 5 integers: deltaLine, deltaChar, length, tokenType, tokenModifiers
       if (tokens.data.length > 0) {
@@ -58,7 +58,7 @@ describe('SemanticTokensProvider', () => {
       const text = `flow MainFlow
   :start -> Welcome
   Welcome -> End`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
@@ -71,7 +71,7 @@ describe('SemanticTokensProvider', () => {
       const text = `messages Messages
   text Welcome "Welcome to our service!"
   richCard Product "Product Information"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
@@ -107,7 +107,10 @@ describe('SemanticTokensProvider', () => {
 
           // Check if token type is within valid range
           const legend = semanticTokensProvider.getLegend();
-          assert.ok(tokenType < legend.tokenTypes.length, 'Token type should be within legend range');
+          assert.ok(
+            tokenType < legend.tokenTypes.length,
+            'Token type should be within legend range',
+          );
         }
       }
     });
@@ -131,16 +134,20 @@ describe('SemanticTokensProvider', () => {
     richCard Planning "What would you like to do?" :large
       reply "Option 1" "option1"
       reply "Option 2" "option2"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const tokens = await semanticTokensProvider.getSemanticTokens(document);
 
       assert.ok(tokens, 'Should handle complex RCL structures');
       assert.ok(Array.isArray(tokens.data), 'Should have data array');
-      
+
       if (tokens.data.length > 0) {
-        assert.equal(tokens.data.length % 5, 0, 'Complex structure tokens should still be properly encoded');
+        assert.equal(
+          tokens.data.length % 5,
+          0,
+          'Complex structure tokens should still be properly encoded',
+        );
       }
     });
   });

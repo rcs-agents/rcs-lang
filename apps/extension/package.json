@@ -8,30 +8,15 @@
   "engines": {
     "vscode": "^1.75.0"
   },
-  "categories": [
-    "Programming Languages",
-    "Snippets",
-    "Linters"
-  ],
-  "keywords": [
-    "rcl",
-    "rich communication language",
-    "rcs",
-    "chatbot",
-    "language server"
-  ],
+  "categories": ["Programming Languages", "Snippets", "Linters"],
+  "keywords": ["rcl", "rich communication language", "rcs", "chatbot", "language server"],
   "main": "./client/out/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "rcl",
-        "aliases": [
-          "RCL",
-          "Rich Communication Language"
-        ],
-        "extensions": [
-          ".rcl"
-        ],
+        "aliases": ["RCL", "Rich Communication Language"],
+        "extensions": [".rcl"],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -49,28 +34,43 @@
         "category": "RCL"
       },
       {
-        "command": "rcl.showPreview",
-        "title": "Show Live Preview",
-        "category": "RCL"
-      },
-      {
-        "command": "rcl.showPreviewPanel",
-        "title": "Show Preview in Panel",
-        "category": "RCL"
-      },
-      {
         "command": "rcl.showJSONOutput",
         "title": "Show JSON Output",
         "category": "RCL"
       },
       {
-        "command": "rcl.exportCompiled",
-        "title": "Export Compiled Output",
+        "command": "rcl.openInteractiveDiagram",
+        "title": "Open Interactive Diagram",
         "category": "RCL"
       },
       {
-        "command": "rcl.openInteractiveDiagram",
-        "title": "Open Interactive Diagram",
+        "command": "rcl.debugWebviewMinimal",
+        "title": "Debug: Minimal Webview Test",
+        "category": "RCL Debug"
+      },
+      {
+        "command": "rcl.debugWebviewResources",
+        "title": "Debug: Resources Loading Test",
+        "category": "RCL Debug"
+      },
+      {
+        "command": "rcl.debugWebviewSprotty",
+        "title": "Debug: Sprotty Library Test",
+        "category": "RCL Debug"
+      },
+      {
+        "command": "rcl.debugWebviewFull",
+        "title": "Debug: Full Interactive Diagram Test",
+        "category": "RCL Debug"
+      },
+      {
+        "command": "rcl.showPreview",
+        "title": "Show Preview",
+        "category": "RCL"
+      },
+      {
+        "command": "rcl.exportCompiled",
+        "title": "Export Compiled Output",
         "category": "RCL"
       }
     ],
@@ -79,11 +79,6 @@
         {
           "when": "resourceExtname == .rcl",
           "command": "rcl.showAgentOutput",
-          "group": "navigation"
-        },
-        {
-          "when": "resourceExtname == .rcl",
-          "command": "rcl.showPreview",
           "group": "navigation"
         },
         {
@@ -105,11 +100,6 @@
         },
         {
           "when": "resourceExtname == .rcl",
-          "command": "rcl.showPreview",
-          "group": "navigation"
-        },
-        {
-          "when": "resourceExtname == .rcl",
           "command": "rcl.showJSONOutput",
           "group": "navigation"
         },
@@ -123,11 +113,10 @@
     "views": {
       "explorer": [
         {
-          "type": "webview",
           "id": "rclPreview",
           "name": "RCL Preview",
-          "when": "resourceExtname == .rcl",
-          "icon": "$(eye)"
+          "type": "webview",
+          "when": "resourceExtname == .rcl"
         }
       ]
     },
@@ -162,11 +151,7 @@
         "rcl.trace.server": {
           "scope": "window",
           "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
+          "enum": ["off", "messages", "verbose"],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
         }
@@ -175,9 +160,9 @@
   },
   "scripts": {
     "vscode:prepublish": "nr compile",
-    "compile": "tsc -b && npm run copy-wasm",
-    "build": "tsc -b && npm run copy-wasm",
-    "copy-wasm": "mkdir -p ./server/out && cp ../../packages/parser/tree-sitter-rcl.wasm ./server/out/ && mkdir -p ./server/out/build/Release && cp ../../packages/parser/build/Release/tree_sitter_rcl_binding.node ./server/out/build/Release/ || true",
+    "compile": "tsc -b && bun run copy-wasm",
+    "build": "tsc -b && bun run copy-wasm",
+    "copy-wasm": "echo 'Using ANTLR parser - no WASM files needed'",
     "dev": "tsc -b -w",
     "watch": "tsc -b -w",
     "clean": "rm -rf client/out server/out",
@@ -186,19 +171,32 @@
     "typecheck": "tsc -b --noEmit",
     "test": "nr test:server && nr test:client",
     "test:server": "cd server && bun test",
-    "test:client": "cd client && bun test",
-    "test:integration": "nr compile && cd client && npm run test:integration",
-    "test:all": "nr test && nr test:integration",
+    "test:client": "cd client && bun run test:unit",
+    "test:integration": "vscode-test",
+    "test:e2e": "wdio run ../../wdio.conf.ts",
+    "test:e2e:coffee-shop": "wdio run ../../wdio.conf.ts --spec='**/comprehensive-coffee-shop.test.ts'",
+    "test:diagnostics": "wdio run ../../wdio.conf.ts --spec='**/comprehensive-coffee-shop.test.ts' --grep='Diagnostics'",
+    "test:diagram": "wdio run ../../wdio.conf.ts --spec='**/comprehensive-coffee-shop.test.ts' --grep='Interactive Diagram'",
+    "test:visual": "nr test:e2e -- --spec='**/visual/*.test.ts'",
+    "test:all": "nr test && nr test:integration && nr test:e2e",
+    "test:watch": "nr test -- --watch",
+    "test:playwright": "playwright test",
+    "test:playwright:ui": "playwright test --ui",
+    "test:playwright:debug": "playwright test --debug",
+    "serve:test": "echo 'Test server for Interactive Diagram testing'",
     "package": "vsce package"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.1",
     "@types/node": "^20.0.0",
-    "@types/vscode": "^1.75.0",
-    "typescript": "^5.0.0",
-    "@vscode/vsce": "^3.0.0"
+    "@types/vscode": "^1.89.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@rcl/parser": "file:../../packages/parser",
-    "@rcl/language-service": "file:../../packages/language-service"
+    "@rcl/parser": "workspace:*",
+    "@rcl/language-service": "workspace:*",
+    "sprotty": "^1.0.0",
+    "sprotty-vscode-webview": "^1.0.0"
   }
 }

@@ -1,6 +1,6 @@
-import { DocumentSymbol } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import { type DocumentSymbol } from 'vscode-languageserver/node';
 export declare class SymbolsProvider {
     private parser;
     constructor(parser: RCLParser);

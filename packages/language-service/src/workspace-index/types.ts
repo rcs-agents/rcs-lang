@@ -1,4 +1,4 @@
-import { ExportedSymbol } from '../import-resolver/types';
+import type { ExportedSymbol } from '../import-resolver/types';
 
 /**
  * Represents a symbol location in the workspace
@@ -48,7 +48,7 @@ export interface RCLDocument {
 export enum FileChangeType {
   Created = 'created',
   Modified = 'modified',
-  Deleted = 'deleted'
+  Deleted = 'deleted',
 }
 
 /**

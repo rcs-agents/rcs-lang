@@ -1,6 +1,6 @@
+import { RCLParser } from '@rcl/parser';
 import { expect } from 'chai';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
 
 describe('RCL Parser Real Tests', () => {
   let parser: RCLParser;
@@ -26,10 +26,10 @@ describe('RCL Parser Real Tests', () => {
       const result = await parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
-      expect(result.ast!.type).to.equal('source_file');
-      expect(result.ast!.children).to.have.length(1);
+      expect(result.ast?.type).to.equal('source_file');
+      expect(result.ast?.children).to.have.length(1);
 
-      const agentNode = result.ast!.children![0];
+      const agentNode = result.ast?.children?.[0];
       expect(agentNode.type).to.equal('agent_definition');
       expect((agentNode as any).name).to.equal('TestAgent');
     });
@@ -91,7 +91,7 @@ describe('RCL Parser Real Tests', () => {
       const result = await parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
-      expect(result.ast!.type).to.equal('source_file');
+      expect(result.ast?.type).to.equal('source_file');
 
       // Check that no parsing errors occurred
       expect(result.diagnostics).to.have.length(0);
@@ -113,7 +113,7 @@ describe('RCL Parser Real Tests', () => {
       const result = await parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
-      expect(result.ast!.type).to.equal('source_file');
+      expect(result.ast?.type).to.equal('source_file');
       expect(result.diagnostics).to.have.length(0);
     });
 
@@ -154,7 +154,7 @@ agent CommentTest
       const result = await parser.parseDocument(document.getText(), document.uri, document.version);
 
       expect(result.ast).to.not.be.null;
-      expect(result.ast!.type).to.equal('source_file');
+      expect(result.ast?.type).to.equal('source_file');
       expect(result.diagnostics).to.have.length(0);
     });
 
@@ -174,7 +174,7 @@ agent CommentTest
       // Test finding node at position (line 0, character 6 - should be in "agent")
       const nodeAtAgent = parser.getNodeAt(result, 0, 6);
       expect(nodeAtAgent).to.not.be.null;
-      expect(nodeAtAgent!.type).to.equal('agent_definition');
+      expect(nodeAtAgent?.type).to.equal('agent_definition');
 
       // Test finding node at position (line 1, character 2 - should be in property)
       const nodeAtProperty = parser.getNodeAt(result, 1, 2);

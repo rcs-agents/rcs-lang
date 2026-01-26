@@ -1,6 +1,6 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { CompilationService } from '../compilationService';
 
 suite('CompilationService Test Suite', () => {
@@ -13,7 +13,7 @@ suite('CompilationService Test Suite', () => {
   });
 
   teardown(() => {
-    disposables.forEach(d => d.dispose());
+    disposables.forEach((d) => d.dispose());
     disposables = [];
   });
 
@@ -31,13 +31,15 @@ messages Messages
   text MsgWelcome "Welcome to Travel Assistant!"
 `;
 
-    const doc = await vscode.workspace.openTextDocument({
+    const _doc = await vscode.workspace.openTextDocument({
       language: 'rcl',
-      content: content
+      content: content,
     });
 
     // Save to a temporary file
-    const tempUri = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test-temp.rcl'));
+    const tempUri = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test-temp.rcl'),
+    );
     await vscode.workspace.fs.writeFile(tempUri, Buffer.from(content));
 
     try {
@@ -49,7 +51,10 @@ messages Messages
       assert.ok(result.data.messages, 'Should have messages data');
       assert.ok(result.data.flows, 'Should have flows data');
       assert.strictEqual(result.data.agent.displayName, 'Travel Assistant');
-      assert.strictEqual(result.data.messages.MsgWelcome.contentMessage.text, 'Welcome to Travel Assistant!');
+      assert.strictEqual(
+        result.data.messages.MsgWelcome.contentMessage.text,
+        'Welcome to Travel Assistant!',
+      );
     } finally {
       // Clean up
       await vscode.workspace.fs.delete(tempUri);
@@ -67,7 +72,9 @@ messages Messages
   text MsgWelcome "Welcome!"
 `;
 
-    const tempUri = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test-invalid.rcl'));
+    const tempUri = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test-invalid.rcl'),
+    );
     await vscode.workspace.fs.writeFile(tempUri, Buffer.from(content));
 
     try {
@@ -82,7 +89,7 @@ messages Messages
   });
 
   test('should handle file outside workspace', async () => {
-    const content = `agent Test
+    const _content = `agent Test
   displayName: "Test"
 
 flow MainFlow
@@ -93,7 +100,7 @@ messages Messages
 
     // Create a file outside workspace
     const tempUri = vscode.Uri.file('/tmp/test-outside.rcl');
-    
+
     try {
       await compilationService.compileFile(tempUri);
       assert.fail('Should throw error for file outside workspace');
@@ -113,9 +120,13 @@ flow MainFlow
 messages Messages
 `;
 
-    const tempUri1 = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test1.rcl'));
-    const tempUri2 = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test2.rcl'));
-    
+    const tempUri1 = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test1.rcl'),
+    );
+    const tempUri2 = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test2.rcl'),
+    );
+
     await vscode.workspace.fs.writeFile(tempUri1, Buffer.from(content));
     await vscode.workspace.fs.writeFile(tempUri2, Buffer.from(content));
 
@@ -150,7 +161,9 @@ flow MainFlow
 messages Messages
 `;
 
-    const tempUri = vscode.Uri.file(path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, 'test-diagnostics.rcl'));
+    const tempUri = vscode.Uri.file(
+      path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath, 'test-diagnostics.rcl'),
+    );
     await vscode.workspace.fs.writeFile(tempUri, Buffer.from(content));
 
     try {

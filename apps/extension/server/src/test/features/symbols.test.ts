@@ -18,14 +18,16 @@ describe('SymbolsProvider', () => {
       const symbols = await symbolsProvider.getDocumentSymbols(document);
 
       assert.ok(Array.isArray(symbols), 'Should return an array of symbols');
-      
-      const agentSymbol = symbols.find(symbol => 
-        symbol.name === 'TestAgent' || symbol.name.includes('TestAgent')
+
+      const agentSymbol = symbols.find(
+        (symbol) => symbol.name === 'TestAgent' || symbol.name.includes('TestAgent'),
       );
-      
+
       if (agentSymbol) {
-        assert.ok(agentSymbol.kind === SymbolKind.Class || agentSymbol.kind === SymbolKind.Object, 
-                  'Agent should be represented as Class or Object symbol');
+        assert.ok(
+          agentSymbol.kind === SymbolKind.Class || agentSymbol.kind === SymbolKind.Object,
+          'Agent should be represented as Class or Object symbol',
+        );
         assert.ok(agentSymbol.range, 'Symbol should have a range');
       }
     });
@@ -40,23 +42,25 @@ describe('SymbolsProvider', () => {
     
   flow SupportFlow
     :start -> Help`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const symbols = await symbolsProvider.getDocumentSymbols(document);
 
-      const flowSymbols = symbols.filter(symbol => 
-        symbol.name === 'MainFlow' || symbol.name === 'SupportFlow' ||
-        symbol.name.includes('Flow')
+      const flowSymbols = symbols.filter(
+        (symbol) =>
+          symbol.name === 'MainFlow' ||
+          symbol.name === 'SupportFlow' ||
+          symbol.name.includes('Flow'),
       );
 
       if (flowSymbols.length > 0) {
-        flowSymbols.forEach(flowSymbol => {
+        flowSymbols.forEach((flowSymbol) => {
           assert.ok(
-            flowSymbol.kind === SymbolKind.Function || 
-            flowSymbol.kind === SymbolKind.Method ||
-            flowSymbol.kind === SymbolKind.Object,
-            'Flow should be represented as Function, Method, or Object symbol'
+            flowSymbol.kind === SymbolKind.Function ||
+              flowSymbol.kind === SymbolKind.Method ||
+              flowSymbol.kind === SymbolKind.Object,
+            'Flow should be represented as Function, Method, or Object symbol',
           );
           assert.ok(flowSymbol.range, 'Flow symbol should have a range');
         });
@@ -70,24 +74,25 @@ describe('SymbolsProvider', () => {
   messages Messages
     text Welcome "Welcome message"
     richCard ProductCard "Product Info"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const symbols = await symbolsProvider.getDocumentSymbols(document);
 
-      const messageSymbols = symbols.filter(symbol => 
-        symbol.name === 'Welcome' || 
-        symbol.name === 'ProductCard' ||
-        symbol.name.includes('Message')
+      const messageSymbols = symbols.filter(
+        (symbol) =>
+          symbol.name === 'Welcome' ||
+          symbol.name === 'ProductCard' ||
+          symbol.name.includes('Message'),
       );
 
       if (messageSymbols.length > 0) {
-        messageSymbols.forEach(messageSymbol => {
+        messageSymbols.forEach((messageSymbol) => {
           assert.ok(
-            messageSymbol.kind === SymbolKind.String || 
-            messageSymbol.kind === SymbolKind.Variable ||
-            messageSymbol.kind === SymbolKind.Property,
-            'Message should be represented as String, Variable, or Property symbol'
+            messageSymbol.kind === SymbolKind.String ||
+              messageSymbol.kind === SymbolKind.Variable ||
+              messageSymbol.kind === SymbolKind.Property,
+            'Message should be represented as String, Variable, or Property symbol',
           );
           assert.ok(messageSymbol.range, 'Message symbol should have a range');
         });
@@ -104,18 +109,18 @@ describe('SymbolsProvider', () => {
 
       const symbols = await symbolsProvider.getDocumentSymbols(document);
 
-      symbols.forEach(symbol => {
+      symbols.forEach((symbol) => {
         assert.ok(symbol.name, 'Symbol should have a name');
         assert.ok(symbol.kind !== undefined, 'Symbol should have a kind');
         assert.ok(symbol.range, 'Symbol should have a range');
         assert.ok(symbol.selectionRange, 'Symbol should have a selection range');
-        
+
         // Validate range structure
         assert.ok(symbol.range.start, 'Range should have start');
         assert.ok(symbol.range.end, 'Range should have end');
         assert.ok(symbol.range.start.line >= 0, 'Start line should be non-negative');
         assert.ok(symbol.range.start.character >= 0, 'Start character should be non-negative');
-        
+
         // Validate selection range structure
         assert.ok(symbol.selectionRange.start, 'Selection range should have start');
         assert.ok(symbol.selectionRange.end, 'Selection range should have end');
@@ -131,15 +136,15 @@ describe('SymbolsProvider', () => {
     
   messages Messages
     text Welcome "Hello"`;
-      
+
       const document = TextDocument.create('test://test.rcl', 'rcl', 1, text);
 
       const symbols = await symbolsProvider.getDocumentSymbols(document);
 
       // Check if any symbols have children (hierarchical structure)
-      symbols.forEach(symbol => {
+      symbols.forEach((symbol) => {
         if (symbol.children && symbol.children.length > 0) {
-          symbol.children.forEach(child => {
+          symbol.children.forEach((child) => {
             assert.ok(child.name, 'Child symbol should have a name');
             assert.ok(child.kind !== undefined, 'Child symbol should have a kind');
             assert.ok(child.range, 'Child symbol should have a range');

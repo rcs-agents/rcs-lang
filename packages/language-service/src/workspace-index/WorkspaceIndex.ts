@@ -1,25 +1,25 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { RCLParser } from '@rcl/parser';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { IParser } from '@rcl/core';
 import { ImportResolver } from '../import-resolver';
-import { SymbolType, ExportedSymbol } from '../import-resolver/types';
-import { 
-  SymbolLocation, 
-  SymbolInfo, 
-  RCLDocument, 
+import { ExportedSymbol, type SymbolType } from '../import-resolver/types';
+import {
   FileChangeEvent,
   FileChangeType,
-  WorkspaceIndexConfig 
+  type RCLDocument,
+  type SymbolInfo,
+  type SymbolLocation,
+  type WorkspaceIndexConfig,
 } from './types';
 
 /**
  * Manages workspace-wide indexing of RCL files
  */
 export class WorkspaceIndex {
-  private parser: RCLParser;
+  private parser: IParser;
   private importResolver: ImportResolver;
   private config: WorkspaceIndexConfig;
-  
+
   // Index storage
   private documents = new Map<string, RCLDocument>();
   private symbolsByName = new Map<string, SymbolInfo[]>();
@@ -28,11 +28,11 @@ export class WorkspaceIndex {
   private dependencies = new Map<string, Set<string>>(); // file -> files it depends on
   private dependents = new Map<string, Set<string>>(); // file -> files that depend on it
 
-  constructor(config: WorkspaceIndexConfig) {
+  constructor(parser: IParser, config: WorkspaceIndexConfig) {
+    this.parser = parser;
     this.config = config;
-    this.parser = new RCLParser();
-    this.importResolver = new ImportResolver({
-      projectRoot: config.workspaceRoot
+    this.importResolver = new ImportResolver(parser, {
+      projectRoot: config.workspaceRoot,
     });
   }
 
@@ -50,11 +50,11 @@ export class WorkspaceIndex {
     try {
       const fileContent = content || fs.readFileSync(uri, 'utf-8');
       const document = await this.parseDocument(uri, fileContent);
-      
+
       this.documents.set(uri, document);
       await this.updateSymbolIndex(document);
       await this.updateDependencyGraph(document);
-      
+
       // Update dependents
       await this.updateDependents(uri);
     } catch (error) {
@@ -71,13 +71,13 @@ export class WorkspaceIndex {
 
     // Remove from main index
     this.documents.delete(uri);
-    
+
     // Remove symbols
     this.removeSymbolsFromIndex(uri);
-    
+
     // Update dependency graph
     this.removeDependencies(uri);
-    
+
     // Update dependents
     this.updateDependentsAfterRemoval(uri);
   }
@@ -88,7 +88,7 @@ export class WorkspaceIndex {
   async updateFile(uri: string, content: string): Promise<void> {
     // Remove old version
     this.removeFile(uri);
-    
+
     // Add new version
     await this.addFile(uri, content);
   }
@@ -98,14 +98,12 @@ export class WorkspaceIndex {
    */
   findSymbol(name: string, type?: SymbolType): SymbolLocation[] {
     const symbols = this.symbolsByName.get(name) || [];
-    
-    const filtered = type 
-      ? symbols.filter(s => s.symbol.type === type)
-      : symbols;
-    
-    return filtered.map(s => ({
+
+    const filtered = type ? symbols.filter((s) => s.symbol.type === type) : symbols;
+
+    return filtered.map((s) => ({
       uri: s.uri,
-      symbol: s.symbol
+      symbol: s.symbol,
     }));
   }
 
@@ -137,9 +135,9 @@ export class WorkspaceIndex {
    */
   getSymbolsByType(type: SymbolType): SymbolLocation[] {
     const symbols = this.symbolsByType.get(type) || [];
-    return symbols.map(s => ({
+    return symbols.map((s) => ({
       uri: s.uri,
-      symbol: s.symbol
+      symbol: s.symbol,
     }));
   }
 
@@ -149,20 +147,20 @@ export class WorkspaceIndex {
   searchSymbols(query: string, type?: SymbolType): SymbolLocation[] {
     const results: SymbolLocation[] = [];
     const lowerQuery = query.toLowerCase();
-    
+
     for (const [name, symbols] of this.symbolsByName) {
       if (name.toLowerCase().includes(lowerQuery)) {
-        const filtered = type 
-          ? symbols.filter(s => s.symbol.type === type)
-          : symbols;
-        
-        results.push(...filtered.map(s => ({
-          uri: s.uri,
-          symbol: s.symbol
-        })));
+        const filtered = type ? symbols.filter((s) => s.symbol.type === type) : symbols;
+
+        results.push(
+          ...filtered.map((s) => ({
+            uri: s.uri,
+            symbol: s.symbol,
+          })),
+        );
       }
     }
-    
+
     return results;
   }
 
@@ -175,15 +173,18 @@ export class WorkspaceIndex {
     symbolsByType: Record<string, number>;
   } {
     const symbolsByType: Record<string, number> = {};
-    
+
     for (const [type, symbols] of this.symbolsByType) {
       symbolsByType[type] = symbols.length;
     }
-    
+
     return {
       totalFiles: this.documents.size,
-      totalSymbols: Array.from(this.symbolsByName.values()).reduce((sum, symbols) => sum + symbols.length, 0),
-      symbolsByType
+      totalSymbols: Array.from(this.symbolsByName.values()).reduce(
+        (sum, symbols) => sum + symbols.length,
+        0,
+      ),
+      symbolsByType,
     };
   }
 
@@ -192,7 +193,7 @@ export class WorkspaceIndex {
    */
   private async scanWorkspace(): Promise<void> {
     const files = await this.findRCLFiles(this.config.workspaceRoot);
-    
+
     for (const file of files) {
       await this.addFile(file);
     }
@@ -203,17 +204,17 @@ export class WorkspaceIndex {
    */
   private async findRCLFiles(dir: string): Promise<string[]> {
     const files: string[] = [];
-    
+
     try {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         if (entry.isDirectory()) {
           // Skip excluded directories
           if (this.isExcluded(fullPath)) continue;
-          
+
           const subFiles = await this.findRCLFiles(fullPath);
           files.push(...subFiles);
         } else if (entry.isFile() && entry.name.endsWith('.rcl')) {
@@ -225,7 +226,7 @@ export class WorkspaceIndex {
     } catch (error) {
       console.error(`Error scanning directory ${dir}:`, error);
     }
-    
+
     return files;
   }
 
@@ -234,8 +235,8 @@ export class WorkspaceIndex {
    */
   private isExcluded(filePath: string): boolean {
     const relativePath = path.relative(this.config.workspaceRoot, filePath);
-    
-    return this.config.exclude.some(pattern => {
+
+    return this.config.exclude.some((pattern) => {
       // Simple pattern matching - could be enhanced with glob patterns
       return relativePath.includes(pattern);
     });
@@ -245,17 +246,21 @@ export class WorkspaceIndex {
    * Parse a document and extract symbols
    */
   private async parseDocument(uri: string, content: string): Promise<RCLDocument> {
-    const document = await this.parser.parseDocument(content, uri);
+    const parseResult = await this.parser.parse(content, uri);
+    if (!parseResult.success) {
+      throw new Error(`Failed to parse ${uri}: ${parseResult.error}`);
+    }
+    const document = parseResult.value;
     const symbols = await this.importResolver.getExports(uri);
     const imports = await this.importResolver.extractImports(uri);
-    
+
     return {
       uri,
       content,
       ast: document.ast,
       symbols,
-      imports: imports.map(imp => imp.path),
-      version: Date.now()
+      imports: imports.map((imp) => imp.path),
+      version: Date.now(),
     };
   }
 
@@ -263,11 +268,11 @@ export class WorkspaceIndex {
    * Update symbol index for a document
    */
   private async updateSymbolIndex(document: RCLDocument): Promise<void> {
-    const symbolInfos: SymbolInfo[] = document.symbols.map(symbol => ({
+    const symbolInfos: SymbolInfo[] = document.symbols.map((symbol) => ({
       symbol,
       uri: document.uri,
       references: [],
-      lastModified: document.version
+      lastModified: document.version,
     }));
 
     // Update by-file index
@@ -279,7 +284,7 @@ export class WorkspaceIndex {
       if (!this.symbolsByName.has(name)) {
         this.symbolsByName.set(name, []);
       }
-      this.symbolsByName.get(name)!.push(symbolInfo);
+      this.symbolsByName.get(name)?.push(symbolInfo);
     }
 
     // Update by-type index
@@ -288,7 +293,7 @@ export class WorkspaceIndex {
       if (!this.symbolsByType.has(type)) {
         this.symbolsByType.set(type, []);
       }
-      this.symbolsByType.get(type)!.push(symbolInfo);
+      this.symbolsByType.get(type)?.push(symbolInfo);
     }
   }
 
@@ -297,14 +302,14 @@ export class WorkspaceIndex {
    */
   private async updateDependencyGraph(document: RCLDocument): Promise<void> {
     const dependencies = new Set<string>();
-    
+
     for (const importPath of document.imports) {
       const resolved = await this.importResolver.resolveImport(importPath, document.uri);
       if (resolved.exists) {
         dependencies.add(resolved.resolvedPath);
       }
     }
-    
+
     this.dependencies.set(document.uri, dependencies);
   }
 
@@ -314,14 +319,14 @@ export class WorkspaceIndex {
   private async updateDependents(uri: string): Promise<void> {
     // Clear existing dependents
     this.dependents.delete(uri);
-    
+
     // Rebuild dependents by checking all files
     for (const [fileUri, deps] of this.dependencies) {
       if (deps.has(uri)) {
         if (!this.dependents.has(uri)) {
           this.dependents.set(uri, new Set());
         }
-        this.dependents.get(uri)!.add(fileUri);
+        this.dependents.get(uri)?.add(fileUri);
       }
     }
   }
@@ -331,13 +336,13 @@ export class WorkspaceIndex {
    */
   private removeSymbolsFromIndex(uri: string): void {
     const symbols = this.symbolsByFile.get(uri) || [];
-    
+
     // Remove from by-name index
     for (const symbolInfo of symbols) {
       const name = symbolInfo.symbol.name;
       const nameSymbols = this.symbolsByName.get(name) || [];
-      const filtered = nameSymbols.filter(s => s.uri !== uri);
-      
+      const filtered = nameSymbols.filter((s) => s.uri !== uri);
+
       if (filtered.length === 0) {
         this.symbolsByName.delete(name);
       } else {
@@ -349,8 +354,8 @@ export class WorkspaceIndex {
     for (const symbolInfo of symbols) {
       const type = symbolInfo.symbol.type;
       const typeSymbols = this.symbolsByType.get(type) || [];
-      const filtered = typeSymbols.filter(s => s.uri !== uri);
-      
+      const filtered = typeSymbols.filter((s) => s.uri !== uri);
+
       if (filtered.length === 0) {
         this.symbolsByType.delete(type);
       } else {
@@ -380,7 +385,7 @@ export class WorkspaceIndex {
         this.dependents.delete(fileUri);
       }
     }
-    
+
     // Remove dependents list for this file
     this.dependents.delete(uri);
   }

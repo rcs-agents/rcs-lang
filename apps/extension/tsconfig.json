@@ -15,8 +15,5 @@
     "composite": true
   },
   "files": [],
-  "references": [
-    { "path": "./client" },
-    { "path": "./server" }
-  ]
+  "references": [{ "path": "./client" }, { "path": "./server" }]
 }

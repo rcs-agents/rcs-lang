@@ -1,17 +1,20 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
-import path from 'node:path';
 import os from 'node:os';
-import { RCLParser } from '@rcl/parser';
+import path from 'node:path';
+import type { IParser } from '@rcl/core';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
-import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex';
 import { HoverProvider } from '../src/providers/HoverProvider';
+import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex';
 
-import { TextDocument, Position } from '../src/providers/types';
+import type { Position, TextDocument } from '../src/providers/types';
 
 // Mock TextDocument implementation
 class MockTextDocument implements TextDocument {
-  constructor(public uri: string, private content: string) {}
+  constructor(
+    public uri: string,
+    private content: string,
+  ) {}
 
   getText(): string {
     return this.content;
@@ -21,18 +24,18 @@ class MockTextDocument implements TextDocument {
     const lines = this.content.substring(0, offset).split('\n');
     return {
       line: lines.length - 1,
-      character: lines[lines.length - 1].length
+      character: lines[lines.length - 1].length,
     };
   }
 
   offsetAt(position: { line: number; character: number }): number {
     const lines = this.content.split('\n');
     let offset = 0;
-    
+
     for (let i = 0; i < position.line && i < lines.length; i++) {
       offset += lines[i].length + 1; // +1 for newline
     }
-    
+
     offset += Math.min(position.character, lines[position.line]?.length || 0);
     return offset;
   }
@@ -40,26 +43,43 @@ class MockTextDocument implements TextDocument {
 
 describe('HoverProvider', () => {
   let tempDir: string;
-  let parser: RCLParser;
+  let parser: IParser;
   let importResolver: ImportResolver;
   let workspaceIndex: WorkspaceIndex;
   let hoverProvider: HoverProvider;
 
   beforeEach(async () => {
-    
     // Create temporary directory for testing
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-hover-test-'));
-    
-    parser = new RCLParser({ strict: false });
-    importResolver = new ImportResolver({ projectRoot: tempDir });
-    workspaceIndex = new WorkspaceIndex({
+
+    // Create mock parser
+    parser = {
+      parse: async (_content: string, _filename?: string) => ({
+        success: true,
+        value: {
+          ast: {
+            type: 'program',
+            children: [],
+          },
+          diagnostics: [],
+        },
+      }),
+      getCapabilities: () => ({
+        supportsIncrementalParsing: false,
+        supportsSyntaxHighlighting: true,
+        supportsErrorRecovery: true,
+      }),
+    };
+
+    importResolver = new ImportResolver(parser, { projectRoot: tempDir });
+    workspaceIndex = new WorkspaceIndex(parser, {
       workspaceRoot: tempDir,
       include: ['**/*.rcl'],
       exclude: ['node_modules/**'],
       watchFiles: false,
-      debounceDelay: 100
+      debounceDelay: 100,
     });
-    
+
     hoverProvider = new HoverProvider(parser, importResolver, workspaceIndex);
     await workspaceIndex.initialize();
   });
@@ -84,10 +104,7 @@ flow MainFlow
   greeting: "Hello from TestAgent"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Position on "TestAgent" in the agent definition
       const position: Position = { line: 0, character: 8 };
@@ -97,7 +114,7 @@ flow MainFlow
       // With mock parser, may not find full definition, but should not throw
       if (hover) {
         expect(hover.contents).toBeTruthy();
-        
+
         if (typeof hover.contents === 'object') {
           const markup = hover.contents as MarkupContent;
           expect(markup.kind).toBe('markdown');
@@ -115,10 +132,7 @@ flow MainFlow
   brandName: "My Brand"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       const position: Position = { line: 0, character: 8 };
       const hover = await hoverProvider.provideHover(document, position);
@@ -143,10 +157,7 @@ flow MainFlow
   end: "Goodbye"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Position on "TestFlow" in the flow definition
       const position: Position = { line: 0, character: 5 };
@@ -171,10 +182,7 @@ flow MainFlow
   enabled: true
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Test different property types
       const tests = [
@@ -235,7 +243,7 @@ flow MainFlow
       const hover = await hoverProvider.provideHover(document, position);
 
       // May or may not work with mock parser, but should not throw
-      expect(hover === null || (hover && hover.contents)).toBeTruthy();
+      expect(hover === null || hover?.contents).toBeTruthy();
     });
   });
 
@@ -245,10 +253,7 @@ flow MainFlow
   name: "Test"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       const position: Position = { line: 0, character: 8 };
       const hover = await hoverProvider.provideHover(document, position);
@@ -268,10 +273,7 @@ flow MainFlow
   name: "Test"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Position on a symbol that might not be recognized
       const position: Position = { line: 1, character: 15 }; // In string content
@@ -292,10 +294,7 @@ flow MainFlow
   name: "Test Agent"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       const position: Position = { line: 0, character: 8 };
       const hover = await hoverProvider.provideHover(document, position);
@@ -305,7 +304,7 @@ flow MainFlow
         expect(markup.kind).toBe('markdown');
         expect(markup.value).toBeTruthy();
         expect(typeof markup.value).toBe('string');
-        
+
         // Should contain markdown formatting
         expect(markup.value).toMatch(/\*\*/); // Bold formatting
       }
@@ -318,16 +317,13 @@ flow MainFlow
   name: "Test"
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Test invalid positions
       const invalidPositions = [
-        { line: -1, character: 0 },    // Negative line
-        { line: 10, character: 0 },    // Line beyond content
-        { line: 0, character: -1 },    // Negative character
+        { line: -1, character: 0 }, // Negative line
+        { line: 10, character: 0 }, // Line beyond content
+        { line: 0, character: -1 }, // Negative character
       ];
 
       for (const position of invalidPositions) {
@@ -337,14 +333,11 @@ flow MainFlow
     });
 
     it('should handle empty documents', async () => {
-      const document = new MockTextDocument(
-        path.join(tempDir, 'empty.rcl'),
-        ''
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'empty.rcl'), '');
 
       const position: Position = { line: 0, character: 0 };
       const hover = await hoverProvider.provideHover(document, position);
-      
+
       expect(hover).toBeNull();
     });
 
@@ -354,16 +347,13 @@ flow
   -> 
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'malformed.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'malformed.rcl'), content);
 
       const position: Position = { line: 0, character: 5 };
       const hover = await hoverProvider.provideHover(document, position);
-      
+
       // Should not throw, should return null or valid hover
-      expect(hover === null || (hover && hover.contents)).toBeTruthy();
+      expect(hover === null || hover?.contents).toBeTruthy();
     });
   });
 
@@ -375,10 +365,7 @@ flow TestFlow
   start -> end
 `;
 
-      const document = new MockTextDocument(
-        path.join(tempDir, 'test.rcl'),
-        content
-      );
+      const document = new MockTextDocument(path.join(tempDir, 'test.rcl'), content);
 
       // Test different symbol positions
       const tests = [
@@ -392,7 +379,7 @@ flow TestFlow
       for (const test of tests) {
         const position: Position = { line: test.line, character: test.character };
         const hover = await hoverProvider.provideHover(document, position);
-        
+
         // Should either get hover or null, but not throw
         expect(hover === null || hover?.contents).toBeTruthy();
       }

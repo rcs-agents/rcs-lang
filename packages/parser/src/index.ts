@@ -1,61 +1,95 @@
-// Main exports for the RCL parser package
-export { RCLParser } from './rclParser';
-export { ASTWalker } from './astWalker';
+import type { ParserConfig } from '@rcl/core';
+import { CharStream, CommonTokenStream } from 'antlr4ng';
+import { RclLexer } from './generated/RclLexer';
+import { RclParser } from './generated/RclParser';
 
-// Type exports
-export * from './astTypes';
-export * from './rclTypes';
-export { IParser, ParseResult, ParserOptions } from './types';
+// Legacy function for backward compatibility with old interface
+export async function parse(source: string): Promise<{ ast: any; errors?: any[] }> {
+  const parser = new AntlrRclParser();
+  await parser.initialize();
 
-// Validation exports
-export * from './validation';
+  const result = await parser.parse(source);
 
-// AST helper exports
-export * from './ast';
+  if (result.success) {
+    return {
+      ast: result.value.ast,
+      errors:
+        result.value.diagnostics.length > 0
+          ? result.value.diagnostics.map((d) => ({
+              message: d.message,
+              line: d.range?.start.line,
+              column: d.range?.start.character,
+              type: 'ERROR',
+            }))
+          : undefined,
+    };
+  }
+  return {
+    ast: null,
+    errors: [
+      {
+        message: result.error.message,
+        type: 'FATAL',
+      },
+    ],
+  };
+}
 
-// Parse result helpers
-export * from './parseResult';
+// Legacy function for tree-sitter compatibility
+export function parseRcl(source: string) {
+  const inputStream = CharStream.fromString(source);
+  const lexer = new RclLexer(inputStream);
+  const tokenStream = new CommonTokenStream(lexer);
+  const parser = new RclParser(tokenStream);
 
-// Parser factory
-export * from './factory';
+  const tree = parser.rcl_file();
+  return tree;
+}
 
-// Legacy parse function - now uses the real parser with proper error handling
-import { RCLParser } from './rclParser';
-import { DiagnosticCollectionImpl } from '@rcl/core-types';
-import { checkForErrorNodes, convertTreeSitterNode } from './parseResult';
+// Export the main parser class
+export { AntlrRclParser } from './parser';
+export { AntlrRclParser as RCLParser } from './parser'; // Alias for compatibility
 
-// Create a global parser instance
-const parser = new RCLParser();
+// Import for factory
+import { AntlrRclParser } from './parser';
 
-export async function parse(text: string): Promise<{ ast: any; errors?: any[] }> {
-  try {
-    const document = await parser.parseDocument(text, 'inline-document.rcl');
-    
-    // Convert tree-sitter node to our AST format
-    const ast = document.ast ? convertTreeSitterNode(document.ast) : null;
-    
-    // Check for ERROR nodes in the AST
-    const diagnostics = new DiagnosticCollectionImpl();
-    if (ast) {
-      checkForErrorNodes(ast, diagnostics);
+// Export parser adapter
+export { AntlrAdapter } from './adapter';
+
+// Export generated classes
+export { RclLexer, RclParser };
+
+// Export types from core
+export type { IParser, IParseResult, IParserCapabilities, ParserConfig } from '@rcl/core';
+
+// Legacy types for compatibility
+export interface RCLDocument {
+  uri: string;
+  version: number;
+  content: string;
+  ast: any;
+  imports: any[];
+  symbols: any[];
+  diagnostics: any[];
+}
+
+export interface RCLSettings {
+  [key: string]: any;
+}
+
+// Export factory
+export class ParserFactory {
+  static async create(config?: ParserConfig) {
+    const parser = new AntlrRclParser();
+    const result = await parser.initialize(config);
+
+    if (!result.success) {
+      return result;
     }
-    
-    // Convert diagnostics to legacy error format for backward compatibility
-    const errors = diagnostics.diagnostics.map(d => ({
-      message: d.message,
-      line: d.range?.start.line,
-      column: d.range?.start.column,
-      type: d.code || 'ERROR'
-    }));
-    
-    return { ast, errors };
-  } catch (error) {
-    return { 
-      ast: null, 
-      errors: [{ 
-        message: error instanceof Error ? error.message : String(error),
-        type: 'FATAL'
-      }] 
+
+    return {
+      success: true as const,
+      value: parser,
     };
   }
 }

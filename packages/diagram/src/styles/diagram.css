@@ -1,0 +1,661 @@
+/* RCL Diagram Styles */
+
+.rcl-diagram-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #1e1e1e;
+  overflow: hidden;
+}
+
+.rcl-diagram-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Node styles */
+.node {
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.node:hover {
+  opacity: 0.8;
+}
+
+.node.selected > * {
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 8px #007acc);
+}
+
+.node.dragging {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.node.editing {
+  filter: drop-shadow(0 0 12px #ff9500);
+}
+
+/* Node type specific styles */
+.start-node {
+  fill: #4ac776;
+  stroke: #0f4c25;
+}
+
+.message-node {
+  fill: #007acc;
+  stroke: #005a9e;
+}
+
+.rich-card-node {
+  fill: #ff9500;
+  stroke: #cc7700;
+}
+
+.end-node {
+  fill: #f85c5c;
+  stroke: #c42e2e;
+}
+
+.condition-node {
+  fill: #9b59b6;
+  stroke: #7d3c8f;
+}
+
+/* Match block styles */
+.match-block {
+  cursor: default;
+}
+
+.match-container {
+  fill: #f0f0f0;
+  stroke: #666;
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+}
+
+.match-option {
+  cursor: pointer;
+}
+
+.match-option:hover rect {
+  fill: #f5f5f5;
+  stroke: #007acc;
+}
+
+.match-option-node rect {
+  fill: #fff;
+  stroke: #999;
+}
+
+/* Node label styles */
+.node-label {
+  fill: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Connection points */
+.connection-point {
+  opacity: 0;
+  transition: opacity 0.2s, r 0.2s;
+  cursor: crosshair;
+}
+
+.node:hover .connection-point,
+.node.selected .connection-point {
+  opacity: 0.5;
+}
+
+.connection-point:hover {
+  opacity: 1 !important;
+  r: 6;
+}
+
+.connection-point.top {
+  fill: #007acc;
+  stroke: #005a9e;
+}
+
+.connection-point.right {
+  fill: #007acc;
+  stroke: #005a9e;
+}
+
+.connection-point.bottom {
+  fill: #007acc;
+  stroke: #005a9e;
+}
+
+.connection-point.left {
+  fill: #007acc;
+  stroke: #005a9e;
+}
+
+/* Edit icon */
+.edit-icon {
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.node:hover .edit-icon,
+.node.selected .edit-icon {
+  opacity: 0.7;
+}
+
+.edit-icon:hover {
+  opacity: 1 !important;
+}
+
+.edit-icon rect {
+  fill: white;
+  stroke: #666;
+}
+
+.edit-icon path {
+  fill: #666;
+}
+
+/* Edge styles */
+.edge {
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.edge path {
+  transition: stroke-width 0.2s;
+}
+
+.edge:hover path {
+  stroke-width: 3px;
+}
+
+.edge.selected path {
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 4px #007acc);
+}
+
+.edge-path.orthogonal {
+  stroke-linejoin: round;
+}
+
+/* Waypoints */
+.waypoint {
+  cursor: move;
+  transition: r 0.2s, fill 0.2s;
+}
+
+.waypoint:hover {
+  r: 7;
+  fill: #007acc !important;
+}
+
+/* Routing toggle */
+.routing-toggle {
+  opacity: 0.8;
+}
+
+.routing-toggle rect {
+  fill: white;
+  stroke: #666;
+  transition: fill 0.2s;
+}
+
+.routing-toggle rect:hover {
+  fill: #f0f0f0;
+  stroke: #007acc;
+}
+
+.routing-toggle text {
+  font-size: 10px;
+  font-weight: bold;
+  fill: #666;
+}
+
+/* Routing handles */
+.routing-handle {
+  cursor: crosshair;
+  fill: #007acc;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.routing-handle:hover {
+  r: 7;
+  fill: #005a9e;
+}
+
+/* Property editor styles */
+.property-editor {
+  padding: 16px;
+  background: #2d2d30;
+  border-radius: 4px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.property-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section {
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 12px;
+  background: #252526;
+}
+
+.form-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d4d4d4;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h4 {
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cccccc;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.char-count {
+  font-size: 10px;
+  color: #888;
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* Suggestions */
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-item {
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px;
+  background: #1e1e1e;
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.suggestion-header select {
+  padding: 4px 8px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #252526;
+  color: #d4d4d4;
+  font-size: 11px;
+}
+
+.suggestion-item input,
+.suggestion-item select {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  font-size: 11px;
+}
+
+.suggestion-item input:last-child,
+.suggestion-item select:last-child {
+  margin-bottom: 0;
+}
+
+/* Buttons */
+.add-btn,
+.remove-btn {
+  padding: 4px 8px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  cursor: pointer;
+  font-size: 11px;
+  transition: background-color 0.2s;
+}
+
+.add-btn:hover {
+  background: #007acc;
+  border-color: #007acc;
+  color: white;
+}
+
+.remove-btn {
+  padding: 2px 6px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  background: #f85c5c;
+  border-color: #f85c5c;
+  color: white;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #444;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 6px 16px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.save-btn {
+  background: #007acc;
+  border-color: #007acc;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #005a9e;
+  border-color: #005a9e;
+}
+
+.cancel-btn:hover {
+  background: #333;
+}
+
+/* Property field specific styles */
+.property-field {
+  margin-bottom: 12px;
+}
+
+.property-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cccccc;
+}
+
+.property-label.required::after {
+  content: " *";
+  color: #f85c5c;
+}
+
+.property-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.property-input:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+}
+
+.property-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.property-select {
+  cursor: pointer;
+}
+
+.property-checkbox {
+  width: auto;
+  margin-right: 8px;
+}
+
+/* Toolbar styles */
+.diagram-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2d2d30;
+  border-bottom: 1px solid #444;
+}
+
+.toolbar-btn {
+  padding: 6px 12px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: #333;
+}
+
+.toolbar-btn.active {
+  background: #007acc;
+  border-color: #007acc;
+  color: white;
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Zoom controls */
+.zoom-controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #2d2d30;
+  color: #d4d4d4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.zoom-btn:hover {
+  background: #333;
+}
+
+/* Connection mode styles */
+.rcl-diagram-container.connection-mode {
+  cursor: crosshair;
+}
+
+.rcl-diagram-container.connection-mode .node {
+  cursor: crosshair;
+}
+
+/* Minimap */
+.diagram-minimap {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  width: 200px;
+  height: 150px;
+  border: 1px solid #444;
+  background: rgba(45, 45, 48, 0.9);
+  border-radius: 4px;
+}
+
+/* Loading state */
+.diagram-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+}
+
+/* Error state */
+.diagram-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #f85c5c;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Sidebar styles */
+.diagram-sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background: #2d2d30;
+  border-left: 1px solid #444;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.diagram-sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #d4d4d4;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+/* Endpoint handles */
+.endpoint-handle {
+  transition: all 0.2s;
+}
+
+.endpoint-handle.source-handle {
+  fill: #007acc;
+}
+
+.endpoint-handle.target-handle {
+  fill: #f85c5c;
+}
+
+.endpoint-handle:hover {
+  transform: scale(1.2);
+}
+
+/* Connection target highlighting */
+.node.connection-target > rect {
+  stroke: #00ff00 !important;
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 12px #00ff00);
+}

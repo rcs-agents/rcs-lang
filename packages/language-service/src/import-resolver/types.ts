@@ -37,7 +37,7 @@ export enum SymbolType {
   Flow = 'flow',
   Message = 'message',
   Property = 'property',
-  Function = 'function'
+  Function = 'function',
 }
 
 /**

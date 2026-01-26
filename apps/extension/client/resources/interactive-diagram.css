@@ -150,6 +150,7 @@ body {
 /* Properties Panel */
 .properties-panel {
   flex: 1;
+  overflow-y: auto;
 }
 
 #propertiesContent {
@@ -158,6 +159,67 @@ body {
 
 .property-group {
   margin-bottom: 16px;
+}
+
+/* Form styles for properties panel */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 5px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 2px;
+  font-family: var(--vscode-font-family);
+  font-size: 12px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.suggestion-item input {
+  width: 100%;
+  padding: 5px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+.properties-panel button {
+  width: 100%;
+  padding: 8px;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.properties-panel button:hover {
+  background: var(--vscode-button-hoverBackground);
 }
 
 .property-label {
@@ -234,30 +296,30 @@ body {
 }
 
 .rcl-message-node {
-  fill: #2196F3;
-  stroke: #1976D2;
+  fill: #2196f3;
+  stroke: #1976d2;
   stroke-width: 2px;
   rx: 8px;
   ry: 8px;
 }
 
 .rcl-message-node.selected {
-  stroke: #FFC107;
+  stroke: #ffc107;
   stroke-width: 3px;
 }
 
 .rcl-message-node.mouseover {
-  fill: #42A5F5;
+  fill: #42a5f5;
 }
 
 .rcl-start-node {
-  fill: #4CAF50;
+  fill: #4caf50;
   stroke: #45a049;
   stroke-width: 2px;
 }
 
 .rcl-start-node.selected {
-  stroke: #FFC107;
+  stroke: #ffc107;
   stroke-width: 3px;
 }
 
@@ -268,20 +330,20 @@ body {
 }
 
 .rcl-end-node.selected {
-  stroke: #FFC107;
+  stroke: #ffc107;
   stroke-width: 3px;
 }
 
 .rcl-rich-card-node {
-  fill: #FF9800;
-  stroke: #F57C00;
+  fill: #ff9800;
+  stroke: #f57c00;
   stroke-width: 2px;
   rx: 8px;
   ry: 8px;
 }
 
 .rcl-rich-card-node.selected {
-  stroke: #FFC107;
+  stroke: #ffc107;
   stroke-width: 3px;
 }
 
@@ -305,7 +367,7 @@ body {
 }
 
 .sprotty-edge.selected {
-  stroke: #FFC107;
+  stroke: #ffc107;
   stroke-width: 3px;
 }
 
@@ -329,26 +391,25 @@ body {
 }
 
 .sprotty-graph defs marker.selected {
-  fill: #FFC107;
+  fill: #ffc107;
 }
 
 /* Selection Handles */
 .sprotty-resize-handle {
-  fill: #FFC107;
-  stroke: #FFB300;
+  fill: #ffc107;
+  stroke: #ffb300;
   stroke-width: 1px;
 }
 
 /* Grid Background */
 .sprotty-graph::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
   pointer-events: none;
@@ -434,12 +495,12 @@ body {
   .sidebar {
     width: 200px;
   }
-  
+
   .toolbar {
     flex-wrap: wrap;
     min-height: auto;
   }
-  
+
   .toolbar-center {
     order: 3;
     width: 100%;
@@ -460,13 +521,13 @@ body {
   .rcl-message-node {
     stroke-width: 3px;
   }
-  
+
   .rcl-start-node,
   .rcl-end-node,
   .rcl-rich-card-node {
     stroke-width: 3px;
   }
-  
+
   .sprotty-edge {
     stroke-width: 3px;
   }
@@ -536,6 +597,26 @@ body {
   stroke-width: 3px !important;
 }
 
+/* Cursor Synchronization Highlight */
+.diagram-node.highlighted {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.diagram-node.highlighted rect,
+.diagram-node.highlighted ellipse {
+  filter: drop-shadow(0 0 10px #00ff00);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 /* Connection Mode */
 .connection-start rect,
 .connection-start ellipse {
@@ -568,7 +649,7 @@ body {
 }
 
 .notification-success {
-  background: var(--vscode-statusBarItem-remoteBackground, #16825D);
+  background: var(--vscode-statusBarItem-remoteBackground, #16825d);
   border: 1px solid var(--vscode-statusBarItem-remoteForeground, #ffffff);
 }
 

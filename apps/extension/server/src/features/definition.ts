@@ -1,13 +1,13 @@
-import { Definition, Position, Location } from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { RCLParser } from '@rcl/parser';
+import type { RCLParser } from '@rcl/parser';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import { type Definition, Location, type Position } from 'vscode-languageserver/node';
 
 export class DefinitionProvider {
   constructor(private parser: RCLParser) {}
 
   public async getDefinition(
-    document: TextDocument,
-    position: Position,
+    _document: TextDocument,
+    _position: Position,
   ): Promise<Definition | null> {
     // Basic implementation - can be enhanced later
     return null;

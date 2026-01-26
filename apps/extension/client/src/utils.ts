@@ -1,7 +1,7 @@
 import * as cp from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { ExtensionContext } from 'vscode';
+import type { ExtensionContext } from 'vscode';
 
 let cachedBuildHash: string | undefined;
 let cachedVersion: string | undefined;
@@ -39,7 +39,7 @@ export function getExtensionVersion(context: ExtensionContext): string {
 
   try {
     const packageJson = JSON.parse(
-      fs.readFileSync(path.join(context.extensionPath, 'package.json'), 'utf8')
+      fs.readFileSync(path.join(context.extensionPath, 'package.json'), 'utf8'),
     );
     cachedVersion = packageJson.version || '0.0.0';
     return cachedVersion;

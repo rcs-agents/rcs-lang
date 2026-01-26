@@ -1,5 +1,9 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
+project:
+  name: 'rcl-language-support'
+  description: 'VSCode extension for RCL'
+
 id: extension
 
 type: application
@@ -7,11 +11,15 @@ language: typescript
 platform: node
 
 dependsOn:
-  - "parser"
+  - '@rcl/parser'
+  - '@rcl/language-service'
 
 tasks:
   build:
     command: nr build
+    deps:
+      - '@rcl/parser:build'
+      - '@rcl/language-service:build'
     inputs:
       - "**/*.ts"
       - "**/*.json"

@@ -1,0 +1,72 @@
+{
+  "name": "@rcl/tree-sitter",
+  "version": "0.1.0",
+  "description": "RCL language parser and AST utilities with tree-sitter grammar",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "." : {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./wasm": {
+      "types": "./dist/index.d.ts",
+      "default": "./build/tree-sitter-rcl.wasm"
+    }
+  },
+  "license": "MIT",
+  "files": [
+    "dist",
+    "grammar.js",
+    "grammar/",
+    "tree-sitter.json",
+    "binding.gyp",
+    "src/parser.c",
+    "src/scanner.c",
+    "build/Release/tree_sitter_rcl_binding.node",
+    "build/tree-sitter-rcl.wasm"
+  ],
+  "scripts": {
+    "build": "npm run build-grammar && npm run build-ts",
+    "build-grammar": "tree-sitter generate",
+    "build-wasm": "tree-sitter generate && tree-sitter build --wasm",
+    "build-wasm-docker": "tree-sitter generate && tree-sitter build --wasm --docker",
+    "build-wasm-script": "node scripts/build-wasm-treesitter.js",
+    "build-native": "node-gyp rebuild",
+    "build-ts": "tsc",
+    "dev": "tsc --watch",
+    "pretest": "node scripts/check-wasm-dev.js",
+    "test": "NODE_ENV=test vitest run",
+    "test:dev": "NODE_ENV=test vitest run",
+    "test:watch": "RCL_DEV_MODE=true NODE_ENV=test vitest",
+    "clean": "rm -rf dist build tree-sitter-rcl.wasm",
+    "install": "node-gyp-build",
+    "install-emscripten": "./scripts/install-emscripten.sh",
+    "lint": "biome lint src",
+    "format": "biome format src --write",
+    "typecheck": "tsc --noEmit",
+    "playground": "tree-sitter playground",
+    "grammar:validate": "echo 'Validating modular grammar structure...' && node -e 'const modules = [\"lexical\", \"values\", \"collections\", \"agent\", \"flows\", \"messages\", \"rich_cards\"]; modules.forEach(m => require(`./grammar/${m}.js`)); console.log(\"✓ Grammar modules loaded successfully\")'"
+  },
+  "dependencies": {
+    "@rcl/core": "workspace:*",
+    "@rcl/antlr": "workspace:*",
+    "antlr4ts": "^0.5.0-alpha.4",
+    "node-addon-api": "^8.2.1",
+    "node-gyp-build": "^4.8.4",
+    "tree-sitter": "^0.25.0",
+    "web-tree-sitter": "^0.25.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^3.2.4",
+    "prebuildify": "^6.0.1",
+    "tree-sitter-cli": "^0.25.6",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

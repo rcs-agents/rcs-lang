@@ -1,0 +1,37 @@
+agent InvalidSyntaxAgent
+  displayName: "Invalid Syntax Test"
+  
+  # Invalid configuration syntax
+  config
+    description "Missing colon"
+    logoUri: <invalid tag format>
+    color #FF5733  # Missing colon
+  
+  # Invalid flow syntax
+  flow BadFlow
+    # Missing start attribute
+    
+    on State1
+      # Missing match keyword
+      "hello" -> State2
+      # Invalid default syntax
+      default -> State1
+    
+    # Missing on keyword
+    State2
+      match @reply.text
+        :default -> State1
+  
+  # Invalid messages syntax  
+  messages Messages
+    # Missing message type
+    BadMessage "This message has no type"
+    
+    # Invalid richCard syntax
+    richCard "Missing ID" "Title"
+      description: "Missing size parameter"
+      
+    # Invalid suggestions
+    text AnotherBad "Test"
+      suggestions
+        invalid "Not a valid suggestion type"

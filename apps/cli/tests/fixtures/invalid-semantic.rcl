@@ -1,0 +1,14 @@
+agent SemanticErrorAgent
+  displayName: "Semantic Error Test"
+  
+  flow IncompleteFlow
+    start: NonExistentState
+    
+    on ExistingState
+      match @reply.text
+        "next" -> AnotherNonExistentState
+        :default -> ExistingState
+  
+  messages Messages
+    # Missing the message for ExistingState
+    text SomeOtherMessage "This message isn't referenced"

@@ -1,0 +1,320 @@
+/* Enhanced diagram styles for RCL Interactive Diagrams */
+
+#sprotty-container {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+  cursor: grab;
+}
+
+#sprotty-container.grabbing {
+  cursor: grabbing;
+}
+
+#sprotty-container.connection-mode {
+  cursor: crosshair;
+}
+
+#sprotty-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Diagram Node Styles */
+.diagram-node {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.diagram-node.hover {
+  opacity: 0.8;
+}
+
+.diagram-node.selected > * {
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 5px var(--vscode-focusBorder));
+}
+
+/* Edge styles */
+.diagram-edge {
+  pointer-events: stroke;
+}
+
+.diagram-edge path {
+  transition: stroke-width 0.2s;
+}
+
+.diagram-edge:hover path {
+  stroke-width: 3px;
+}
+
+.diagram-edge.selected path {
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 3px;
+}
+
+/* Match node styles */
+.match-option {
+  cursor: pointer;
+  transition: fill 0.2s;
+}
+
+.match-option:hover {
+  fill: var(--vscode-list-hoverBackground) !important;
+}
+
+/* Connection ports */
+.connection-port {
+  cursor: crosshair;
+  transition: all 0.2s;
+}
+
+.connection-port:hover {
+  r: 6;
+  fill: var(--vscode-focusBorder);
+}
+
+/* Temporary connection line */
+.temp-connection {
+  pointer-events: none;
+  animation: dash 0.5s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Connection mode styles */
+.connection-mode .diagram-node {
+  cursor: crosshair;
+}
+
+.connection-mode .connection-port {
+  opacity: 1 !important;
+}
+
+/* Active button state */
+.toolbar-btn.active {
+  background: var(--vscode-button-hoverBackground);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Start node - green circle */
+.rcl-start-node {
+  fill: #4ac776;
+  stroke: #0f4c25;
+}
+
+.rcl-start-node.selected {
+  stroke: #6fe899;
+}
+
+/* End node - red circle */
+.rcl-end-node {
+  fill: #f85c5c;
+  stroke: #4c1a1a;
+}
+
+.rcl-end-node.selected {
+  stroke: #ff8888;
+}
+
+/* Message node - blue rectangle */
+.rcl-message-node {
+  fill: var(--vscode-button-background);
+  stroke: var(--vscode-button-foreground);
+}
+
+.rcl-message-node.selected {
+  fill: var(--vscode-button-hoverBackground);
+}
+
+/* Rich card node - gold star */
+.rcl-rich_card-node {
+  fill: #ffd700;
+  stroke: #b8860b;
+}
+
+.rcl-rich_card-node.selected {
+  stroke: #ffed4e;
+}
+
+/* Edge styles */
+.rcl-edge {
+  fill: none;
+  stroke: var(--vscode-editorWidget-border);
+  stroke-width: 2px;
+}
+
+.rcl-edge.selected {
+  stroke: var(--vscode-selection-background);
+  stroke-width: 3px;
+}
+
+.rcl-edge .sprotty-edge {
+  marker-end: url(#rcl-arrow);
+}
+
+/* Label styles */
+.sprotty-label {
+  fill: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: 12px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.sprotty-edge-label {
+  fill: var(--vscode-descriptionForeground);
+  font-size: 10px;
+}
+
+/* Port styles (for connection points) */
+.sprotty-port {
+  fill: var(--vscode-editorWidget-border);
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 1px;
+  r: 4;
+}
+
+.sprotty-port.mouseover {
+  fill: var(--vscode-button-background);
+  r: 6;
+}
+
+/* Hidden div for measuring */
+.sprotty-hidden {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  visibility: hidden;
+}
+
+/* Resize handles */
+.sprotty-resize-handle {
+  fill: var(--vscode-editorWidget-border);
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 1px;
+  r: 4;
+}
+
+.sprotty-resize-handle.mouseover {
+  fill: var(--vscode-button-background);
+  r: 6;
+}
+
+/* Routing points */
+.sprotty-routing-handle {
+  fill: var(--vscode-editorWidget-border);
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 1px;
+  r: 3;
+}
+
+.sprotty-routing-handle.mouseover {
+  fill: var(--vscode-button-background);
+  r: 5;
+}
+
+/* Selection feedback */
+.sprotty-node.selected > .sprotty-comp,
+.sprotty-edge.selected > .sprotty-comp {
+  stroke-dasharray: 5, 5;
+  animation: dash 0.5s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Hover feedback */
+.sprotty-node.hover,
+.sprotty-edge.hover {
+  opacity: 0.8;
+}
+
+/* Animation for node appearance */
+.sprotty-node {
+  animation: nodeAppear 0.3s ease-out;
+}
+
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Connection feedback */
+.connection-feedback {
+  stroke: var(--vscode-textLink-foreground);
+  stroke-width: 2px;
+  stroke-dasharray: 5, 5;
+  fill: none;
+  pointer-events: none;
+}
+
+/* Toolbar integration */
+.sprotty-toolbar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.sprotty-button {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sprotty-button:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+.sprotty-button:active {
+  transform: translateY(1px);
+}
+
+/* Make all text non-selectable */
+.diagram-node text,
+.diagram-edge text {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none;
+}
+
+/* Node dragging cursor */
+.diagram-node {
+  cursor: move;
+}
+
+.diagram-node.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+/* Better arrow markers */
+#arrow {
+  overflow: visible;
+}

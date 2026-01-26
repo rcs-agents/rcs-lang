@@ -1,0 +1,46 @@
+project:
+  name: '@rcl/validation'
+  description: 'Validation pipeline for RCL language'
+
+type: library
+language: typescript
+
+dependsOn:
+  - '@rcl/core'
+
+tasks:
+  build:
+    command: tsc
+    deps:
+      - '@rcl/core:build'
+    inputs:
+      - src/**/*
+      - tsconfig.json
+    outputs:
+      - dist/**/*
+
+  clean:
+    command: rm -rf dist
+    local: true
+
+  typecheck:
+    command: tsc --noEmit
+    deps:
+      - '@rcl/core:build'
+    inputs:
+      - src/**/*
+      - tsconfig.json
+
+  test:
+    command: vitest run
+    deps:
+      - build
+    inputs:
+      - src/**/*
+      - tests/**/*
+
+  test-watch:
+    command: vitest
+    local: true
+    deps:
+      - build
