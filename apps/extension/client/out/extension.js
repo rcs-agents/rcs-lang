@@ -64,6 +64,7 @@ function activate(context) {
     // Create preview provider
     const previewProvider = new previewProvider_1.RCLPreviewProvider(context, compilationService);
     const interactiveDiagramProvider = new interactiveDiagramProvider_1.InteractiveDiagramProvider(context);
+    interactiveDiagramProvider.setCompilationService(compilationService);
     // Register webview view provider
     context.subscriptions.push(vscode_1.window.registerWebviewViewProvider(previewProvider_1.RCLPreviewProvider.viewType, previewProvider));
     // Register commands
