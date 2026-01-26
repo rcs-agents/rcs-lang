@@ -101,7 +101,7 @@ export class FlowMachine {
     // Try each transition
     for (const transition of sortedTransitions) {
       if (this.matchesTransition(transition, input, context)) {
-        return this.createTransitionResult(transition);
+        return this.createTransitionResult(transition, context);
       }
     }
 
@@ -111,7 +111,7 @@ export class FlowMachine {
     );
 
     if (defaultTransition) {
-      return this.createTransitionResult(defaultTransition);
+      return this.createTransitionResult(defaultTransition, context);
     }
 
     return { type: 'none' };
@@ -199,8 +199,14 @@ export class FlowMachine {
       return false;
     }
 
+    // Resolve string interpolation in pattern (#{variable} -> ${variable})
+    let resolvedPattern = transition.pattern;
+    if (resolvedPattern.includes('#{')) {
+      resolvedPattern = this.interpolatePattern(resolvedPattern, context);
+    }
+
     // Exact match (case insensitive)
-    if (transition.pattern.toLowerCase() === input.toLowerCase()) {
+    if (resolvedPattern.toLowerCase() === input.toLowerCase()) {
       return true;
     }
 
@@ -212,6 +218,24 @@ export class FlowMachine {
     }
 
     return false;
+  }
+
+  /**
+   * Interpolates variables in pattern strings.
+   * Converts #{variable} to ${variable} and evaluates as template literal.
+   */
+  private interpolatePattern(pattern: string, context: Context): string {
+    try {
+      // Convert #{variable} to ${context.variable} syntax
+      const templateString = pattern.replace(/#{([^}]+)}/g, '${context.$1}');
+      
+      // Create a function that has access to context and evaluates the template
+      const fn = new Function('context', `return \`${templateString}\``);
+      return fn(context);
+    } catch (error) {
+      console.error(`Error interpolating pattern: ${pattern}`, error);
+      return pattern; // Return original pattern if interpolation fails
+    }
   }
 
   /**
@@ -235,8 +259,19 @@ export class FlowMachine {
   /**
    * Creates a transition result from a transition definition.
    */
-  private createTransitionResult(transition: Transition): TransitionResult {
-    const target = transition.target;
+  private createTransitionResult(transition: Transition, context?: Context): TransitionResult {
+    let target = transition.target;
+
+    // Resolve context variables in target (e.g., @next -> context.next)
+    if (target.startsWith('@')) {
+      const varName = target.substring(1);
+      const resolvedTarget = context?.[varName];
+      if (typeof resolvedTarget === 'string') {
+        target = resolvedTarget;
+      } else {
+        throw new Error(`Context variable '${varName}' not found or not a string: ${resolvedTarget}`);
+      }
+    }
 
     // Check if this is a machine transition
     if (target.startsWith('machine:')) {

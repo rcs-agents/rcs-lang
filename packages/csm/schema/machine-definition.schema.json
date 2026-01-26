@@ -110,8 +110,8 @@
         },
         "target": {
           "type": "string",
-          "description": "Target state ID or 'machine:FlowId' for cross-flow transitions",
-          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|machine:[a-zA-Z][a-zA-Z0-9_]*)$"
+          "description": "Target reference using type:ID format (state:StateName, flow:FlowName, message:MessageName) or '@variable' for context-based targets, or flow termination (:ok, :cancel, :error)",
+          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|state:[a-zA-Z][a-zA-Z0-9_]*|flow:[a-zA-Z][a-zA-Z0-9_]*|message:[a-zA-Z][a-zA-Z0-9_]*|@[a-zA-Z][a-zA-Z0-9_]*|:(ok|cancel|error))$"
         },
         "context": {
           "type": "object",
@@ -125,6 +125,109 @@
         "priority": {
           "type": "number",
           "description": "Priority for pattern matching. Higher numbers are checked first. Default: 0"
+        },
+        "flowInvocation": {
+          "type": "object",
+          "description": "Configuration for flow invocation with result handling",
+          "additionalProperties": false,
+          "properties": {
+            "flowId": {
+              "type": "string",
+              "description": "ID of the flow to invoke",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+            },
+            "parameters": {
+              "type": "object",
+              "description": "Parameters to pass to the invoked flow",
+              "additionalProperties": true
+            },
+            "onResult": {
+              "type": "object",
+              "description": "Result handlers for different flow outcomes",
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "$ref": "#/definitions/resultHandler"
+                },
+                "cancel": {
+                  "$ref": "#/definitions/resultHandler"
+                },
+                "error": {
+                  "$ref": "#/definitions/resultHandler"
+                }
+              }
+            }
+          },
+          "required": ["flowId", "onResult"]
+        }
+      }
+    },
+    "resultHandler": {
+      "type": "object",
+      "description": "Handler for flow result with optional operations and target",
+      "additionalProperties": false,
+      "properties": {
+        "operations": {
+          "type": "array",
+          "description": "Array of operations to perform before transitioning",
+          "items": {
+            "$ref": "#/definitions/operation"
+          }
+        },
+        "target": {
+          "type": "string",
+          "description": "Target reference after operations complete",
+          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|state:[a-zA-Z][a-zA-Z0-9_]*|flow:[a-zA-Z][a-zA-Z0-9_]*|message:[a-zA-Z][a-zA-Z0-9_]*|@[a-zA-Z][a-zA-Z0-9_]*)$"
+        }
+      },
+      "required": ["target"]
+    },
+    "operation": {
+      "type": "object",
+      "description": "Context operation using JSONLogic-style expressions",
+      "additionalProperties": false,
+      "properties": {
+        "set": {
+          "type": "object",
+          "description": "Set variable operation",
+          "properties": {
+            "variable": {
+              "type": "string",
+              "description": "Variable name to set"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value"
+            }
+          },
+          "required": ["variable", "value"]
+        },
+        "append": {
+          "type": "object", 
+          "description": "Append to array operation",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "Array variable name"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value to append"
+            }
+          },
+          "required": ["to", "value"]
+        },
+        "merge": {
+          "type": "object",
+          "description": "Merge object operation", 
+          "properties": {
+            "into": {
+              "type": "string",
+              "description": "Target variable name"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value to merge"
+            }
+          },
+          "required": ["into", "value"]
         }
       }
     }

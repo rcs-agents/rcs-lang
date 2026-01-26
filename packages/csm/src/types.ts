@@ -41,6 +41,9 @@ export interface StateMeta {
   /** Whether this is a transient state (auto-transitions). */
   transient?: boolean;
 
+  /** Tags for categorizing states. */
+  tags?: string[];
+
   /** Custom metadata for application-specific needs. */
   custom?: Record<string, any>;
 }

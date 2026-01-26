@@ -67,8 +67,8 @@ export interface TransitionJSON {
   /** Pattern to match against user input. If undefined, transition is automatic */
   pattern?: string;
 
-  /** Target state ID or 'machine:FlowId' for cross-flow transitions */
-  target: string;
+  /** Target state ID or reference using type:ID format */
+  target?: string;
 
   /** Context updates to apply when taking this transition */
   context?: Record<string, any>;
@@ -78,6 +78,33 @@ export interface TransitionJSON {
 
   /** Priority for pattern matching. Higher numbers are checked first */
   priority?: number;
+
+  /** Flow invocation configuration */
+  flowInvocation?: {
+    /** ID of the flow to invoke */
+    flowId: string;
+    
+    /** Parameters to pass to the invoked flow */
+    parameters?: Record<string, any>;
+    
+    /** Result handlers for different flow outcomes */
+    onResult: {
+      ok?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+      cancel?: {
+        target: string;
+      };
+      error?: {
+        target: string;
+      };
+    };
+  };
 }
 
 /**
@@ -155,8 +182,13 @@ export function validateMachineDefinition(
         throw new Error(`Transition ${i} in state '${stateId}' must be an object`);
       }
 
-      if (!transition.target || typeof transition.target !== 'string') {
-        throw new Error(`Transition ${i} in state '${stateId}' must have a target string`);
+      // Check that transition has either target or flowInvocation
+      if (!transition.target && !transition.flowInvocation) {
+        throw new Error(`Transition ${i} in state '${stateId}' must have either a target string or flowInvocation`);
+      }
+      
+      if (transition.target && typeof transition.target !== 'string') {
+        throw new Error(`Transition ${i} in state '${stateId}' target must be a string`);
       }
     }
   }

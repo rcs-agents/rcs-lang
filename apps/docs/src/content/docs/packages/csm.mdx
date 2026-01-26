@@ -129,10 +129,26 @@ Transitions define how to move between states:
 ```typescript
 interface TransitionJSON {
   pattern?: string;      // Pattern to match user input (optional for auto-transitions)
-  target: string;        // Target state ID or "machine:FlowId" for cross-flow
+  target?: string;       // Target reference using type:ID format (state:Name, flow:Name, @variable, :ok/:cancel/:error)
   context?: Record<string, any>;  // Context updates to apply
   condition?: string;    // JavaScript condition expression
   priority?: number;     // Priority for pattern matching (higher = first)
+  flowInvocation?: {     // Flow invocation with result handling
+    flowId: string;      // ID of the flow to invoke
+    parameters?: Record<string, any>;  // Parameters to pass to the flow
+    onResult: {          // Handlers for different flow outcomes
+      ok?: {
+        operations?: Array<Operation>;  // Operations before transitioning
+        target: string;   // Target after successful completion
+      };
+      cancel?: {
+        target: string;   // Target if user cancels
+      };
+      error?: {
+        target: string;   // Target if error occurs
+      };
+    };
+  };
 }
 ```
 
@@ -298,30 +314,87 @@ Here's a basic machine definition for a greeting flow:
 }
 ```
 
-### Cross-Flow Transitions
+### Reference Format and Flow Control
 
-To transition to another machine/flow, use the `machine:FlowId` syntax:
+CSM supports several target reference formats:
+
+- **State references**: `state:StateName` - Navigate to a state in the current flow
+- **Flow references**: `flow:FlowName` - Navigate to another flow
+- **Message references**: `message:MessageName` - Jump to a specific message
+- **Context variables**: `@variableName` - Dynamic targets from context
+- **Flow termination**: `:ok`, `:cancel`, `:error` - End flow with result
+
+### Flow Invocation with Result Handling
+
+Use `flowInvocation` for complex flow control with explicit result handling:
 
 ```json
 {
-  "id": "MainMenu",
-  "initial": "menu",
+  "id": "TopFlow",
+  "initial": "Welcome",
   "states": {
-    "menu": {
+    "Welcome": {
       "transitions": [
         {
-          "pattern": "profile|account",
-          "target": "machine:UserProfileFlow"
-        },
-        {
-          "pattern": "help|support", 
-          "target": "machine:HelpFlow"
+          "pattern": "Start Order",
+          "flowInvocation": {
+            "flowId": "CreateOrder",
+            "onResult": {
+              "ok": {
+                "operations": [
+                  {
+                    "append": {
+                      "to": "orders",
+                      "value": {"var": "result"}
+                    }
+                  }
+                ],
+                "target": "state:ConfirmAllOrders"
+              },
+              "cancel": {
+                "target": "state:Welcome"
+              },
+              "error": {
+                "target": "state:OrderError"
+              }
+            }
+          }
         }
       ]
     }
   }
 }
 ```
+
+### Context Operations
+
+Operations allow you to manipulate context data when handling flow results:
+
+- **Set**: `{"set": {"variable": "name", "value": {...}}}`
+- **Append**: `{"append": {"to": "arrayName", "value": {...}}}`  
+- **Merge**: `{"merge": {"into": "objectName", "value": {...}}}`
+
+Values support JSONLogic expressions, including `{"var": "result"}` to access the flow's return value.
+
+### Context Variable Resolution
+
+CSM supports dynamic context resolution using the `@variable` syntax:
+
+```json
+{
+  "transitions": [
+    {
+      "pattern": "go",
+      "target": "@nextState",
+      "context": {
+        "message": "Going to #{@nextState}"
+      }
+    }
+  ]
+}
+```
+
+Context variables are resolved at runtime, and string interpolation supports `#{variable}` syntax for dynamic message content.
 
 ## Validation
 
@@ -342,6 +415,8 @@ try {
   console.error('Validation failed:', error.message);
 }
 ```
+
+**Note**: Transitions must have either a `target` OR a `flowInvocation` - not both. This allows for both simple state transitions and complex flow invocations with result handling.
 
 ## Pattern Matching
 
