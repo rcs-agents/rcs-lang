@@ -3,6 +3,7 @@
  * Individual flow state machine implementation.
  */
 
+import jsonLogic from 'json-logic-js';
 import type { MachineDefinitionJSON } from './machine-definition';
 import type {
   Context,
@@ -17,11 +18,46 @@ import type {
  * Result of a transition attempt within a flow.
  */
 export interface TransitionResult {
-  type: 'state' | 'machine' | 'none';
+  type: 'state' | 'machine' | 'flow_invocation' | 'flow_termination' | 'none';
   stateId?: string;
   machineId?: string;
   transition?: Transition;
   contextUpdates?: Record<string, any>;
+  
+  // Flow termination specific fields
+  termination?: 'end' | 'cancel' | 'error';
+  
+  // Flow invocation specific fields
+  flowInvocation?: {
+    flowId: string;
+    parameters: Record<string, any>;
+    onResult: {
+      end?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+      cancel?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+      error?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+    };
+  };
 }
 
 /**
@@ -239,19 +275,39 @@ export class FlowMachine {
   }
 
   /**
-   * Evaluates a JavaScript condition expression.
+   * Evaluates a condition expression using the appropriate evaluation method.
    *
-   * @param condition - JS expression as string
+   * @param condition - Condition to evaluate (string, code object, or JSON Logic object)
    * @param context - Context object available to the expression
    * @returns Result of evaluation
    */
-  private evaluateCondition(condition: string, context: Context): boolean {
+  private evaluateCondition(
+    condition: string | { type: "code"; expression: string } | { type: "jsonlogic"; rule: any },
+    context: Context
+  ): boolean {
     try {
-      // Create a function that has access to context
-      const fn = new Function('context', `return ${condition}`);
-      return !!fn(context);
+      // Handle legacy string format (deprecated)
+      if (typeof condition === 'string') {
+        console.warn(`[CSM] Deprecated: Using string conditions is deprecated. Use {type: "code", expression: "${condition}"} instead.`);
+        const fn = new Function('context', `return ${condition}`);
+        return !!fn(context);
+      }
+
+      // Handle explicit code type
+      if (condition.type === 'code') {
+        const fn = new Function('context', `return ${condition.expression}`);
+        return !!fn(context);
+      }
+
+      // Handle JSON Logic type
+      if (condition.type === 'jsonlogic') {
+        return !!jsonLogic.apply(condition.rule, context);
+      }
+
+      console.error(`Unknown condition type:`, condition);
+      return false;
     } catch (error) {
-      console.error(`Error evaluating condition: ${condition}`, error);
+      console.error(`Error evaluating condition:`, condition, error);
       return false;
     }
   }
@@ -260,6 +316,16 @@ export class FlowMachine {
    * Creates a transition result from a transition definition.
    */
   private createTransitionResult(transition: Transition, context?: Context): TransitionResult {
+    // Check if this is a flow invocation
+    if (transition.flowInvocation) {
+      return {
+        type: 'flow_invocation',
+        transition,
+        contextUpdates: transition.context,
+        flowInvocation: transition.flowInvocation
+      };
+    }
+
     let target = transition.target;
 
     // Resolve context variables in target (e.g., @next -> context.next)
@@ -270,6 +336,19 @@ export class FlowMachine {
         target = resolvedTarget;
       } else {
         throw new Error(`Context variable '${varName}' not found or not a string: ${resolvedTarget}`);
+      }
+    }
+
+    // Check if this is a flow termination
+    if (target.startsWith(':')) {
+      const termination = target.substring(1);
+      if (['end', 'cancel', 'error'].includes(termination)) {
+        return {
+          type: 'flow_termination',
+          termination: termination as 'end' | 'cancel' | 'error',
+          transition,
+          contextUpdates: transition.context,
+        };
       }
     }
 

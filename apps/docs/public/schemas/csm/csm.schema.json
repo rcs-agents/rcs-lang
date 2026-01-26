@@ -1,0 +1,322 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rcl-lang.org/schemas/csm/machine-definition.schema.json",
+  "title": "CSM Machine Definition",
+  "description": "Schema for defining conversation state machines with multiple flows",
+  "type": "object",
+  "required": [
+    "id",
+    "initialFlow",
+    "flows"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this machine",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "initialFlow": {
+      "type": "string",
+      "description": "ID of the initial flow to start when entering this machine",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "flows": {
+      "type": "object",
+      "description": "Map of flow IDs to their definitions",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "$ref": "#/definitions/flowDefinition"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "meta": {
+      "type": "object",
+      "description": "Optional metadata for the machine",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the machine"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this machine does"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the machine definition"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorizing machines"
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom metadata for application-specific needs"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "flowDefinition": {
+      "type": "object",
+      "required": [
+        "id",
+        "initial",
+        "states"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this flow within the machine",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+        },
+        "initial": {
+          "type": "string",
+          "description": "ID of the initial state when entering this flow"
+        },
+        "states": {
+          "type": "object",
+          "description": "Map of state IDs to their definitions",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9_]*$": {
+              "$ref": "#/definitions/stateDefinition"
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "meta": {
+          "type": "object",
+          "description": "Optional metadata for the flow",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Display name for the flow"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of what this flow does"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the flow definition"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tags for categorizing flows"
+            },
+            "custom": {
+              "type": "object",
+              "description": "Custom metadata for application-specific needs"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "stateDefinition": {
+      "type": "object",
+      "required": [
+        "transitions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "transitions": {
+          "type": "array",
+          "description": "List of possible transitions from this state",
+          "items": {
+            "$ref": "#/definitions/transition"
+          }
+        },
+        "meta": {
+          "type": "object",
+          "description": "Optional metadata for the state",
+          "properties": {
+            "messageId": {
+              "type": "string",
+              "description": "ID of the message to send when entering this state"
+            },
+            "transient": {
+              "type": "boolean",
+              "description": "Whether this is a transient state (auto-transitions)"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tags for categorizing states"
+            },
+            "custom": {
+              "type": "object",
+              "description": "Custom metadata for application-specific needs"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "required": [
+        "target"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Pattern to match against user input. If undefined, transition is automatic (transient state). Special values: ':default' for fallback"
+        },
+        "target": {
+          "type": "string",
+          "description": "Target reference using type:ID format (state:StateName, flow:FlowName, message:MessageName) or '@variable' for context-based targets, or flow termination (:end, :cancel, :error)",
+          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|state:[a-zA-Z][a-zA-Z0-9_]*|flow:[a-zA-Z][a-zA-Z0-9_]*|message:[a-zA-Z][a-zA-Z0-9_]*|@[a-zA-Z][a-zA-Z0-9_]*|:(end|cancel|error))$"
+        },
+        "context": {
+          "type": "object",
+          "description": "Context updates to apply when taking this transition",
+          "additionalProperties": true
+        },
+        "condition": {
+          "type": "string",
+          "description": "Optional JavaScript condition expression. Has access to context object."
+        },
+        "priority": {
+          "type": "number",
+          "description": "Priority for pattern matching. Higher numbers are checked first. Default: 0"
+        },
+        "flowInvocation": {
+          "type": "object",
+          "description": "Configuration for flow invocation with result handling",
+          "additionalProperties": false,
+          "properties": {
+            "flowId": {
+              "type": "string",
+              "description": "ID of the flow to invoke within this machine",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+            },
+            "parameters": {
+              "type": "object",
+              "description": "Parameters to pass to the invoked flow",
+              "additionalProperties": true
+            },
+            "onResult": {
+              "type": "object",
+              "description": "Result handlers for different flow outcomes",
+              "additionalProperties": false,
+              "properties": {
+                "end": {
+                  "$ref": "#/definitions/resultHandler"
+                },
+                "cancel": {
+                  "$ref": "#/definitions/resultHandler"
+                },
+                "error": {
+                  "$ref": "#/definitions/resultHandler"
+                }
+              }
+            }
+          },
+          "required": [
+            "flowId",
+            "onResult"
+          ]
+        }
+      }
+    },
+    "resultHandler": {
+      "type": "object",
+      "description": "Handler for flow result with optional operations and target",
+      "additionalProperties": false,
+      "properties": {
+        "operations": {
+          "type": "array",
+          "description": "Array of operations to perform before transitioning",
+          "items": {
+            "$ref": "#/definitions/operation"
+          }
+        },
+        "target": {
+          "type": "string",
+          "description": "Target reference after operations complete",
+          "pattern": "^([a-zA-Z][a-zA-Z0-9_]*|state:[a-zA-Z][a-zA-Z0-9_]*|flow:[a-zA-Z][a-zA-Z0-9_]*|message:[a-zA-Z][a-zA-Z0-9_]*|@[a-zA-Z][a-zA-Z0-9_]*)$"
+        }
+      },
+      "required": [
+        "target"
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "description": "Context operation using JSONLogic-style expressions",
+      "additionalProperties": false,
+      "properties": {
+        "set": {
+          "type": "object",
+          "description": "Set variable operation",
+          "properties": {
+            "variable": {
+              "type": "string",
+              "description": "Variable name to set"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value"
+            }
+          },
+          "required": [
+            "variable",
+            "value"
+          ]
+        },
+        "append": {
+          "type": "object",
+          "description": "Append to array operation",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "Array variable name"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value to append"
+            }
+          },
+          "required": [
+            "to",
+            "value"
+          ]
+        },
+        "merge": {
+          "type": "object",
+          "description": "Merge object operation",
+          "properties": {
+            "into": {
+              "type": "string",
+              "description": "Target variable name"
+            },
+            "value": {
+              "description": "JSONLogic expression for the value to merge"
+            }
+          },
+          "required": [
+            "into",
+            "value"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@ description: API documentation for Conversational State Machine
 
 ## Overview
 
-The `@rcs-lang/csm` package provides a lightweight conversation state machine for RCS agents. This is the core runtime that executes RCL-compiled conversation flows.
+The `@rcs-lang/csm` package provides a lightweight conversation state machine for RCS agents. This is the core runtime that executes RCL-compiled conversation flows with support for multi-flow machines, flow invocations, JSON Logic conditions, and scoped context management.
 
 ## Core Classes
 
@@ -18,25 +18,25 @@ Main class for running conversation flows.
 class ConversationalAgent {
   constructor(options: AgentOptions)
   
-  // Flow management
-  addFlow(flow: FlowDefinition): void
+  // Machine/Flow management (supports both single-flow and multi-flow machines)
+  addMachine(machine: MachineDefinitionJSON): void
+  addFlow(flow: FlowDefinition): void  // Legacy support
   removeFlow(flowId: string): void
-  getFlow(flowId: string): FlowDefinition | null
   
   // State management
-  getCurrentState(): AgentState
-  setState(state: Partial<AgentState>): void
+  getCurrentState(): { machine: string; state: string }
+  setState(machineId: string, stateId: string): void  // For restoration
   
   // Message processing
-  processInput(input: UserInput): Promise<AgentResponse>
+  processInput(input: string): Promise<ProcessResult>
   
-  // Event handling
-  onStateChange(handler: StateChangeHandler): void
-  onError(handler: ErrorHandler): void
+  // Context management
+  getContext(): Context
+  updateContext(updates: Partial<Context>): void
   
   // Serialization
-  serialize(): string
-  static deserialize(data: string): ConversationalAgent
+  toURLHash(): string
+  static fromURLHash(hash: string, options: AgentOptions): ConversationalAgent
 }
 ```
 
@@ -65,38 +65,98 @@ class FlowMachine {
 
 ## Key Interfaces
 
-### FlowDefinition
+### MachineDefinitionJSON
+
+Supports both single-flow and multi-flow machines:
 
 ```typescript
-interface FlowDefinition {
-  id: string
-  name: string
-  start: string
-  states: Record<string, StateDefinition>
-  context?: Context
+type MachineDefinitionJSON = SingleFlowMachineDefinitionJSON | MultiFlowMachineDefinitionJSON;
+
+interface SingleFlowMachineDefinitionJSON {
+  id: string;
+  initial: string;
+  states: Record<string, StateDefinitionJSON>;
+  meta?: MachineMetadata;
+}
+
+interface MultiFlowMachineDefinitionJSON {
+  id: string;
+  initialFlow: string;
+  flows: Record<string, SingleFlowMachineDefinitionJSON>;
+  meta?: MachineMetadata;
 }
 ```
 
-### StateDefinition
+### StateDefinitionJSON
 
 ```typescript
-interface StateDefinition {
-  id: string
-  type?: StateType
-  transitions: Transition[]
-  actions?: Action[]
-  metadata?: StateMetadata
+interface StateDefinitionJSON {
+  transitions: TransitionJSON[];
+  meta?: StateMetadata;
 }
 ```
 
-### Transition
+### TransitionJSON
 
 ```typescript
-interface Transition {
-  event: string
-  target: string
-  condition?: string
-  context?: Record<string, any>
+interface TransitionJSON {
+  pattern?: string;      // Pattern to match user input
+  target?: string;       // Target state/flow reference
+  context?: Record<string, any>;  // Context updates
+  condition?: string | ConditionObject;  // Transition condition
+  priority?: number;     // Pattern matching priority
+  flowInvocation?: FlowInvocationDefinition;  // Flow invocation config
+}
+
+type ConditionObject = 
+  | { type: "code"; expression: string }
+  | { type: "jsonlogic"; rule: JSONLogicRule };
+```
+
+### FlowInvocationDefinition
+
+```typescript
+interface FlowInvocationDefinition {
+  flowId: string;                    // ID of flow to invoke
+  parameters?: Record<string, any>;  // Parameters to pass
+  onResult: {                        // Result handlers
+    end?: ResultHandler;
+    cancel?: ResultHandler;
+    error?: ResultHandler;
+  };
+}
+
+interface ResultHandler {
+  operations?: ContextOperation[];   // Context operations
+  target: string;                    // Target state
+}
+
+interface ContextOperation {
+  set?: { variable: string; value: any };
+  append?: { to: string; value: any };
+  merge?: { into: string; value: any };
+}
+```
+
+### ScopedContext
+
+```typescript
+interface ScopedContext {
+  conversation: Record<string, any>;  // Session-wide context
+  flow: Record<string, any>;          // Flow-scoped context
+  params: Record<string, any>;        // Parameter context
+}
+```
+
+### ProcessResult
+
+```typescript
+interface ProcessResult {
+  state: string;        // Current state ID
+  machine: string;      // Current machine/flow ID
+  transitioned: boolean; // Whether transition occurred
+  transition?: Transition; // The transition taken
+  context: Context;     // Updated context
 }
 ```
 
@@ -105,38 +165,117 @@ interface Transition {
 ### Basic Agent Setup
 
 ```typescript
-import { ConversationalAgent } from '@rcs-lang/csm';
+import { ConversationalAgent, type MachineDefinitionJSON } from '@rcs-lang/csm';
+
+// Multi-flow machine definition
+const coffeeShopMachine: MachineDefinitionJSON = {
+  id: 'CoffeeShopBot',
+  initialFlow: 'MainFlow',
+  flows: {
+    MainFlow: {
+      id: 'MainFlow',
+      initial: 'Welcome',
+      states: {
+        Welcome: {
+          transitions: [
+            {
+              pattern: 'order coffee',
+              flowInvocation: {
+                flowId: 'OrderFlow', 
+                onResult: {
+                  end: { target: 'OrderComplete' },
+                  cancel: { target: 'Welcome' }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    OrderFlow: {
+      id: 'OrderFlow',
+      initial: 'ChooseSize',
+      states: {
+        ChooseSize: {
+          transitions: [
+            { pattern: 'small', target: ':end', context: { size: 'small' } }
+          ]
+        }
+      }
+    }
+  }
+};
 
 const agent = new ConversationalAgent({
   id: 'coffee-bot',
-  name: 'Coffee Shop Assistant'
-});
-
-// Add flow from RCL compilation
-agent.addFlow(compiledFlow);
-
-// Process user input
-const response = await agent.processInput({
-  type: 'text',
-  text: 'I want coffee'
-});
-```
-
-### Event Handling
-
-```typescript
-agent.onStateChange(async (event) => {
-  console.log(`State changed: ${event.from} -> ${event.to}`);
-  
-  // Send message to user
-  if (event.message) {
-    await sendMessage(event.message);
+  onStateChange: async (event) => {
+    console.log(`State: ${event.state} in ${event.machine}`);
+    await sendMessage(getMessageForState(event.state));
   }
 });
 
-agent.onError((error) => {
-  console.error('Agent error:', error);
-});
+// Add machine (supports both single-flow and multi-flow)
+agent.addMachine(coffeeShopMachine);
+
+// Process user input
+const response = await agent.processInput('order coffee');
+```
+
+### JSON Logic Conditions
+
+```typescript
+const machineWithConditions: MachineDefinitionJSON = {
+  id: 'ConditionalBot',
+  initial: 'CheckAccess',
+  states: {
+    CheckAccess: {
+      transitions: [
+        {
+          pattern: 'premium feature',
+          target: 'PremiumContent',
+          condition: {
+            type: 'jsonlogic',
+            rule: {
+              'and': [
+                { '==': [{ 'var': 'membership' }, 'premium'] },
+                { '>': [{ 'var': 'points' }, 100] }
+              ]
+            }
+          }
+        },
+        {
+          pattern: 'basic feature',
+          target: 'BasicContent',
+          condition: {
+            type: 'code',
+            expression: 'context.membership !== "guest"'
+          }
+        }
+      ]
+    }
+  }
+};
+```
+
+### Context Operations
+
+```typescript
+// Flow invocation with context operations
+{
+  "flowInvocation": {
+    "flowId": "CreateOrder",
+    "parameters": { "source": "menu" },
+    "onResult": {
+      "end": {
+        "operations": [
+          { "append": { "to": "orders", "value": { "var": "result" } } },
+          { "set": { "variable": "lastOrderTime", "value": { "var": "now" } } }
+        ],
+        "target": "OrderHistory"
+      }
+    }
+  }
+}
 ```
 
 See the main README for more detailed examples.

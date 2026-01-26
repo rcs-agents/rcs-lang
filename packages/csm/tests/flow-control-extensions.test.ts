@@ -374,14 +374,21 @@ describe('Flow Control Extensions', () => {
 describe('Flow Control Integration', () => {
   test('should validate complete coffee shop example', async () => {
     const { default: coffeeShopMachine } = await import('./fixtures/coffee-shop-machine.json');
+    const { extractSingleFlow } = await import('../src/schema-validator');
     
-    expect(() => validateMachineDefinition(coffeeShopMachine as MachineDefinitionJSON)).not.toThrow();
-    expect(validateMachineDefinition(coffeeShopMachine as MachineDefinitionJSON)).toBe(true);
+    // Extract single-flow structure for CSM compatibility
+    const singleFlowMachine = extractSingleFlow(coffeeShopMachine);
+    
+    expect(() => validateMachineDefinition(singleFlowMachine as MachineDefinitionJSON)).not.toThrow();
+    expect(validateMachineDefinition(singleFlowMachine as MachineDefinitionJSON)).toBe(true);
   });
 
   test('should validate flow invocation patterns in coffee shop', async () => {
     const { default: coffeeShopMachine } = await import('./fixtures/coffee-shop-machine.json');
-    const machine = coffeeShopMachine as MachineDefinitionJSON;
+    const { extractSingleFlow } = await import('../src/schema-validator');
+    
+    // Extract single-flow structure for CSM compatibility
+    const machine = extractSingleFlow(coffeeShopMachine) as MachineDefinitionJSON;
     
     // Find a flow invocation transition
     const welcomeState = machine.states.Welcome;
@@ -391,8 +398,8 @@ describe('Flow Control Integration', () => {
     
     expect(flowInvocationTransition).toBeDefined();
     expect(flowInvocationTransition!.flowInvocation!.flowId).toBe('CreateOrder');
-    expect(flowInvocationTransition!.flowInvocation!.onResult.ok.target).toBe('state:ConfirmAllOrders');
-    expect(flowInvocationTransition!.flowInvocation!.onResult.cancel.target).toBe('state:Welcome');
-    expect(flowInvocationTransition!.flowInvocation!.onResult.error.target).toBe('state:OrderError');
+    expect(flowInvocationTransition!.flowInvocation!.onResult.end!.target).toBe('state:ConfirmAllOrders');
+    expect(flowInvocationTransition!.flowInvocation!.onResult.cancel!.target).toBe('state:Welcome');
+    expect(flowInvocationTransition!.flowInvocation!.onResult.error!.target).toBe('state:OrderError');
   });
 });

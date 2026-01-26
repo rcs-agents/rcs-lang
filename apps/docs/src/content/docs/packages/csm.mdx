@@ -13,7 +13,11 @@ A lightweight, TypeScript-first state machine library designed specifically for 
 - 🔗 **URL-Safe**: Compact state representation for URL parameters
 - 🎯 **Simple API**: Single callback for all state transitions
 - 🧩 **Composable**: Connect multiple flows into complex agents
-- 📦 **Zero Dependencies**: No external runtime dependencies
+- 🌊 **Flow Invocations**: Flows can invoke other flows with result handling
+- 🔧 **JSON Logic Conditions**: Safe, serializable conditions with JS fallback
+- 📊 **Scoped Context**: Three-level context system (conversation/flow/params)
+- 🎚️ **Multi-Flow Machines**: Single machine definition with multiple flows
+- 📦 **Minimal Dependencies**: Only neverthrow and json-logic-js
 - 🏃 **Fast**: Optimized for request/response cycle performance
 
 ## Installation
@@ -46,24 +50,30 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ## Quick Start
 
 ```typescript
-import { ConversationalAgent, FlowDefinition } from '@rcs-lang/csm';
+import { ConversationalAgent, type MachineDefinitionJSON } from '@rcs-lang/csm';
 
-// Define your flow (usually generated from RCL)
-const coffeeFlow: FlowDefinition = {
-  id: 'OrderFlow',
-  initial: 'Welcome',
-  states: {
-    Welcome: {
-      transitions: [
-        { pattern: 'Order Coffee', target: 'ChooseSize' },
-        { pattern: 'View Menu', target: 'ShowMenu' }
-      ]
-    },
-    ChooseSize: {
-      transitions: [
-        { pattern: 'Small', target: 'ChooseDrink', context: { size: 'small', price: 3.50 } },
-        { pattern: 'Medium', target: 'ChooseDrink', context: { size: 'medium', price: 4.50 } }
-      ]
+// Define your machine (usually generated from RCL)
+const coffeeShopMachine: MachineDefinitionJSON = {
+  id: 'CoffeeShopBot',
+  initialFlow: 'OrderFlow',
+  flows: {
+    OrderFlow: {
+      id: 'OrderFlow',
+      initial: 'Welcome',
+      states: {
+        Welcome: {
+          transitions: [
+            { pattern: 'Order Coffee', target: 'ChooseSize' },
+            { pattern: 'View Menu', target: 'ShowMenu' }
+          ]
+        },
+        ChooseSize: {
+          transitions: [
+            { pattern: 'Small', target: 'ChooseDrink', context: { size: 'small', price: 3.50 } },
+            { pattern: 'Medium', target: 'ChooseDrink', context: { size: 'medium', price: 4.50 } }
+          ]
+        }
+      }
     }
   }
 };
@@ -78,8 +88,8 @@ const agent = new ConversationalAgent({
   }
 });
 
-// Add flows
-agent.addFlow(coffeeFlow);
+// Add machine (supports both single-flow and multi-flow machines)
+agent.addMachine(coffeeShopMachine);
 
 // Process user input
 const response = await agent.processInput('Order Coffee');
@@ -91,7 +101,12 @@ const stateHash = agent.toURLHash();
 // "Q29mZmVlQm90Ok9yZGVyRmxvdzpDaG9vc2VTaXplOnt9"
 
 // Restore in next request
-const restoredAgent = ConversationalAgent.fromURLHash(stateHash, { onStateChange });
+const restoredAgent = ConversationalAgent.fromURLHash(stateHash, { 
+  id: 'CoffeeBot',
+  onStateChange: async (event) => {
+    await sendMessage(event.context.userId, messages[event.state]);
+  }
+});
 ```
 
 ## Machine Definition Schema
@@ -129,27 +144,34 @@ Transitions define how to move between states:
 ```typescript
 interface TransitionJSON {
   pattern?: string;      // Pattern to match user input (optional for auto-transitions)
-  target?: string;       // Target reference using type:ID format (state:Name, flow:Name, @variable, :ok/:cancel/:error)
+  target?: string;       // Target reference using type:ID format (state:Name, flow:Name, @variable, :end/:cancel/:error)
   context?: Record<string, any>;  // Context updates to apply
-  condition?: string;    // JavaScript condition expression
+  condition?: string | ConditionObject;  // Condition for this transition (see Conditions section)
   priority?: number;     // Priority for pattern matching (higher = first)
   flowInvocation?: {     // Flow invocation with result handling
     flowId: string;      // ID of the flow to invoke
     parameters?: Record<string, any>;  // Parameters to pass to the flow
     onResult: {          // Handlers for different flow outcomes
-      ok?: {
-        operations?: Array<Operation>;  // Operations before transitioning
+      end?: {
+        operations?: Array<ContextOperation>;  // Operations before transitioning
         target: string;   // Target after successful completion
       };
       cancel?: {
+        operations?: Array<ContextOperation>;  // Operations before transitioning
         target: string;   // Target if user cancels
       };
       error?: {
+        operations?: Array<ContextOperation>;  // Operations before transitioning
         target: string;   // Target if error occurs
       };
     };
   };
 }
+
+// Condition types
+type ConditionObject = 
+  | { type: "code"; expression: string }           // JavaScript code
+  | { type: "jsonlogic"; rule: JSONLogicRule };    // JSON Logic rule
 ```
 
 ### Metadata
@@ -417,6 +439,173 @@ try {
 ```
 
 **Note**: Transitions must have either a `target` OR a `flowInvocation` - not both. This allows for both simple state transitions and complex flow invocations with result handling.
+
+## Multi-Flow Machines
+
+CSM supports multi-flow machines, where a single machine definition contains multiple flows that can invoke each other:
+
+```typescript
+interface MultiFlowMachineDefinitionJSON {
+  id: string;
+  initialFlow: string;  // ID of the starting flow
+  flows: Record<string, SingleFlowMachineDefinitionJSON>;  // Map of flow definitions
+  meta?: MachineMetadata;
+}
+```
+
+### Multi-Flow Example
+
+```json
+{
+  "id": "CoffeeShopBot",
+  "initialFlow": "TopFlow",
+  "flows": {
+    "TopFlow": {
+      "id": "TopFlow",
+      "initial": "Welcome",
+      "states": {
+        "Welcome": {
+          "transitions": [
+            {
+              "pattern": "Start Order",
+              "flowInvocation": {
+                "flowId": "CreateOrder",
+                "parameters": {"source": "welcome"},
+                "onResult": {
+                  "end": {
+                    "operations": [
+                      {"append": {"to": "orders", "value": {"var": "result"}}}
+                    ],
+                    "target": "ConfirmAllOrders"
+                  },
+                  "cancel": {"target": "Welcome"},
+                  "error": {"target": "OrderError"}
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "CreateOrder": {
+      "id": "CreateOrder", 
+      "initial": "ChooseSize",
+      "states": {
+        "ChooseSize": {
+          "transitions": [
+            {"pattern": "small", "target": "ChooseDrink", "context": {"size": "small"}},
+            {"pattern": "cancel", "target": ":cancel"}
+          ]
+        },
+        "ChooseDrink": {
+          "transitions": [
+            {"pattern": "coffee", "target": ":end", "context": {"drink": "coffee"}}
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+## Conditions System
+
+CSM supports three types of conditions for controlling transitions:
+
+### 1. Legacy String Conditions (Deprecated)
+
+```typescript
+// Simple JavaScript expressions (generates deprecation warning)
+condition: "context.verified === true"
+condition: "context.user && context.user.age >= 18"
+```
+
+### 2. Explicit JavaScript Code
+
+```typescript
+// Recommended for complex JavaScript logic
+condition: {
+  type: "code",
+  expression: "context.user && context.user.points > 100 && context.user.verified"
+}
+```
+
+### 3. JSON Logic (Recommended)
+
+```typescript
+// Safe, serializable conditions using JSON Logic
+condition: {
+  type: "jsonlogic",
+  rule: {
+    "and": [
+      {"==": [{"var": "user.verified"}, true]},
+      {">": [{"var": "user.points"}, 100]}
+    ]
+  }
+}
+```
+
+### Condition Examples
+
+```json
+{
+  "states": {
+    "CheckAccess": {
+      "transitions": [
+        {
+          "pattern": "premium feature",
+          "target": "PremiumContent",
+          "condition": {
+            "type": "jsonlogic",
+            "rule": {
+              "and": [
+                {"==": [{"var": "membership"}, "premium"]},
+                {">": [{"var": "points"}, 100]}
+              ]
+            }
+          }
+        },
+        {
+          "pattern": "basic feature", 
+          "target": "BasicContent",
+          "condition": {
+            "type": "code",
+            "expression": "context.membership === 'basic' || context.membership === 'premium'"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Scoped Context System
+
+CSM implements a three-level context system for proper variable isolation:
+
+- **Conversation Context**: Persists across the entire agent session
+- **Flow Context**: Isolated per individual flow execution  
+- **Parameters Context**: Temporary variables for current state/transition
+
+```typescript
+interface ScopedContext {
+  conversation: Record<string, any>;  // Persists for entire session
+  flow: Record<string, any>;          // Isolated per flow
+  params: Record<string, any>;        // Current state parameters
+}
+```
+
+This allows flows to maintain their own state while sharing conversation-level data.
+
+## Flow Result Handling
+
+Flows can terminate with three types of results:
+
+- **`:end`** - Successful completion with return value
+- **`:cancel`** - User-initiated cancellation  
+- **`:error`** - Error condition occurred
+
+Each result type can have its own operations and target state in the parent flow.
 
 ## Pattern Matching
 
@@ -890,8 +1079,9 @@ The ConversationalAgent class provides the main interface:
 class ConversationalAgent {
   constructor(options: AgentOptions);
 
-  // Flow management
-  addFlow(flow: FlowDefinition): void;
+  // Machine management (supports both single-flow and multi-flow machines)
+  addMachine(machine: MachineDefinitionJSON): void;
+  addFlow(flow: FlowDefinition): void;  // Legacy support for single flows
   removeFlow(flowId: string): void;
 
   // State processing
@@ -902,9 +1092,10 @@ class ConversationalAgent {
   static fromURLHash(hash: string, options: AgentOptions): ConversationalAgent;
 
   // State access
-  getCurrentState(): AgentState;
+  getCurrentState(): { machine: string; state: string };
   getContext(): Context;
   updateContext(updates: Partial<Context>): void;
+  setState(machineId: string, stateId: string): void;  // For restoration
 }
 ```
 

@@ -5,10 +5,9 @@
  */
 
 /**
- * Machine definition in JSON-serializable format.
- * This matches the JSON schema exactly.
+ * Single-flow machine definition in JSON-serializable format.
  */
-export interface MachineDefinitionJSON {
+export interface SingleFlowMachineDefinitionJSON {
   /** Unique identifier for this flow/machine */
   id: string;
 
@@ -35,6 +34,58 @@ export interface MachineDefinitionJSON {
     /** Custom metadata for application-specific needs */
     custom?: Record<string, any>;
   };
+}
+
+/**
+ * Multi-flow machine definition in JSON-serializable format.
+ */
+export interface MultiFlowMachineDefinitionJSON {
+  /** Unique identifier for this machine */
+  id: string;
+
+  /** ID of the initial flow when starting this machine */
+  initialFlow: string;
+
+  /** Map of flow IDs to their definitions */
+  flows: Record<string, SingleFlowMachineDefinitionJSON>;
+
+  /** Optional metadata for the machine */
+  meta?: {
+    /** Display name for the machine */
+    name?: string;
+
+    /** Description of what this machine does */
+    description?: string;
+
+    /** Version of the machine definition */
+    version?: string;
+
+    /** Tags for categorizing machines */
+    tags?: string[];
+
+    /** Custom metadata for application-specific needs */
+    custom?: Record<string, any>;
+  };
+}
+
+/**
+ * Machine definition in JSON-serializable format.
+ * Supports both single-flow and multi-flow machines.
+ */
+export type MachineDefinitionJSON = SingleFlowMachineDefinitionJSON | MultiFlowMachineDefinitionJSON;
+
+/**
+ * Type guard to check if a machine definition is multi-flow.
+ */
+export function isMultiFlowMachine(machine: MachineDefinitionJSON): machine is MultiFlowMachineDefinitionJSON {
+  return 'flows' in machine;
+}
+
+/**
+ * Type guard to check if a machine definition is single-flow.
+ */
+export function isSingleFlowMachine(machine: MachineDefinitionJSON): machine is SingleFlowMachineDefinitionJSON {
+  return 'states' in machine;
 }
 
 /**
@@ -68,7 +119,7 @@ export interface TransitionJSON {
   pattern?: string;
 
   /** Target state ID or reference using type:ID format */
-  target?: string;
+  target: string;
 
   /** Context updates to apply when taking this transition */
   context?: Record<string, any>;
@@ -89,7 +140,7 @@ export interface TransitionJSON {
     
     /** Result handlers for different flow outcomes */
     onResult: {
-      ok?: {
+      end?: {
         operations?: Array<{
           set?: { variable: string; value: any };
           append?: { to: string; value: any };
@@ -98,9 +149,19 @@ export interface TransitionJSON {
         target: string;
       };
       cancel?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
         target: string;
       };
       error?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
         target: string;
       };
     };
@@ -156,16 +217,61 @@ export function validateMachineDefinition(
     throw new Error('Machine definition must have an id string');
   }
 
-  if (!def.initial || typeof def.initial !== 'string') {
-    throw new Error('Machine definition must have an initial state');
+  // Check if this is a multi-flow or single-flow machine
+  if (def.flows) {
+    // Multi-flow machine validation
+    if (!def.initialFlow || typeof def.initialFlow !== 'string') {
+      throw new Error('Multi-flow machine definition must have an initialFlow string');
+    }
+
+    if (typeof def.flows !== 'object') {
+      throw new Error('Multi-flow machine definition must have flows object');
+    }
+
+    // Validate each flow
+    for (const [flowId, flow] of Object.entries(def.flows)) {
+      validateSingleFlow(flowId, flow);
+    }
+
+    // Check that initialFlow exists
+    if (!def.flows[def.initialFlow]) {
+      throw new Error(`Initial flow '${def.initialFlow}' not found in flows`);
+    }
+  } else {
+    // Single-flow machine validation
+    if (!def.initial || typeof def.initial !== 'string') {
+      throw new Error('Single-flow machine definition must have an initial state');
+    }
+
+    if (!def.states || typeof def.states !== 'object') {
+      throw new Error('Single-flow machine definition must have states object');
+    }
+
+    validateSingleFlow(def.id, def);
   }
 
-  if (!def.states || typeof def.states !== 'object') {
-    throw new Error('Machine definition must have states object');
+  return true;
+}
+
+/**
+ * Validates a single flow definition.
+ */
+function validateSingleFlow(flowId: string, flow: any): void {
+  if (!flow.states || typeof flow.states !== 'object') {
+    throw new Error(`Flow '${flowId}' must have states object`);
+  }
+
+  if (!flow.initial || typeof flow.initial !== 'string') {
+    throw new Error(`Flow '${flowId}' must have an initial state`);
+  }
+
+  // Check that initial state exists
+  if (!flow.states[flow.initial]) {
+    throw new Error(`Initial state '${flow.initial}' not found in flow '${flowId}' states`);
   }
 
   // Validate each state
-  for (const [stateId, state] of Object.entries(def.states)) {
+  for (const [stateId, state] of Object.entries(flow.states)) {
     if (!state || typeof state !== 'object') {
       throw new Error(`State '${stateId}' must be an object`);
     }
@@ -192,11 +298,4 @@ export function validateMachineDefinition(
       }
     }
   }
-
-  // Check that initial state exists
-  if (!def.states[def.initial]) {
-    throw new Error(`Initial state '${def.initial}' not found in states`);
-  }
-
-  return true;
 }

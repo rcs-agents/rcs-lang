@@ -24,11 +24,57 @@ export interface Transition {
   /** Context updates to apply when taking this transition. */
   context?: Record<string, any>;
 
-  /** Optional JavaScript condition expression. Has access to context. */
-  condition?: string;
+  /** 
+   * Optional condition for this transition. Supports multiple evaluation methods:
+   * - Legacy JavaScript string: "context.verified === true" (deprecated)
+   * - JavaScript code object: {type: "code", expression: "context.verified === true"}
+   * - JSON Logic (recommended): {type: "jsonlogic", rule: {"==": [{"var": "verified"}, true]}}
+   * Has access to context variables.
+   */
+  condition?: 
+    | string // Legacy support
+    | { type: "code"; expression: string }
+    | { type: "jsonlogic"; rule: import('json-logic-js').RulesLogic };
 
   /** Priority for pattern matching. Higher numbers are checked first. Default: 0 */
   priority?: number;
+
+  /** Flow invocation configuration */
+  flowInvocation?: {
+    /** ID of the flow to invoke */
+    flowId: string;
+    
+    /** Parameters to pass to the invoked flow */
+    parameters?: Record<string, any>;
+    
+    /** Result handlers for different flow outcomes */
+    onResult: {
+      end?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+      cancel?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+      error?: {
+        operations?: Array<{
+          set?: { variable: string; value: any };
+          append?: { to: string; value: any };
+          merge?: { into: string; value: any };
+        }>;
+        target: string;
+      };
+    };
+  };
 }
 
 /**
@@ -229,6 +275,9 @@ export interface SerializedAgentState {
 
   /** Context data. */
   c: Context;
+
+  /** Flow execution state (for multi-flow machines with invocations). */
+  f?: import('./flow-execution').SerializableFlowExecutionState;
 
   /** Schema version for backward compatibility. */
   v: number;
