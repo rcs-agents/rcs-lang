@@ -1,41 +1,34 @@
-import { RCLNode } from '@rcl/parser';
+import { RCLNode, schemaValidator, ValidationResult, AgentConfig as SchemaAgentConfig } from '@rcl/parser';
 
+// Main agent configuration following the JSON schema
 export interface AgentConfig {
-  name: string;
-  displayName?: string;
+  name?: string;
+  displayName: string;
   brandName?: string;
-  config?: AgentConfigSection;
-  defaults?: AgentDefaultsSection;
+  rcsBusinessMessagingAgent?: RcsBusinessMessagingAgent;
+  // Internal RCL properties not in the schema
   flows?: string[];
   messages?: string[];
 }
 
-export interface AgentConfigSection {
+// Schema-compliant interfaces
+export interface RcsBusinessMessagingAgent {
   description?: string;
   logoUri?: string;
   heroUri?: string;
-  phoneNumberEntry?: PhoneNumberEntry;
-  emailEntry?: EmailEntry;
-  websiteEntry?: WebsiteEntry;
-  privacy?: PrivacyEntry;
-  termsConditions?: TermsConditionsEntry;
+  phoneNumbers?: PhoneEntry[];
+  emails?: EmailEntry[];
+  websites?: WebEntry[];
+  privacy?: WebEntry;
+  termsConditions?: WebEntry;
   color?: string;
-  billingConfig?: BillingConfig;
-  agentUseCase?: string;
-  hostingRegion?: string;
+  billingConfig?: RcsBusinessMessagingAgentBillingConfig;
+  agentUseCase?: AgentUseCase;
+  hostingRegion?: HostingRegion;
+  partner?: PartnerEntry;
 }
 
-export interface AgentDefaultsSection {
-  fallbackMessage?: string;
-  messageTrafficType?: string;
-  ttl?: string;
-  postbackData?: string;
-  expressions?: {
-    language?: string;
-  };
-}
-
-export interface PhoneNumberEntry {
+export interface PhoneEntry {
   number: string;
   label?: string;
 }
@@ -45,23 +38,50 @@ export interface EmailEntry {
   label?: string;
 }
 
-export interface WebsiteEntry {
+export interface WebEntry {
   url: string;
   label?: string;
 }
 
-export interface PrivacyEntry {
-  url: string;
-  label?: string;
+export interface RcsBusinessMessagingAgentBillingConfig {
+  billingCategory: BillingCategory;
 }
 
-export interface TermsConditionsEntry {
-  url: string;
-  label?: string;
+export interface PartnerEntry {
+  partnerId?: string;
+  displayName?: string;
+  company?: string;
 }
 
-export interface BillingConfig {
-  billingCategory?: string;
+export type AgentUseCase = 
+  | 'AGENT_USE_CASE_UNSPECIFIED'
+  | 'TRANSACTIONAL'
+  | 'PROMOTIONAL'
+  | 'OTP'
+  | 'MULTI_USE';
+
+export type HostingRegion = 
+  | 'HOSTING_REGION_UNSPECIFIED'
+  | 'NORTH_AMERICA'
+  | 'EUROPE'
+  | 'ASIA_PACIFIC';
+
+export type BillingCategory = 
+  | 'BILLING_CATEGORY_UNSPECIFIED'
+  | 'CONVERSATIONAL_LEGACY'
+  | 'CONVERSATIONAL'
+  | 'SINGLE_MESSAGE'
+  | 'BASIC_MESSAGE';
+
+// Legacy interfaces for internal RCL properties
+export interface AgentDefaultsSection {
+  fallbackMessage?: string;
+  messageTrafficType?: string;
+  ttl?: string;
+  postbackData?: string;
+  expressions?: {
+    language?: string;
+  };
 }
 
 export class AgentExtractor {
@@ -74,7 +94,34 @@ export class AgentExtractor {
       }
     });
     
+    // Validate against schema if config exists
+    if (agentConfig) {
+      this.validateAndApplyDefaults(agentConfig);
+    }
+    
     return agentConfig;
+  }
+
+  /**
+   * Validate agent config against schema and apply defaults
+   */
+  private validateAndApplyDefaults(config: AgentConfig): void {
+    try {
+      // Create schema-compliant object for validation
+      const schemaConfig: SchemaAgentConfig = {
+        displayName: config.displayName,
+        ...(config.name && { name: config.name }),
+        ...(config.brandName && { brandName: config.brandName }),
+        ...(config.rcsBusinessMessagingAgent && { rcsBusinessMessaging: { rbmAgent: {} } })
+      };
+
+      const validationResult = schemaValidator.validateAgentConfig(schemaConfig);
+      if (!validationResult.valid) {
+        console.warn('Agent config failed schema validation:', validationResult.errors);
+      }
+    } catch (error) {
+      console.warn('Error validating agent config:', error);
+    }
   }
 
   private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
@@ -87,30 +134,49 @@ export class AgentExtractor {
   private parseAgentDefinition(node: RCLNode): AgentConfig {
     const agentName = this.extractAgentName(node);
     const config: AgentConfig = {
-      name: agentName || 'UnknownAgent',
+      displayName: '', // Required field, will be updated below
       flows: [],
       messages: []
     };
 
+    // Set name if available
+    if (agentName) {
+      config.name = agentName;
+    }
+
+    let rcsAgent: RcsBusinessMessagingAgent = {};
+    let hasRcsAgentData = false;
+    let defaults: AgentDefaultsSection | undefined;
+
     this.traverseAST(node, (child) => {
-      // Extract displayName
+      // Extract displayName (required)
       if (this.isPropertyNode(child, 'displayName')) {
-        config.displayName = this.extractPropertyValue(child);
+        const displayName = this.extractPropertyValue(child);
+        if (displayName) {
+          config.displayName = displayName;
+        }
       }
       
-      // Extract brandName
+      // Extract brandName (read-only)
       if (this.isPropertyNode(child, 'brandName')) {
-        config.brandName = this.extractPropertyValue(child);
+        const brandName = this.extractPropertyValue(child);
+        if (brandName) {
+          config.brandName = brandName;
+        }
       }
       
-      // Extract config section
+      // Extract config section -> rcsBusinessMessagingAgent
       if (child.type === 'config_section') {
-        config.config = this.parseConfigSection(child);
+        const configData = this.parseRcsBusinessMessagingAgent(child);
+        if (configData) {
+          rcsAgent = { ...rcsAgent, ...configData };
+          hasRcsAgentData = true;
+        }
       }
       
-      // Extract defaults section
+      // Extract defaults section (internal RCL feature)
       if (child.type === 'defaults_section') {
-        config.defaults = this.parseDefaultsSection(child);
+        defaults = this.parseDefaultsSection(child);
       }
       
       // Extract flow references
@@ -127,6 +193,17 @@ export class AgentExtractor {
         config.messages!.push(...messageIds);
       }
     });
+
+    // Set rcsBusinessMessagingAgent if we have data
+    if (hasRcsAgentData) {
+      config.rcsBusinessMessagingAgent = rcsAgent;
+    }
+
+    // Validate required fields
+    if (!config.displayName) {
+      console.warn('Agent config is missing required displayName field');
+      config.displayName = config.name || 'UnknownAgent';
+    }
 
     return config;
   }
@@ -158,49 +235,88 @@ export class AgentExtractor {
     return null;
   }
 
-  private parseConfigSection(node: RCLNode): AgentConfigSection {
-    const config: AgentConfigSection = {};
+  private parseRcsBusinessMessagingAgent(node: RCLNode): RcsBusinessMessagingAgent | null {
+    const rcsAgent: RcsBusinessMessagingAgent = {};
+    let hasData = false;
     
     this.traverseAST(node, (child) => {
       if (child.type === 'config_property') {
-        this.parseConfigProperty(child, config);
+        const parsed = this.parseRcsAgentProperty(child);
+        if (parsed) {
+          Object.assign(rcsAgent, parsed);
+          hasData = true;
+        }
       }
     });
     
-    return config;
+    return hasData ? rcsAgent : null;
   }
 
-  private parseConfigProperty(node: RCLNode, config: AgentConfigSection): void {
+  private parseRcsAgentProperty(node: RCLNode): Partial<RcsBusinessMessagingAgent> | null {
     const text = node.text || '';
+    const result: Partial<RcsBusinessMessagingAgent> = {};
     
     if (text.includes('description:')) {
-      config.description = this.extractValueFromText(text, 'description:');
+      result.description = this.extractValueFromText(text, 'description:');
     } else if (text.includes('logoUri:')) {
-      config.logoUri = this.extractValueFromText(text, 'logoUri:');
+      result.logoUri = this.extractValueFromText(text, 'logoUri:');
     } else if (text.includes('heroUri:')) {
-      config.heroUri = this.extractValueFromText(text, 'heroUri:');
+      result.heroUri = this.extractValueFromText(text, 'heroUri:');
     } else if (text.includes('color:')) {
-      config.color = this.extractValueFromText(text, 'color:');
+      result.color = this.extractValueFromText(text, 'color:');
     } else if (text.includes('agentUseCase:')) {
-      config.agentUseCase = this.extractValueFromText(text, 'agentUseCase:');
+      const useCase = this.extractValueFromText(text, 'agentUseCase:');
+      if (useCase && this.isValidAgentUseCase(useCase)) {
+        result.agentUseCase = useCase as AgentUseCase;
+      }
     } else if (text.includes('hostingRegion:')) {
-      config.hostingRegion = this.extractValueFromText(text, 'hostingRegion:');
-    } else if (node.type === 'phone_number_property') {
-      config.phoneNumberEntry = this.parsePhoneNumberEntry(node);
-    } else if (node.type === 'email_property') {
-      config.emailEntry = this.parseEmailEntry(node);
-    } else if (node.type === 'website_property') {
-      config.websiteEntry = this.parseWebsiteEntry(node);
+      const region = this.extractValueFromText(text, 'hostingRegion:');
+      if (region && this.isValidHostingRegion(region)) {
+        result.hostingRegion = region as HostingRegion;
+      }
+    } else if (node.type === 'phone_numbers_property') {
+      result.phoneNumbers = this.parsePhoneNumbers(node);
+    } else if (node.type === 'emails_property') {
+      result.emails = this.parseEmails(node);
+    } else if (node.type === 'websites_property') {
+      result.websites = this.parseWebsites(node);
     } else if (node.type === 'privacy_property') {
-      config.privacy = this.parsePrivacyEntry(node);
+      result.privacy = this.parseWebEntry(node);
     } else if (node.type === 'terms_conditions_property') {
-      config.termsConditions = this.parseTermsConditionsEntry(node);
+      result.termsConditions = this.parseWebEntry(node);
     } else if (node.type === 'billing_config_property') {
-      config.billingConfig = this.parseBillingConfig(node);
+      result.billingConfig = this.parseRcsBillingConfig(node);
+    } else {
+      return null;
     }
+    
+    return Object.keys(result).length > 0 ? result : null;
   }
 
-  private parsePhoneNumberEntry(node: RCLNode): PhoneNumberEntry | undefined {
+  private isValidAgentUseCase(value: string): boolean {
+    return ['AGENT_USE_CASE_UNSPECIFIED', 'TRANSACTIONAL', 'PROMOTIONAL', 'OTP', 'MULTI_USE'].includes(value);
+  }
+
+  private isValidHostingRegion(value: string): boolean {
+    return ['HOSTING_REGION_UNSPECIFIED', 'NORTH_AMERICA', 'EUROPE', 'ASIA_PACIFIC'].includes(value);
+  }
+
+  private parsePhoneNumbers(node: RCLNode): PhoneEntry[] | undefined {
+    const phoneNumbers: PhoneEntry[] = [];
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'phone_entry') {
+        const entry = this.parsePhoneEntry(child);
+        if (entry) {
+          phoneNumbers.push(entry);
+        }
+      }
+    });
+    
+    return phoneNumbers.length > 0 ? phoneNumbers : undefined;
+  }
+
+  private parsePhoneEntry(node: RCLNode): PhoneEntry | undefined {
     let number = '';
     let label: string | undefined;
     
@@ -214,6 +330,21 @@ export class AgentExtractor {
     });
     
     return number ? { number, label } : undefined;
+  }
+
+  private parseEmails(node: RCLNode): EmailEntry[] | undefined {
+    const emails: EmailEntry[] = [];
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'email_entry') {
+        const entry = this.parseEmailEntry(child);
+        if (entry) {
+          emails.push(entry);
+        }
+      }
+    });
+    
+    return emails.length > 0 ? emails : undefined;
   }
 
   private parseEmailEntry(node: RCLNode): EmailEntry | undefined {
@@ -232,7 +363,22 @@ export class AgentExtractor {
     return address ? { address, label } : undefined;
   }
 
-  private parseWebsiteEntry(node: RCLNode): WebsiteEntry | undefined {
+  private parseWebsites(node: RCLNode): WebEntry[] | undefined {
+    const websites: WebEntry[] = [];
+    
+    this.traverseAST(node, (child) => {
+      if (child.type === 'web_entry') {
+        const entry = this.parseWebEntry(child);
+        if (entry) {
+          websites.push(entry);
+        }
+      }
+    });
+    
+    return websites.length > 0 ? websites : undefined;
+  }
+
+  private parseWebEntry(node: RCLNode): WebEntry | undefined {
     let url = '';
     let label: string | undefined;
     
@@ -248,39 +394,7 @@ export class AgentExtractor {
     return url ? { url, label } : undefined;
   }
 
-  private parsePrivacyEntry(node: RCLNode): PrivacyEntry | undefined {
-    let url = '';
-    let label: string | undefined;
-    
-    this.traverseAST(node, (child) => {
-      if (child.text?.includes('url:')) {
-        url = this.extractValueFromText(child.text, 'url:') || '';
-      }
-      if (child.text?.includes('label:')) {
-        label = this.extractValueFromText(child.text, 'label:');
-      }
-    });
-    
-    return url ? { url, label } : undefined;
-  }
-
-  private parseTermsConditionsEntry(node: RCLNode): TermsConditionsEntry | undefined {
-    let url = '';
-    let label: string | undefined;
-    
-    this.traverseAST(node, (child) => {
-      if (child.text?.includes('url:')) {
-        url = this.extractValueFromText(child.text, 'url:') || '';
-      }
-      if (child.text?.includes('label:')) {
-        label = this.extractValueFromText(child.text, 'label:');
-      }
-    });
-    
-    return url ? { url, label } : undefined;
-  }
-
-  private parseBillingConfig(node: RCLNode): BillingConfig | undefined {
+  private parseRcsBillingConfig(node: RCLNode): RcsBusinessMessagingAgentBillingConfig | undefined {
     let billingCategory: string | undefined;
     
     this.traverseAST(node, (child) => {
@@ -289,7 +403,21 @@ export class AgentExtractor {
       }
     });
     
-    return billingCategory ? { billingCategory } : undefined;
+    if (billingCategory && this.isValidBillingCategory(billingCategory)) {
+      return { billingCategory: billingCategory as BillingCategory };
+    }
+    
+    return undefined;
+  }
+
+  private isValidBillingCategory(value: string): boolean {
+    return [
+      'BILLING_CATEGORY_UNSPECIFIED',
+      'CONVERSATIONAL_LEGACY',
+      'CONVERSATIONAL',
+      'SINGLE_MESSAGE',
+      'BASIC_MESSAGE'
+    ].includes(value);
   }
 
   private parseDefaultsSection(node: RCLNode): AgentDefaultsSection {
