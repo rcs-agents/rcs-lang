@@ -4,7 +4,7 @@
  */
 
 import { ConversationalAgent } from './conversational-agent';
-import type { MachineDefinitionJSON } from './machine-definition';
+import type { MachineDefinitionJSON, SingleFlowMachineDefinitionJSON } from './machine-definition';
 import type { Context, StateChangeEvent } from './types';
 
 /**
@@ -41,7 +41,7 @@ export interface SubFlowReturnType {
 /**
  * Enhanced machine definition supporting sub-flow returns.
  */
-export interface SubFlowMachineDefinition extends MachineDefinitionJSON {
+export interface SubFlowMachineDefinition extends SingleFlowMachineDefinitionJSON {
   /** Return type configuration for this flow */
   returnType?: SubFlowReturnType;
 }

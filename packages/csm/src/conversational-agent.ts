@@ -444,11 +444,15 @@ export class ConversationalAgent {
 
     // Switch to the invoked flow
     this.flowExecutionState.currentFlow = flowId;
-    this.flowExecutionState.currentState = targetFlow.definition.initial;
+    this.flowExecutionState.currentState = 'initial' in targetFlow.definition 
+      ? targetFlow.definition.initial 
+      : 'start';
     this.activeMachineId = flowId;
 
     // Set the target flow to its initial state
-    targetFlow.setState(targetFlow.definition.initial);
+    targetFlow.setState('initial' in targetFlow.definition 
+      ? targetFlow.definition.initial 
+      : 'start');
 
     // Emit state change event
     await this.emitStateChange('input', input, previousState, undefined, result.transition);
@@ -484,7 +488,9 @@ export class ConversationalAgent {
     }
 
     // Find the transition that invoked this flow
-    const parentState = parentFlow.definition.states[stackFrame.stateId];
+    const parentState = 'states' in parentFlow.definition 
+      ? parentFlow.definition.states[stackFrame.stateId]
+      : undefined;
     if (!parentState) {
       throw new Error(`Parent state '${stackFrame.stateId}' not found in flow '${stackFrame.flowId}'`);
     }

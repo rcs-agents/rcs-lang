@@ -65,7 +65,7 @@ export interface TransitionResult {
  * Each flow in an RCL document becomes one FlowMachine instance.
  */
 export class FlowMachine {
-  private definition: MachineDefinitionJSON;
+  public definition: MachineDefinitionJSON;
   private currentState: string;
   private compiledPatterns: Map<string, RegExp> = new Map();
 
@@ -78,7 +78,15 @@ export class FlowMachine {
   constructor(definition: FlowDefinition | MachineDefinitionJSON, initialState?: string) {
     // Support both old and new formats
     this.definition = definition as MachineDefinitionJSON;
-    this.currentState = initialState || definition.initial;
+    
+    // Handle both single-flow and multi-flow formats
+    if ('initial' in definition) {
+      this.currentState = initialState || definition.initial;
+    } else if ('initialFlow' in definition) {
+      throw new Error('FlowMachine expects a single flow definition, not a multi-flow machine');
+    } else {
+      this.currentState = initialState || 'start';
+    }
 
     // Pre-compile regex patterns for performance
     this.compilePatterns();
@@ -102,7 +110,10 @@ export class FlowMachine {
    * Gets the current state definition.
    */
   get stateDefinition(): StateDefinition | undefined {
-    return this.definition.states[this.currentState];
+    if ('states' in this.definition) {
+      return this.definition.states[this.currentState];
+    }
+    return undefined;
   }
 
   /**
@@ -170,8 +181,10 @@ export class FlowMachine {
    * @throws Error if state doesn't exist
    */
   setState(stateId: string): void {
-    if (!this.definition.states[stateId]) {
-      throw new Error(`State '${stateId}' does not exist in flow '${this.id}'`);
+    if ('states' in this.definition) {
+      if (!this.definition.states[stateId]) {
+        throw new Error(`State '${stateId}' does not exist in flow '${this.id}'`);
+      }
     }
     this.currentState = stateId;
   }
@@ -197,6 +210,8 @@ export class FlowMachine {
    * Pre-compiles regex patterns for performance.
    */
   private compilePatterns(): void {
+    if (!('states' in this.definition)) return;
+    
     for (const [stateId, stateDef] of Object.entries(this.definition.states)) {
       for (const transition of stateDef.transitions) {
         if (
@@ -322,7 +337,10 @@ export class FlowMachine {
         type: 'flow_invocation',
         transition,
         contextUpdates: transition.context,
-        flowInvocation: transition.flowInvocation
+        flowInvocation: {
+          ...transition.flowInvocation,
+          parameters: transition.flowInvocation.parameters || {}
+        }
       };
     }
 
