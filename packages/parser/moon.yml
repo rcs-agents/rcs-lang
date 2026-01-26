@@ -11,6 +11,7 @@ platform: bun
 
 dependsOn:
   - '@rcs-lang/ast'
+  - '@rcs-lang/core'
 
 tags:
   - test
@@ -48,6 +49,7 @@ tasks:
     command: tsc
     deps:
       - '@rcs-lang/ast:build'
+      - '@rcs-lang/core:build'
       - fix-imports
     inputs:
       - 'src/**/*.g4'
