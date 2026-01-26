@@ -13,7 +13,7 @@ class MockTextDocument implements TextDocument {
   constructor(
     public uri: string,
     private content: string,
-  ) { }
+  ) {}
 
   getText(): string {
     return this.content;

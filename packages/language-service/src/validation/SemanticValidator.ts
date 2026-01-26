@@ -43,12 +43,9 @@ export class SemanticValidator {
   }
 
   private async loadDependencies() {
-    try {
-      // These would normally be injected or imported
-      // For now, we'll implement basic semantic validation without CLI dependencies
-    } catch (error) {
-      console.warn('Could not load CLI dependencies for semantic validation:', error);
-    }
+    // These would normally be injected or imported
+    // For now, we'll implement basic semantic validation without CLI dependencies
+    // TODO: Implement dynamic loading of CLI dependencies when needed
   }
 
   /**
