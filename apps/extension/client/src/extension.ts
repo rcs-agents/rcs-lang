@@ -137,8 +137,7 @@ async function showPreview(uri?: Uri, previewProvider?: RCLPreviewProvider): Pro
       await previewProvider.showPreview(document);
     }
     
-    // Open the webview view if not already visible
-    await commands.executeCommand('workbench.view.extension.rclPreview');
+    // The webview view should automatically appear when the provider is activated
     
     window.showInformationMessage('RCL Preview opened');
   } catch (error) {

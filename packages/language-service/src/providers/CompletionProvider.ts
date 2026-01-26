@@ -123,7 +123,7 @@ export class CompletionProvider {
   };
 
   // Built-in property types and values
-  private readonly propertyValues = {
+  private readonly propertyValues: Record<string, string[]> = {
     enabled: ['true', 'false'],
     timeout: ['30', '60', '120', '300'],
     brandName: [],
@@ -599,7 +599,7 @@ export class CompletionProvider {
    * Get keyword documentation
    */
   private getKeywordDocumentation(keyword: string): string {
-    const docs = {
+    const docs: Record<string, string> = {
       agent: 'Defines a conversational agent with properties and configuration',
       flow: 'Defines a conversation flow with states and transitions',
       import: 'Imports symbols from another RCL file',
@@ -612,7 +612,7 @@ export class CompletionProvider {
    * Get property documentation
    */
   private getPropertyDocumentation(property: string): string {
-    const docs = {
+    const docs: Record<string, string> = {
       name: 'The internal name of the agent',
       brandName: 'The brand name displayed to users',
       displayName: 'The display name shown in conversations',
@@ -626,7 +626,7 @@ export class CompletionProvider {
    * Get property detail information
    */
   private getPropertyDetail(property: string): string {
-    const details = {
+    const details: Record<string, string> = {
       name: 'string',
       brandName: 'string',
       displayName: 'string',
@@ -640,7 +640,7 @@ export class CompletionProvider {
    * Get property insert text with placeholder
    */
   private getPropertyInsertText(property: string): string {
-    const templates = {
+    const templates: Record<string, string> = {
       name: 'name: "${1:Agent Name}"',
       brandName: 'brandName: "${1:Brand Name}"',
       displayName: 'displayName: "${1:Display Name}"',

@@ -141,8 +141,7 @@ async function showPreview(uri, previewProvider) {
         if (previewProvider) {
             await previewProvider.showPreview(document);
         }
-        // Open the webview view if not already visible
-        await vscode_1.commands.executeCommand('workbench.view.extension.rclPreview');
+        // The webview view should automatically appear when the provider is activated
         vscode_1.window.showInformationMessage('RCL Preview opened');
     }
     catch (error) {

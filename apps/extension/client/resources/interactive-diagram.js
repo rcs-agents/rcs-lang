@@ -307,7 +307,7 @@
         shape.setAttribute('stroke-width', '2');
         shape.style.cursor = 'pointer';
         
-        // Node label
+        // Node label (remove quotes and enable editing)
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', width / 2);
         text.setAttribute('y', height / 2);
@@ -317,8 +317,16 @@
         text.setAttribute('font-family', 'var(--vscode-font-family)');
         text.setAttribute('font-size', '12');
         text.setAttribute('font-weight', '500');
-        text.style.pointerEvents = 'none';
-        text.textContent = node.data?.label || node.id;
+        text.style.pointerEvents = 'all';
+        text.style.cursor = 'text';
+        text.setAttribute('data-node-id', node.id);
+        
+        // Clean text display (remove quotes)
+        let displayText = node.data?.messageData?.text || node.data?.label || node.id;
+        if (displayText.startsWith('"') && displayText.endsWith('"')) {
+            displayText = displayText.slice(1, -1);
+        }
+        text.textContent = displayText;
         
         g.appendChild(shape);
         g.appendChild(text);
@@ -337,7 +345,13 @@
         
         g.addEventListener('dblclick', (e) => {
             e.stopPropagation();
-            editNodeProperties(node.id);
+            editNodeInline(node.id, text);
+        });
+        
+        // Add text editing capability
+        text.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            editNodeInline(node.id, text);
         });
         
         svg.appendChild(g);
@@ -351,13 +365,64 @@
             return;
         }
         
+        // Calculate attachment points on box borders
+        const sourceCenter = {
+            x: sourceNode.position.x + 60,
+            y: sourceNode.position.y + 20
+        };
+        const targetCenter = {
+            x: targetNode.position.x + 60,
+            y: targetNode.position.y + 20
+        };
+        
+        // Calculate direction vector
+        const dx = targetCenter.x - sourceCenter.x;
+        const dy = targetCenter.y - sourceCenter.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length === 0) return;
+        
+        // Normalize direction
+        const unitX = dx / length;
+        const unitY = dy / length;
+        
+        // Box dimensions
+        const boxWidth = 120;
+        const boxHeight = 40;
+        const boxRadius = 8;
+        
+        // Calculate edge attachment points
+        let sourceX, sourceY, targetX, targetY;
+        
+        // Source attachment point (exit from box border)
+        if (Math.abs(unitX) > Math.abs(unitY)) {
+            // Horizontal direction dominant
+            sourceX = sourceCenter.x + (unitX > 0 ? boxWidth/2 : -boxWidth/2);
+            sourceY = sourceCenter.y + (unitY * boxWidth/2 / Math.abs(unitX));
+        } else {
+            // Vertical direction dominant
+            sourceX = sourceCenter.x + (unitX * boxHeight/2 / Math.abs(unitY));
+            sourceY = sourceCenter.y + (unitY > 0 ? boxHeight/2 : -boxHeight/2);
+        }
+        
+        // Target attachment point (enter at box border)
+        if (Math.abs(unitX) > Math.abs(unitY)) {
+            // Horizontal direction dominant
+            targetX = targetCenter.x + (unitX > 0 ? -boxWidth/2 : boxWidth/2);
+            targetY = targetCenter.y - (unitY * boxWidth/2 / Math.abs(unitX));
+        } else {
+            // Vertical direction dominant
+            targetX = targetCenter.x - (unitX * boxHeight/2 / Math.abs(unitY));
+            targetY = targetCenter.y + (unitY > 0 ? -boxHeight/2 : boxHeight/2);
+        }
+        
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('class', 'diagram-edge');
         line.setAttribute('data-edge-id', edge.id);
-        line.setAttribute('x1', sourceNode.position.x + 60); // Center of source node
-        line.setAttribute('y1', sourceNode.position.y + 20);
-        line.setAttribute('x2', targetNode.position.x + 60); // Center of target node
-        line.setAttribute('y2', targetNode.position.y + 20);
+        line.setAttribute('x1', sourceX);
+        line.setAttribute('y1', sourceY);
+        line.setAttribute('x2', targetX);
+        line.setAttribute('y2', targetY);
         line.setAttribute('stroke', '#666');
         line.setAttribute('stroke-width', '2');
         line.setAttribute('marker-end', 'url(#arrow)');
@@ -683,3 +748,78 @@
         saveChanges: saveChanges
     };
 })();
+// Inline text editing function - Added via patch
+function editNodeInline(nodeId, textElement) {
+    const vscode = acquireVsCodeApi();
+    const flow = window.rclInteractiveDiagram?.getCurrentState()?.flows?.[window.rclInteractiveDiagram?.getCurrentState()?.activeFlow];
+    const node = flow?.nodes.find(n => n.id === nodeId);
+    if (\!node || \!textElement) return;
+
+    // Create input element for inline editing
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = textElement.textContent;
+    input.style.position = 'absolute';
+    input.style.left = (node.position.x + 10) + 'px';
+    input.style.top = (node.position.y + 15) + 'px';
+    input.style.width = '100px';
+    input.style.fontSize = '12px';
+    input.style.fontFamily = 'var(--vscode-font-family)';
+    input.style.background = 'var(--vscode-input-background)';
+    input.style.color = 'var(--vscode-foreground)';
+    input.style.border = '1px solid var(--vscode-input-border)';
+    input.style.zIndex = '1000';
+
+    // Add input to container
+    const container = document.getElementById('sprotty-container');
+    container.appendChild(input);
+    input.focus();
+    input.select();
+
+    function finishEdit() {
+        const newText = input.value.trim();
+        if (newText && newText \!== textElement.textContent) {
+            // Update node data
+            if (node.type === 'message' || node.type === 'rich_card') {
+                if (\!node.data) node.data = {};
+                if (\!node.data.messageData) node.data.messageData = {};
+                node.data.messageData.text = newText;
+            } else {
+                if (\!node.data) node.data = {};
+                node.data.label = newText;
+            }
+
+            // Update visual text
+            textElement.textContent = newText;
+
+            // Notify extension of change
+            vscode.postMessage({
+                type: 'nodeUpdated',
+                data: { flowId: window.rclInteractiveDiagram?.getCurrentState()?.activeFlow, node }
+            });
+        }
+        
+        // Remove input element
+        if (input.parentNode) {
+            input.parentNode.removeChild(input);
+        }
+    }
+
+    // Handle input events
+    input.addEventListener('blur', finishEdit);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            finishEdit();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            if (input.parentNode) {
+                input.parentNode.removeChild(input);
+            }
+        }
+    });
+}
+
+// Make function globally accessible
+window.editNodeInline = editNodeInline;
+
