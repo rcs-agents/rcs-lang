@@ -11,7 +11,17 @@ projects:
   - "apps/*"
   - "packages/*"
 
-dependencyManager: pnpm
+runner:
+  # Use the proto toolchain for package management
+  archivableTargets:
+    - ':build'
+    - ':test'
+
+node:
+  packageManager: bun
+  
+bun:
+  lockfile: bun.lockb
 
 docker:
   scaffold:

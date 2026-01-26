@@ -1,0 +1,9 @@
+agent Simple Test Agent
+  displayName: "Simple Agent"
+  
+  flow MainFlow
+    :start -> :greeting
+    :greeting -> :end
+  
+  messages Messages
+    text greeting "Hello! Welcome to our service."

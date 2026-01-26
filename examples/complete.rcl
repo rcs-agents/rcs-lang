@@ -1,6 +1,0 @@
-agent Test
-  displayName: "Test Agent"
-  flow Test Flow
-    :start -> text "Hello"
-  messages Messages
-    text "Welcome"

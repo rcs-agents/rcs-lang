@@ -16,7 +16,7 @@ export interface AgentContentMessage {
   contentInfo?: ContentInfo;
 }
 
-export type MessageTrafficType = 
+export type MessageTrafficType =
   | 'MESSAGE_TRAFFIC_TYPE_UNSPECIFIED'
   | 'AUTHENTICATION'
   | 'TRANSACTION'
@@ -137,7 +137,7 @@ export interface Contact {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
 export interface ValidationResult {
@@ -157,7 +157,7 @@ export class SchemaValidator {
   /**
    * Validate an AgentMessage against basic schema rules
    */
-  validateAgentMessage(message: any): ValidationResult {
+  validateAgentMessage(message: unknown): ValidationResult {
     const errors: ValidationError[] = [];
 
     // Check required fields
@@ -166,11 +166,13 @@ export class SchemaValidator {
       return { valid: false, errors };
     }
 
-    if (!message.contentMessage) {
+    const msg = message as any; // Type assertion for dynamic validation
+
+    if (!msg.contentMessage) {
       errors.push({ field: 'contentMessage', message: 'contentMessage is required' });
     }
 
-    if (!message.messageTrafficType) {
+    if (!msg.messageTrafficType) {
       errors.push({ field: 'messageTrafficType', message: 'messageTrafficType is required' });
     } else {
       const validTypes = [
@@ -179,13 +181,13 @@ export class SchemaValidator {
         'TRANSACTION',
         'PROMOTION',
         'SERVICEREQUEST',
-        'ACKNOWLEDGEMENT'
+        'ACKNOWLEDGEMENT',
       ];
-      if (!validTypes.includes(message.messageTrafficType)) {
-        errors.push({ 
-          field: 'messageTrafficType', 
-          message: `Invalid message traffic type: ${message.messageTrafficType}`,
-          value: message.messageTrafficType
+      if (!validTypes.includes(msg.messageTrafficType)) {
+        errors.push({
+          field: 'messageTrafficType',
+          message: `Invalid message traffic type: ${msg.messageTrafficType}`,
+          value: msg.messageTrafficType,
         });
       }
     }
@@ -196,7 +198,7 @@ export class SchemaValidator {
   /**
    * Validate an AgentConfig against basic schema rules
    */
-  validateAgentConfig(config: any): ValidationResult {
+  validateAgentConfig(config: unknown): ValidationResult {
     const errors: ValidationError[] = [];
 
     if (!config || typeof config !== 'object') {
@@ -219,7 +221,7 @@ export class SchemaValidator {
       errors.push({
         field: 'contentMessage.text',
         message: 'Text content exceeds 2048 character limit',
-        value: message.contentMessage.text.length
+        value: message.contentMessage.text.length,
       });
     }
 
@@ -228,7 +230,7 @@ export class SchemaValidator {
       errors.push({
         field: 'contentMessage.suggestions',
         message: 'Maximum 11 suggestions allowed',
-        value: message.contentMessage.suggestions.length
+        value: message.contentMessage.suggestions.length,
       });
     }
 
@@ -240,7 +242,7 @@ export class SchemaValidator {
           errors.push({
             field: `contentMessage.suggestions[${index}].${suggestion.reply ? 'reply' : 'action'}.text`,
             message: 'Suggestion text exceeds 25 character limit',
-            value: suggestionText.length
+            value: suggestionText.length,
           });
         }
 
@@ -249,7 +251,7 @@ export class SchemaValidator {
           errors.push({
             field: `contentMessage.suggestions[${index}].${suggestion.reply ? 'reply' : 'action'}.postbackData`,
             message: 'Postback data exceeds 2048 character limit',
-            value: postbackData.length
+            value: postbackData.length,
           });
         }
       });
@@ -260,27 +262,28 @@ export class SchemaValidator {
       message.contentMessage.text ? 'text' : null,
       message.contentMessage.richCard ? 'richCard' : null,
       message.contentMessage.uploadedRbmFile ? 'uploadedRbmFile' : null,
-      message.contentMessage.contentInfo ? 'contentInfo' : null
+      message.contentMessage.contentInfo ? 'contentInfo' : null,
     ].filter(Boolean);
 
     if (contentTypes.length > 1) {
       errors.push({
         field: 'contentMessage',
         message: `Only one content type allowed, found: ${contentTypes.join(', ')}`,
-        value: contentTypes
+        value: contentTypes,
       });
     }
 
     if (contentTypes.length === 0) {
       errors.push({
         field: 'contentMessage',
-        message: 'At least one content type required (text, richCard, uploadedRbmFile, or contentInfo)'
+        message:
+          'At least one content type required (text, richCard, uploadedRbmFile, or contentInfo)',
       });
     }
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -296,7 +299,7 @@ export class SchemaValidator {
         errors.push({
           field: 'carouselCard.cardContents',
           message: 'Carousel cards require minimum 2 cards',
-          value: richCard.carouselCard.cardContents.length
+          value: richCard.carouselCard.cardContents.length,
         });
       }
 
@@ -304,20 +307,20 @@ export class SchemaValidator {
         errors.push({
           field: 'carouselCard.cardContents',
           message: 'Carousel cards allow maximum 10 cards',
-          value: richCard.carouselCard.cardContents.length
+          value: richCard.carouselCard.cardContents.length,
         });
       }
 
       // Check that all cards have the same media height
       const mediaHeights = richCard.carouselCard.cardContents
-        .map(card => card.media?.height)
+        .map((card) => card.media?.height)
         .filter(Boolean);
-      
+
       if (mediaHeights.length > 1 && new Set(mediaHeights).size > 1) {
         errors.push({
           field: 'carouselCard.cardContents',
           message: 'All cards in a carousel must have the same media height',
-          value: mediaHeights
+          value: mediaHeights,
         });
       }
     }
@@ -325,15 +328,19 @@ export class SchemaValidator {
     if (richCard.standaloneCard) {
       // Standalone card validation
       const cardContent = richCard.standaloneCard.cardContent;
-      
+
       if (richCard.standaloneCard.cardOrientation === 'HORIZONTAL' && cardContent.media) {
         // Horizontal cards with media require at least one of: title, description, or suggestions
-        const hasRequiredContent = !!(cardContent.title || cardContent.description || cardContent.suggestions?.length);
+        const hasRequiredContent = !!(
+          cardContent.title ||
+          cardContent.description ||
+          cardContent.suggestions?.length
+        );
         if (!hasRequiredContent) {
           errors.push({
             field: 'standaloneCard.cardContent',
             message: 'Horizontal cards with media require title, description, or suggestions',
-            value: cardContent
+            value: cardContent,
           });
         }
       }
@@ -341,7 +348,7 @@ export class SchemaValidator {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 }

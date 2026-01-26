@@ -1,0 +1,47 @@
+agent "Shortcuts Demo"
+  displayName: "Shortcuts Bot"
+
+  flow MainFlow
+    :start -> welcome
+    welcome -> menu
+    menu -> :end
+
+  messages Messages
+    # Text shortcuts - simple and clean
+    text welcome "Welcome! Here are examples of different message types."
+      reply "Rich Cards" "cards"
+      reply "Files" "files"
+      reply "Actions" "actions"
+
+    # Rich card shortcuts - inline syntax
+    richCard cardDemo "Rich Card Example" :large :vertical
+      description: "This card was created using shortcut syntax"
+      reply "Nice!" "thanks"
+      openUrl "Learn More" <url>"https://example.com"
+
+    # File shortcuts - multiple variants
+    rbmFile docExample "document.pdf" "User Manual"
+    file imageExample <url>"https://example.com/image.jpg" "Product Image" :jpg
+
+    # Carousel shortcut
+    carousel productCarousel :medium
+      richCard product1 "Product A" :compact
+        description: "First product"
+        reply "Buy Now" "buy_a"
+      
+      richCard product2 "Product B" :compact  
+        description: "Second product"
+        reply "Buy Now" "buy_b"
+
+    # Traditional verbose syntax for comparison
+    agentMessage verboseExample
+      contentMessage
+        richCard
+          standaloneCard
+            cardContent
+              title: "Verbose Rich Card"
+              description: "This is the traditional verbose syntax"
+              suggestion
+                reply text: "Verbose but flexible"
+
+    text thanks "Thanks for checking out the shortcuts!"

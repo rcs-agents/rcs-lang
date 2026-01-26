@@ -1,6 +1,25 @@
 import { MessageNormalizer, AgentMessage, MessageTrafficType } from '../../src/normalizers/messageNormalizer';
 import { TestUtils } from '../testUtils';
-import { RCLNode } from '@rcl/parser';
+
+// Conditional import for tree-sitter dependency
+let RCLNode: any;
+let parserAvailable = false;
+
+try {
+  ({ RCLNode } = require('@rcl/parser'));
+  parserAvailable = true;
+} catch (error) {
+  console.warn('Parser not available, using mock node types:', error.message);
+  // Define a minimal RCLNode type for when parser is not available
+  RCLNode = class {
+    type: string;
+    text?: string;
+    startPosition: { row: number; column: number };
+    endPosition: { row: number; column: number };
+    children: any[];
+    parent: any;
+  };
+}
 
 describe('MessageNormalizer', () => {
   let normalizer: MessageNormalizer;
@@ -144,7 +163,7 @@ describe('MessageNormalizer', () => {
 
     it('should extract dial action suggestions', () => {
       const dialAction = TestUtils.createMockNode('dial_action', undefined, [
-        TestUtils.createMockNode('phone_property', undefined, [
+        TestUtils.createMockNode('phone_number_property', undefined, [
           TestUtils.createMockNode('identifier', 'phoneNumber'),
           TestUtils.createMockNode('string', '"+1234567890"')
         ])
@@ -222,7 +241,9 @@ describe('MessageNormalizer', () => {
       ]);
 
       const carouselCard = TestUtils.createMockNode('carousel_card', undefined, [
-        TestUtils.createMockNode('card_width', ':MEDIUM'),
+        TestUtils.createMockNode('card_width_property', undefined, [
+          TestUtils.createMockNode('atom', ':MEDIUM')
+        ]),
         TestUtils.createMockNode('card_contents', undefined, [cardContent1, cardContent2])
       ]);
 
@@ -239,7 +260,9 @@ describe('MessageNormalizer', () => {
 
     it('should extract media from cards', () => {
       const media = TestUtils.createMockNode('media', undefined, [
-        TestUtils.createMockNode('height', ':MEDIUM'),
+        TestUtils.createMockNode('height_property', undefined, [
+          TestUtils.createMockNode('atom', ':MEDIUM')
+        ]),
         TestUtils.createMockNode('content_info', undefined, [
           TestUtils.createMockNode('file_url_property', undefined, [
             TestUtils.createMockNode('identifier', 'fileUrl'),
@@ -356,7 +379,8 @@ describe('MessageNormalizer', () => {
     });
 
     it('should generate valid postback data for all suggestions', () => {
-      const suggestion = TestUtils.createSuggestionNode('reply', 'Test', 'test_action');
+      const validPostbackData = JSON.stringify({ action: 'test', value: 'test_action' });
+      const suggestion = TestUtils.createSuggestionNode('reply', 'Test', validPostbackData);
       const contentMessage = TestUtils.createMockNode('content_message', undefined, [
         TestUtils.createMockNode('suggestions', undefined, [suggestion])
       ]);

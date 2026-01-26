@@ -47,7 +47,7 @@ connection.onInitialize((params) => {
             // Code completion
             completionProvider: {
                 resolveProvider: true,
-                triggerCharacters: [' ', ':', '.', '$', '<', '|']
+                triggerCharacters: [' ', ':', '.', '$', '<', '|'],
             },
             // Hover information
             hoverProvider: true,
@@ -61,7 +61,7 @@ connection.onInitialize((params) => {
             workspaceSymbolProvider: true,
             // Code actions
             codeActionProvider: {
-                codeActionKinds: ['quickfix', 'refactor']
+                codeActionKinds: ['quickfix', 'refactor'],
             },
             // Document formatting
             documentFormattingProvider: true,
@@ -73,21 +73,21 @@ connection.onInitialize((params) => {
                 legend: semanticTokensProvider.getLegend(),
                 range: false,
                 full: {
-                    delta: false
-                }
+                    delta: false,
+                },
             },
             // Diagnostics
             diagnosticProvider: {
                 interFileDependencies: false,
-                workspaceDiagnostics: false
-            }
-        }
+                workspaceDiagnostics: false,
+            },
+        },
     };
     if (hasWorkspaceFolderCapability) {
         result.capabilities.workspace = {
             workspaceFolders: {
-                supported: true
-            }
+                supported: true,
+            },
         };
     }
     return result;
@@ -98,7 +98,7 @@ connection.onInitialized(() => {
         connection.client.register(node_1.DidChangeConfigurationNotification.type, undefined);
     }
     if (hasWorkspaceFolderCapability) {
-        connection.workspace.onDidChangeWorkspaceFolders(_event => {
+        connection.workspace.onDidChangeWorkspaceFolders((_event) => {
             connection.console.log('Workspace folder change event received.');
         });
     }
@@ -107,19 +107,19 @@ connection.onInitialized(() => {
 const defaultSettings = {
     maxNumberOfProblems: 1000,
     validation: {
-        enabled: true
+        enabled: true,
     },
     completion: {
-        enabled: true
+        enabled: true,
     },
     formatting: {
-        enabled: true
-    }
+        enabled: true,
+    },
 };
 let globalSettings = defaultSettings;
 // Cache settings of all open documents
 const documentSettings = new Map();
-connection.onDidChangeConfiguration(change => {
+connection.onDidChangeConfiguration((change) => {
     if (hasConfigurationCapability) {
         // Reset all cached document settings
         documentSettings.clear();
@@ -138,19 +138,19 @@ function getDocumentSettings(resource) {
     if (!result) {
         result = connection.workspace.getConfiguration({
             scopeUri: resource,
-            section: 'rcl'
+            section: 'rcl',
         });
         documentSettings.set(resource, result);
     }
     return result;
 }
 // Only keep settings for open documents
-documents.onDidClose(e => {
+documents.onDidClose((e) => {
     documentSettings.delete(e.document.uri);
     parser.clearCache(e.document.uri);
 });
 // Handle document content changes
-documents.onDidChangeContent(change => {
+documents.onDidChangeContent((change) => {
     // Clear cache for changed document
     parser.clearCache(change.document.uri);
     // Trigger validation
@@ -162,13 +162,13 @@ connection.languages.diagnostics.on(async (params) => {
     if (document !== undefined) {
         return {
             kind: node_1.DocumentDiagnosticReportKind.Full,
-            items: await validateTextDocument(document)
+            items: await validateTextDocument(document),
         };
     }
     else {
         return {
             kind: node_1.DocumentDiagnosticReportKind.Full,
-            items: []
+            items: [],
         };
     }
 });
@@ -178,19 +178,21 @@ async function validateTextDocument(textDocument) {
         return [];
     }
     try {
-        const rclDocument = parser.parseDocument(textDocument.getText(), textDocument.uri, textDocument.version);
+        const rclDocument = await parser.parseDocument(textDocument.getText(), textDocument.uri, textDocument.version);
         const diagnostics = await diagnosticsProvider.getDiagnostics(rclDocument, settings);
         // Limit the number of problems reported
         return diagnostics.slice(0, settings.maxNumberOfProblems);
     }
     catch (error) {
         console.error('Error validating document:', error);
-        return [{
+        return [
+            {
                 severity: node_1.DiagnosticSeverity.Error,
                 range: { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } },
                 message: 'Internal validation error: ' + error.message,
-                source: 'rcl'
-            }];
+                source: 'rcl',
+            },
+        ];
     }
 }
 // Code completion

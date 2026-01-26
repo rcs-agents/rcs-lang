@@ -1,0 +1,422 @@
+================================================================================
+Reply suggestion shortcut
+================================================================================
+
+agent SuggestionTest
+  displayName: "Suggestions"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Choose an option:"
+      reply "Option 1" "opt1"
+      reply "Option 2"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (reply_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (string)))
+          (suggestion_shortcut
+            (reply_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+Dial suggestion shortcut
+================================================================================
+
+agent DialTest
+  displayName: "Dial"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Contact "Call us:"
+      dial "Customer Service" <phone "+1234567890">
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (dial_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string))))))))))
+
+================================================================================
+Open URL suggestion shortcut
+================================================================================
+
+agent URLTest
+  displayName: "URL"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Info "Learn more:"
+      openUrl "Visit Website" <url "https://example.com">
+      openUrl "Documentation" <url "https://docs.example.com"> "Documentation Site" :browser :full
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (open_url_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))))
+          (suggestion_shortcut
+            (open_url_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+Share location suggestion
+================================================================================
+
+agent LocationTest
+  displayName: "Location"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Delivery "Share your location for delivery:"
+      shareLocation "Share Location"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (share_location_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+Calendar event suggestion with block syntax
+================================================================================
+
+agent CalendarTest
+  displayName: "Calendar"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Meeting "Schedule a meeting:"
+      saveEvent "Book Meeting"
+        title: "Product Demo"
+        startTime: <datetime "2024-12-01T10:00:00Z">
+        endTime: <datetime "2024-12-01T11:00:00Z">
+        description: "Product demonstration meeting"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (create_calendar_event_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+Calendar event suggestion with inline syntax
+================================================================================
+
+agent CalendarInlineTest
+  displayName: "Calendar Inline"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Appointment "Book appointment:"
+      saveEvent "Schedule" "Consultation" <datetime "2024-12-01T15:00:00Z"> <datetime "2024-12-01T16:00:00Z"> "Medical consultation"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (create_calendar_event_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))
+              (typed_value
+                (type_tag
+                  (string)))
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+View location suggestion
+================================================================================
+
+agent ViewLocationTest
+  displayName: "View Location"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Store "Find our store:"
+      viewLocation "Main Store"
+        latLong: 37.7749 -122.4194
+        label: "San Francisco Store"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))
+          (suggestion_shortcut
+            (view_location_shortcut
+              (enhanced_simple_value
+                (simple_value
+                  (string)))
+              (number)
+              (number)
+              (enhanced_simple_value
+                (simple_value
+                  (string))))))))))
+
+================================================================================
+Multiple suggestions on full message
+================================================================================
+
+agent MultiSuggestionTest
+  displayName: "Multi Suggestions"
+  flow Main
+    :start -> :end
+  messages Messages
+    agentMessage Options
+      contentMessage
+        text: "How can I help you?"
+        suggestion
+          reply
+            text: "Product info"
+            postbackData: "info"
+        suggestion
+          action
+            text: "Call support"
+            dialAction
+              phoneNumber: <phone "+1234567890">
+        suggestion
+          action
+            text: "Visit website"
+            openUrlAction
+              url: <url "https://example.com">
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (simple_value
+              (string)))
+          (suggestion
+            (suggested_reply
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string)))
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string))))))
+          (suggestion
+            (suggested_action
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string))))
+              (dial_action
+                (typed_value
+                  (type_tag
+                    (string))))))
+          (suggestion
+            (suggested_action
+              (inline_parameter_list
+                (parameter
+                  (attribute_key)
+                  (simple_value
+                    (string))))
+              (open_url_action
+                (typed_value
+                  (type_tag
+                    (string))))))))))

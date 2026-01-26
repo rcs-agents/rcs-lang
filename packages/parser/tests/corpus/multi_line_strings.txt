@@ -1,0 +1,138 @@
+================================================================================
+Clean multi-line string
+================================================================================
+
+agent MultiLineTest
+  displayName: "Multi-line Strings"
+  messages Messages
+    agentMessage Welcome
+      contentMessage
+        text: |
+          This is a multi-line string
+          with clean formatting.
+          Each line is preserved.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (multi_line_string)))))))
+
+================================================================================
+Trimmed multi-line string
+================================================================================
+
+agent TrimTest
+  displayName: "Trim Test"
+  messages Messages
+    agentMessage NoNewline
+      contentMessage
+        text: |-
+          This string has
+          no trailing newline
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (multi_line_string)))))))
+
+================================================================================
+Preserve leading space
+================================================================================
+
+agent PreserveTest
+  displayName: "Preserve Test"
+  messages Messages
+    agentMessage Code
+      contentMessage
+        text: +|
+            function hello() {
+              console.log("Hello!");
+            }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (multi_line_string)))))))
+
+================================================================================
+Preserve all whitespace
+================================================================================
+
+agent PreserveAllTest
+  displayName: "Preserve All"
+  messages Messages
+    agentMessage ASCII
+      contentMessage
+        text: +|+
+            ┌─────────┐
+            │ ASCII   │
+            │   Art   │
+            └─────────┘
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (enhanced_simple_value
+            (multi_line_string)))))))
+
+================================================================================
+Multi-line string in defaults
+================================================================================
+
+agent DefaultMultiLine
+  displayName: "Default Multi-line"
+  agentDefaults Defaults
+    fallbackMessage: |
+      Sorry, I didn't understand that.
+      Please try again with a different question.
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (defaults_section
+      (default_property
+        (enhanced_simple_value
+          (multi_line_string))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

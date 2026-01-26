@@ -1,0 +1,232 @@
+================================================================================
+Single line JavaScript code
+================================================================================
+
+agent CodeTest
+  displayName: "Code Test"
+  flow TestFlow
+    :start -> $js> context.user ? "welcome" : "login"
+  messages Messages
+    text welcome "Welcome!"
+    text login "Please login"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (embedded_code
+            (single_line_embedded_code)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Single line TypeScript code
+================================================================================
+
+agent TSTest
+  displayName: "TypeScript Test"
+  flow TestFlow
+    :start -> $ts> (context.score as number) > 50 ? "pass" : "fail"
+  messages Messages
+    text pass "You passed!"
+    text fail "Try again"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (embedded_code
+            (single_line_embedded_code)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Default language embedded code
+================================================================================
+
+agent DefaultTest
+  displayName: "Default Language"
+  flow TestFlow
+    :start -> $> context.ready ? "proceed" : "wait"
+  messages Messages
+    text proceed "Let's go!"
+    text wait "Please wait"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (embedded_code
+            (single_line_embedded_code)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Multi-line JavaScript block
+================================================================================
+
+agent MultiLineTest
+  displayName: "Multi-line Code"
+  flow ComplexFlow
+    :start -> $js>>>
+      const score = context.score || 0;
+      if (score >= 90) return "excellent";
+      if (score >= 70) return "good";
+      return "needsWork";
+  messages Messages
+    text excellent "Excellent work!"
+    text good "Good job!"
+    text needsWork "Keep practicing"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (embedded_code
+            (multi_line_embedded_code)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Embedded code in defaults
+================================================================================
+
+agent DefaultsCodeTest
+  displayName: "Defaults with Code"
+  agentDefaults Defaults
+    postbackData: $> context.messageId.toLowerCase().replace(/\s+/g, '_')
+    expressions:
+      language: :javascript
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (defaults_section
+      (default_property
+        (embedded_code
+          (single_line_embedded_code)))
+      (default_property
+        (atom)))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Embedded code in message text
+================================================================================
+
+agent MessageCodeTest
+  displayName: "Message with Code"
+  messages Messages
+    agentMessage Dynamic
+      contentMessage
+        text: $> `Hello ${context.userName || 'Guest'}!`
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (embedded_value
+            (embedded_code
+              (single_line_embedded_code))))))))

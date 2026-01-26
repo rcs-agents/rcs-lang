@@ -8,9 +8,16 @@
   },
   "main": "./out/extension.js",
   "scripts": {
+    "build": "tsc -b",
     "compile": "tsc -b",
+    "dev": "tsc -b -w",
     "watch": "tsc -b -w",
-    "test": "npm run compile && mocha out/test/**/*.test.js"
+    "test": "NODE_ENV=test vitest run",
+    "test:watch": "NODE_ENV=test vitest",
+    "clean": "rm -rf out",
+    "lint": "biome lint src",
+    "format": "biome format src --write",
+    "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
     "inversify": "^7.5.4",
@@ -21,13 +28,11 @@
     "vscode-languageclient": "^8.0.0"
   },
   "devDependencies": {
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.75.0",
     "@vscode/test-electron": "^2.3.0",
-    "glob": "^8.1.0",
-    "mocha": "^10.2.0",
-    "typescript": "^5.0.0"
+    "@vitest/ui": "^3.2.4",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   }
 }

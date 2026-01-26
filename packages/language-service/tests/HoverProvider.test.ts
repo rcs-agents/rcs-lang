@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 import { RCLParser } from '@rcl/parser';
 import { ImportResolver } from '../src/import-resolver/ImportResolver';
 import { WorkspaceIndex } from '../src/workspace-index/WorkspaceIndex';
-import { HoverProvider, Hover, MarkupContent } from '../src/providers/HoverProvider';
+import { HoverProvider } from '../src/providers/HoverProvider';
+
 import { TextDocument, Position } from '../src/providers/types';
 
 // Mock TextDocument implementation
@@ -45,10 +46,11 @@ describe('HoverProvider', () => {
   let hoverProvider: HoverProvider;
 
   beforeEach(async () => {
+    
     // Create temporary directory for testing
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rcl-hover-test-'));
     
-    parser = new RCLParser();
+    parser = new RCLParser({ strict: false });
     importResolver = new ImportResolver({ projectRoot: tempDir });
     workspaceIndex = new WorkspaceIndex({
       workspaceRoot: tempDir,
@@ -63,6 +65,9 @@ describe('HoverProvider', () => {
   });
 
   afterEach(() => {
+    if (!tempDir) {
+      return;
+    }
     // Clean up temporary directory
     fs.rmSync(tempDir, { recursive: true, force: true });
   });

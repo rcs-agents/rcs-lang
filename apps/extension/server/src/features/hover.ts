@@ -8,7 +8,7 @@ export class HoverProvider {
   public async getHover(document: TextDocument, position: Position): Promise<Hover | null> {
     const line = document.getText({
       start: { line: position.line, character: 0 },
-      end: { line: position.line + 1, character: 0 }
+      end: { line: position.line + 1, character: 0 },
     });
 
     // Simple hover for RCL keywords
@@ -16,8 +16,8 @@ export class HoverProvider {
       return {
         contents: {
           kind: MarkupKind.Markdown,
-          value: '## Agent\n\nDefines an RCS agent with its configuration and behavior.'
-        }
+          value: '## Agent\n\nDefines an RCS agent with its configuration and behavior.',
+        },
       };
     }
 
@@ -25,8 +25,8 @@ export class HoverProvider {
       return {
         contents: {
           kind: MarkupKind.Markdown,
-          value: '## Flow\n\nDefines a conversation flow with states and transitions.'
-        }
+          value: '## Flow\n\nDefines a conversation flow with states and transitions.',
+        },
       };
     }
 

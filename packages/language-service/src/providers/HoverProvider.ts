@@ -3,6 +3,8 @@ import { ImportResolver } from '../import-resolver';
 import { WorkspaceIndex } from '../workspace-index';
 import { SymbolType } from '../import-resolver/types';
 import { TextDocument, Position } from './types';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * Represents hover information
@@ -205,7 +207,7 @@ export class HoverProvider {
     
     try {
       // Parse the external file to get full definition context
-      const externalContent = require('fs').readFileSync(symbolLoc.uri, 'utf-8');
+      const externalContent = fs.readFileSync(symbolLoc.uri, 'utf-8');
       const externalDocument = this.parser.parseDocument(externalContent, symbolLoc.uri);
       
       const definition = this.findSymbolDefinitionInAST(externalDocument.ast, symbol);
@@ -566,7 +568,6 @@ export class HoverProvider {
    * Get relative path between two files
    */
   private getRelativePath(fromUri: string, toUri: string): string {
-    const path = require('path');
     return path.relative(path.dirname(fromUri), toUri);
   }
 

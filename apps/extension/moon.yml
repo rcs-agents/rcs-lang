@@ -11,7 +11,7 @@ dependsOn:
 
 tasks:
   build:
-    command: pnpm compile
+    command: nr build
     inputs:
       - "**/*.ts"
       - "**/*.json"
@@ -32,8 +32,12 @@ tasks:
       - "client/out"
       - "server/out"
 
+  dev:
+    command: nr dev
+    local: true
+
   test:
-    command: pnpm test
+    command: nr test
     inputs:
       - "**/*.ts"
       - "**/*.json"
@@ -41,17 +45,27 @@ tasks:
       NODE_ENV: "test"
 
   clean:
-    command: "rm -rf client/out server/out client/tsconfig.tsbuildinfo server/tsconfig.tsbuildinfo"
+    command: nr clean
     local: true
 
   lint:
-    command: "pnpm lint"
+    command: nr lint
     inputs:
       - "**/*.ts"
-      - ".eslintrc.js"
+
+  format:
+    command: nr format
+    inputs:
+      - "**/*.ts"
+
+  typecheck:
+    command: nr typecheck
+    inputs:
+      - "**/*.ts"
+      - "tsconfig.json"
 
   package:
-    command: "vsce package --no-dependencies"
+    command: nr package
     inputs:
       - "client/out"
       - "server/out"

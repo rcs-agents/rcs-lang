@@ -35,9 +35,9 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
-const path = __importStar(require("path"));
-const fs = __importStar(require("fs"));
-const cp = __importStar(require("child_process"));
+const path = __importStar(require("node:path"));
+const fs = __importStar(require("node:fs"));
+const cp = __importStar(require("node:child_process"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
 const previewProvider_1 = require("./previewProvider");
@@ -82,32 +82,35 @@ function activate(context) {
             transport: node_1.TransportKind.ipc,
             // Debug options for the server
             options: {
-                execArgv: ['--nolazy', '--inspect=6009']
-            }
-        }
+                execArgv: ['--nolazy', '--inspect=6009'],
+            },
+        },
     };
     // Options to control the language client
     const clientOptions = {
         // Register the server for RCL documents
         documentSelector: [
             { scheme: 'file', language: 'rcl' },
-            { scheme: 'untitled', language: 'rcl' }
+            { scheme: 'untitled', language: 'rcl' },
         ],
         synchronize: {
             // Notify the server about file changes to RCL files contained in the workspace
-            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/*.rcl')
+            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/*.rcl'),
         },
         // Use the workspace configuration section 'rcl'
         initializationOptions: {
-            settings: vscode_1.workspace.getConfiguration('rcl')
-        }
+            settings: vscode_1.workspace.getConfiguration('rcl'),
+        },
     };
     // Create the language client and start the client
     client = new node_1.LanguageClient('rclLanguageServer', 'RCL Language Server', serverOptions, clientOptions);
     // Start the client. This will also launch the server
-    client.start().then(() => {
+    client
+        .start()
+        .then(() => {
         console.log('RCL Language Server started successfully');
-    }).catch((error) => {
+    })
+        .catch((error) => {
         console.error('Failed to start RCL Language Server:', error);
         vscode_1.window.showErrorMessage('Failed to start RCL Language Server: ' + error.message);
     });
@@ -179,7 +182,7 @@ async function showJSONOutput(uri) {
         await vscode_1.window.withProgress({
             location: { viewId: 'workbench.view.explorer' },
             title: 'Compiling RCL to JSON...',
-            cancellable: false
+            cancellable: false,
         }, async () => {
             const rclFilePath = targetUri.fsPath;
             const outputPath = rclFilePath.replace('.rcl', '.json');
@@ -219,7 +222,7 @@ async function exportCompiled(uri) {
     // Ask user for format preference
     const format = await vscode_1.window.showQuickPick([
         { label: 'JavaScript (.js)', value: 'js' },
-        { label: 'JSON (.json)', value: 'json' }
+        { label: 'JSON (.json)', value: 'json' },
     ], { placeHolder: 'Select export format' });
     if (!format) {
         return; // User cancelled
@@ -311,7 +314,7 @@ async function showAgentOutput(uri) {
         await vscode_1.window.withProgress({
             location: { viewId: 'workbench.view.explorer' },
             title: 'Compiling RCL agent...',
-            cancellable: false
+            cancellable: false,
         }, async () => {
             const rclFilePath = targetUri.fsPath;
             const outputPath = rclFilePath.replace('.rcl', '.js');
@@ -358,7 +361,7 @@ function findRclCli(workspacePath) {
 function runRclCli(cliPath, inputPath, outputPath, format = 'js') {
     return new Promise((resolve) => {
         const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
-        cp.exec(command, (error, stdout, stderr) => {
+        cp.exec(command, (error, _stdout, stderr) => {
             if (error) {
                 resolve({ success: false, error: error.message });
             }

@@ -21,12 +21,12 @@ class SymbolsProvider {
                     kind: node_1.SymbolKind.Class,
                     range: {
                         start: { line: i, character: 0 },
-                        end: { line: i, character: line.length }
+                        end: { line: i, character: line.length },
                     },
                     selectionRange: {
                         start: { line: i, character: 6 },
-                        end: { line: i, character: 6 + name.length }
-                    }
+                        end: { line: i, character: 6 + name.length },
+                    },
                 });
             }
             if (line.startsWith('flow ')) {
@@ -37,12 +37,12 @@ class SymbolsProvider {
                     kind: node_1.SymbolKind.Method,
                     range: {
                         start: { line: i, character: 0 },
-                        end: { line: i, character: line.length }
+                        end: { line: i, character: line.length },
                     },
                     selectionRange: {
                         start: { line: i, character: 5 },
-                        end: { line: i, character: 5 + name.length }
-                    }
+                        end: { line: i, character: 5 + name.length },
+                    },
                 });
             }
         }

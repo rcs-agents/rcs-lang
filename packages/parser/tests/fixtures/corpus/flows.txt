@@ -1,0 +1,307 @@
+================================================================================
+Simple flow rule
+================================================================================
+
+agent FlowTest
+  displayName: "Flow Test"
+  flow MainFlow
+    :start -> greeting
+    greeting -> end
+  messages Messages
+    text greeting "Hello!"
+    text end "Goodbye!"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Flow with text action
+================================================================================
+
+agent TextActionFlow
+  displayName: "Text Action"
+  flow QuickFlow
+    :start -> text "Inline message" -> done
+  messages Messages
+    text done "Complete"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_action_text
+            (enhanced_simple_value
+              (simple_value
+                (string)))))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Flow with when clause
+================================================================================
+
+agent ConditionalFlow
+  displayName: "Conditional"
+  flow CheckFlow
+    :start -> verify when $> context.verified
+    verify -> success
+  messages Messages
+    text verify "Verifying..."
+    text success "Verified!"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (when_clause
+          (embedded_code
+            (single_line_embedded_code))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Flow with with clause
+================================================================================
+
+agent ParameterFlow
+  displayName: "Parameters"
+  flow DataFlow
+    :start -> Process Data with
+      input: "test"
+      count: 5
+  messages Messages
+    text Process Data "Processing..."
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (with_clause
+          (attribute_key)
+          (value
+            (simple_value
+              (string)))
+          (attribute_key)
+          (value
+            (simple_value
+              (number))))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Flow with start reference
+================================================================================
+
+agent FlowReference
+  displayName: "Flow Ref"
+  flow MainFlow
+    :start -> check
+    check -> start SubFlow
+  flow SubFlow
+    :start -> process
+    process -> :end
+  messages Messages
+    text check "Checking..."
+    text process "Processing..."
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (identifier))))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Complex flow with multiple conditions
+================================================================================
+
+agent ComplexFlow
+  displayName: "Complex"
+  flow DecisionFlow
+    :start -> $> context.userType when $> context.isLoggedIn
+    $> context.userType -> handleUser when $> context.userType === "premium"
+    handleUser -> :end
+  messages Messages
+    text handleUser "Handling user..."
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (embedded_code
+            (single_line_embedded_code)))
+        (when_clause
+          (embedded_code
+            (single_line_embedded_code))))
+      (flow_rule
+        (flow_operand_or_expression
+          (embedded_code
+            (single_line_embedded_code)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (when_clause
+          (embedded_code
+            (single_line_embedded_code))))
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

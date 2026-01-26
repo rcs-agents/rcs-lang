@@ -1,0 +1,174 @@
+================================================================================
+Email type tag
+================================================================================
+
+agent TypeTagTest
+  displayName: "Type Tags"
+  agentConfig Config
+    emailEntry
+      address: <email user@example.com>
+      label: "Support Email"
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (email_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Phone type tag
+================================================================================
+
+agent PhoneTest
+  displayName: "Phone Test"
+  agentConfig Config
+    phoneNumberEntry
+      number: <phone +1234567890>
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (phone_number_property
+        (typed_value
+          (type_tag
+            (string)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Time type tag with modifier
+================================================================================
+
+agent TimeTest
+  displayName: "Time Test"
+  messages Messages
+    agentMessage Reminder
+      contentMessage
+        text: "Meeting at <time 4pm | UTC>"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+URL type tag
+================================================================================
+
+agent URLTest
+  displayName: "URL Test"
+  agentConfig Config
+    websiteEntry
+      url: <url https://example.com>
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (website_property
+        (typed_value
+          (type_tag
+            (string)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Duration type tag
+================================================================================
+
+agent DurationTest
+  displayName: "Duration Test"
+  agentDefaults Defaults
+    ttl: <duration P1D>
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (defaults_section
+      (default_property
+        (string)))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Zipcode type tag with modifier
+================================================================================
+
+agent ZipTest
+  displayName: "Zip Test"
+  messages Messages
+    agentMessage Location
+      contentMessage
+        text: "Zip: <zip 25585-460 | BR>"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (messages_section
+      (agent_message
+        (identifier)
+        (content_message
+          (embedded_value
+            (simple_value
+              (string))))))))

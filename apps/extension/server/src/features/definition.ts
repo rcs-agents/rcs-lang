@@ -5,7 +5,10 @@ import { RCLParser } from '@rcl/parser';
 export class DefinitionProvider {
   constructor(private parser: RCLParser) {}
 
-  public async getDefinition(document: TextDocument, position: Position): Promise<Definition | null> {
+  public async getDefinition(
+    document: TextDocument,
+    position: Position,
+  ): Promise<Definition | null> {
     // Basic implementation - can be enhanced later
     return null;
   }

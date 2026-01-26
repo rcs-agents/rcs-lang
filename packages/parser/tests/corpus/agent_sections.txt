@@ -1,0 +1,298 @@
+================================================================================
+Minimal agent
+================================================================================
+
+agent MinimalAgent
+  displayName: "Minimal"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent with all sections
+================================================================================
+
+agent CompleteAgent
+  displayName: "Complete Agent"
+  brandName: "Test Brand"
+  agentConfig Config
+    description: "A complete test agent"
+    logoUri: "https://example.com/logo.png"
+    color: "#FF0000"
+  agentDefaults Defaults
+    fallbackMessage: "Sorry, I didn't understand"
+    messageTrafficType: :transactional
+  flow MainFlow
+    :start -> welcome
+  flow ErrorFlow
+    :start -> error
+  messages Messages
+    text welcome "Welcome!"
+    text error "An error occurred"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (string)
+    (config_section
+      (config_property
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (config_property
+        (string))
+      (config_property
+        (string)))
+    (defaults_section
+      (default_property
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (default_property
+        (atom)))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (identifier)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string)))))
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent config with contact entries
+================================================================================
+
+agent ContactAgent
+  displayName: "Contact Test"
+  agentConfig Config
+    phoneNumberEntry
+      number: <phone "+1234567890">
+      label: "Support"
+    emailEntry
+      address: <email "support@example.com">
+      label: "Support Email"
+    websiteEntry
+      url: <url "https://example.com">
+      label: "Homepage"
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (phone_number_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (email_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (website_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string)))))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent config with privacy and billing
+================================================================================
+
+agent BusinessAgent
+  displayName: "Business"
+  agentConfig Config
+    privacy
+      url: <url "https://example.com/privacy">
+      label: "Privacy Policy"
+    termsConditions
+      url: <url "https://example.com/terms">
+      label: "Terms of Service"
+    billingConfig
+      billingCategory: :monthly_billing
+    agentUseCase: :customer_support
+    hostingRegion: :us_central1
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (config_section
+      (privacy_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (terms_conditions_property
+        (typed_value
+          (type_tag
+            (string)))
+        (enhanced_simple_value
+          (simple_value
+            (string))))
+      (billing_config_property
+        (atom))
+      (config_property
+        (atom))
+      (config_property
+        (atom)))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))
+
+================================================================================
+Agent defaults with all properties
+================================================================================
+
+agent DefaultsAgent
+  displayName: "Defaults Test"
+  agentDefaults Defaults
+    fallbackMessage: |
+      I'm sorry, I don't understand.
+      Please try again.
+    messageTrafficType: :promotional
+    ttl: "P1D"
+    postbackData: $> context.action.toLowerCase()
+    expressions:
+      language: :typescript
+  flow Main
+    :start -> :end
+  messages Messages
+    text Welcome "Hi"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (agent_definition
+    (identifier)
+    (string)
+    (defaults_section
+      (default_property
+        (enhanced_simple_value
+          (multi_line_string)))
+      (default_property
+        (atom))
+      (default_property
+        (string))
+      (default_property
+        (embedded_code
+          (single_line_embedded_code)))
+      (default_property
+        (atom)))
+    (flow_section
+      (identifier)
+      (flow_rule
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))
+        (flow_operand_or_expression
+          (flow_operand
+            (atom)))))
+    (messages_section
+      (message_shortcut
+        (text_shortcut
+          (identifier)
+          (embedded_value
+            (simple_value
+              (string))))))))

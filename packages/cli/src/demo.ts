@@ -14,7 +14,7 @@ function parseRCLDemo(content: string): DemoOutput {
   const result: DemoOutput = {
     messages: {},
     flows: {},
-    agent: { name: 'UnknownAgent' }
+    agent: { name: 'UnknownAgent' },
   };
 
   let currentSection = '';
@@ -45,7 +45,7 @@ function parseRCLDemo(content: string): DemoOutput {
       result.flows[flowName] = {
         id: flowName,
         initial: 'start',
-        states: {}
+        states: {},
       };
       continue;
     }
@@ -58,15 +58,17 @@ function parseRCLDemo(content: string): DemoOutput {
 
     // Parse flow transitions
     if (currentSection === 'flow' && trimmed.includes('->')) {
-      const [from, to] = trimmed.split('->').map(s => s.trim());
+      const [from, to] = trimmed.split('->').map((s) => s.trim());
       // Add to current flow
-      const currentFlow = Object.values(result.flows)[Object.values(result.flows).length - 1] as any;
+      const currentFlow = Object.values(result.flows)[
+        Object.values(result.flows).length - 1
+      ] as any;
       if (currentFlow) {
         if (!currentFlow.states[from]) {
           currentFlow.states[from] = { on: {} };
         }
         currentFlow.states[from].on.NEXT = to;
-        
+
         if (!currentFlow.states[to]) {
           currentFlow.states[to] = {};
         }
@@ -75,12 +77,12 @@ function parseRCLDemo(content: string): DemoOutput {
 
     // Parse messages
     if (currentSection === 'messages' && trimmed.includes(':')) {
-      const [id, text] = trimmed.split(':').map(s => s.trim());
+      const [id, text] = trimmed.split(':').map((s) => s.trim());
       result.messages[id] = {
         contentMessage: {
-          text: text.replace(/['"]/g, '')
+          text: text.replace(/['"]/g, ''),
         },
-        messageTrafficType: 'TRANSACTION'
+        messageTrafficType: 'TRANSACTION',
       };
     }
 
@@ -92,9 +94,9 @@ function parseRCLDemo(content: string): DemoOutput {
         const text = parts.slice(2).join(' ').replace(/['"]/g, '');
         result.messages[id] = {
           contentMessage: {
-            text: text
+            text: text,
           },
-          messageTrafficType: 'TRANSACTION'
+          messageTrafficType: 'TRANSACTION',
         };
       }
     }
@@ -126,7 +128,7 @@ export default { messages, flows, agent, getMessage, getFlow };
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.length === 0) {
     console.log('Usage: node demo.js <input.rcl> [output.js]');
     process.exit(1);
@@ -139,16 +141,15 @@ function main() {
     const content = fs.readFileSync(inputPath, 'utf-8');
     const parsed = parseRCLDemo(content);
     const jsOutput = generateJavaScript(parsed);
-    
+
     fs.writeFileSync(outputPath, jsOutput);
-    
+
     console.log('✓ Successfully compiled RCL file');
     console.log(`  Input:  ${inputPath}`);
     console.log(`  Output: ${outputPath}`);
     console.log(`  Agent:  ${parsed.agent.name}`);
     console.log(`  Messages: ${Object.keys(parsed.messages).length}`);
     console.log(`  Flows: ${Object.keys(parsed.flows).length}`);
-    
   } catch (error) {
     console.error('✗ Compilation failed:', error instanceof Error ? error.message : error);
     process.exit(1);

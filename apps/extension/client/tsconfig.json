@@ -3,8 +3,10 @@
   "compilerOptions": {
     "outDir": "out",
     "rootDir": "src",
-    "strict": false
+    "strict": false,
+    "types": ["node", "vscode"],
+    "composite": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out"]
+  "exclude": ["node_modules", "out", "src/test/**/*", "vitest.config.ts"]
 }

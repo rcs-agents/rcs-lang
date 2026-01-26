@@ -1,0 +1,19 @@
+# Build outputs
+dist/
+build/
+*.wasm
+
+# Node.js
+node_modules/
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Tree-sitter generated files (keep in git for distribution)
+# generated/ (commented out - these should be in git for publishing)
+
+# Temporary files
+.DS_Store
+.vscode/
+.idea/

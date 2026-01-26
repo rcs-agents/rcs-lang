@@ -1,4 +1,9 @@
-agent Test
-  displayName: "Test Agent"
+agent "Hello Agent"
+  displayName: "Hello"
+
+  flow MainFlow
+    :start -> greeting
+    greeting -> :end
+
   messages Messages
-    text "Hello"
+    text greeting "Hello! Welcome to RCL."

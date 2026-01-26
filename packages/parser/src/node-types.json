@@ -1,0 +1,2144 @@
+[
+  {
+    "type": "agent_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "config_section",
+          "named": true
+        },
+        {
+          "type": "defaults_section",
+          "named": true
+        },
+        {
+          "type": "flow_section",
+          "named": true
+        },
+        {
+          "type": "messages_section",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "agent_definition",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "agent_body",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "agent_message",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "content_message",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "billing_config_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "boolean_literal",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "brace_object",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "object_entry",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "card_content",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "card_suggestion",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "media",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "card_suggestion",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "suggested_action",
+          "named": true
+        },
+        {
+          "type": "suggested_reply",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "carousel_card",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "card_content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "carousel_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "rich_card_shortcut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "compose_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "compose_recording_message",
+          "named": true
+        },
+        {
+          "type": "compose_text_message",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "compose_recording_message",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "compose_text_message",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "config_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "billing_config_property",
+          "named": true
+        },
+        {
+          "type": "email_property",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "phone_number_property",
+          "named": true
+        },
+        {
+          "type": "privacy_property",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "terms_conditions_property",
+          "named": true
+        },
+        {
+          "type": "website_property",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "config_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "config_property",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "content_info",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "dictionary",
+          "named": true
+        },
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "content_message",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "content_info",
+          "named": true
+        },
+        {
+          "type": "embedded_value",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "rich_card",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "suggestion",
+          "named": true
+        },
+        {
+          "type": "uploaded_rbm_file",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "create_calendar_event_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "create_calendar_event_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "default_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "defaults_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "default_property",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "dial_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "dial_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "dictionary",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "brace_object",
+          "named": true
+        },
+        {
+          "type": "indented_object",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "email_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "embedded_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "simple_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enhanced_simple_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "multi_line_string",
+          "named": true
+        },
+        {
+          "type": "simple_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "file_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "suggestion_shortcut",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flow_action_text",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flow_operand",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flow_operand_or_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "flow_action_text",
+          "named": true
+        },
+        {
+          "type": "flow_operand",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flow_rule",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "flow_operand_or_expression",
+          "named": true
+        },
+        {
+          "type": "when_clause",
+          "named": true
+        },
+        {
+          "type": "with_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flow_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "flow_rule",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "import_path",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "import_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "import_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "import_path",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "indented_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "indented_list_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "indented_list_item",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "list_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "indented_object",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "object_entry",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inline_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "list_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inline_parameter_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "parameter",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "lat_long_object",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "indented_list",
+          "named": true
+        },
+        {
+          "type": "inline_list",
+          "named": true
+        },
+        {
+          "type": "parentheses_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "list_item",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "nested_list",
+          "named": true
+        },
+        {
+          "type": "simple_value",
+          "named": true
+        },
+        {
+          "type": "type_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "mapped_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "mapped_type_item",
+          "named": true
+        },
+        {
+          "type": "mapped_type_schema",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "mapped_type_field",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_key",
+          "named": true
+        },
+        {
+          "type": "type_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "mapped_type_item",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "mapped_type_schema",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "mapped_type_field",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "media",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "content_info",
+          "named": true
+        },
+        {
+          "type": "uploaded_rbm_file",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "message_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "carousel_shortcut",
+          "named": true
+        },
+        {
+          "type": "file_shortcut",
+          "named": true
+        },
+        {
+          "type": "rich_card_shortcut",
+          "named": true
+        },
+        {
+          "type": "text_shortcut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "messages_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "agent_message",
+          "named": true
+        },
+        {
+          "type": "message_shortcut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "multi_line_string",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "nested_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "null_literal",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "object_entry",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "open_url_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "open_url_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parameter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_key",
+          "named": true
+        },
+        {
+          "type": "simple_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parentheses_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "list_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "phone_number_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "privacy_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "ref",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "reply_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rich_card",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "carousel_card",
+          "named": true
+        },
+        {
+          "type": "standalone_card",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rich_card_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "suggestion_shortcut",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "share_location_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "simple_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "boolean_literal",
+          "named": true
+        },
+        {
+          "type": "null_literal",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "type_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "agent_definition",
+          "named": true
+        },
+        {
+          "type": "import_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "standalone_card",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "atom",
+          "named": true
+        },
+        {
+          "type": "card_content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "suggested_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "compose_action",
+          "named": true
+        },
+        {
+          "type": "create_calendar_event_action",
+          "named": true
+        },
+        {
+          "type": "dial_action",
+          "named": true
+        },
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        },
+        {
+          "type": "open_url_action",
+          "named": true
+        },
+        {
+          "type": "share_location_action",
+          "named": true
+        },
+        {
+          "type": "view_location_action",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "suggested_reply",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "suggestion",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "suggested_action",
+          "named": true
+        },
+        {
+          "type": "suggested_reply",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "suggestion_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "create_calendar_event_shortcut",
+          "named": true
+        },
+        {
+          "type": "dial_shortcut",
+          "named": true
+        },
+        {
+          "type": "open_url_shortcut",
+          "named": true
+        },
+        {
+          "type": "reply_shortcut",
+          "named": true
+        },
+        {
+          "type": "share_location_shortcut",
+          "named": true
+        },
+        {
+          "type": "view_location_shortcut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "terms_conditions_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "text_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "embedded_value",
+          "named": true
+        },
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "suggestion_shortcut",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_tag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "typed_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "type_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "uploaded_rbm_file",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "dictionary",
+          "named": true
+        },
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "dictionary",
+          "named": true
+        },
+        {
+          "type": "inline_parameter_list",
+          "named": true
+        },
+        {
+          "type": "list",
+          "named": true
+        },
+        {
+          "type": "mapped_type",
+          "named": true
+        },
+        {
+          "type": "ref",
+          "named": true
+        },
+        {
+          "type": "simple_value",
+          "named": true
+        },
+        {
+          "type": "type_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "view_location_action",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "lat_long_object",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "view_location_shortcut",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "website_property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "enhanced_simple_value",
+          "named": true
+        },
+        {
+          "type": "typed_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "when_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "with_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_key",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": "+|",
+    "named": false
+  },
+  {
+    "type": "+|+",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
+    "type": "-",
+    "named": false
+  },
+  {
+    "type": "->",
+    "named": false
+  },
+  {
+    "type": "/",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": ":browser",
+    "named": false
+  },
+  {
+    "type": ":full",
+    "named": false
+  },
+  {
+    "type": ":half",
+    "named": false
+  },
+  {
+    "type": ":tall",
+    "named": false
+  },
+  {
+    "type": ":webview",
+    "named": false
+  },
+  {
+    "type": "<",
+    "named": false
+  },
+  {
+    "type": ">",
+    "named": false
+  },
+  {
+    "type": "Active",
+    "named": false
+  },
+  {
+    "type": "Config",
+    "named": false
+  },
+  {
+    "type": "Defaults",
+    "named": false
+  },
+  {
+    "type": "Disabled",
+    "named": false
+  },
+  {
+    "type": "Enabled",
+    "named": false
+  },
+  {
+    "type": "False",
+    "named": false
+  },
+  {
+    "type": "Inactive",
+    "named": false
+  },
+  {
+    "type": "Messages",
+    "named": false
+  },
+  {
+    "type": "No",
+    "named": false
+  },
+  {
+    "type": "None",
+    "named": false
+  },
+  {
+    "type": "Null",
+    "named": false
+  },
+  {
+    "type": "Off",
+    "named": false
+  },
+  {
+    "type": "On",
+    "named": false
+  },
+  {
+    "type": "True",
+    "named": false
+  },
+  {
+    "type": "Void",
+    "named": false
+  },
+  {
+    "type": "Yes",
+    "named": false
+  },
+  {
+    "type": "action",
+    "named": false
+  },
+  {
+    "type": "address",
+    "named": false
+  },
+  {
+    "type": "agent",
+    "named": false
+  },
+  {
+    "type": "agentConfig",
+    "named": false
+  },
+  {
+    "type": "agentDefaults",
+    "named": false
+  },
+  {
+    "type": "agentMessage",
+    "named": false
+  },
+  {
+    "type": "agentUseCase",
+    "named": false
+  },
+  {
+    "type": "as",
+    "named": false
+  },
+  {
+    "type": "atom",
+    "named": true
+  },
+  {
+    "type": "attribute_key",
+    "named": true
+  },
+  {
+    "type": "billingCategory",
+    "named": false
+  },
+  {
+    "type": "billingConfig",
+    "named": false
+  },
+  {
+    "type": "brandName",
+    "named": false
+  },
+  {
+    "type": "cardContent",
+    "named": false
+  },
+  {
+    "type": "cardOrientation",
+    "named": false
+  },
+  {
+    "type": "cardWidth",
+    "named": false
+  },
+  {
+    "type": "carousel",
+    "named": false
+  },
+  {
+    "type": "carouselCard",
+    "named": false
+  },
+  {
+    "type": "color",
+    "named": false
+  },
+  {
+    "type": "comment",
+    "named": true,
+    "extra": true
+  },
+  {
+    "type": "composeAction",
+    "named": false
+  },
+  {
+    "type": "composeRecordingMessage",
+    "named": false
+  },
+  {
+    "type": "composeTextMessage",
+    "named": false
+  },
+  {
+    "type": "contentInfo",
+    "named": false
+  },
+  {
+    "type": "contentMessage",
+    "named": false
+  },
+  {
+    "type": "createCalendarEventAction",
+    "named": false
+  },
+  {
+    "type": "description",
+    "named": false
+  },
+  {
+    "type": "dial",
+    "named": false
+  },
+  {
+    "type": "dialAction",
+    "named": false
+  },
+  {
+    "type": "displayName",
+    "named": false
+  },
+  {
+    "type": "emailEntry",
+    "named": false
+  },
+  {
+    "type": "endTime",
+    "named": false
+  },
+  {
+    "type": "expireTime",
+    "named": false
+  },
+  {
+    "type": "expressions",
+    "named": false
+  },
+  {
+    "type": "fallbackMessage",
+    "named": false
+  },
+  {
+    "type": "file",
+    "named": false
+  },
+  {
+    "type": "fileName",
+    "named": false
+  },
+  {
+    "type": "flow",
+    "named": false
+  },
+  {
+    "type": "height",
+    "named": false
+  },
+  {
+    "type": "heroUri",
+    "named": false
+  },
+  {
+    "type": "hostingRegion",
+    "named": false
+  },
+  {
+    "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "import",
+    "named": false
+  },
+  {
+    "type": "import_identifier",
+    "named": true
+  },
+  {
+    "type": "label",
+    "named": false
+  },
+  {
+    "type": "language",
+    "named": false
+  },
+  {
+    "type": "latLong",
+    "named": false
+  },
+  {
+    "type": "list",
+    "named": false
+  },
+  {
+    "type": "logoUri",
+    "named": false
+  },
+  {
+    "type": "media",
+    "named": false
+  },
+  {
+    "type": "messageTrafficType",
+    "named": false
+  },
+  {
+    "type": "messages",
+    "named": false
+  },
+  {
+    "type": "number",
+    "named": false
+  },
+  {
+    "type": "number",
+    "named": true
+  },
+  {
+    "type": "of",
+    "named": false
+  },
+  {
+    "type": "openUrl",
+    "named": false
+  },
+  {
+    "type": "openUrlAction",
+    "named": false
+  },
+  {
+    "type": "phoneNumber",
+    "named": false
+  },
+  {
+    "type": "phoneNumberEntry",
+    "named": false
+  },
+  {
+    "type": "postbackData",
+    "named": false
+  },
+  {
+    "type": "privacy",
+    "named": false
+  },
+  {
+    "type": "promotional",
+    "named": false
+  },
+  {
+    "type": "query",
+    "named": false
+  },
+  {
+    "type": "rbmFile",
+    "named": false
+  },
+  {
+    "type": "reply",
+    "named": false
+  },
+  {
+    "type": "richCard",
+    "named": false
+  },
+  {
+    "type": "saveEvent",
+    "named": false
+  },
+  {
+    "type": "shareLocation",
+    "named": false
+  },
+  {
+    "type": "share_location_action",
+    "named": true
+  },
+  {
+    "type": "standaloneCard",
+    "named": false
+  },
+  {
+    "type": "start",
+    "named": false
+  },
+  {
+    "type": "startTime",
+    "named": false
+  },
+  {
+    "type": "string",
+    "named": true
+  },
+  {
+    "type": "suggestion",
+    "named": false
+  },
+  {
+    "type": "termsConditions",
+    "named": false
+  },
+  {
+    "type": "text",
+    "named": false
+  },
+  {
+    "type": "thumbnailImageAlignment",
+    "named": false
+  },
+  {
+    "type": "title",
+    "named": false
+  },
+  {
+    "type": "transactional",
+    "named": false
+  },
+  {
+    "type": "ttl",
+    "named": false
+  },
+  {
+    "type": "uploadedRbmFile",
+    "named": false
+  },
+  {
+    "type": "url",
+    "named": false
+  },
+  {
+    "type": "viewLocation",
+    "named": false
+  },
+  {
+    "type": "viewLocationAction",
+    "named": false
+  },
+  {
+    "type": "websiteEntry",
+    "named": false
+  },
+  {
+    "type": "when",
+    "named": false
+  },
+  {
+    "type": "with",
+    "named": false
+  },
+  {
+    "type": "{",
+    "named": false
+  },
+  {
+    "type": "|",
+    "named": false
+  },
+  {
+    "type": "|-",
+    "named": false
+  },
+  {
+    "type": "}",
+    "named": false
+  }
+]

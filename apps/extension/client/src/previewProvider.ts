@@ -33,7 +33,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
   private _state: PreviewState = {
     messages: {},
     flows: {},
-    agent: {}
+    agent: {},
   };
 
   constructor(private readonly _extensionContext: vscode.ExtensionContext) {
@@ -49,7 +49,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this._extensionUri]
+      localResourceRoots: [this._extensionUri],
     };
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
@@ -104,8 +104,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
 
     // Watch for cursor changes
     vscode.window.onDidChangeTextEditorSelection((event) => {
-      if (this._cursorFollowingEnabled && 
-          event.textEditor.document === this._currentDocument) {
+      if (this._cursorFollowingEnabled && event.textEditor.document === this._currentDocument) {
         this._handleCursorMove();
       }
     });
@@ -144,7 +143,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
         this._state = {
           ...result.data,
           lastCompiled: Date.now(),
-          compilationErrors: undefined
+          compilationErrors: undefined,
         };
       } else {
         this._state.compilationErrors = result.errors || ['Unknown compilation error'];
@@ -175,27 +174,27 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
       // Create temporary file for compilation
       const tempPath = path.join(require('os').tmpdir(), `rcl-preview-${Date.now()}.rcl`);
       const tempOutputPath = tempPath.replace('.rcl', '.json');
-      
+
       await fs.promises.writeFile(tempPath, document.getText(), 'utf-8');
-      
+
       const result = await this._runRclCli(cliPath, tempPath, tempOutputPath, 'json');
-      
+
       if (result.success) {
         const compiledContent = await fs.promises.readFile(tempOutputPath, 'utf-8');
         const compiledData = JSON.parse(compiledContent);
-        
+
         // Clean up temp files
         fs.promises.unlink(tempPath).catch(() => {});
         fs.promises.unlink(tempOutputPath).catch(() => {});
-        
+
         return { success: true, data: compiledData };
       } else {
         return { success: false, errors: [result.error || 'Compilation failed'] };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        errors: [error instanceof Error ? error.message : String(error)] 
+      return {
+        success: false,
+        errors: [error instanceof Error ? error.message : String(error)],
       };
     }
   }
@@ -221,10 +220,15 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     return null;
   }
 
-  private _runRclCli(cliPath: string, inputPath: string, outputPath: string, format: string = 'json'): Promise<{ success: boolean; error?: string }> {
+  private _runRclCli(
+    cliPath: string,
+    inputPath: string,
+    outputPath: string,
+    format: string = 'json',
+  ): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       const command = `node "${cliPath}" "${inputPath}" -o "${outputPath}" --format ${format}`;
-      
+
       cp.exec(command, (error, stdout, stderr) => {
         if (error) {
           resolve({ success: false, error: error.message });
@@ -241,7 +245,7 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     if (this._view) {
       const message: ExtensionMessage = {
         type: 'updateData',
-        data: this._state
+        data: this._state,
       };
       this._view.webview.postMessage(message);
     }
@@ -256,15 +260,15 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     const position = editor.selection.active;
     const currentLine = position.line;
     const lineText = this._currentDocument.lineAt(currentLine).text;
-    
+
     // Try to detect flow context from cursor position
     const flowId = this._detectFlowAtCursor(currentLine);
-    
+
     if (flowId && flowId !== this._state.selectedFlow) {
       this._state.selectedFlow = flowId;
       const message: ExtensionMessage = {
         type: 'cursorMove',
-        data: { flowId, line: currentLine, text: lineText }
+        data: { flowId, line: currentLine, text: lineText },
       };
       if (this._view) {
         this._view.webview.postMessage(message);
@@ -279,31 +283,31 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
 
     const text = this._currentDocument.getText();
     const lines = text.split('\n');
-    
+
     // Look backwards from cursor to find the most recent flow definition
     let currentFlowId: string | null = null;
-    
+
     for (let i = currentLine; i >= 0; i--) {
       const line = lines[i].trim();
-      
+
       // Check for flow definition
       const flowMatch = line.match(/^flow\s+([A-Za-z][A-Za-z0-9_]*)/);
       if (flowMatch) {
         currentFlowId = flowMatch[1];
         break;
       }
-      
+
       // If we hit another section (agent, messages), stop looking
       if (line.startsWith('agent ') || line === 'messages') {
         break;
       }
     }
-    
+
     // Verify this flow exists in our compiled flows
     if (currentFlowId && this._state.flows && this._state.flows[currentFlowId]) {
       return currentFlowId;
     }
-    
+
     return null;
   }
 
@@ -314,11 +318,13 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      const defaultPath = this._currentDocument.uri.fsPath.replace('.rcl', 
-        options.format === 'js' ? '.js' : '.json');
-      
+      const defaultPath = this._currentDocument.uri.fsPath.replace(
+        '.rcl',
+        options.format === 'js' ? '.js' : '.json',
+      );
+
       const outputPath = options.path || defaultPath;
-      
+
       const workspaceFolder = vscode.workspace.getWorkspaceFolder(this._currentDocument.uri);
       if (!workspaceFolder) {
         throw new Error('File must be within a workspace folder');
@@ -329,23 +335,38 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
         throw new Error('RCL CLI tool not found');
       }
 
-      const result = await this._runRclCli(cliPath, this._currentDocument.uri.fsPath, outputPath, options.format);
-      
+      const result = await this._runRclCli(
+        cliPath,
+        this._currentDocument.uri.fsPath,
+        outputPath,
+        options.format,
+      );
+
       if (result.success) {
-        vscode.window.showInformationMessage(`Exported compiled output to ${path.basename(outputPath)}`);
+        vscode.window.showInformationMessage(
+          `Exported compiled output to ${path.basename(outputPath)}`,
+        );
       } else {
         throw new Error(result.error || 'Export failed');
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+      vscode.window.showErrorMessage(
+        `Export failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview): string {
     // Get URIs for resources
-    const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.css'));
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.js'));
-    const mermaidUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'mermaid.min.js'));
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.css'),
+    );
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'preview.js'),
+    );
+    const mermaidUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'mermaid.min.js'),
+    );
 
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();

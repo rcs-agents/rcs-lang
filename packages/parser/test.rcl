@@ -1,0 +1,19 @@
+agent: greeting-bot
+  You are a friendly greeting bot.
+  
+  message: hello
+    Hello! How can I help you today?
+    
+  message: goodbye
+    Goodbye! Have a great day!
+    
+agent: math-tutor
+  You are a helpful math tutor.
+  
+  message: explain-addition
+    Let me explain addition to you.
+    Addition is combining two or more numbers.
+    
+  message: practice-problem
+    Let's try a practice problem:
+    What is 2 + 3?

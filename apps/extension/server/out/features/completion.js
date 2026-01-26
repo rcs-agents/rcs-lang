@@ -15,10 +15,10 @@ class CompletionProvider {
                 detail: 'Agent Definition',
                 documentation: {
                     kind: node_1.MarkupKind.Markdown,
-                    value: 'Define a new RCS agent'
+                    value: 'Define a new RCS agent',
                 },
                 insertText: 'agent ${1:AgentName}',
-                insertTextFormat: node_1.InsertTextFormat.Snippet
+                insertTextFormat: node_1.InsertTextFormat.Snippet,
             },
             {
                 label: 'flow',
@@ -26,15 +26,15 @@ class CompletionProvider {
                 detail: 'Flow Definition',
                 documentation: 'Define a conversation flow',
                 insertText: 'flow ${1:FlowName}',
-                insertTextFormat: node_1.InsertTextFormat.Snippet
+                insertTextFormat: node_1.InsertTextFormat.Snippet,
             },
             {
                 label: 'displayName',
                 kind: node_1.CompletionItemKind.Property,
                 detail: 'Agent Display Name',
                 insertText: 'displayName: "${1:Name}"',
-                insertTextFormat: node_1.InsertTextFormat.Snippet
-            }
+                insertTextFormat: node_1.InsertTextFormat.Snippet,
+            },
         ];
     }
     resolveCompletion(item) {

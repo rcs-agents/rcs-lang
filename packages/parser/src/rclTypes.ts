@@ -44,7 +44,7 @@ export enum SymbolKind {
   Defaults = 'defaults',
   Import = 'import',
   Parameter = 'parameter',
-  Expression = 'expression'
+  Expression = 'expression',
 }
 
 export interface RCLSettings {
@@ -69,7 +69,15 @@ export interface CompletionContext {
   position: Position;
   word: string;
   line: string;
-  context: 'root' | 'agent' | 'flow' | 'message' | 'configuration' | 'defaults' | 'parameter' | 'expression';
+  context:
+    | 'root'
+    | 'agent'
+    | 'flow'
+    | 'message'
+    | 'configuration'
+    | 'defaults'
+    | 'parameter'
+    | 'expression';
   parentNode?: RCLASTNode;
 }
 
@@ -79,7 +87,6 @@ export interface ValidationRule {
   severity: 'error' | 'warning' | 'info';
   check: (node: RCLASTNode, document: RCLDocument) => Diagnostic[];
 }
-
 
 export interface HoverInfo {
   range: Range;
@@ -124,7 +131,7 @@ export interface TextEdit {
 export interface Command {
   title: string;
   command: string;
-  arguments?: any[];
+  arguments?: unknown[];
 }
 
 export interface SemanticToken {
@@ -156,27 +163,53 @@ export interface RCLLanguageFeatures {
 }
 
 export const RCL_KEYWORDS = [
-  'agent', 'flow', 'messages', 'defaults', 'configuration', 'import',
-  'True', 'False', 'Yes', 'No', 'On', 'Off', 'Enabled', 'Disabled',
-  'Active', 'Inactive', 'Null', 'None', 'Void'
+  'agent',
+  'flow',
+  'messages',
+  'defaults',
+  'configuration',
+  'import',
+  'True',
+  'False',
+  'Yes',
+  'No',
+  'On',
+  'Off',
+  'Enabled',
+  'Disabled',
+  'Active',
+  'Inactive',
+  'Null',
+  'None',
+  'Void',
 ];
 
-export const RCL_SECTION_TYPES = [
-  'agent', 'flow', 'messages', 'defaults', 'configuration'
-];
+export const RCL_SECTION_TYPES = ['agent', 'flow', 'messages', 'defaults', 'configuration'];
 
-export const RCL_MESSAGE_TYPES = [
-  'text', 'rich_card', 'carousel', 'suggestion'
-];
+export const RCL_MESSAGE_TYPES = ['text', 'rich_card', 'carousel', 'suggestion'];
 
 export const RCL_TYPE_TAGS = [
-  'phone', 'email', 'url', 'date', 'time', 'duration', 'zip', 'currency'
+  'phone',
+  'email',
+  'url',
+  'date',
+  'time',
+  'duration',
+  'zip',
+  'currency',
 ];
 
 export const RCL_BOOLEAN_VALUES = [
-  'True', 'False', 'Yes', 'No', 'On', 'Off', 'Enabled', 'Disabled', 'Active', 'Inactive'
+  'True',
+  'False',
+  'Yes',
+  'No',
+  'On',
+  'Off',
+  'Enabled',
+  'Disabled',
+  'Active',
+  'Inactive',
 ];
 
-export const RCL_NULL_VALUES = [
-  'Null', 'None', 'Void'
-];
+export const RCL_NULL_VALUES = ['Null', 'None', 'Void'];

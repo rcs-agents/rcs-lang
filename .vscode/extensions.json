@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "arahata.linter-actionlint",
+        "biomejs.biome",
+        "gplane.dprint2",
+        "moonrepo.moon-console",
+        "oven.bun-vscode",
+        "github.vscode-github-actions",
+        "anthropic.claude-code",
+        "dprint.dprint"
+    ]
+}

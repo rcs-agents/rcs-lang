@@ -1,0 +1,26 @@
+{
+  "messages": {
+    "Welcome": {
+      "contentMessage": {
+        "text": ""
+      },
+      "messageTrafficType": "TRANSACTION"
+    },
+    "Help": {
+      "contentMessage": {
+        "text": ""
+      },
+      "messageTrafficType": "TRANSACTION"
+    }
+  },
+  "flows": {},
+  "agent": {
+    "displayName": "TestAgent",
+    "flows": [],
+    "messages": [
+      "Welcome",
+      "Help"
+    ],
+    "name": "TestAgent"
+  }
+}

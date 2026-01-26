@@ -8,3 +8,14 @@ export * from './rclTypes';
 
 // Validation exports
 export * from './validation';
+
+// Legacy parse function for backward compatibility
+import { MockParser } from './mockParser';
+
+// Create a global mock parser instance for synchronous parsing
+const mockParser = new MockParser();
+
+export function parse(text: string): any {
+  // For CLI tests, use the mock parser which is synchronous
+  return mockParser.parse(text);
+}

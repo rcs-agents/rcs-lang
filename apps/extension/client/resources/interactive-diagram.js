@@ -15,7 +15,12 @@
         agent: {},
         selectedNodes: [],
         selectedEdges: [],
-        editMode: 'select' // 'select', 'add-node', 'connect'
+        editMode: 'select', // 'select', 'add-node', 'connect'
+        connectionStart: null,
+        undoStack: [],
+        redoStack: [],
+        clipboard: null,
+        showSettings: false
     };
 
     // DOM elements
@@ -62,13 +67,11 @@
         });
 
         elements.undoBtn.addEventListener('click', () => {
-            // TODO: Implement undo
-            console.log('Undo functionality to be implemented');
+            performUndo();
         });
 
         elements.redoBtn.addEventListener('click', () => {
-            // TODO: Implement redo
-            console.log('Redo functionality to be implemented');
+            performRedo();
         });
 
         elements.flowSelect.addEventListener('change', (e) => {
@@ -89,8 +92,7 @@
         });
 
         elements.settingsBtn.addEventListener('click', () => {
-            // TODO: Implement settings
-            console.log('Settings functionality to be implemented');
+            toggleSettings();
         });
 
         // Keyboard shortcuts
@@ -106,10 +108,17 @@
                     saveChanges();
                 } else if (e.key === 'z') {
                     e.preventDefault();
-                    // TODO: Implement undo
+                    if (e.shiftKey) {
+                        performRedo();
+                    } else {
+                        performUndo();
+                    }
                 } else if (e.key === 'y') {
                     e.preventDefault();
-                    // TODO: Implement redo
+                    performRedo();
+                } else if (e.key === 'a') {
+                    e.preventDefault();
+                    selectAll();
                 }
             }
         });
@@ -334,11 +343,16 @@
         // Add event listeners
         g.addEventListener('click', (e) => {
             e.stopPropagation();
-            selectNode(node.id);
+            
+            if (currentState.editMode === 'connect') {
+                handleConnectionClick(node.id);
+            } else {
+                selectNode(node.id);
+            }
         });
         
         g.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { // Left mouse button
+            if (e.button === 0 && currentState.editMode === 'select') { // Left mouse button
                 startNodeDrag(node.id, e);
             }
         });
@@ -355,6 +369,193 @@
         });
         
         svg.appendChild(g);
+        
+        // Add hover effects
+        g.addEventListener('mouseenter', () => {
+            g.classList.add('hover');
+            shape.style.filter = 'url(#dropshadow) brightness(1.1)';
+        });
+        
+        g.addEventListener('mouseleave', () => {
+            g.classList.remove('hover');
+            shape.style.filter = 'url(#dropshadow)';
+        });
+    }
+    
+    // RCL Node Renderers
+    function getRCLNodeRenderer(type) {
+        const renderers = {
+            start: {
+                render: (node) => {
+                    const width = 120;
+                    const height = 50;
+                    const shape = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    shape.setAttribute('cx', width / 2);
+                    shape.setAttribute('cy', height / 2);
+                    shape.setAttribute('rx', width / 2);
+                    shape.setAttribute('ry', height / 2);
+                    shape.setAttribute('fill', 'var(--vscode-statusBarItem-remoteBackground, #16825D)');
+                    shape.setAttribute('stroke', 'var(--vscode-statusBarItem-remoteForeground, #ffffff)');
+                    shape.setAttribute('stroke-width', '2');
+                    return { shape, width, height };
+                }
+            },
+            message: {
+                render: (node) => {
+                    const width = 140;
+                    const height = 60;
+                    const shape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    shape.setAttribute('width', width);
+                    shape.setAttribute('height', height);
+                    shape.setAttribute('rx', 8);
+                    shape.setAttribute('ry', 8);
+                    shape.setAttribute('fill', 'var(--vscode-button-background, #0e639c)');
+                    shape.setAttribute('stroke', 'var(--vscode-button-foreground, #ffffff)');
+                    shape.setAttribute('stroke-width', '2');
+                    return { shape, width, height };
+                }
+            },
+            rich_card: {
+                render: (node) => {
+                    const width = 160;
+                    const height = 80;
+                    const shape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    shape.setAttribute('width', width);
+                    shape.setAttribute('height', height);
+                    shape.setAttribute('rx', 12);
+                    shape.setAttribute('ry', 12);
+                    shape.setAttribute('fill', 'var(--vscode-statusBarItem-warningBackground, #ff9800)');
+                    shape.setAttribute('stroke', 'var(--vscode-statusBarItem-warningForeground, #ffffff)');
+                    shape.setAttribute('stroke-width', '2');
+                    return { shape, width, height };
+                }
+            },
+            end: {
+                render: (node) => {
+                    const width = 120;
+                    const height = 50;
+                    const shape = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    shape.setAttribute('cx', width / 2);
+                    shape.setAttribute('cy', height / 2);
+                    shape.setAttribute('rx', width / 2);
+                    shape.setAttribute('ry', height / 2);
+                    shape.setAttribute('fill', 'var(--vscode-statusBarItem-errorBackground, #f44336)');
+                    shape.setAttribute('stroke', 'var(--vscode-statusBarItem-errorForeground, #ffffff)');
+                    shape.setAttribute('stroke-width', '2');
+                    return { shape, width, height };
+                }
+            }
+        };
+        
+        return renderers[type] || renderers.message;
+    }
+    
+    function createNodeLabel(node, width, height) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'node-label-group');
+        
+        // Main label
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', width / 2);
+        text.setAttribute('y', height / 2);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'central');
+        text.setAttribute('fill', 'var(--vscode-editor-background, #ffffff)');
+        text.setAttribute('font-family', 'var(--vscode-font-family)');
+        text.setAttribute('font-size', '13');
+        text.setAttribute('font-weight', '500');
+        text.style.pointerEvents = 'all';
+        text.style.cursor = 'text';
+        text.setAttribute('data-node-id', node.id);
+        
+        // Extract and clean text
+        let displayText = extractNodeDisplayText(node);
+        text.textContent = displayText;
+        
+        // Add type label for non-message nodes
+        if (node.type !== 'message' && node.type !== 'rich_card') {
+            const typeLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            typeLabel.setAttribute('x', width / 2);
+            typeLabel.setAttribute('y', height - 5);
+            typeLabel.setAttribute('text-anchor', 'middle');
+            typeLabel.setAttribute('font-size', '10');
+            typeLabel.setAttribute('fill', 'var(--vscode-descriptionForeground, #cccccc)');
+            typeLabel.setAttribute('font-family', 'var(--vscode-font-family)');
+            typeLabel.textContent = node.type.toUpperCase();
+            g.appendChild(typeLabel);
+        }
+        
+        g.appendChild(text);
+        return g;
+    }
+    
+    function extractNodeDisplayText(node) {
+        let text = '';
+        
+        if (node.data?.messageData?.contentMessage?.text) {
+            text = node.data.messageData.contentMessage.text;
+        } else if (node.data?.messageData?.text) {
+            text = node.data.messageData.text;
+        } else if (node.data?.label) {
+            text = node.data.label;
+        } else {
+            text = node.id;
+        }
+        
+        // Clean quotes
+        if (text.startsWith('"') && text.endsWith('"')) {
+            text = text.slice(1, -1);
+        }
+        
+        // Truncate if too long
+        if (text.length > 20) {
+            text = text.substring(0, 17) + '...';
+        }
+        
+        return text;
+    }
+    
+    function createSuggestionIndicator(nodeWidth, nodeHeight) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'suggestion-indicator');
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', nodeWidth - 10);
+        circle.setAttribute('cy', nodeHeight - 10);
+        circle.setAttribute('r', 6);
+        circle.setAttribute('fill', 'var(--vscode-badge-background, #007acc)');
+        circle.setAttribute('stroke', 'var(--vscode-badge-foreground, #ffffff)');
+        circle.setAttribute('stroke-width', '1');
+        
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', nodeWidth - 10);
+        text.setAttribute('y', nodeHeight - 7);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-size', '8');
+        text.setAttribute('fill', 'var(--vscode-badge-foreground, #ffffff)');
+        text.textContent = 'S';
+        
+        g.appendChild(circle);
+        g.appendChild(text);
+        return g;
+    }
+    
+    function createRichCardIndicator(nodeWidth, nodeHeight) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'richcard-indicator');
+        
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', 5);
+        rect.setAttribute('y', 5);
+        rect.setAttribute('width', 16);
+        rect.setAttribute('height', 12);
+        rect.setAttribute('rx', 2);
+        rect.setAttribute('fill', 'var(--vscode-minimap-findMatchHighlight, #ffd700)');
+        rect.setAttribute('stroke', 'var(--vscode-editor-foreground, #ffffff)');
+        rect.setAttribute('stroke-width', '1');
+        
+        g.appendChild(rect);
+        return g;
     }
 
     function renderEdge(svg, edge, nodes) {
@@ -433,6 +634,42 @@
             selectEdge(edge.id);
         });
         
+        // Add edge label if trigger exists
+        if (edge.data?.trigger && edge.data.trigger !== '') {
+            const midX = (sourceX + targetX) / 2;
+            const midY = (sourceY + targetY) / 2;
+            
+            const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            labelGroup.setAttribute('class', 'edge-label');
+            
+            const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            const triggerText = edge.data.trigger === 'NEXT' ? '' : edge.data.trigger;
+            const textWidth = triggerText.length * 6 + 8;
+            
+            labelBg.setAttribute('x', midX - textWidth/2);
+            labelBg.setAttribute('y', midY - 8);
+            labelBg.setAttribute('width', textWidth);
+            labelBg.setAttribute('height', 16);
+            labelBg.setAttribute('rx', 3);
+            labelBg.setAttribute('fill', 'var(--vscode-badge-background)');
+            labelBg.setAttribute('stroke', 'var(--vscode-badge-foreground)');
+            labelBg.setAttribute('stroke-width', '1');
+            
+            const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            labelText.setAttribute('x', midX);
+            labelText.setAttribute('y', midY + 3);
+            labelText.setAttribute('text-anchor', 'middle');
+            labelText.setAttribute('font-size', '10');
+            labelText.setAttribute('fill', 'var(--vscode-badge-foreground)');
+            labelText.textContent = triggerText;
+            
+            if (triggerText) {
+                labelGroup.appendChild(labelBg);
+                labelGroup.appendChild(labelText);
+                svg.appendChild(labelGroup);
+            }
+        }
+        
         svg.appendChild(line);
     }
 
@@ -448,7 +685,13 @@
             position: { x: x - 60, y: y - 20 }, // Center the node on the cursor
             data: {
                 label: nodeId,
-                messageData: nodeType === 'message' ? { text: 'New message' } : null
+                messageData: nodeType === 'message' || nodeType === 'rich_card' ? { text: 'New message' } : null,
+                rclMetadata: {
+                    hasConditions: false,
+                    hasSuggestions: false,
+                    messageType: nodeType === 'message' ? 'text' : nodeType,
+                    trafficType: 'TRANSACTION'
+                }
             }
         };
         
@@ -459,6 +702,27 @@
         
         currentState.flows[currentState.activeFlow].nodes.push(newNode);
         
+        // If it's a message node, create default message
+        if (nodeType === 'message' || nodeType === 'rich_card') {
+            if (!currentState.messages[nodeId]) {
+                currentState.messages[nodeId] = {
+                    contentMessage: {
+                        text: nodeType === 'message' ? 'New message' : undefined,
+                        richCard: nodeType === 'rich_card' ? {
+                            standaloneCard: {
+                                cardOrientation: 'VERTICAL',
+                                cardContent: {
+                                    title: 'New Rich Card',
+                                    description: 'Card description'
+                                }
+                            }
+                        } : undefined
+                    },
+                    messageTrafficType: 'TRANSACTION'
+                };
+            }
+        }
+        
         // Notify extension
         vscode.postMessage({
             type: 'nodeCreated',
@@ -466,6 +730,9 @@
         });
         
         renderDiagram();
+        
+        // Auto-select the new node
+        selectNode(nodeId);
     }
 
     function selectNode(nodeId) {
@@ -740,12 +1007,269 @@
 
     window.deleteNode = deleteNode;
 
+    // Connection handling functions
+    function handleConnectionClick(nodeId) {
+        if (!currentState.connectionStart) {
+            // Start connection
+            currentState.connectionStart = nodeId;
+            highlightNode(nodeId, 'connection-start');
+        } else if (currentState.connectionStart === nodeId) {
+            // Cancel connection
+            clearConnectionHighlights();
+            currentState.connectionStart = null;
+        } else {
+            // Complete connection
+            createConnection(currentState.connectionStart, nodeId);
+            clearConnectionHighlights();
+            currentState.connectionStart = null;
+        }
+    }
+
+    function createConnection(sourceId, targetId) {
+        if (!currentState.activeFlow || !currentState.flows[currentState.activeFlow]) {
+            return;
+        }
+        
+        const flow = currentState.flows[currentState.activeFlow];
+        const edgeId = `${sourceId}-${targetId}-${Date.now()}`;
+        
+        // Check if connection already exists
+        const existingEdge = flow.edges.find(edge => 
+            edge.source === sourceId && edge.target === targetId
+        );
+        
+        if (existingEdge) {
+            console.log('Connection already exists');
+            return;
+        }
+        
+        const newEdge = {
+            id: edgeId,
+            source: sourceId,
+            target: targetId,
+            data: {
+                trigger: 'NEXT'
+            }
+        };
+        
+        flow.edges.push(newEdge);
+        
+        // Notify extension
+        vscode.postMessage({
+            type: 'edgeCreated',
+            data: { flowId: currentState.activeFlow, edge: newEdge }
+        });
+        
+        renderDiagram();
+    }
+
+    function highlightNode(nodeId, className) {
+        const nodeElement = document.querySelector(`[data-node-id="${nodeId}"]`);
+        if (nodeElement) {
+            nodeElement.classList.add(className);
+            const shape = nodeElement.querySelector('rect, ellipse');
+            if (shape) {
+                shape.setAttribute('stroke', '#00ff00');
+                shape.setAttribute('stroke-width', '3');
+            }
+        }
+    }
+
+    function clearConnectionHighlights() {
+        document.querySelectorAll('.connection-start').forEach(element => {
+            element.classList.remove('connection-start');
+            const shape = element.querySelector('rect, ellipse');
+            if (shape) {
+                shape.setAttribute('stroke', '#333');
+                shape.setAttribute('stroke-width', '2');
+            }
+        });
+    }
+
+    // RCL Validation functions
+    function validateRCLModel() {
+        const errors = [];
+        const warnings = [];
+        
+        if (!currentState.activeFlow || !currentState.flows[currentState.activeFlow]) {
+            errors.push('No active flow selected');
+            return { errors, warnings };
+        }
+        
+        const flow = currentState.flows[currentState.activeFlow];
+        
+        // Check for orphaned nodes (no incoming or outgoing edges)
+        flow.nodes.forEach(node => {
+            const hasIncoming = flow.edges.some(edge => edge.target === node.id);
+            const hasOutgoing = flow.edges.some(edge => edge.source === node.id);
+            
+            if (!hasIncoming && !hasOutgoing && node.type !== 'start' && node.type !== 'end') {
+                warnings.push(`Node '${node.id}' has no connections`);
+            }
+        });
+        
+        // Check for missing start/end nodes
+        const hasStart = flow.nodes.some(node => node.type === 'start');
+        const hasEnd = flow.nodes.some(node => node.type === 'end');
+        
+        if (!hasStart) {
+            errors.push('Flow must have a start node');
+        }
+        if (!hasEnd) {
+            warnings.push('Flow should have an end node');
+        }
+        
+        // Check for invalid message references
+        flow.nodes.forEach(node => {
+            if ((node.type === 'message' || node.type === 'rich_card') && node.id) {
+                if (!currentState.messages[node.id]) {
+                    warnings.push(`Node '${node.id}' references missing message`);
+                }
+            }
+        });
+        
+        return { errors, warnings };
+    }
+
+    function showValidationResults() {
+        const validation = validateRCLModel();
+        
+        if (validation.errors.length === 0 && validation.warnings.length === 0) {
+            showNotification('Model is valid', 'success');
+            return;
+        }
+        
+        let message = '';
+        if (validation.errors.length > 0) {
+            message += 'Errors:\n' + validation.errors.join('\n') + '\n';
+        }
+        if (validation.warnings.length > 0) {
+            message += 'Warnings:\n' + validation.warnings.join('\n');
+        }
+        
+        showNotification(message, validation.errors.length > 0 ? 'error' : 'warning');
+    }
+
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${message}</span>
+                <button class="notification-close">×</button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+        
+        // Add close button handler
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        });
+    }
+
+    // Enhanced property panel functions
+    window.validateModel = function() {
+        showValidationResults();
+    };
+
+    window.autoLayout = function() {
+        if (!currentState.activeFlow || !currentState.flows[currentState.activeFlow]) {
+            return;
+        }
+        
+        const flow = currentState.flows[currentState.activeFlow];
+        
+        // Simple hierarchical layout
+        const startNodes = flow.nodes.filter(node => node.type === 'start');
+        if (startNodes.length === 0) {
+            showNotification('No start node found for auto-layout', 'warning');
+            return;
+        }
+        
+        // Build dependency graph
+        const visited = new Set();
+        const levels = [];
+        
+        function traverse(nodeId, level) {
+            if (visited.has(nodeId)) return;
+            visited.add(nodeId);
+            
+            if (!levels[level]) levels[level] = [];
+            levels[level].push(nodeId);
+            
+            // Find outgoing edges
+            const outgoingEdges = flow.edges.filter(edge => edge.source === nodeId);
+            outgoingEdges.forEach(edge => {
+                traverse(edge.target, level + 1);
+            });
+        }
+        
+        // Start traversal from start nodes
+        startNodes.forEach(startNode => {
+            traverse(startNode.id, 0);
+        });
+        
+        // Position nodes
+        const xSpacing = 200;
+        const ySpacing = 100;
+        const startX = 100;
+        const startY = 100;
+        
+        levels.forEach((level, levelIndex) => {
+            level.forEach((nodeId, nodeIndex) => {
+                const node = flow.nodes.find(n => n.id === nodeId);
+                if (node) {
+                    node.position.x = startX + (levelIndex * xSpacing);
+                    node.position.y = startY + (nodeIndex * ySpacing) - ((level.length - 1) * ySpacing / 2);
+                }
+            });
+        });
+        
+        renderDiagram();
+        showNotification('Auto-layout applied', 'success');
+    };
+
+    window.exportDiagram = function() {
+        const diagramData = {
+            flows: currentState.flows,
+            messages: currentState.messages,
+            agent: currentState.agent,
+            timestamp: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(diagramData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `rcl-diagram-${Date.now()}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        showNotification('Diagram exported', 'success');
+    };
+
     // Expose global functions for debugging
     window.rclInteractiveDiagram = {
         getCurrentState: () => currentState,
         setActiveFlow: setActiveFlow,
         clearSelection: clearSelection,
-        saveChanges: saveChanges
+        saveChanges: saveChanges,
+        validateModel: validateRCLModel,
+        autoLayout: window.autoLayout,
+        exportDiagram: window.exportDiagram
     };
 })();
 // Inline text editing function - Added via patch

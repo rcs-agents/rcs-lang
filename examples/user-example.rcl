@@ -1,6 +1,0 @@
-agent Test Agent
-  displayName: "Test Agent"
-  flow Main Flow
-    :start -> end
-  messages Messages
-    end: "Done"

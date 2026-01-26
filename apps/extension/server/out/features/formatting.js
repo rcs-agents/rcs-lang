@@ -12,7 +12,9 @@ class FormattingProvider {
         const formattedLines = [];
         for (const line of lines) {
             const trimmed = line.trim();
-            if (trimmed.startsWith('agent') || trimmed.startsWith('flow') || trimmed.startsWith('messages')) {
+            if (trimmed.startsWith('agent') ||
+                trimmed.startsWith('flow') ||
+                trimmed.startsWith('messages')) {
                 formattedLines.push(trimmed);
             }
             else if (trimmed.length > 0 && !trimmed.startsWith('#')) {
@@ -26,13 +28,15 @@ class FormattingProvider {
         }
         const formattedText = formattedLines.join('\n');
         if (formattedText !== text) {
-            return [{
+            return [
+                {
                     range: {
                         start: { line: 0, character: 0 },
-                        end: { line: document.lineCount, character: 0 }
+                        end: { line: document.lineCount, character: 0 },
                     },
-                    newText: formattedText
-                }];
+                    newText: formattedText,
+                },
+            ];
         }
         return [];
     }
