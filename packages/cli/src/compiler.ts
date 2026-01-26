@@ -1,7 +1,9 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';
-import { RclProgram } from '@rcl/language-service';
+import { Result } from '@rcl/core-types';
+import { ICompilationResult, IFileSystem } from '@rcl/core-interfaces';
+import { RCLCompiler } from '@rcl/compiler';
+import { FileSystemFactory } from '@rcl/file-system';
 
 export interface CompileOptions {
   output?: string;
@@ -11,135 +13,148 @@ export interface CompileOptions {
   configPath?: string;
 }
 
+/**
+ * Compile RCL file using the new compiler infrastructure
+ */
 export async function compileRCL(inputPath: string, options: CompileOptions): Promise<void> {
-  // Resolve input path
-  const resolvedInput = path.resolve(inputPath);
+  const fileSystem = FileSystemFactory.getDefault();
+  const compiler = new RCLCompiler({ fileSystem });
   
-  if (!fs.existsSync(resolvedInput)) {
+  // Resolve input path
+  const resolvedInput = fileSystem.resolve(inputPath);
+  
+  // Check if file exists
+  const existsResult = await fileSystem.exists(resolvedInput);
+  if (!existsResult.success || !existsResult.value) {
     throw new Error(`Input file not found: ${inputPath}`);
   }
-
-  // Create RclProgram with optional config path
-  const program = new RclProgram(options.configPath || path.dirname(resolvedInput));
-  const config = program.getConfiguration();
-
-  console.log(chalk.blue('📋 Configuration:'));
-  console.log(chalk.gray(`  Root: ${config.rootDir || 'current directory'}`));
-  console.log(chalk.gray(`  Output: ${config.outDir || 'next to source files'}`));
-
+  
+  console.log(chalk.blue(`🔨 Compiling ${fileSystem.basename(inputPath)}...`));
+  
   // Compile the file
-  console.log(chalk.blue(`🔨 Compiling ${path.basename(inputPath)}...`));
+  const compileResult = await compiler.compileFile(resolvedInput);
   
-  const result = await program.compileFile(resolvedInput);
-  
-  if (!result.success) {
-    console.error(chalk.red('❌ Compilation failed:'));
-    for (const diagnostic of result.diagnostics) {
-      const prefix = diagnostic.severity === 'error' ? chalk.red('ERROR:') : chalk.yellow('WARNING:');
-      console.error(`  ${prefix} ${diagnostic.message}`);
-      if (diagnostic.file && diagnostic.line) {
-        console.error(chalk.gray(`    at ${diagnostic.file}:${diagnostic.line}:${diagnostic.column || 0}`));
-      }
-    }
+  if (!compileResult.success) {
+    handleCompilationError(compileResult);
     throw new Error('Compilation failed');
   }
-
-  // Check if we should override the output settings
-  if (options.output || options.format) {
-    // Manual output mode - emit to specific location
-    await emitManual(result.data!, resolvedInput, options);
-  } else {
-    // Use RclProgram's emit
-    const emitResult = await program.emit();
-    
-    if (!emitResult.success) {
-      console.error(chalk.red('❌ Emit failed:'));
-      for (const diagnostic of emitResult.diagnostics) {
-        console.error(`  ${diagnostic.message}`);
-      }
-      throw new Error('Emit failed');
-    }
-
-    console.log(chalk.green('✅ Successfully compiled:'));
-    for (const file of emitResult.emittedFiles) {
-      console.log(chalk.gray(`  → ${path.relative(process.cwd(), file)}`));
-    }
-    console.log(chalk.green('✓ Compilation successful'));
-  }
-}
-
-async function emitManual(
-  compiledData: any,
-  inputPath: string,
-  options: CompileOptions
-): Promise<void> {
-  const parsed = path.parse(inputPath);
   
-  if (options.format === 'both' || options.format === 'json' || !options.format) {
-    const jsonPath = options.output 
-      ? (options.output.endsWith('.json') ? options.output : `${options.output}.json`)
-      : path.join(parsed.dir, `${parsed.name}.json`);
-    
-    const jsonContent = JSON.stringify(compiledData, null, options.pretty ? 2 : 0);
-    await fs.promises.writeFile(jsonPath, jsonContent, 'utf-8');
-    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsonPath)}`));
-  }
-
-  if (options.format === 'both' || options.format === 'js') {
-    const jsPath = options.output 
-      ? (options.output.endsWith('.js') ? options.output : `${options.output}.js`)
-      : path.join(parsed.dir, `${parsed.name}.js`);
-    
-    const jsContent = generateJavaScript(compiledData, parsed.name);
-    await fs.promises.writeFile(jsPath, jsContent, 'utf-8');
-    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsPath)}`));
+  const { output, diagnostics, success } = compileResult.value;
+  
+  // Show warnings even if compilation succeeded
+  if (diagnostics.length > 0) {
+    displayDiagnostics(diagnostics);
   }
   
-  // Add the expected success message for tests
+  if (!success || !output) {
+    throw new Error('Compilation failed');
+  }
+  
+  // Emit the output
+  await emitOutput(output, resolvedInput, options, fileSystem);
+  
   console.log(chalk.green('✓ Compilation successful'));
 }
 
-function generateJavaScript(data: any, baseName: string): string {
-  return `// Generated by RCL CLI
-// This file contains the compiled output from your RCL agent definition
-
-import agentData from './${baseName}.json' assert { type: 'json' };
-
 /**
- * Messages dictionary - Maps message IDs to normalized AgentMessage objects
+ * Handle compilation errors
  */
-export const messages = agentData.messages;
-
-/**
- * Flow configurations - XState machine definitions for each flow
- */
-export const flows = agentData.flows;
-
-/**
- * Agent configuration
- */
-export const agent = agentData.agent;
-
-/**
- * Get a message by ID
- */
-export function getMessage(messageId) {
-  return messages[messageId] || null;
+function handleCompilationError(result: Result<ICompilationResult>): void {
+  console.error(chalk.red('❌ Compilation failed:'));
+  
+  if (!result.success) {
+    console.error(chalk.red(`  ERROR: ${(result as any).error.message}`));
+    return;
+  }
+  
+  const { diagnostics } = result.value;
+  displayDiagnostics(diagnostics);
 }
 
 /**
- * Get a flow configuration by ID
+ * Display diagnostics
  */
-export function getFlow(flowId) {
-  return flows[flowId] || null;
+function displayDiagnostics(diagnostics: any[]): void {
+  for (const diagnostic of diagnostics) {
+    const prefix = diagnostic.severity === 'error' 
+      ? chalk.red('ERROR:') 
+      : diagnostic.severity === 'warning'
+      ? chalk.yellow('WARNING:')
+      : chalk.blue('INFO:');
+      
+    console.error(`  ${prefix} ${diagnostic.message}`);
+    
+    if (diagnostic.file && diagnostic.range) {
+      const line = diagnostic.range.start.line + 1;
+      const column = diagnostic.range.start.column + 1;
+      console.error(chalk.gray(`    at ${diagnostic.file}:${line}:${column}`));
+    }
+  }
 }
 
+/**
+ * Emit compilation output
+ */
+async function emitOutput(
+  output: any,
+  inputPath: string,
+  options: CompileOptions,
+  fileSystem: IFileSystem
+): Promise<void> {
+  const parsed = path.parse(inputPath);
+  const format = options.format || 'json';
+  
+  // Emit JSON
+  if (format === 'both' || format === 'json') {
+    const jsonPath = options.output 
+      ? (options.output.endsWith('.json') ? options.output : `${options.output}.json`)
+      : fileSystem.join(parsed.dir, `${parsed.name}.json`);
+    
+    const jsonContent = JSON.stringify(output, null, options.pretty ? 2 : 0);
+    const writeResult = await fileSystem.writeFile(jsonPath, jsonContent);
+    
+    if (!writeResult.success) {
+      throw new Error(`Failed to write JSON output: ${(writeResult as any).error.message}`);
+    }
+    
+    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsonPath)}`));
+  }
+  
+  // Emit JavaScript
+  if (format === 'both' || format === 'js') {
+    const jsPath = options.output 
+      ? (options.output.endsWith('.js') ? options.output : `${options.output}.js`)
+      : fileSystem.join(parsed.dir, `${parsed.name}.js`);
+    
+    const jsContent = generateJavaScript(output, parsed.name);
+    const writeResult = await fileSystem.writeFile(jsPath, jsContent);
+    
+    if (!writeResult.success) {
+      throw new Error(`Failed to write JavaScript output: ${(writeResult as any).error.message}`);
+    }
+    
+    console.log(chalk.green(`✅ Generated: ${path.relative(process.cwd(), jsPath)}`));
+  }
+}
+
+/**
+ * Generate JavaScript output
+ */
+function generateJavaScript(data: any, name: string): string {
+  const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
+  
+  return `// Generated from ${name}.rcl
+export const agent = ${JSON.stringify(data.agent, null, 2)};
+
+export const messages = ${JSON.stringify(data.messages, null, 2)};
+
+export const flows = ${JSON.stringify(data.flows, null, 2)};
+
+// Convenience export
 export default {
-  messages,
-  flows,
   agent,
-  getMessage,
-  getFlow
+  messages,
+  flows
 };
 `;
 }
