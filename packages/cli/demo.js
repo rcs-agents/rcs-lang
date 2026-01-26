@@ -104,6 +104,64 @@ function parseRCLDemo(content) {
       }
     }
 
+    // Parse richCard messages
+    if (trimmed.startsWith('richCard ')) {
+      const match = trimmed.match(/richCard\s+(\w+)\s+"([^"]+)"/);
+      if (match) {
+        const [, id, title] = match;
+        result.messages[id] = {
+          contentMessage: {
+            richCard: {
+              standaloneCard: {
+                cardContent: {
+                  title: title,
+                  description: ''
+                }
+              }
+            }
+          },
+          messageTrafficType: 'TRANSACTION'
+        };
+      }
+    }
+
+    // Parse carousel messages
+    if (trimmed.startsWith('carousel ')) {
+      const match = trimmed.match(/carousel\s+(\w+)\s+"([^"]+)"/);
+      if (match) {
+        const [, id, title] = match;
+        result.messages[id] = {
+          contentMessage: {
+            richCard: {
+              carouselCard: {
+                cardWidth: 'MEDIUM',
+                cardContents: []
+              }
+            }
+          },
+          messageTrafficType: 'TRANSACTION'
+        };
+      }
+    }
+
+    // Parse file messages
+    if (trimmed.startsWith('file ')) {
+      const match = trimmed.match(/file\s+(\w+)\s+<url\s+([^>]+)>\s+"([^"]+)"/);
+      if (match) {
+        const [, id, url, caption] = match;
+        result.messages[id] = {
+          contentMessage: {
+            uploadedRbmFile: {
+              fileName: caption,
+              fileUri: url,
+              thumbnailUri: url
+            }
+          },
+          messageTrafficType: 'TRANSACTION'
+        };
+      }
+    }
+
     // Parse transactional messages
     if (trimmed.startsWith('transactional ')) {
       const parts = trimmed.split(' ');
