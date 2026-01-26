@@ -7,7 +7,7 @@ title: "isSpreadDirective"
 
 > **isSpreadDirective**(`node`): `node is SpreadDirective`
 
-Defined in: [guards.ts:72](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/guards.ts#L72)
+Defined in: [guards.ts:72](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/guards.ts#L72)
 
 ## Parameters
 

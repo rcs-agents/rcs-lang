@@ -4,8 +4,36 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "paths": {
+      "@rcs-lang/parser": [
+        "../parser/src/index.ts"
+      ],
+      "@rcs-lang/parser/*": [
+        "../parser/src/*"
+      ],
+      "@rcs-lang/core": [
+        "../core/src/index.ts"
+      ],
+      "@rcs-lang/core/*": [
+        "../core/src/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../parser"
+    }
+  ]
 }

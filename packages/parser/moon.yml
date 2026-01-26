@@ -9,9 +9,7 @@ type: library
 language: typescript
 platform: bun
 
-dependsOn:
-  - '@rcs-lang/ast'
-  - '@rcs-lang/core'
+dependsOn: []
 
 tags:
   - test
@@ -21,15 +19,15 @@ tasks:
   prebuild:
     command: rm
     args: [-rf, src/generated]
-    
+
   build-grammar:
     command: bash
-    args: 
+    args:
       - -c
       - "bunx antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4"
     deps:
       - prebuild
-      
+
   fix-imports:
     command: bash
     args:
@@ -50,8 +48,6 @@ tasks:
   build:
     command: tsc
     deps:
-      - '@rcs-lang/ast:build'
-      - '@rcs-lang/core:build'
       - fix-imports
     inputs:
       - 'src/**/*.g4'
@@ -60,7 +56,7 @@ tasks:
       - 'package.json'
     outputs:
       - 'dist'
-      
+
   postbuild:
     command: bash
     args:

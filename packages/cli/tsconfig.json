@@ -8,9 +8,61 @@
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "module": "esnext",
-    "target": "ES2020"
+    "target": "ES2020",
+    "paths": {
+      "@rcs-lang/parser": [
+        "../parser/src/index.ts"
+      ],
+      "@rcs-lang/parser/*": [
+        "../parser/src/*"
+      ],
+      "@rcs-lang/compiler": [
+        "../compiler/src/index.ts"
+      ],
+      "@rcs-lang/compiler/*": [
+        "../compiler/src/*"
+      ],
+      "@rcs-lang/core": [
+        "../core/src/index.ts"
+      ],
+      "@rcs-lang/core/*": [
+        "../core/src/*"
+      ],
+      "@rcs-lang/file-system": [
+        "../file-system/src/index.ts"
+      ],
+      "@rcs-lang/file-system/*": [
+        "../file-system/src/*"
+      ],
+      "@rcs-lang/types": [
+        "../types/src/index.ts"
+      ],
+      "@rcs-lang/types/*": [
+        "../types/src/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts", "src/legacy/**/*"],
-  "references": [{ "path": "../../packages/parser" }, { "path": "../../packages/language-service" }]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.test.ts",
+    "src/legacy/**/*"
+  ],
+  "references": [
+    {
+      "path": "../language-service"
+    },
+    {
+      "path": "../parser"
+    },
+    {
+      "path": "../compiler"
+    },
+    {
+      "path": "../core"
+    }
+  ]
 }

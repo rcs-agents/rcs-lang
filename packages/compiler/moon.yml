@@ -5,12 +5,7 @@ project:
 type: library
 language: typescript
 
-dependsOn:
-  - '@rcs-lang/core'
-  - '@rcs-lang/parser'
-  - '@rcs-lang/ast'
-  - '@rcs-lang/validation'
-  - '@rcs-lang/file-system'
+dependsOn: []
 
 tags:
   - typescript
@@ -19,18 +14,10 @@ tags:
 
 tasks:
   build:
-    deps:
-      - '@rcs-lang/core:build'
-      - 'parser:postbuild'
-      - '@rcs-lang/validation:build'
-      - '@rcs-lang/file-system:build'
+    deps: []
 
   typecheck:
-    deps:
-      - '@rcs-lang/core:build'
-      - 'parser:postbuild'
-      - '@rcs-lang/validation:build'
-      - '@rcs-lang/file-system:build'
+    deps: []
 
   test:
     deps:

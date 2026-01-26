@@ -7,13 +7,62 @@
     "declarationMap": true,
     "sourceMap": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    "module": "esnext"
+    "module": "esnext",
+    "paths": {
+      "@rcs-lang/parser": [
+        "../parser/src/index.ts"
+      ],
+      "@rcs-lang/parser/*": [
+        "../parser/src/*"
+      ],
+      "@rcs-lang/compiler": [
+        "../compiler/src/index.ts"
+      ],
+      "@rcs-lang/compiler/*": [
+        "../compiler/src/*"
+      ],
+      "@rcs-lang/core": [
+        "../core/src/index.ts"
+      ],
+      "@rcs-lang/core/*": [
+        "../core/src/*"
+      ],
+      "@rcs-lang/types": [
+        "../types/src/index.ts"
+      ],
+      "@rcs-lang/types/*": [
+        "../types/src/*"
+      ],
+      "@rcs-lang/validation": [
+        "../validation/src/index.ts"
+      ],
+      "@rcs-lang/validation/*": [
+        "../validation/src/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
   "references": [
     {
+      "path": "../compiler"
+    },
+    {
+      "path": "../core"
+    },
+    {
       "path": "../parser"
+    },
+    {
+      "path": "../types"
+    },
+    {
+      "path": "../validation"
     }
   ]
 }

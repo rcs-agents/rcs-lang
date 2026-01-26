@@ -7,7 +7,7 @@ title: "getAllSections"
 
 > **getAllSections**(`file`): [`Section`](/api/ast/interfaces/section/)[]
 
-Defined in: [utils.ts:48](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/utils.ts#L48)
+Defined in: [utils.ts:48](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/utils.ts#L48)
 
 Get all sections from an RCL file
 

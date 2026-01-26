@@ -7,11 +7,7 @@ project:
 type: library
 language: typescript
 
-dependsOn:
-  - '@rcs-lang/parser'
-  - '@rcs-lang/core'
-  - '@rcs-lang/validation'
-  - '@rcs-lang/compiler'
+dependsOn: []
 
 tags:
   - typescript
@@ -24,14 +20,10 @@ tasks:
   build:
     deps:
       - 'parser:postbuild'
-      - '@rcs-lang/core:build'
-      - '@rcs-lang/validation:build'
-      - '@rcs-lang/compiler:build'
+
 
   typecheck:
     deps:
       - 'parser:postbuild'
-      - '@rcs-lang/core:build'
-      - '@rcs-lang/validation:build'
-      - '@rcs-lang/compiler:build'
+
 

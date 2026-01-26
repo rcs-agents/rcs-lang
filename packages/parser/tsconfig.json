@@ -6,10 +6,41 @@
     "types": [],
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "paths": {
-      "@parser/*": ["./src/*"],
-      "@parser/generated/*": ["./src/generated/*"]
+      "@parser/*": [
+        "./src/*"
+      ],
+      "@parser/generated/*": [
+        "./src/generated/*"
+      ],
+      "@rcs-lang/ast": [
+        "../ast/src/index.ts"
+      ],
+      "@rcs-lang/ast/*": [
+        "../ast/src/*"
+      ],
+      "@rcs-lang/core": [
+        "../core/src/index.ts"
+      ],
+      "@rcs-lang/core/*": [
+        "../core/src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "tests/**/*"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.ts",
+    "tests/**/*"
+  ],
+  "references": [
+    {
+      "path": "../ast"
+    },
+    {
+      "path": "../core"
+    }
+  ]
 }
