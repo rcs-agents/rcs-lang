@@ -46,11 +46,11 @@
     "act:push": "act push",
     "act:pr": "act pull_request",
     "act:list": "act -l",
-    "publish:cli": "cd apps/cli && bun run publish",
-    "publish:cli:dry": "cd apps/cli && bun run publish:dry",
-    "publish:extension": "cd apps/extension && bun run publish:marketplace",
-    "publish:extension:package": "cd apps/extension && bun run vsce:package",
-    "publish:extension:dry": "cd apps/extension && bun run vsce:publish:dry"
+    "publish:cli": "cd apps/cli && npm run publish",
+    "publish:cli:dry": "cd apps/cli && npm run publish:dry",
+    "publish:extension": "cd apps/extension && npm run publish:marketplace",
+    "publish:extension:package": "cd apps/extension && npm run vsce:package",
+    "publish:extension:dry": "cd apps/extension && npm run vsce:publish:dry"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
