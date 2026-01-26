@@ -110,7 +110,11 @@ export interface ContentInfo {
 }
 
 export class MessageNormalizer {
-  extractAndNormalize(ast: RCLNode): Record<string, AgentMessage> {
+  extractAndNormalize(ast: RCLNode | null | undefined): Record<string, AgentMessage> {
+    if (!ast) {
+      return {};
+    }
+
     const messages: Record<string, AgentMessage> = {};
     
     this.traverseAST(ast, (node) => {
@@ -121,13 +125,30 @@ export class MessageNormalizer {
         const trafficType = this.extractTrafficType(node);
         const suggestions = this.extractSuggestions(node);
         
-        if (messageId && messageText) {
+        if (messageId) {
           messages[messageId] = {
             contentMessage: {
-              text: messageText,
+              text: messageText || '',
               suggestions: suggestions.length > 0 ? suggestions : undefined
             },
             messageTrafficType: trafficType
+          };
+        }
+      }
+      
+      // Handle transactional shortcuts
+      if (node.type === 'transactional_shortcut') {
+        const messageId = this.extractMessageId(node);
+        const messageText = this.extractMessageText(node);
+        const suggestions = this.extractSuggestions(node);
+        
+        if (messageId) {
+          messages[messageId] = {
+            contentMessage: {
+              text: messageText || '',
+              suggestions: suggestions.length > 0 ? suggestions : undefined
+            },
+            messageTrafficType: 'TRANSACTION'
           };
         }
       }
@@ -146,7 +167,11 @@ export class MessageNormalizer {
     return messages;
   }
 
-  private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
+  private traverseAST(node: RCLNode | null | undefined, callback: (node: RCLNode) => void): void {
+    if (!node) {
+      return;
+    }
+    
     callback(node);
     if (node.children) {
       node.children.forEach(child => this.traverseAST(child, callback));
@@ -157,8 +182,8 @@ export class MessageNormalizer {
     // For text shortcuts, the ID is usually the second identifier
     if (node.children && node.children.length >= 2) {
       const idNode = node.children[1];
-      if (idNode.type === 'identifier') {
-        return idNode.text || undefined;
+      if (idNode && idNode.type === 'identifier') {
+        return idNode.text || null;
       }
     }
     return null;
@@ -270,12 +295,11 @@ export class MessageNormalizer {
   }
 
   private extractAgentMessageId(node: RCLNode): string | null {
-    // Extract ID from agentMessage node
-    if (node.children) {
-      for (const child of node.children) {
-        if (child.type === 'identifier') {
-          return child.text || undefined;
-        }
+    // Extract ID from agentMessage node - skip first identifier (agentMessage keyword)
+    if (node.children && node.children.length >= 2) {
+      const idNode = node.children[1];
+      if (idNode && idNode.type === 'identifier') {
+        return idNode.text || null;
       }
     }
     return null;
