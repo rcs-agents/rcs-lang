@@ -95,9 +95,10 @@ export class RenameProvider {
 
     // Simple regex-based approach for now
     const wordPattern = /\b\w+\b/g;
-    let match;
+    let match: RegExpExecArray | null;
 
-    while ((match = wordPattern.exec(text)) !== null) {
+    match = wordPattern.exec(text);
+    while (match !== null) {
       const start = match.index;
       const end = start + match[0].length;
 
@@ -122,6 +123,7 @@ export class RenameProvider {
           range,
         };
       }
+      match = wordPattern.exec(text);
     }
 
     return null;
@@ -150,15 +152,17 @@ export class RenameProvider {
 
     // Simple regex-based approach
     const pattern = new RegExp(`\\b${symbolName}\\b`, 'g');
-    let match;
+    let match: RegExpExecArray | null;
 
-    while ((match = pattern.exec(text)) !== null) {
+    match = pattern.exec(text);
+    while (match !== null) {
       const start = document.positionAt(match.index);
       const end = document.positionAt(match.index + match[0].length);
 
       references.push({
         range: { start, end },
       });
+      match = pattern.exec(text);
     }
 
     return references;
