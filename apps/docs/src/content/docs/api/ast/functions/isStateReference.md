@@ -7,7 +7,7 @@ title: "isStateReference"
 
 > **isStateReference**(`node`): `node is StateReference`
 
-Defined in: [guards.ts:206](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/guards.ts#L206)
+Defined in: [guards.ts:206](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/guards.ts#L206)
 
 ## Parameters
 

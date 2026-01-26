@@ -5,7 +5,7 @@ prev: false
 title: "MultiLineString"
 ---
 
-Defined in: [ast.ts:163](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L163)
+Defined in: [ast.ts:163](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L163)
 
 A multi-line string with chomping controls or in triple-quoted mode.
 
@@ -23,7 +23,7 @@ MultiLineString ::= (PIPE_STYLE) | (TRIPLE_QUOTE_STYLE)
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec
 
 > **mode**: `"clean"` \| `"trim"` \| `"preserve"` \| `"preserve_all"` \| `"quoted"`
 
-Defined in: [ast.ts:165](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L165)
+Defined in: [ast.ts:165](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L165)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:165](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548
 
 > **type**: `"MultiLineString"`
 
-Defined in: [ast.ts:164](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L164)
+Defined in: [ast.ts:164](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L164)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:164](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548
 
 > **value**: `string`
 
-Defined in: [ast.ts:166](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L166)
+Defined in: [ast.ts:166](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L166)

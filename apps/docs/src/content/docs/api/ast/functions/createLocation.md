@@ -7,7 +7,7 @@ title: "createLocation"
 
 > **createLocation**(`range`, `source?`): [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [utils.ts:34](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/utils.ts#L34)
+Defined in: [utils.ts:34](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/utils.ts#L34)
 
 Create a source location object
 

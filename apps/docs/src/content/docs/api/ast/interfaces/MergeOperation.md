@@ -5,7 +5,7 @@ prev: false
 title: "MergeOperation"
 ---
 
-Defined in: [ast.ts:347](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L347)
+Defined in: [ast.ts:347](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L347)
 
 A merge operation.
 
@@ -23,7 +23,7 @@ MERGE (RESULT | Value) INTO Variable
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e34fcec
 
 > **source**: [`Value`](/api/ast/type-aliases/value/) \| `"result"`
 
-Defined in: [ast.ts:349](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L349)
+Defined in: [ast.ts:349](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L349)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:349](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548
 
 > **target**: [`Variable`](/api/ast/interfaces/variable/) \| [`PropertyAccess`](/api/ast/interfaces/propertyaccess/)
 
-Defined in: [ast.ts:350](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L350)
+Defined in: [ast.ts:350](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L350)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:350](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548
 
 > **type**: `"MergeOperation"`
 
-Defined in: [ast.ts:348](https://github.com/rcs-agents/rcs-lang/blob/e34fcec4548d8ec3299746a4224e94ecf4afd448/packages/ast/src/ast.ts#L348)
+Defined in: [ast.ts:348](https://github.com/rcs-agents/rcs-lang/blob/3050c02cb37fc4f276350de86af1e0873f1db089/packages/ast/src/ast.ts#L348)
