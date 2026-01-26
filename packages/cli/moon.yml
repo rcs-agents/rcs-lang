@@ -39,3 +39,10 @@ tasks:
       - "dist/**/*"
     deps:
       - build
+
+  test:
+    command: bun
+    args: [test]
+    deps:
+      - build
+      - '@rcs-lang/parser:postbuild'
