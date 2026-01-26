@@ -29,7 +29,7 @@ export class WebviewHelpers {
     try {
       const diagram = await $('#sprotty-diagram, .diagram-container, .interactive-diagram');
       return await diagram.isDisplayed();
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -51,12 +51,12 @@ export class WebviewHelpers {
           if ((await element.isExisting()) && (await element.isDisplayed())) {
             return true;
           }
-        } catch (e) {
+        } catch (_e) {
           // Try next selector
         }
       }
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -72,12 +72,12 @@ export class WebviewHelpers {
           if (elements.length > 0) {
             return true;
           }
-        } catch (e) {
+        } catch (_e) {
           // Try next selector
         }
       }
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -86,7 +86,7 @@ export class WebviewHelpers {
     try {
       const labels = await $$('.edge-label, .transition-label, text[font-size]');
       return labels.length > 0;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -107,12 +107,12 @@ export class WebviewHelpers {
             await element.click();
             return true;
           }
-        } catch (e) {
+        } catch (_e) {
           // Try next selector
         }
       }
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -157,12 +157,12 @@ export class WebviewHelpers {
 
             return true;
           }
-        } catch (e) {
+        } catch (_e) {
           // Try next selector
         }
       }
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -185,11 +185,11 @@ export class WebviewHelpers {
 
       for (const option of options) {
         const text = await option.getText();
-        if (text && text.trim()) flows.push(text.trim());
+        if (text?.trim()) flows.push(text.trim());
       }
 
       return flows;
-    } catch (error) {
+    } catch (_error) {
       return [];
     }
   }

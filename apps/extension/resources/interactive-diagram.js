@@ -902,10 +902,10 @@
       const radius = i % 2 === 0 ? outerRadius : innerRadius;
       const x = cx + radius * Math.cos(i * angle - Math.PI / 2);
       const y = cy + radius * Math.sin(i * angle - Math.PI / 2);
-      path += (i === 0 ? 'M' : 'L') + x + ',' + y;
+      path += `${(i === 0 ? 'M' : 'L') + x},${y}`;
     }
 
-    return path + 'Z';
+    return `${path}Z`;
   }
 
   function updateSelections() {

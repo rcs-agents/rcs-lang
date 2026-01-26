@@ -95,7 +95,7 @@ export class ImportResolver {
   async getExports(filePath: string): Promise<ExportedSymbol[]> {
     // Check cache first
     if (this.symbolCache.has(filePath)) {
-      return this.symbolCache.get(filePath)!;
+      return this.symbolCache.get(filePath) || [];
     }
 
     try {

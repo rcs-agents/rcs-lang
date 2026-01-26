@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 test.describe('Enhanced Interactive Diagram Tests', () => {
-  let testRclContent: string;
+  let _testRclContent: string;
 
   test.beforeAll(() => {
     // Create test RCL content
-    testRclContent = `agent TestDiagram
+    _testRclContent = `agent TestDiagram
   displayName: "Test Diagram Agent"
   
   flow MainFlow

@@ -3,7 +3,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { Location, Position, ReferenceContext } from 'vscode-languageserver/node';
 
 export class ReferencesProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   public async getReferences(
     _document: TextDocument,

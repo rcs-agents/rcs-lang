@@ -1,12 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { FullConfig } from '@playwright/test';
 
 /**
  * Global teardown for Playwright tests
  * Cleans up VS Code extension testing environment
  */
-async function globalTeardown(config: FullConfig) {
+async function globalTeardown(_config: FullConfig) {
   console.log('🧹 Cleaning up Playwright test environment...');
 
   // Close browser context and browser

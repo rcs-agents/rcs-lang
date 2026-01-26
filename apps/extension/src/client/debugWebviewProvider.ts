@@ -92,7 +92,7 @@ export class DebugWebviewProvider {
     }
   }
 
-  private _getMinimalHtml(webview: vscode.Webview, nonce: string): string {
+  private _getMinimalHtml(_webview: vscode.Webview, nonce: string): string {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,10 +196,14 @@ export class DebugWebviewProvider {
   private _getResourcesTestHtml(webview: vscode.Webview, nonce: string): string {
     // Get URIs for actual resources
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css'),
+      ),
     );
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.js')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.js'),
+      ),
     );
 
     return `<!DOCTYPE html>
@@ -262,18 +266,24 @@ export class DebugWebviewProvider {
 
   private _getSprottyTestHtml(webview: vscode.Webview, nonce: string): string {
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(
-        this._extensionUri.fsPath,
-        'client',
-        'resources',
-        'interactive-diagram-improved.js',
-      )),
+      vscode.Uri.file(
+        path.join(
+          this._extensionUri.fsPath,
+          'client',
+          'resources',
+          'interactive-diagram-improved.js',
+        ),
+      ),
     );
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'interactive-diagram.css'),
+      ),
     );
     const sprottyStyleUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._extensionUri.fsPath, 'client', 'resources', 'sprotty-diagram.css')),
+      vscode.Uri.file(
+        path.join(this._extensionUri.fsPath, 'client', 'resources', 'sprotty-diagram.css'),
+      ),
     );
 
     return `<!DOCTYPE html>
@@ -406,7 +416,7 @@ export class DebugWebviewProvider {
 </html>`;
   }
 
-  private _getFullTestHtml(webview: vscode.Webview, nonce: string): string {
+  private _getFullTestHtml(_webview: vscode.Webview, nonce: string): string {
     // This would test with actual coffee-shop data
     return `<!DOCTYPE html>
 <html lang="en">

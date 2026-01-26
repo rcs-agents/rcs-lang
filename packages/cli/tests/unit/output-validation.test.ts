@@ -1,5 +1,5 @@
-import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, test } from 'bun:test';
+import { RCLCompiler } from '@rcs-lang/compiler';
 
 describe.skip('CLI Output Content Validation', () => {
   const compiler = new RCLCompiler();
@@ -28,10 +28,10 @@ agent TestAgent
 
       expect(result.success).toBe(true);
       expect(result.output).toBeDefined();
-      expect(result.output!.json).toBeDefined();
+      expect(result.output?.json).toBeDefined();
 
       // Should be valid JSON
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       // Should have required top-level properties
       expect(parsed).toHaveProperty('agent');
@@ -75,7 +75,7 @@ agent ContentAgent
       const result = await compiler.compile(validRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       // Should not have empty objects
       expect(Object.keys(parsed.agent).length).toBeGreaterThan(0);
@@ -139,7 +139,7 @@ agent SchemaTestAgent
       const result = await compiler.compile(complexRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       // Validate agent structure
       expect(parsed.agent).toMatchObject({
@@ -147,7 +147,7 @@ agent SchemaTestAgent
         description: 'Testing schema compliance',
         logoUri: {
           type: 'url',
-          value: 'https://example.com/logo.png'
+          value: 'https://example.com/logo.png',
         },
         color: '#123456',
       });
@@ -198,9 +198,9 @@ agent JSTestAgent
       const result = await compiler.compile(validRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      expect(result.output!.js).toBeDefined();
+      expect(result.output?.js).toBeDefined();
 
-      const jsCode = result.output!.js;
+      const jsCode = result.output?.js;
 
       // Should be a proper ES module
       expect(jsCode).toMatch(/export const agent = /);
@@ -237,7 +237,7 @@ agent EscapeTestAgent
       const result = await compiler.compile(rclWithSpecialChars, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const jsCode = result.output!.js;
+      const jsCode = result.output?.js;
 
       // Should properly escape quotes and other special characters
       expect(jsCode).toMatch(/displayName.*Test.*Quotes.*and.*Apostrophes/);
@@ -270,8 +270,8 @@ agent FormatTestAgent
       expect(result2.success).toBe(true);
 
       // Should generate identical output for identical input
-      expect(result1.output!.json).toBe(result2.output!.json);
-      expect(result1.output!.js).toBe(result2.output!.js);
+      expect(result1.output?.json).toBe(result2.output?.json);
+      expect(result1.output?.js).toBe(result2.output?.js);
     });
   });
 
@@ -306,7 +306,7 @@ agent CompleteAgent
       const result = await compiler.compile(fullAgentRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       // Should include all agent config properties
       expect(parsed.agent.displayName).toBe('Complete Agent');
@@ -353,7 +353,7 @@ agent FlowTestAgent
       const result = await compiler.compile(complexFlowRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       const flow = parsed.flows.ComplexFlow;
       expect(flow.initial).toBe('State1');
@@ -398,7 +398,7 @@ agent MessageTestAgent
       const result = await compiler.compile(messageTypesRcl, 'test.rcl');
 
       expect(result.success).toBe(true);
-      const parsed = JSON.parse(result.output!.json);
+      const parsed = JSON.parse(result.output?.json);
 
       // Should include all message types
       expect(parsed.messages.SimpleText).toMatchObject({

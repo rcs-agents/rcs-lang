@@ -90,7 +90,7 @@ export class RenameProvider {
       if (!referencesByUri.has(uri)) {
         referencesByUri.set(uri, []);
       }
-      referencesByUri.get(uri)!.push(ref);
+      referencesByUri.get(uri)?.push(ref);
     }
 
     // Create text edits for each document
@@ -172,7 +172,7 @@ export class RenameProvider {
     while (current) {
       switch (current.type) {
         case 'identifier':
-        case 'IDENTIFIER':
+        case 'IDENTIFIER': {
           // Check parent context
           const parent = current.parent;
           if (!parent) break;
@@ -208,9 +208,10 @@ export class RenameProvider {
           }
 
           break;
+        }
 
         case 'string':
-        case 'STRING':
+        case 'STRING': {
           // Some identifiers might be strings in certain contexts
           const stringParent = current.parent;
           if (stringParent?.type === 'import_statement') {
@@ -218,6 +219,7 @@ export class RenameProvider {
             return null;
           }
           break;
+        }
       }
 
       current = current.parent;
@@ -273,10 +275,10 @@ export class RenameProvider {
               const range = this.getNodeRange(flowRef, document);
               if (range) {
                 const uri = document.uri.toString();
-                if (!workspaceEdit.changes![uri]) {
+                if (!workspaceEdit.changes?.[uri]) {
                   workspaceEdit.changes![uri] = [];
                 }
-                workspaceEdit.changes![uri].push({
+                workspaceEdit.changes?.[uri].push({
                   range,
                   newText: newName,
                 });
@@ -318,10 +320,10 @@ export class RenameProvider {
             const range = this.getNodeRange(child, document);
             if (range) {
               const uri = document.uri.toString();
-              if (!workspaceEdit.changes![uri]) {
+              if (!workspaceEdit.changes?.[uri]) {
                 workspaceEdit.changes![uri] = [];
               }
-              workspaceEdit.changes![uri].push({
+              workspaceEdit.changes?.[uri].push({
                 range,
                 newText: newName,
               });

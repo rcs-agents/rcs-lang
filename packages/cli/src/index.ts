@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import * as fs from 'node:fs';
+import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import { Command } from 'commander';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,7 +30,7 @@ program
       if (!str.includes('outputHelp') && !str.includes(version)) {
         write(str);
       }
-    }
+    },
   });
 
 program
@@ -91,7 +91,11 @@ program
         errorMessage.includes('does not exist')
       ) {
         process.exit(3); // File not found
-      } else if (errorCode === 'OUTPUT_ERROR' || errorMessage.includes('permission') || errorMessage.includes('write')) {
+      } else if (
+        errorCode === 'OUTPUT_ERROR' ||
+        errorMessage.includes('permission') ||
+        errorMessage.includes('write')
+      ) {
         process.exit(4); // Output error
       } else if (errorCode === 'SYNTAX_ERROR') {
         process.exit(1); // Syntax error
@@ -169,7 +173,11 @@ program
         errorMessage.includes('does not exist')
       ) {
         process.exit(3); // File not found
-      } else if (errorCode === 'OUTPUT_ERROR' || errorMessage.includes('permission') || errorMessage.includes('write')) {
+      } else if (
+        errorCode === 'OUTPUT_ERROR' ||
+        errorMessage.includes('permission') ||
+        errorMessage.includes('write')
+      ) {
         process.exit(4); // Output error
       } else if (errorCode === 'SYNTAX_ERROR') {
         process.exit(1); // Syntax error
@@ -244,7 +252,11 @@ program
         errorMessage.includes('does not exist')
       ) {
         process.exit(3); // File not found
-      } else if (errorCode === 'OUTPUT_ERROR' || errorMessage.includes('permission') || errorMessage.includes('write')) {
+      } else if (
+        errorCode === 'OUTPUT_ERROR' ||
+        errorMessage.includes('permission') ||
+        errorMessage.includes('write')
+      ) {
         process.exit(4); // Output error
       } else if (errorCode === 'SYNTAX_ERROR') {
         process.exit(1); // Syntax error
@@ -266,7 +278,12 @@ if (process.argv.length === 2) {
 // Check for invalid commands before parsing
 const validCommands = ['compile', 'parse', 'diagram', 'init'];
 const firstArg = process.argv[2];
-if (firstArg && !firstArg.startsWith('-') && !validCommands.includes(firstArg) && !fs.existsSync(firstArg)) {
+if (
+  firstArg &&
+  !firstArg.startsWith('-') &&
+  !validCommands.includes(firstArg) &&
+  !fs.existsSync(firstArg)
+) {
   console.error(chalk.red(`❌ Unknown command: ${firstArg}`));
   console.error(chalk.yellow('Available commands: compile, parse, diagram, init'));
   console.error(chalk.yellow('Use --help for more information.'));
@@ -285,10 +302,12 @@ program.exitOverride((err) => {
   if (err.code === 'commander.helpDisplayed' || err.code === 'commander.version') {
     process.exit(0);
   }
-  
-  if (err.code === 'commander.missingMandatoryOptionValue' || 
-      err.code === 'commander.missingArgument' ||
-      err.code === 'commander.unknownOption') {
+
+  if (
+    err.code === 'commander.missingMandatoryOptionValue' ||
+    err.code === 'commander.missingArgument' ||
+    err.code === 'commander.unknownOption'
+  ) {
     console.error(chalk.red('❌ Invalid usage'));
     console.error(chalk.yellow(err.message));
     process.exit(64); // Usage error
@@ -300,16 +319,18 @@ try {
   program.parse();
 } catch (error: any) {
   // Don't print error messages for help/version
-  if (error.code === 'commander.helpDisplayed' || 
-      error.code === 'commander.version' ||
-      error.message?.includes('(outputHelp)') ||
-      error.message === version) {
+  if (
+    error.code === 'commander.helpDisplayed' ||
+    error.code === 'commander.version' ||
+    error.message?.includes('(outputHelp)') ||
+    error.message === version
+  ) {
     // Exit silently with success
     process.exit(0);
   }
-  
+
   if (error.code?.startsWith('commander.')) {
-    // Don't print "Invalid usage" for help output  
+    // Don't print "Invalid usage" for help output
     if (!error.message?.includes('(outputHelp)')) {
       console.error(chalk.red('❌ Invalid usage:'), error.message);
     }

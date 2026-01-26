@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { expect } from 'chai';
 import * as vscode from 'vscode';
 
@@ -53,7 +53,7 @@ export class TestClient {
   async deleteFile(filePath: string): Promise<void> {
     try {
       await fs.promises.unlink(filePath);
-    } catch (error) {
+    } catch (_error) {
       // File may not exist, ignore error
     }
   }
@@ -126,7 +126,7 @@ export async function waitForLanguageServer(maxWait = 5000): Promise<void> {
           return;
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // Language server not ready yet
     }
     await sleep(100);

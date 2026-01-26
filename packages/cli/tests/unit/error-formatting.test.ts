@@ -1,8 +1,8 @@
-import { exec } from 'child_process';
-import * as path from 'path';
-import { promisify } from 'util';
-import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, test } from 'bun:test';
+import { exec } from 'node:child_process';
+import * as path from 'node:path';
+import { promisify } from 'node:util';
+import { RCLCompiler } from '@rcs-lang/compiler';
 
 const execAsync = promisify(exec);
 
@@ -26,7 +26,7 @@ agent TestAgent
       expect(result.success).toBe(false);
       expect(result.diagnostics.length).toBeGreaterThan(0);
 
-      const errors = result.diagnostics.filter(d => d.severity === 'error');
+      const errors = result.diagnostics.filter((d) => d.severity === 'error');
       expect(errors.length).toBeGreaterThan(0);
 
       errors.forEach((error) => {
@@ -70,13 +70,11 @@ agent TestAgent
       const result = await compiler.compileSource(rclWithError, 'test.rcl');
 
       expect(result.success).toBe(false);
-      const errors = result.diagnostics.filter(d => d.severity === 'error');
+      const errors = result.diagnostics.filter((d) => d.severity === 'error');
       expect(errors.length).toBeGreaterThan(0);
 
       // Should identify the problematic line if range is available
-      const errorLines = errors
-        .filter(e => e.range)
-        .map((e) => e.range!.start.line);
+      const errorLines = errors.filter((e) => e.range).map((e) => e.range?.start.line);
       if (errorLines.length > 0) {
         expect(errorLines.some((line) => line >= 6 && line <= 8)).toBe(true);
       }
@@ -93,7 +91,7 @@ agent TestAgent
         const result = await compiler.compileSource(testCase, 'test.rcl');
 
         expect(result.success).toBe(false);
-        const errors = result.diagnostics.filter(d => d.severity === 'error');
+        const errors = result.diagnostics.filter((d) => d.severity === 'error');
         expect(errors.length).toBeGreaterThan(0);
 
         errors.forEach((error) => {
@@ -136,7 +134,7 @@ agent TestAgent
         const result = await compiler.compileSource(testCase.content, 'test.rcl');
 
         expect(result.success).toBe(false);
-        const errors = result.diagnostics.filter(d => d.severity === 'error');
+        const errors = result.diagnostics.filter((d) => d.severity === 'error');
         expect(errors.length).toBeGreaterThan(0);
 
         const errorMessages = errors.map((e) => e.message.toLowerCase());
@@ -157,7 +155,7 @@ agent TestAgent
       const result = await compiler.compileSource(invalidRcl, 'test.rcl');
 
       expect(result.success).toBe(false);
-      const errors = result.diagnostics.filter(d => d.severity === 'error');
+      const errors = result.diagnostics.filter((d) => d.severity === 'error');
       expect(errors.length).toBeGreaterThan(0);
 
       errors.forEach((error) => {
@@ -189,7 +187,7 @@ agent TestAgent
         const result = await compiler.compileSource(testCase.content, 'test.rcl');
 
         expect(result.success).toBe(false);
-        const errors = result.diagnostics.filter(d => d.severity === 'error');
+        const errors = result.diagnostics.filter((d) => d.severity === 'error');
         expect(errors.length).toBeGreaterThan(0);
 
         const errorMessages = errors.map((e) => e.message.toLowerCase());
@@ -285,8 +283,12 @@ agent TestAgent
       expect(semanticResult.success).toBe(false);
 
       // Should have different error codes for different types
-      const syntaxCodes = syntaxResult.diagnostics.filter(d => d.severity === 'error').map((e) => e.code);
-      const semanticCodes = semanticResult.diagnostics.filter(d => d.severity === 'error').map((e) => e.code);
+      const syntaxCodes = syntaxResult.diagnostics
+        .filter((d) => d.severity === 'error')
+        .map((e) => e.code);
+      const semanticCodes = semanticResult.diagnostics
+        .filter((d) => d.severity === 'error')
+        .map((e) => e.code);
 
       // Note: Error codes are not yet implemented in all cases
       // For now, just verify we have errors
@@ -314,11 +316,11 @@ agent TestAgent
         const result = await compiler.compileSource(testCase.content, 'test.rcl');
 
         expect(result.success).toBe(false);
-        expect(result.diagnostics.filter(d => d.severity === 'error').length).toBeGreaterThan(0);
+        expect(result.diagnostics.filter((d) => d.severity === 'error').length).toBeGreaterThan(0);
 
         // Should have meaningful error codes that relate to the issue
         // Note: Error codes are not yet implemented in all cases
-        const errors = result.diagnostics.filter(d => d.severity === 'error');
+        const errors = result.diagnostics.filter((d) => d.severity === 'error');
         errors.forEach((error) => {
           expect(error.message).toBeDefined();
           expect(error.severity).toBe('error');
@@ -352,13 +354,13 @@ agent BadAgent
       const result = await compiler.compileSource(multipleErrorsRcl, 'test.rcl');
 
       expect(result.success).toBe(false);
-      expect(result.diagnostics.filter(d => d.severity === 'error').length).toBeGreaterThan(1);
+      expect(result.diagnostics.filter((d) => d.severity === 'error').length).toBeGreaterThan(1);
 
       // Should find errors in different sections
-      const errors = result.diagnostics.filter(d => d.severity === 'error');
+      const errors = result.diagnostics.filter((d) => d.severity === 'error');
       const errorLines = errors
-        .filter(e => e.range)
-        .map((e) => e.range!.start.line)
+        .filter((e) => e.range)
+        .map((e) => e.range?.start.line)
         .sort((a, b) => a - b);
       const uniqueLines = [...new Set(errorLines)];
 
@@ -384,10 +386,10 @@ agent TestAgent
       const result = await compiler.compileSource(errorAtStart, 'test.rcl');
 
       expect(result.success).toBe(false);
-      expect(result.diagnostics.filter(d => d.severity === 'error').length).toBeGreaterThan(0);
+      expect(result.diagnostics.filter((d) => d.severity === 'error').length).toBeGreaterThan(0);
 
       // Should report errors from different parts of the file
-      const errors = result.diagnostics.filter(d => d.severity === 'error');
+      const errors = result.diagnostics.filter((d) => d.severity === 'error');
       const errorMessages = errors.map((e) => e.message);
       expect(errorMessages.length).toBeGreaterThan(0);
     });

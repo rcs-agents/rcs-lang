@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -7,7 +7,7 @@ import { expect, test } from '@playwright/test';
  */
 
 const COFFEE_SHOP_FILE = path.join(__dirname, '../../examples/coffee-shop.rcl');
-const EXTENSION_PATH = path.join(__dirname, '../..');
+const _EXTENSION_PATH = path.join(__dirname, '../..');
 
 test.describe('Interactive Diagram Feature', () => {
   test.beforeEach(async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('Interactive Diagram Feature', () => {
   test.describe('Flow Visualization', () => {
     test('should display all flow states as diagram nodes', async ({ page }) => {
       // Test that all states from coffee-shop.rcl are rendered as nodes
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Trigger Interactive Diagram command
       await page.keyboard.press('F1');
@@ -56,7 +56,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should display state transitions as diagram edges', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -86,7 +86,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should properly layout nodes in hierarchical structure', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -105,13 +105,13 @@ test.describe('Interactive Diagram Feature', () => {
 
       // In a left-to-right layout, ChooseSize should be to the right of Welcome
       // Or in top-to-bottom layout, ChooseSize should be below Welcome
-      expect(chooseSizeBox!.x > welcomeBox!.x || chooseSizeBox!.y > welcomeBox!.y).toBeTruthy();
+      expect(chooseSizeBox?.x > welcomeBox?.x || chooseSizeBox?.y > welcomeBox?.y).toBeTruthy();
     });
   });
 
   test.describe('Node Interactions', () => {
     test('should highlight node on hover', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -130,7 +130,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should show node details on click', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -152,7 +152,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should sync cursor position when clicking nodes', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open both editor and diagram
       await page.keyboard.press('F1');
@@ -168,7 +168,7 @@ test.describe('Interactive Diagram Feature', () => {
 
       // Verify cursor moves to corresponding line in RCL file
       // This would require checking the editor cursor position
-      const editorCursor = page.locator('.monaco-editor .cursor');
+      const _editorCursor = page.locator('.monaco-editor .cursor');
 
       // Should be positioned at the "on ChooseSize" line
       // Exact implementation depends on VS Code editor testing setup
@@ -177,7 +177,7 @@ test.describe('Interactive Diagram Feature', () => {
 
   test.describe('Message Integration', () => {
     test('should display message content in node tooltips', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -198,7 +198,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should distinguish rich card messages visually', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -235,7 +235,7 @@ test.describe('Interactive Diagram Feature', () => {
       // This would require creating a temporary file with invalid content
       // For now, we'll test the error display behavior
 
-      await page.goto('data:text/plain,' + encodeURIComponent(invalidRclContent));
+      await page.goto(`data:text/plain,${encodeURIComponent(invalidRclContent)}`);
 
       // Try to open Interactive Diagram
       await page.keyboard.press('F1');
@@ -255,7 +255,7 @@ test.describe('Interactive Diagram Feature', () => {
             start: Welcome
       `;
 
-      await page.goto('data:text/plain,' + encodeURIComponent(emptyFlowContent));
+      await page.goto(`data:text/plain,${encodeURIComponent(emptyFlowContent)}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -270,7 +270,7 @@ test.describe('Interactive Diagram Feature', () => {
 
   test.describe('Performance', () => {
     test('should render large flows efficiently', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -294,7 +294,7 @@ test.describe('Interactive Diagram Feature', () => {
 
   test.describe('Accessibility', () => {
     test('should support keyboard navigation', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');
@@ -315,7 +315,7 @@ test.describe('Interactive Diagram Feature', () => {
     });
 
     test('should have proper ARIA attributes', async ({ page }) => {
-      await page.goto('file://' + COFFEE_SHOP_FILE);
+      await page.goto(`file://${COFFEE_SHOP_FILE}`);
 
       // Open Interactive Diagram
       await page.keyboard.press('F1');

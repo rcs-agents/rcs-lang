@@ -13,7 +13,7 @@ import {
 } from 'vscode-languageserver/node';
 
 export class RenameProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   /**
    * Prepare rename - validate that the symbol can be renamed
@@ -109,7 +109,7 @@ export class RenameProvider {
 
         // Determine type based on context (simplified)
         let type = 'identifier';
-        const lineText = document.getText(range);
+        const _lineText = document.getText(range);
         const prevText = text.substring(Math.max(0, start - 20), start);
 
         if (prevText.includes('agent')) type = 'agent';
@@ -141,7 +141,7 @@ export class RenameProvider {
   private findAllReferences(
     document: TextDocument,
     symbolName: string,
-    symbolType: string,
+    _symbolType: string,
   ): { range: Range }[] {
     // This is a simplified implementation
     // In a real implementation, you would traverse the AST to find all references

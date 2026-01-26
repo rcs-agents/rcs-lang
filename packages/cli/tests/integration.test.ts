@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, test } from 'bun:test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { beforeEach, describe, expect, test } from 'bun:test';
 import { FlowCompiler } from '../src/legacy/compilers/flowCompiler';
 import { AgentExtractor } from '../src/legacy/extractors/agentExtractor';
 import { MessageNormalizer } from '../src/legacy/normalizers/messageNormalizer';

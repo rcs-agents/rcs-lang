@@ -110,7 +110,7 @@ flow MainFlow {
       expect(createAction).to.exist;
 
       // Apply the action
-      if (createAction && createAction.edit) {
+      if (createAction?.edit) {
         const success = await vscode.workspace.applyEdit(createAction.edit);
         expect(success).to.be.true;
 

@@ -1,7 +1,7 @@
-import { exec } from 'child_process';
-import * as path from 'path';
-import { promisify } from 'util';
-import * as fs from 'fs/promises';
+import { exec } from 'node:child_process';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { promisify } from 'node:util';
 import { afterEach, beforeEach, describe, expect, it as test } from 'vitest';
 
 const execAsync = promisify(exec);
@@ -24,7 +24,7 @@ describe('CLI Integration Tests', () => {
       await Promise.all(
         generatedFiles.map((f) => fs.unlink(path.join(testDir, f)).catch(() => {})),
       );
-    } catch (error) {
+    } catch (_error) {
       // Directory might not exist, ignore
     }
   });
@@ -67,7 +67,7 @@ agent BrokenAgent
       try {
         await execAsync(`node ${cliPath} compile ${testFile}`);
         expect.fail('CLI should have failed');
-      } catch (error: any) {
+      } catch (_error: any) {
         // Verify no output files were created
         const jsonPath = testFile.replace('.rcl', '.json');
         const jsPath = testFile.replace('.rcl', '.js');
@@ -192,7 +192,7 @@ agent EmptyAgent
       await fs.writeFile(testFile, emptyRcl);
 
       try {
-        const result = await execAsync(`node ${cliPath} compile ${testFile}`);
+        const _result = await execAsync(`node ${cliPath} compile ${testFile}`);
 
         // If compilation succeeds, check that output has meaningful content
         const jsonPath = testFile.replace('.rcl', '.json');

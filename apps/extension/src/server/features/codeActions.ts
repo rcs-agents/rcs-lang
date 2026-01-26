@@ -14,7 +14,7 @@ import {
 } from 'vscode-languageserver/node';
 
 export class CodeActionProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   /**
    * Provide code actions for the given range and context
@@ -44,7 +44,7 @@ export class CodeActionProvider {
    */
   private async getActionsForDiagnostic(
     document: TextDocument,
-    range: Range,
+    _range: Range,
     diagnostic: Diagnostic,
   ): Promise<CodeAction[]> {
     const actions: CodeAction[] = [];
@@ -86,7 +86,7 @@ export class CodeActionProvider {
     const actions: CodeAction[] = [];
 
     // Check what's selected
-    const selectedText = document.getText(range);
+    const _selectedText = document.getText(range);
 
     // Convert text message to rich card
     if (this.isTextMessage(document, range)) {
@@ -142,14 +142,14 @@ export class CodeActionProvider {
     if (messagesSection) {
       // Add to existing messages section
       const insertPosition = messagesSection.end;
-      action.edit!.changes![document.uri].push({
+      action.edit?.changes?.[document.uri].push({
         range: { start: insertPosition, end: insertPosition },
         newText: `    text ${messageName} "New message text"\n`,
       });
     } else {
       // Create new messages section
       const endOfFile = document.positionAt(document.getText().length);
-      action.edit!.changes![document.uri].push({
+      action.edit?.changes?.[document.uri].push({
         range: { start: endOfFile, end: endOfFile },
         newText: `\n  messages Messages\n    text ${messageName} "New message text"\n`,
       });
@@ -175,7 +175,7 @@ export class CodeActionProvider {
     // Find a good insertion point (after other flows or after agent definition)
     const insertPosition = this.findFlowInsertPosition(document);
 
-    action.edit!.changes![document.uri].push({
+    action.edit?.changes?.[document.uri].push({
       range: { start: insertPosition, end: insertPosition },
       newText: `\n  flow ${flowName}\n    start -> end\n`,
     });
@@ -388,7 +388,7 @@ export class CodeActionProvider {
     return match ? match[1] : 'message';
   }
 
-  private expandToFullLine(document: TextDocument, range: Range): Range {
+  private expandToFullLine(_document: TextDocument, range: Range): Range {
     return {
       start: { line: range.start.line, character: 0 },
       end: { line: range.end.line + 1, character: 0 },

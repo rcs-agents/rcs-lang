@@ -1,6 +1,6 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { describe, expect, test } from 'bun:test';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 
@@ -107,18 +107,14 @@ This indicates a regression in type safety that should be fixed immediately.
         // Check for dependency-related type issues but exclude known @types conflicts
         if (output.includes('node_modules') && output.includes('types')) {
           // Known conflicts in @types packages that we can ignore
-          const knownConflicts = [
-            '@types/glob',
-            '@types/mocha',
-            'minimatch',
-          ];
-          
-          const hasOnlyKnownConflicts = knownConflicts.some(pkg => output.includes(pkg));
-          
+          const knownConflicts = ['@types/glob', '@types/mocha', 'minimatch'];
+
+          const hasOnlyKnownConflicts = knownConflicts.some((pkg) => output.includes(pkg));
+
           if (!hasOnlyKnownConflicts) {
             throw new Error(`Dependency type conflicts detected:\n${output}`);
           }
-          
+
           // If it's only known conflicts, pass the test
           return;
         }
@@ -254,16 +250,16 @@ This indicates a regression in type safety that should be fixed immediately.
       // Since the CLI is an ES module, we'll test that the build outputs are valid
       try {
         // First ensure the CLI is built
-        await execAsync('npm run build', { 
+        await execAsync('npm run build', {
           cwd: process.cwd(),
-          timeout: 30000 
+          timeout: 30000,
         });
-        
+
         // Test that the CLI can be executed
         const result = await execAsync('node dist/index.js --version', {
           cwd: process.cwd(),
         });
-        
+
         // Should not throw and should have output
         expect(result.stdout).toBeTruthy();
       } catch (error: any) {

@@ -3,7 +3,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { type Definition, Location, type Position } from 'vscode-languageserver/node';
 
 export class DefinitionProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   public async getDefinition(
     _document: TextDocument,

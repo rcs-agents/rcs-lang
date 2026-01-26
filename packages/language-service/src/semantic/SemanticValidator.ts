@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { ensureOldAST } from '../ast-adapter';
@@ -47,7 +47,7 @@ export class SemanticValidator {
         if (file === 'rcl-document.schema.json' && schema.properties?.sections?.items?.oneOf) {
           schema.properties.sections.items.oneOf = schema.properties.sections.items.oneOf.map(
             (ref: any) => {
-              if (ref.$ref && ref.$ref.startsWith('./')) {
+              if (ref.$ref?.startsWith('./')) {
                 const refFile = ref.$ref.replace('./', '');
                 const refSchema = this.schemas.get(refFile);
                 if (refSchema?.$id) {
@@ -238,9 +238,10 @@ export class SemanticValidator {
         return this.getNodeText(node).replace(/^["']|["']$/g, '');
       case 'number':
         return Number.parseFloat(this.getNodeText(node));
-      case 'boolean':
+      case 'boolean': {
         const text = this.getNodeText(node).toLowerCase();
         return text === 'true' || text === 'yes' || text === 'on';
+      }
       case 'null':
         return null;
       case 'list':
@@ -428,7 +429,7 @@ export class SemanticValidator {
     return diagnostics;
   }
 
-  private validateFlowSections(document: any, ast: ASTNode): Diagnostic[] {
+  private validateFlowSections(document: any, _ast: ASTNode): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 
     // Get all agents and validate flows inside them
@@ -460,7 +461,7 @@ export class SemanticValidator {
     return diagnostics;
   }
 
-  private validateMessagesSections(document: any, ast: ASTNode): Diagnostic[] {
+  private validateMessagesSections(document: any, _ast: ASTNode): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 
     // Get all agents and check for multiple messages sections inside each

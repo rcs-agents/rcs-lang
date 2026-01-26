@@ -9,7 +9,7 @@ import {
 } from 'vscode-languageserver/node';
 
 export class CompletionProvider {
-  constructor(private parser: RCLParser) { }
+  constructor(private parser: RCLParser) {}
 
   public async getCompletions(
     _document: TextDocument,

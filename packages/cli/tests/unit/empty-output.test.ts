@@ -1,5 +1,5 @@
-import { RCLCompiler } from '@rcs-lang/compiler';
 import { describe, expect, test } from 'bun:test';
+import { RCLCompiler } from '@rcs-lang/compiler';
 
 describe('Empty Output Detection', () => {
   const compiler = new RCLCompiler();
