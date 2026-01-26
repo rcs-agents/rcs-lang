@@ -1,0 +1,50 @@
+agent "Test Agent"
+    displayName: "Test Agent"
+    brandName: "Test Brand"
+
+    agentConfig Config
+        description: "A test agent for unit testing"
+        logoUri: "<url https://example.com/logo.png>"
+        color: "#0066B1"
+
+    messages Messages
+        text Welcome "Welcome to our service!"
+        transactional Confirm "Please confirm your action"
+        
+        agentMessage DetailedMessage
+            messageTrafficType: :TRANSACTION
+            contentMessage
+                text: "This is a detailed message with suggestions"
+                suggestions
+                    suggestion
+                        reply
+                            text: "Yes"
+                            postbackData: "confirm_yes"
+                    suggestion
+                        reply
+                            text: "No"
+                            postbackData: "confirm_no"
+
+        agentMessage RichCardMessage
+            contentMessage
+                richCard
+                    standaloneCard
+                        cardOrientation: :VERTICAL
+                        cardContent
+                            title: "Product Information"
+                            description: "Learn about our latest product"
+                            media
+                                height: :MEDIUM
+                                contentInfo
+                                    fileUrl: "<url https://example.com/product.jpg>"
+                            suggestions
+                                suggestion
+                                    action
+                                        text: "Learn More"
+                                        postbackData: "learn_more"
+                                        openUrlAction
+                                            url: "<url https://example.com/product>"
+
+    flow MainFlow
+        :start -> Welcome
+        Welcome -> "confirm" -> Confirm
