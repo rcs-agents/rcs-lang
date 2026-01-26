@@ -67,8 +67,9 @@ tasks:
     inputs:
       - 'src/**/*.g4'
       - 'src/**/*.ts'
+      - 'tsconfig.json'
+      - 'package.json'
     outputs:
-      - 'src/generated'
       - 'dist'
     
   postbuild:

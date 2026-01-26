@@ -41,6 +41,15 @@ jobs:
       - name: Build packages
         run: moon run :build
         
+      - name: Ensure parser is built
+        run: |
+          cd packages/parser
+          if [ ! -d dist ]; then
+            echo "Parser dist directory missing, building..."
+            bun run tsc
+          fi
+          ls -la dist/ | head -10
+        
       - name: Run all tests
         run: moon run :test
         
