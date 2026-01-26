@@ -9,6 +9,7 @@ import {
   TransportKind,
 } from 'vscode-languageclient/node';
 import { RCLPreviewProvider } from './previewProvider';
+import { RCLPreviewPanelProvider } from './previewPanelProvider';
 import { InteractiveDiagramProvider } from './interactiveDiagramProvider';
 
 let client: LanguageClient;
@@ -50,6 +51,11 @@ export function activate(context: ExtensionContext) {
     await showPreview(uri, previewProvider);
   });
   context.subscriptions.push(showPreviewCommand);
+
+  const showPreviewPanelCommand = commands.registerCommand('rcl.showPreviewPanel', async (uri?: Uri) => {
+    await showPreviewInPanel(context, uri);
+  });
+  context.subscriptions.push(showPreviewPanelCommand);
 
   const showJSONOutputCommand = commands.registerCommand(
     'rcl.showJSONOutput',
@@ -162,9 +168,22 @@ async function showPreview(uri?: Uri, previewProvider?: RCLPreviewProvider): Pro
       await previewProvider.showPreview(document);
     }
 
-    // The webview view should automatically appear when the provider is activated
+    // Focus on the Explorer view and reveal the preview
+    await commands.executeCommand('workbench.view.explorer');
+    
+    // Try to reveal/focus the RCL Preview view
+    try {
+      await commands.executeCommand('rclPreview.focus');
+    } catch {
+      // If the command doesn't exist, try to reveal the view
+      try {
+        await commands.executeCommand('workbench.view.extension.rclPreview');
+      } catch {
+        // Ignore if view cannot be focused
+      }
+    }
 
-    window.showInformationMessage('RCL Preview opened');
+    window.showInformationMessage('RCL Preview opened in Explorer sidebar');
   } catch (error) {
     window.showErrorMessage(
       `Failed to open preview: ${error instanceof Error ? error.message : String(error)}`,
@@ -478,5 +497,51 @@ function getExtensionVersion(context: ExtensionContext): string {
     return packageJson.version || '0.0.0';
   } catch {
     return '0.0.0';
+  }
+}
+
+async function showPreviewInPanel(context: ExtensionContext, uri?: Uri): Promise<void> {
+  let targetUri: Uri;
+
+  if (uri) {
+    targetUri = uri;
+  } else {
+    const activeEditor = window.activeTextEditor;
+    if (!activeEditor) {
+      window.showErrorMessage('No RCL file is currently open');
+      return;
+    }
+    targetUri = activeEditor.document.uri;
+  }
+
+  if (!targetUri.fsPath.endsWith('.rcl')) {
+    window.showErrorMessage('Please select an RCL file');
+    return;
+  }
+
+  try {
+    const document = await workspace.openTextDocument(targetUri);
+    
+    // Create or show webview panel
+    const panel = window.createWebviewPanel(
+      'rclPreviewPanel',
+      `RCL Preview - ${path.basename(targetUri.fsPath)}`,
+      ViewColumn.Beside,
+      {
+        enableScripts: true,
+        localResourceRoots: [context.extensionUri],
+        retainContextWhenHidden: true
+      }
+    );
+
+    // Create a preview provider instance for this panel
+    const panelPreviewProvider = new RCLPreviewPanelProvider(context, panel);
+    await panelPreviewProvider.showPreview(document);
+
+    window.showInformationMessage('RCL Preview opened in new panel');
+  } catch (error) {
+    window.showErrorMessage(
+      `Failed to open preview panel: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
