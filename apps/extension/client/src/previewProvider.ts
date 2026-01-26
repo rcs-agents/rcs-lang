@@ -368,6 +368,10 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, 'client', 'resources', 'mermaid.min.js'),
     );
 
+    // Get version info
+    const version = this._getExtensionVersion();
+    const buildHash = this._getBuildHash();
+
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();
 
@@ -390,6 +394,9 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
                     </select>
                     <button id="allFlowsBtn" class="toolbar-btn" title="Show All Flows">All Flows</button>
                     <button id="cursorFollowBtn" class="toolbar-btn" title="Follow Cursor">📍</button>
+                </div>
+                <div class="toolbar-center">
+                    <span class="version-info">v${version} (${buildHash})</span>
                 </div>
                 <div class="toolbar-right">
                     <button id="exportJsonBtn" class="toolbar-btn" title="Export JSON">📤 JSON</button>
@@ -437,6 +444,29 @@ export class RCLPreviewProvider implements vscode.WebviewViewProvider {
   public dispose() {
     this._fileWatcher?.dispose();
     clearTimeout(this._debounceTimer);
+  }
+
+  private _getExtensionVersion(): string {
+    try {
+      const packageJson = JSON.parse(
+        fs.readFileSync(path.join(this._extensionContext.extensionPath, 'package.json'), 'utf8')
+      );
+      return packageJson.version || '0.0.0';
+    } catch {
+      return '0.0.0';
+    }
+  }
+
+  private _getBuildHash(): string {
+    try {
+      // Try to get git commit hash
+      const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
+      return result;
+    } catch {
+      // Fallback to a timestamp-based hash if git is not available
+      const timestamp = Date.now().toString(36);
+      return timestamp.substring(timestamp.length - 4);
+    }
   }
 }
 
