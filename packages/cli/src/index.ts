@@ -233,7 +233,7 @@ program
   .action(async (input: string, options: any) => {
     // Convert legacy format to new format
     if (options.format === 'js' || options.format === 'json') {
-      options.format = options.format;
+      // Keep the format as is
     } else {
       options.format = 'both';
     }

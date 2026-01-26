@@ -42,7 +42,9 @@ export class FlowCompiler {
   private traverseAST(node: RCLNode, callback: (node: RCLNode) => void): void {
     callback(node);
     if (node.children) {
-      node.children.forEach((child) => this.traverseAST(child, callback));
+      for (const child of node.children) {
+        this.traverseAST(child, callback);
+      }
     }
   }
 
