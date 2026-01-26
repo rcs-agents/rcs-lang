@@ -1,6 +1,5 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
-import * as cp from 'node:child_process';
 import { workspace, ExtensionContext, window, commands, Uri, ViewColumn, StatusBarAlignment, StatusBarItem } from 'vscode';
 import {
   LanguageClient,
@@ -12,6 +11,7 @@ import { RCLPreviewProvider } from './previewProvider';
 import { RCLPreviewPanelProvider } from './previewPanelProvider';
 import { InteractiveDiagramProvider } from './interactiveDiagramProvider';
 import { CompilationService } from './compilationService';
+import { getBuildHash, getExtensionVersion } from './utils';
 
 let client: LanguageClient;
 let statusBarItem: StatusBarItem;
@@ -478,28 +478,6 @@ export default {
 `;
 }
 
-function getBuildHash(): string {
-  try {
-    // Try to get git commit hash
-    const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
-    return result;
-  } catch {
-    // Fallback to a timestamp-based hash if git is not available
-    const timestamp = Date.now().toString(36);
-    return timestamp.substring(timestamp.length - 4);
-  }
-}
-
-function getExtensionVersion(context: ExtensionContext): string {
-  try {
-    const packageJson = JSON.parse(
-      fs.readFileSync(path.join(context.extensionPath, 'package.json'), 'utf8')
-    );
-    return packageJson.version || '0.0.0';
-  } catch {
-    return '0.0.0';
-  }
-}
 
 async function showPreviewInPanel(context: ExtensionContext, uri?: Uri): Promise<void> {
   let targetUri: Uri;

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
+import { getBuildHash, getExtensionVersion } from './utils';
 
 interface PreviewState {
   messages: Record<string, any>;
@@ -390,8 +391,8 @@ export class RCLPreviewPanelProvider {
     );
 
     // Get version info
-    const version = this._getExtensionVersion();
-    const buildHash = this._getBuildHash();
+    const version = getExtensionVersion(this._extensionContext);
+    const buildHash = getBuildHash();
 
     // Use a nonce to whitelist specific scripts for security
     const nonce = getNonce();
@@ -474,28 +475,6 @@ export class RCLPreviewPanelProvider {
     }
   }
 
-  private _getExtensionVersion(): string {
-    try {
-      const packageJson = JSON.parse(
-        fs.readFileSync(path.join(this._extensionContext.extensionPath, 'package.json'), 'utf8')
-      );
-      return packageJson.version || '0.0.0';
-    } catch {
-      return '0.0.0';
-    }
-  }
-
-  private _getBuildHash(): string {
-    try {
-      // Try to get git commit hash
-      const result = cp.execSync('git rev-parse --short=4 HEAD', { encoding: 'utf8' }).trim();
-      return result;
-    } catch {
-      // Fallback to a timestamp-based hash if git is not available
-      const timestamp = Date.now().toString(36);
-      return timestamp.substring(timestamp.length - 4);
-    }
-  }
 }
 
 function getNonce() {
