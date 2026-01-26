@@ -5,7 +5,7 @@ prev: false
 title: "ContextOperationSequence"
 ---
 
-Defined in: [ast.ts:369](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/ast.ts#L369)
+Defined in: [ast.ts:369](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L369)
 
 A sequence of context operations followed by a target reference.
 
@@ -23,7 +23,7 @@ ContextOperationSequence ::= ContextOperation (ARROW ContextOperation)* ARROW Ta
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5
 
 > **operations**: [`ContextOperation`](/api/ast/type-aliases/contextoperation/)[]
 
-Defined in: [ast.ts:371](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/ast.ts#L371)
+Defined in: [ast.ts:371](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L371)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:371](https://github.com/rcs-agents/rcs-lang/blob/96f7bb57105
 
 > **target**: [`TargetReference`](/api/ast/type-aliases/targetreference/)
 
-Defined in: [ast.ts:372](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/ast.ts#L372)
+Defined in: [ast.ts:372](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L372)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:372](https://github.com/rcs-agents/rcs-lang/blob/96f7bb57105
 
 > **type**: `"ContextOperationSequence"`
 
-Defined in: [ast.ts:370](https://github.com/rcs-agents/rcs-lang/blob/96f7bb5710555321ae9695be4004d52239e42e7e/packages/ast/src/ast.ts#L370)
+Defined in: [ast.ts:370](https://github.com/rcs-agents/rcs-lang/blob/89258eb41dbc7637c8bdc8bfc04b38ebfa30409c/packages/ast/src/ast.ts#L370)
