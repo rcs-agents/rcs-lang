@@ -5,18 +5,10 @@
       ".moon/tasks.yml",
       ".moon/tasks/**/*.yml"
     ],
-    ".moon/cache/schemas/project.json": [
-      "**/moon.yml"
-    ],
-    ".moon/cache/schemas/template.json": [
-      "**/template.yml"
-    ],
-    ".moon/cache/schemas/workspace.json": [
-      "**/.moon/workspace.yml"
-    ],
-    ".moon/cache/schemas/toolchain.json": [
-      "**/.moon/toolchain.yml"
-    ]
+    ".moon/cache/schemas/project.json": ["**/moon.yml"],
+    ".moon/cache/schemas/template.json": ["**/template.yml"],
+    ".moon/cache/schemas/workspace.json": ["**/.moon/workspace.yml"],
+    ".moon/cache/schemas/toolchain.json": ["**/.moon/toolchain.yml"]
   },
   "files.associations": {
     "*.yml.tera": "jinja-yaml",
@@ -51,23 +43,23 @@
   "references.preferredLocation": "peek",
   "typescript.tsdk": "node_modules/typescript/lib",
   "workbench.colorCustomizations": {
-    "statusBar.background": "#dd0531",
-    "statusBar.foreground": "#e7e7e7",
-    "statusBarItem.hoverBackground": "#fa1b49",
-    "statusBarItem.remoteBackground": "#dd0531",
-    "statusBarItem.remoteForeground": "#e7e7e7",
-    "sash.hoverBorder": "#fa1b49",
-    "activityBar.activeBackground": "#fa1b49",
-    "activityBar.background": "#fa1b49",
-    "activityBar.foreground": "#e7e7e7",
-    "activityBar.inactiveForeground": "#e7e7e799",
-    "activityBarBadge.background": "#155e02",
+    "statusBar.background": "#f3c993",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#eeb265",
+    "statusBarItem.remoteBackground": "#f3c993",
+    "statusBarItem.remoteForeground": "#15202b",
+    "sash.hoverBorder": "#f8e0c1",
+    "activityBar.activeBackground": "#f8e0c1",
+    "activityBar.background": "#f8e0c1",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#13ac69",
     "activityBarBadge.foreground": "#e7e7e7",
-    "commandCenter.border": "#e7e7e799",
-    "titleBar.activeBackground": "#dd0531",
-    "titleBar.activeForeground": "#e7e7e7",
-    "titleBar.inactiveBackground": "#dd053199",
-    "titleBar.inactiveForeground": "#e7e7e799"
+    "commandCenter.border": "#15202b99",
+    "titleBar.activeBackground": "#f3c993",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#f3c99399",
+    "titleBar.inactiveForeground": "#15202b99"
   },
-  "peacock.color": "#dd0531"
+  "peacock.color": "#f3c993"
 }
