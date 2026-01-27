@@ -19,8 +19,7 @@
     "typecheck": "moon run csm:typecheck",
     "clean": "moon run csm:clean",
     "lint": "moon run csm:lint",
-    "format": "moon run csm:format",
-    "validate-fixture": "bun run validate-fixture.ts"
+    "format": "moon run csm:format"
   },
   "keywords": [
     "state-machine",

@@ -1,8 +1,8 @@
-import { RclLexerBase } from "../RclLexerBase";
 
 import * as antlr from "antlr4ng";
 import { Token } from "antlr4ng";
 
+import { RclLexerBase } from "../RclLexerBase";
 
 export class RclLexer extends RclLexerBase {
     public static readonly IMPORT = 1;

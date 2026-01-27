@@ -14,6 +14,7 @@ dependsOn: []
 tags:
   - test
   - common
+  - typescript
 
 tasks:
   prebuild:
@@ -21,34 +22,22 @@ tasks:
     args: [-rf, src/generated]
 
   build-grammar:
-    command: bash
-    args:
-      - -c
-      - "bunx antlr-ng -D language=TypeScript -o src/generated src/RclLexer.g4 && bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4"
+    script: |
+      bunx antlr-ng -D language=TypeScript \
+        -o src/generated src/RclLexer.g4 && \
+      bunx antlr-ng -D language=TypeScript --generate-visitor -o src/generated src/RclParser.g4
+
     deps:
       - prebuild
-
-  fix-imports:
-    command: bash
-    args:
-      - -c
-      - |
-        cd $MOON_WORKSPACE_ROOT/packages/parser/src/generated && \
-        if [ -f RclLexer.ts ]; then \
-          if ! grep -q "import { RclLexerBase }" RclLexer.ts; then \
-            sed -i.bak '1s/^/import { RclLexerBase } from "..\/RclLexerBase";\n/' RclLexer.ts; \
-          fi && \
-          rm -f *.ts.bak; \
-        else \
-          echo "No generated files found, skipping fix-imports"; \
-        fi
-    deps:
-      - build-grammar
+    inputs:
+      - 'src/**/*.g4'
+    outputs:
+      - 'src/generated/*'
 
   compile:
     command: tsc
     deps:
-      - fix-imports
+      - build-grammar
     inputs:
       - 'src/**/*.g4'
       - 'src/**/*.ts'
@@ -56,23 +45,6 @@ tasks:
       - 'package.json'
     outputs:
       - 'dist'
-
-  fix-js-imports:
-    command: bash
-    args:
-      - -c
-      - |
-        cd dist/generated && \
-        sed -i.bak 's/from "\(\.\.[^"]*\)"/from "\1.js"/g' *.js && \
-        rm -f *.js.bak
-    deps:
-      - compile
-
-  build:
-    command: echo
-    args: ["Parser build complete"]
-    deps:
-      - fix-js-imports
 
   test:
     command: bun

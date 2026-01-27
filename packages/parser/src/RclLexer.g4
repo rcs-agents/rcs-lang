@@ -4,6 +4,8 @@ options {
     superClass = RclLexerBase;
 }
 
+@header {import { RclLexerBase } from "../RclLexerBase";}
+
 // Keywords (minimal set for generic language)
 IMPORT: 'import';
 AS: 'as';
