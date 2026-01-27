@@ -5,7 +5,7 @@ prev: false
 title: "Dictionary"
 ---
 
-Defined in: [ast.ts:229](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L229)
+Defined in: [ast.ts:229](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L229)
 
 A dictionary of key-value pairs.
 
@@ -23,7 +23,7 @@ Dictionary ::= BraceDictionary | BlockDictionary
 
 > **entries**: [`DictionaryEntry`](/api/ast/interfaces/dictionaryentry/)[]
 
-Defined in: [ast.ts:231](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L231)
+Defined in: [ast.ts:231](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L231)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:231](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f6
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,4 +43,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d27a86a
 
 > **type**: `"Dictionary"`
 
-Defined in: [ast.ts:230](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L230)
+Defined in: [ast.ts:230](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L230)

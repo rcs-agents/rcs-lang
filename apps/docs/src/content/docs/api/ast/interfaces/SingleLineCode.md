@@ -5,7 +5,7 @@ prev: false
 title: "SingleLineCode"
 ---
 
-Defined in: [ast.ts:269](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L269)
+Defined in: [ast.ts:269](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L269)
 
 A single-line embedded code expression.
 
@@ -23,7 +23,7 @@ SingleLineCode ::= EMBEDDED_CODE
 
 > **code**: `string`
 
-Defined in: [ast.ts:272](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L272)
+Defined in: [ast.ts:272](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L272)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:272](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f6
 
 > `optional` **language**: `"js"` \| `"ts"`
 
-Defined in: [ast.ts:271](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L271)
+Defined in: [ast.ts:271](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L271)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [ast.ts:271](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f6
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -51,4 +51,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/d27a86a
 
 > **type**: `"SingleLineCode"`
 
-Defined in: [ast.ts:270](https://github.com/rcs-agents/rcs-lang/blob/d27a86a06f607707e27756903556e47acb5d9058/packages/ast/src/ast.ts#L270)
+Defined in: [ast.ts:270](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L270)
