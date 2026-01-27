@@ -24,10 +24,17 @@
     "lint": "moon run compiler:lint",
     "format": "moon run compiler:format"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@rcs-lang/core": "^0.3.4",
+    "@rcs-lang/csm": "^0.3.4",
+    "@rcs-lang/file-system": "^0.3.4",
+    "@rcs-lang/validation": "^0.3.4"
+  },
   "devDependencies": {
+    "@types/bun": "^1.3.6",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "tsconfig-moon": "^1.4.2",
+    "typescript": "^5.9.0"
   },
   "files": [
     "dist/**/*"

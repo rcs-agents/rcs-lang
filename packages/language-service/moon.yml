@@ -19,11 +19,11 @@ tags:
 tasks:
   build:
     deps:
-      - 'parser:postbuild'
+      - 'parser:build'
 
 
   typecheck:
     deps:
-      - 'parser:postbuild'
+      - 'parser:build'
 
 

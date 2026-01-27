@@ -5,7 +5,11 @@ project:
 type: library
 language: typescript
 
-dependsOn: []
+dependsOn:
+  - '@rcs-lang/core'
+  - '@rcs-lang/csm'
+  - '@rcs-lang/file-system'
+  - '@rcs-lang/validation'
 
 tags:
   - typescript

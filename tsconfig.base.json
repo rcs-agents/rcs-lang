@@ -17,8 +17,14 @@
     "sourceMap": true,
     "composite": true,
     "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo",
     "outDir": "dist"
   },
-  "exclude": ["node_modules", "dist", "build", "out", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }
