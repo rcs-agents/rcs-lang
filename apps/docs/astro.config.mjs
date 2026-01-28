@@ -43,6 +43,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview', slug: '' },
 						{ label: 'Getting Started', slug: 'getting-started' },
+						{ label: 'Playground', link: '/playground' },
 						{ label: 'Examples', slug: 'examples' },
 					],
 				},

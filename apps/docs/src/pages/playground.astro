@@ -1,0 +1,16 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Playground } from '../components/playground/Playground';
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'RCL Playground',
+		description: 'Interactive playground for experimenting with RCL code',
+		template: 'splash',
+	}}
+>
+	<div style="width: 100%; height: calc(100vh - 8rem); margin: 0 auto;">
+		<Playground client:only="react" />
+	</div>
+</StarlightPage>
