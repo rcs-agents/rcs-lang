@@ -2,7 +2,8 @@
 
 export class RCLWebDiagram {
   constructor(containerId: string, config?: any);
-  render(): void;
-  update(data: any): void;
+  initialize(): void;
+  updateModel(data: any): void;
   dispose(): void;
+  zoomToFit(): void;
 }

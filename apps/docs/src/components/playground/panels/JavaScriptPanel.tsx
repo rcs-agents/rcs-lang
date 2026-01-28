@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShiki } from '../hooks/useShiki';
 
 export interface JavaScriptPanelProps {
 	code: string;
@@ -14,6 +15,8 @@ export function JavaScriptPanel({ code }: JavaScriptPanelProps) {
 			</div>
 		);
 	}
+
+	const highlighted = useShiki(code, 'javascript');
 
 	const handleCopy = async () => {
 		try {
@@ -38,9 +41,10 @@ export function JavaScriptPanel({ code }: JavaScriptPanelProps) {
 					{copied ? '✓ Copied' : '📋 Copy'}
 				</button>
 			</div>
-			<pre className="javascript-content">
-				<code>{code}</code>
-			</pre>
+			<div
+				className="javascript-content shiki-container"
+				dangerouslySetInnerHTML={{ __html: highlighted }}
+			/>
 		</div>
 	);
 }

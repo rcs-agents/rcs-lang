@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useShiki } from '../hooks/useShiki';
 
 export interface RbxJsonPanelProps {
 	json: any;
@@ -16,6 +17,7 @@ export function RbxJsonPanel({ json }: RbxJsonPanelProps) {
 	}
 
 	const jsonString = JSON.stringify(json, null, 2);
+	const highlighted = useShiki(jsonString, 'json');
 
 	const handleCopy = async () => {
 		try {
@@ -40,9 +42,10 @@ export function RbxJsonPanel({ json }: RbxJsonPanelProps) {
 					{copied ? '✓ Copied' : '📋 Copy'}
 				</button>
 			</div>
-			<pre className="json-content">
-				<code>{jsonString}</code>
-			</pre>
+			<div
+				className="json-content shiki-container"
+				dangerouslySetInnerHTML={{ __html: highlighted }}
+			/>
 		</div>
 	);
 }

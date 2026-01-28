@@ -370,6 +370,39 @@
 	color: var(--sl-color-text);
 }
 
+/* Shiki syntax highlighting */
+.shiki-container {
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+}
+
+.shiki-container pre {
+	background: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	overflow: visible;
+}
+
+.shiki-container code {
+	font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+	font-size: 0.9rem !important;
+	line-height: 1.5 !important;
+	background: transparent !important;
+	padding: 0 !important;
+}
+
+/* Ensure Shiki tokens are visible */
+.shiki-container .line {
+	display: block;
+}
+
+/* Override Shiki background to match our theme */
+.shiki {
+	background-color: transparent !important;
+}
+
 /* Status Bar */
 .status-bar {
 	display: flex;
