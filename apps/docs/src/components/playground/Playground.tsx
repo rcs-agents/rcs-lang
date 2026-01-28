@@ -41,8 +41,9 @@ export function Playground() {
 			const startTime = performance.now();
 
 			try {
-				// Dynamically import parser to avoid SSR issues
+				// Dynamically import parser and compiler to avoid SSR issues
 				const { parse } = await import('@rcs-lang/parser');
+				const { RCLCompiler } = await import('@rcs-lang/compiler');
 
 				const result = await parse(code);
 				const parseTime = performance.now() - startTime;
@@ -63,10 +64,57 @@ export function Playground() {
 					},
 				}));
 
-				// TODO: Compile to RBX JSON and JavaScript
-				// For now, using placeholder values
-				const rbxJson = result.ast ? { placeholder: 'RBX JSON compilation coming soon' } : null;
-				const javascript = result.ast ? '// JavaScript compilation coming soon' : '';
+				// Compile to RBX JSON and JavaScript if AST is valid
+				let rbxJson = null;
+				let javascript = '';
+
+				if (result.ast && !result.errors?.length) {
+					try {
+						const compiler = new RCLCompiler();
+
+						// Compile to get output
+						const compileResult = await compiler.compile({
+							source: code,
+							uri: 'playground://input.rcl',
+							ast: result.ast,
+						});
+
+						if (compileResult.success && compileResult.value.success) {
+							rbxJson = compileResult.value.output;
+
+							// Generate JavaScript
+							const jsResult = await compiler.compileToJavaScript({
+								source: code,
+								uri: 'playground://input.rcl',
+								ast: result.ast,
+							});
+
+							if (jsResult.success) {
+								javascript = jsResult.value;
+							}
+						} else if (compileResult.success && compileResult.value.diagnostics) {
+							// Add compilation diagnostics
+							compileResult.value.diagnostics.forEach((d) => {
+								diagnostics.push({
+									message: d.message,
+									severity: d.severity as 'error' | 'warning' | 'info',
+									range: d.range || {
+										start: { line: 0, character: 0 },
+										end: { line: 0, character: 1 },
+									},
+								});
+							});
+						}
+					} catch (compileError) {
+						console.warn('Compilation error:', compileError);
+						// Don't fail the whole parse if compilation fails
+						diagnostics.push({
+							message: `Compilation error: ${compileError instanceof Error ? compileError.message : 'Unknown error'}`,
+							severity: 'warning',
+							range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } },
+						});
+					}
+				}
 
 				setParseResult({
 					ast: result.ast,
