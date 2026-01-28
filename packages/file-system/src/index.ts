@@ -1,16 +1,16 @@
-// File system implementations
+/**
+ * @rcs-lang/file-system - Cross-platform filesystem abstraction
+ *
+ * @remarks
+ * This module provides filesystem implementations for Node.js, browser, and
+ * in-memory environments. Use the FileSystemFactory to get the appropriate
+ * implementation for your environment.
+ *
+ * @packageDocumentation
+ */
+
+// Export filesystem implementations
 export * from './memoryFileSystem.js';
 export * from './browserFileSystem.js';
-
-// Conditional export for Node.js
-if (typeof process !== 'undefined' && process.versions?.node) {
-  try {
-    const nodeFs = require('./nodeFileSystem.js');
-    Object.assign(exports, nodeFs);
-  } catch (error) {
-    // Ignore in browser
-  }
-}
-
-// Factory and providers
+export * from './nodeFileSystem.js';
 export * from './fileSystemFactory.js';

@@ -1,6 +1,10 @@
 import { type Result, err, ok } from '@rcs-lang/core';
 import type { IFileStats, IFileSystem } from '@rcs-lang/core';
 
+/**
+ * Internal structure for storing file data in memory.
+ * @internal
+ */
 interface MemoryFile {
   content: string;
   stats: {
@@ -12,17 +16,89 @@ interface MemoryFile {
 }
 
 /**
- * In-memory file system implementation for testing and browser environments
+ * In-memory file system implementation for testing and browser environments.
+ *
+ * @remarks
+ * This implementation stores all files and directories in memory using Map and Set
+ * data structures. It's ideal for:
+ * - Unit tests that don't need real filesystem access
+ * - Browser environments where filesystem access is limited
+ * - Sandboxed environments
+ * - Temporary file operations that don't need persistence
+ *
+ * All file paths are automatically normalized to use forward slashes and start
+ * with a leading slash. The root directory (/) always exists and cannot be removed.
+ *
+ * @example
+ * Basic usage
+ * ```typescript
+ * const fs = new MemoryFileSystem();
+ *
+ * // Create directory
+ * await fs.mkdir('/project/src', true);
+ *
+ * // Write file
+ * await fs.writeFile('/project/src/index.ts', 'export const x = 1;');
+ *
+ * // Read file
+ * const result = await fs.readFile('/project/src/index.ts');
+ * if (result.success) {
+ *   console.log(result.value);
+ * }
+ * ```
+ *
+ * @example
+ * Testing usage
+ * ```typescript
+ * describe('MyCompiler', () => {
+ *   let fs: MemoryFileSystem;
+ *
+ *   beforeEach(() => {
+ *     fs = new MemoryFileSystem();
+ *     // Pre-populate with test files
+ *     await fs.mkdir('/test', true);
+ *     await fs.writeFile('/test/input.txt', 'test data');
+ *   });
+ *
+ *   afterEach(() => {
+ *     fs.clear(); // Clean up
+ *   });
+ * });
+ * ```
+ *
+ * @see {@link NodeFileSystem} for real filesystem access
+ * @see {@link BrowserFileSystem} for persistent browser storage
  */
 export class MemoryFileSystem implements IFileSystem {
   private files: Map<string, MemoryFile> = new Map();
   private directories: Set<string> = new Set();
 
+  /**
+   * Creates a new MemoryFileSystem instance.
+   *
+   * @remarks
+   * The root directory (/) is automatically created and cannot be removed.
+   */
   constructor() {
     // Root directory always exists
     this.directories.add('/');
   }
 
+  /**
+   * Reads a file from memory as a UTF-8 string.
+   *
+   * @param filePath - Path to the file to read
+   * @param _encoding - Character encoding (unused, always UTF-8)
+   * @returns Result containing file contents or an error if file doesn't exist
+   *
+   * @example
+   * ```typescript
+   * const fs = new MemoryFileSystem();
+   * await fs.writeFile('/data.txt', 'Hello');
+   * const result = await fs.readFile('/data.txt');
+   * // result.value === 'Hello'
+   * ```
+   */
   async readFile(filePath: string, _encoding?: string): Promise<Result<string>> {
     const normalizedPath = this.normalize(filePath);
     const file = this.files.get(normalizedPath);
@@ -34,6 +110,25 @@ export class MemoryFileSystem implements IFileSystem {
     return ok(file.content);
   }
 
+  /**
+   * Writes content to a file in memory.
+   *
+   * @param filePath - Path to the file to write
+   * @param content - String content to write
+   * @param _encoding - Character encoding (unused, always UTF-8)
+   * @returns Result containing void on success or an error if parent directory doesn't exist
+   *
+   * @remarks
+   * The parent directory must exist before writing. Use {@link mkdir} with
+   * recursive: true to ensure the parent directory exists.
+   *
+   * @example
+   * ```typescript
+   * const fs = new MemoryFileSystem();
+   * await fs.mkdir('/project', true);
+   * await fs.writeFile('/project/readme.md', '# My Project');
+   * ```
+   */
   async writeFile(filePath: string, content: string, _encoding?: string): Promise<Result<void>> {
     const normalizedPath = this.normalize(filePath);
     const dir = this.dirname(normalizedPath);
@@ -57,11 +152,23 @@ export class MemoryFileSystem implements IFileSystem {
     return ok(undefined);
   }
 
+  /**
+   * Checks if a file or directory exists at the given path.
+   *
+   * @param filePath - Path to check
+   * @returns Result always containing true if exists, false otherwise
+   */
   async exists(filePath: string): Promise<Result<boolean>> {
     const normalizedPath = this.normalize(filePath);
     return ok(this.files.has(normalizedPath) || this.directories.has(normalizedPath));
   }
 
+  /**
+   * Gets file or directory statistics.
+   *
+   * @param filePath - Path to the file or directory
+   * @returns Result containing file statistics or an error if path doesn't exist
+   */
   async stat(filePath: string): Promise<Result<IFileStats>> {
     const normalizedPath = this.normalize(filePath);
 
@@ -94,6 +201,12 @@ export class MemoryFileSystem implements IFileSystem {
     });
   }
 
+  /**
+   * Lists all entries in a directory.
+   *
+   * @param dirPath - Path to the directory
+   * @returns Result containing array of entry names or an error if directory doesn't exist
+   */
   async readdir(dirPath: string): Promise<Result<string[]>> {
     const normalizedPath = this.normalize(dirPath);
 
@@ -128,6 +241,13 @@ export class MemoryFileSystem implements IFileSystem {
     return ok([...new Set(entries)].sort());
   }
 
+  /**
+   * Creates a directory in memory.
+   *
+   * @param dirPath - Path to the directory to create
+   * @param recursive - If true, creates parent directories as needed
+   * @returns Result containing void on success or an error if parent doesn't exist
+   */
   async mkdir(dirPath: string, recursive = false): Promise<Result<void>> {
     const normalizedPath = this.normalize(dirPath);
 
@@ -154,6 +274,12 @@ export class MemoryFileSystem implements IFileSystem {
     return ok(undefined);
   }
 
+  /**
+   * Deletes a file from memory.
+   *
+   * @param filePath - Path to the file to delete
+   * @returns Result containing void on success or an error if file doesn't exist
+   */
   async unlink(filePath: string): Promise<Result<void>> {
     const normalizedPath = this.normalize(filePath);
 
@@ -165,6 +291,13 @@ export class MemoryFileSystem implements IFileSystem {
     return ok(undefined);
   }
 
+  /**
+   * Removes a directory from memory.
+   *
+   * @param dirPath - Path to the directory to remove
+   * @param recursive - If true, removes directory and all contents
+   * @returns Result containing void on success or an error
+   */
   async rmdir(dirPath: string, recursive = false): Promise<Result<void>> {
     const normalizedPath = this.normalize(dirPath);
 
@@ -200,21 +333,46 @@ export class MemoryFileSystem implements IFileSystem {
     return ok(undefined);
   }
 
+  /**
+   * Joins path segments using forward slashes.
+   *
+   * @param segments - Path segments to join
+   * @returns Joined path with normalized slashes
+   */
   join(...segments: string[]): string {
     return segments.join('/').replace(/\/+/g, '/');
   }
 
+  /**
+   * Resolves path segments to a normalized absolute path.
+   *
+   * @param segments - Path segments to resolve
+   * @returns Normalized absolute path
+   */
   resolve(...segments: string[]): string {
     const joined = this.join(...segments);
     return this.normalize(joined);
   }
 
+  /**
+   * Gets the directory portion of a path.
+   *
+   * @param filePath - Path to extract directory from
+   * @returns Directory path
+   */
   dirname(filePath: string): string {
     const normalized = this.normalize(filePath);
     const lastSlash = normalized.lastIndexOf('/');
     return lastSlash <= 0 ? '/' : normalized.slice(0, lastSlash);
   }
 
+  /**
+   * Gets the filename portion of a path.
+   *
+   * @param filePath - Path to extract basename from
+   * @param ext - Optional extension to remove
+   * @returns Filename with or without extension
+   */
   basename(filePath: string, ext?: string): string {
     const normalized = this.normalize(filePath);
     const lastSlash = normalized.lastIndexOf('/');
@@ -227,16 +385,32 @@ export class MemoryFileSystem implements IFileSystem {
     return base;
   }
 
+  /**
+   * Gets the file extension from a path.
+   *
+   * @param filePath - Path to extract extension from
+   * @returns Extension including the dot, or empty string
+   */
   extname(filePath: string): string {
     const base = this.basename(filePath);
     const lastDot = base.lastIndexOf('.');
     return lastDot === -1 || lastDot === 0 ? '' : base.slice(lastDot);
   }
 
+  /**
+   * Checks if a path is absolute (starts with /).
+   *
+   * @param filePath - Path to check
+   * @returns True if absolute, false otherwise
+   */
   isAbsolute(filePath: string): boolean {
     return filePath.startsWith('/');
   }
 
+  /**
+   * Normalizes a path to use forward slashes and have a leading slash.
+   * @internal
+   */
   private normalize(filePath: string): string {
     // Simple normalization
     let normalized = filePath.replace(/\\/g, '/');
@@ -251,7 +425,19 @@ export class MemoryFileSystem implements IFileSystem {
   }
 
   /**
-   * Clear all files and directories (except root)
+   * Clears all files and directories except the root directory.
+   *
+   * @remarks
+   * This is useful for cleaning up between tests or resetting the filesystem
+   * to a fresh state. The root directory (/) is always preserved.
+   *
+   * @example
+   * ```typescript
+   * const fs = new MemoryFileSystem();
+   * await fs.writeFile('/test.txt', 'data');
+   * fs.clear();
+   * const exists = await fs.exists('/test.txt'); // false
+   * ```
    */
   clear(): void {
     this.files.clear();
