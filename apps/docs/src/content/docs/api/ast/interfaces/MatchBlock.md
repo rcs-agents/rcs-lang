@@ -5,7 +5,7 @@ prev: false
 title: "MatchBlock"
 ---
 
-Defined in: [ast.ts:75](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L75)
+Defined in: [ast.ts:75](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L75)
 
 A match block for conditional value selection.
 
@@ -23,7 +23,7 @@ MatchBlock ::= 'match' Value INDENT (MatchCase)+ DEDENT
 
 > **cases**: [`MatchCase`](/api/ast/interfaces/matchcase/)[]
 
-Defined in: [ast.ts:78](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L78)
+Defined in: [ast.ts:78](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L78)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:78](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc
 
 > **discriminant**: [`Value`](/api/ast/type-aliases/value/)
 
-Defined in: [ast.ts:77](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L77)
+Defined in: [ast.ts:77](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L77)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [ast.ts:77](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -51,4 +51,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa
 
 > **type**: `"MatchBlock"`
 
-Defined in: [ast.ts:76](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L76)
+Defined in: [ast.ts:76](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L76)

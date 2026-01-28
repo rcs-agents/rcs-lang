@@ -5,7 +5,7 @@ prev: false
 title: "NumericLiteral"
 ---
 
-Defined in: [ast.ts:170](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L170)
+Defined in: [ast.ts:170](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L170)
 
 A numeric literal.
 
@@ -19,7 +19,7 @@ A numeric literal.
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa
 
 > **type**: `"NumericLiteral"`
 
-Defined in: [ast.ts:171](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L171)
+Defined in: [ast.ts:171](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L171)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [ast.ts:171](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4d
 
 > **value**: `number`
 
-Defined in: [ast.ts:172](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L172)
+Defined in: [ast.ts:172](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L172)

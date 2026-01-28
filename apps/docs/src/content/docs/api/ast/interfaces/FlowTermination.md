@@ -5,7 +5,7 @@ prev: false
 title: "FlowTermination"
 ---
 
-Defined in: [ast.ts:363](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L363)
+Defined in: [ast.ts:363](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L363)
 
 A flow termination.
 
@@ -23,7 +23,7 @@ FlowTermination ::= ':end' | ':cancel' | ':error'
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa
 
 > **result**: [`FlowResult`](/api/ast/type-aliases/flowresult/)
 
-Defined in: [ast.ts:365](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L365)
+Defined in: [ast.ts:365](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L365)
 
 ***
 
@@ -43,4 +43,4 @@ Defined in: [ast.ts:365](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4d
 
 > **type**: `"FlowTermination"`
 
-Defined in: [ast.ts:364](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L364)
+Defined in: [ast.ts:364](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L364)

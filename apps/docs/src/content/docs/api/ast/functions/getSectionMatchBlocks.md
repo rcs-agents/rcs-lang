@@ -7,7 +7,7 @@ title: "getSectionMatchBlocks"
 
 > **getSectionMatchBlocks**(`section`): [`MatchBlock`](/api/ast/interfaces/matchblock/)[]
 
-Defined in: [utils.ts:117](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/utils.ts#L117)
+Defined in: [utils.ts:117](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/utils.ts#L117)
 
 Get all match blocks from a section
 

@@ -7,7 +7,7 @@ title: "findNodeByType"
 
 > **findNodeByType**(`ast`, `nodeType`): `any`
 
-Defined in: [utils.ts:185](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/utils.ts#L185)
+Defined in: [utils.ts:185](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/utils.ts#L185)
 
 Find a node by type in the AST
 

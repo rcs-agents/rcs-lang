@@ -5,7 +5,7 @@ prev: false
 title: "PropertyAccess"
 ---
 
-Defined in: [ast.ts:206](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L206)
+Defined in: [ast.ts:206](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L206)
 
 A property access on a variable.
 
@@ -19,7 +19,7 @@ A property access on a variable.
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/26d5daa
 
 > **object**: [`Variable`](/api/ast/interfaces/variable/)
 
-Defined in: [ast.ts:208](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L208)
+Defined in: [ast.ts:208](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L208)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [ast.ts:208](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4d
 
 > **properties**: `string`[]
 
-Defined in: [ast.ts:209](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L209)
+Defined in: [ast.ts:209](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L209)
 
 ***
 
@@ -47,4 +47,4 @@ Defined in: [ast.ts:209](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4d
 
 > **type**: `"PropertyAccess"`
 
-Defined in: [ast.ts:207](https://github.com/rcs-agents/rcs-lang/blob/26d5daa2d4dc12570291746a8620ffb47db53cd7/packages/ast/src/ast.ts#L207)
+Defined in: [ast.ts:207](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L207)
