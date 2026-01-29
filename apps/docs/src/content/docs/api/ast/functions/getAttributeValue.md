@@ -7,7 +7,7 @@ title: "getAttributeValue"
 
 > **getAttributeValue**(`section`, `key`): `undefined` \| [`Value`](/api/ast/type-aliases/value/)
 
-Defined in: [utils.ts:92](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/utils.ts#L92)
+Defined in: [utils.ts:92](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/utils.ts#L92)
 
 Get attribute value by key
 

@@ -5,7 +5,7 @@ prev: false
 title: "Variable"
 ---
 
-Defined in: [ast.ts:200](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L200)
+Defined in: [ast.ts:200](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L200)
 
 A variable reference.
 
@@ -19,7 +19,7 @@ A variable reference.
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc
 
 > **name**: `string`
 
-Defined in: [ast.ts:202](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L202)
+Defined in: [ast.ts:202](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L202)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [ast.ts:202](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c
 
 > **type**: `"Variable"`
 
-Defined in: [ast.ts:201](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L201)
+Defined in: [ast.ts:201](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L201)

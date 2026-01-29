@@ -14,7 +14,7 @@ export default defineConfig({
 	vite: {
 		optimizeDeps: {
 			// Exclude RCL packages from pre-bundling - they're dynamically imported in playground
-			exclude: ['@rcs-lang/compiler', '@rcs-lang/parser', '@rcs-lang/file-system'],
+			exclude: ['@rcs-lang/compiler', '@rcs-lang/parser', '@rcs-lang/file-system', '@rcs-lang/diagram'],
 		},
 	},
 	integrations: [

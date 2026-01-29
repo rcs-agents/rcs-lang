@@ -5,7 +5,7 @@ prev: false
 title: "BooleanLiteral"
 ---
 
-Defined in: [ast.ts:176](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L176)
+Defined in: [ast.ts:176](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L176)
 
 A boolean literal.
 
@@ -19,7 +19,7 @@ A boolean literal.
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -31,7 +31,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc
 
 > **type**: `"BooleanLiteral"`
 
-Defined in: [ast.ts:177](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L177)
+Defined in: [ast.ts:177](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L177)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [ast.ts:177](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c
 
 > **value**: `boolean`
 
-Defined in: [ast.ts:178](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L178)
+Defined in: [ast.ts:178](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L178)

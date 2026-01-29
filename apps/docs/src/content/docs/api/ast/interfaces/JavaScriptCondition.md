@@ -5,7 +5,7 @@ prev: false
 title: "JavaScriptCondition"
 ---
 
-Defined in: [ast.ts:406](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L406)
+Defined in: [ast.ts:406](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L406)
 
 A JavaScript-based condition expression.
 
@@ -23,7 +23,7 @@ JavaScriptCondition ::= EmbeddedCode
 
 > **expression**: [`EmbeddedCode`](/api/ast/type-aliases/embeddedcode/)
 
-Defined in: [ast.ts:408](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L408)
+Defined in: [ast.ts:408](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L408)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:408](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,4 +43,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc
 
 > **type**: `"JavaScriptCondition"`
 
-Defined in: [ast.ts:407](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L407)
+Defined in: [ast.ts:407](https://github.com/rcs-agents/rcs-lang/blob/449c6aed2b429240a17a07baa187612f547c69a0/packages/ast/src/ast.ts#L407)

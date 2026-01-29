@@ -39,7 +39,7 @@
     "check:workspace": "bun scripts/check-workspace-deps.js",
     "check:pre-release": "bun scripts/pre-release-check.js",
     "version": "changeset version",
-    "release:prepare": "bun run check:pre-release && bun run check:workspace && bun run build && bun run test && changeset version && bun update",
+    "release:prepare": "bun run check:pre-release && bun run check:workspace && moon run ':build' --query 'project!=docs' && bun run test && changeset version && bun update",
     "release:commit": "git add .changeset packages/*/package.json package.json bun.lock CHANGELOG.md && git commit -m 'chore: version packages'",
     "release:publish": "bun run check:workspace && for dir in packages/*/; do (cd \"$dir\" && bun publish --access public) || true; done",
     "release:push": "git push --follow-tags",

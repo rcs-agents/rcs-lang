@@ -33,7 +33,7 @@
     },
     "apps/docs": {
       "name": "@rcs-lang/docs",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "dependencies": {
         "@astrojs/markdoc": "^0.15.0",
         "@astrojs/react": "^4.3.0",
@@ -90,27 +90,9 @@
         "typescript": "^5.0.0",
       },
     },
-    "libs/diagram": {
-      "name": "@rcs-lang/diagram",
-      "version": "0.4.0",
-      "dependencies": {
-        "elkjs": "^0.10.0",
-        "inversify": "6.2.2",
-        "reflect-metadata": "^0.2.2",
-        "sprotty": "^1.4.0",
-        "sprotty-protocol": "^1.4.0",
-      },
-      "devDependencies": {
-        "@types/node": "^20.0.0",
-        "typescript": "^5.0.0",
-      },
-      "peerDependencies": {
-        "@rcs-lang/compiler": "workspace:*",
-      },
-    },
     "packages/ast": {
       "name": "@rcs-lang/ast",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "devDependencies": {
         "@types/minimatch": "^6.0.0",
         "@types/node": "^24.0.13",
@@ -119,7 +101,7 @@
     },
     "packages/cli": {
       "name": "@rcs-lang/cli",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "bin": {
         "rcl-cli": "./dist/index.js",
         "rcl": "./dist/index.js",
@@ -150,7 +132,7 @@
     },
     "packages/compiler": {
       "name": "@rcs-lang/compiler",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
         "@rcs-lang/csm": "workspace:*",
@@ -166,7 +148,7 @@
     },
     "packages/core": {
       "name": "@rcs-lang/core",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
       },
@@ -178,7 +160,7 @@
     },
     "packages/csm": {
       "name": "@rcs-lang/csm",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
         "json-logic-js": "^2.0.2",
@@ -192,9 +174,27 @@
         "typescript": "^5.5.3",
       },
     },
+    "packages/diagram": {
+      "name": "@rcs-lang/diagram",
+      "version": "0.5.1",
+      "dependencies": {
+        "elkjs": "^0.10.0",
+        "inversify": "6.2.2",
+        "reflect-metadata": "^0.2.2",
+        "sprotty": "^1.4.0",
+        "sprotty-protocol": "^1.4.0",
+      },
+      "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0",
+      },
+      "peerDependencies": {
+        "@rcs-lang/compiler": "workspace:*",
+      },
+    },
     "packages/file-system": {
       "name": "@rcs-lang/file-system",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
       },
@@ -205,7 +205,7 @@
     },
     "packages/language-service": {
       "name": "@rcs-lang/language-service",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/compiler": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -228,7 +228,7 @@
     },
     "packages/parser": {
       "name": "@rcs-lang/parser",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/ast": "workspace:*",
         "@rcs-lang/core": "workspace:*",
@@ -241,7 +241,7 @@
     },
     "packages/types": {
       "name": "@rcs-lang/types",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "devDependencies": {
         "@types/node": "^24.1.0",
         "typedoc": "^0.28.7",
@@ -251,7 +251,7 @@
     },
     "packages/validation": {
       "name": "@rcs-lang/validation",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "dependencies": {
         "@rcs-lang/core": "workspace:*",
         "@rcs-lang/parser": "workspace:*",
@@ -666,7 +666,7 @@
 
     "@rcs-lang/csm": ["@rcs-lang/csm@workspace:packages/csm"],
 
-    "@rcs-lang/diagram": ["@rcs-lang/diagram@workspace:libs/diagram"],
+    "@rcs-lang/diagram": ["@rcs-lang/diagram@workspace:packages/diagram"],
 
     "@rcs-lang/docs": ["@rcs-lang/docs@workspace:apps/docs"],
 

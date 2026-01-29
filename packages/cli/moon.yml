@@ -1,8 +1,8 @@
 $schema: "https://moonrepo.dev/schemas/project.json"
 
 project:
-  name: '@rcs-lang/cli'
-  description: 'RCL command-line interface'
+  name: "@rcs-lang/cli"
+  description: "RCL command-line interface"
 
 id: cli
 
@@ -11,11 +11,11 @@ language: typescript
 platform: node
 
 dependsOn:
-  - '@rcs-lang/compiler'
-  - '@rcs-lang/core'
-  - '@rcs-lang/file-system'
-  - '@rcs-lang/parser'
-  - '@rcs-lang/types'
+  - "@rcs-lang/compiler"
+  - "@rcs-lang/core"
+  - "@rcs-lang/file-system"
+  - "@rcs-lang/parser"
+  - "@rcs-lang/types"
 
 tags:
   - typescript
@@ -27,11 +27,7 @@ tags:
 tasks:
   build:
     deps:
-      - '@rcs-lang/compiler:build'
-      - '@rcs-lang/core:build'
-      - '@rcs-lang/file-system:build'
-      - '@rcs-lang/parser:build'
-      - '@rcs-lang/types:build'
+      - "^:build"
     env:
       NODE_ENV: "production"
 
@@ -49,5 +45,4 @@ tasks:
     args: [test]
     deps:
       - build
-
-      - 'parser:build'
+      - "parser:build"
