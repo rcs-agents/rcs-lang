@@ -2,7 +2,7 @@ import { exec } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
-import { afterEach, beforeEach, describe, expect, it as test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 
 const execAsync = promisify(exec);
 
@@ -46,7 +46,7 @@ agent InvalidAgent
         const result = await execAsync(`node ${cliPath} compile ${testFile}`);
 
         // Should fail - if we get here, the CLI incorrectly reported success
-        expect.fail(`CLI should have failed but reported success. Output: ${result.stdout}`);
+        throw new Error(`CLI should have failed but reported success. Output: ${result.stdout}`);
       } catch (error: any) {
         // CLI should exit with non-zero code for parse errors
         expect(error.code).toBeGreaterThan(0);
@@ -66,7 +66,7 @@ agent BrokenAgent
 
       try {
         await execAsync(`node ${cliPath} compile ${testFile}`);
-        expect.fail('CLI should have failed');
+        throw new Error('CLI should have failed');
       } catch (_error: any) {
         // Verify no output files were created
         const jsonPath = testFile.replace('.rcl', '.json');
@@ -111,7 +111,7 @@ agent BrokenAgent
 
         try {
           await execAsync(`node ${cliPath} compile ${testFile}`);
-          expect.fail(`CLI should have failed for: ${testCase.name}`);
+          throw new Error(`CLI should have failed for: ${testCase.name}`);
         } catch (error: any) {
           const output = error.stderr || error.stdout || '';
           expect(output).toMatch(testCase.expectedError);
@@ -120,7 +120,7 @@ agent BrokenAgent
     });
   });
 
-  describe.skip('Output Content Validation', () => {
+  describe('Output Content Validation', () => {
     test('should generate non-empty output for valid RCL files', async () => {
       const validRcl = `
 agent SimpleAgent
@@ -164,9 +164,9 @@ agent SimpleAgent
       expect(Object.keys(parsedJson)).toContain('flows');
 
       // Verify actual content exists (not just empty objects)
-      expect(Object.keys(parsedJson.agent).length).greaterThan(0);
-      expect(Object.keys(parsedJson.messages).length).greaterThan(0);
-      expect(Object.keys(parsedJson.flows).length).greaterThan(0);
+      expect(Object.keys(parsedJson.agent).length).toBeGreaterThan(0);
+      expect(Object.keys(parsedJson.messages).length).toBeGreaterThan(0);
+      expect(Object.keys(parsedJson.flows).length).toBeGreaterThan(0);
 
       // Verify JS file contains exports
       expect(jsContent).toMatch(/export.*agent/);
@@ -201,10 +201,10 @@ agent EmptyAgent
 
         // Should not have empty objects
         if (Object.keys(parsedJson.flows).length === 0) {
-          expect.fail('Generated empty flows object - semantic validation should have caught this');
+          throw new Error('Generated empty flows object - semantic validation should have caught this');
         }
         if (Object.keys(parsedJson.messages).length === 0) {
-          expect.fail(
+          throw new Error(
             'Generated empty messages object - semantic validation should have caught this',
           );
         }
@@ -215,7 +215,7 @@ agent EmptyAgent
     });
   });
 
-  describe.skip('Exit Code Validation', () => {
+  describe('Exit Code Validation', () => {
     test('should return 0 for successful compilation', async () => {
       const validRcl = `
 agent SuccessAgent
@@ -246,7 +246,7 @@ agent SuccessAgent
 
       try {
         await execAsync(`node ${cliPath} compile ${testFile}`);
-        expect.fail('Should have thrown due to non-zero exit code');
+        throw new Error('Should have thrown due to non-zero exit code');
       } catch (error: any) {
         expect(error.code).toBeGreaterThan(0);
       }
@@ -257,7 +257,7 @@ agent SuccessAgent
 
       try {
         await execAsync(`node ${cliPath} compile ${nonExistentFile}`);
-        expect.fail('Should have thrown due to non-zero exit code');
+        throw new Error('Should have thrown due to non-zero exit code');
       } catch (error: any) {
         expect(error.code).toBeGreaterThan(0);
         expect(error.stderr || error.stdout).toMatch(/not found|does not exist/i);
@@ -284,7 +284,7 @@ agent TestAgent
 
       try {
         await execAsync(`node ${cliPath} compile ${testFile}`);
-        expect.fail('Should have failed');
+        throw new Error('Should have failed');
       } catch (error: any) {
         const output = error.stderr || error.stdout;
 
@@ -306,7 +306,7 @@ agent TestAgent
 
         // If we get here, check that success wasn't reported with errors present
         if (result.stdout.includes('ERROR') || result.stderr.includes('ERROR')) {
-          expect.fail('CLI reported success despite errors in output');
+          throw new Error('CLI reported success despite errors in output');
         }
       } catch (error: any) {
         // This is expected - CLI should fail

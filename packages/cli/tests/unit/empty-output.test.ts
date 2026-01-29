@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { RCLCompiler } from '@rcs-lang/compiler';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 
 describe('Empty Output Detection', () => {
-  const compiler = new RCLCompiler();
+  const compiler = new RCLCompiler({ fileSystem: new MemoryFileSystem() });
 
   describe('Empty Structure Detection', () => {
     test('should fail when agent section is empty', async () => {

@@ -39,7 +39,7 @@ export async function compileRCL(inputPath: string, options: CompileOptions): Pr
   const compileResult = await compiler.compileFile(resolvedInput);
 
   if (!compileResult.success) {
-    handleCompilationError(compileResult);
+    handleCompilationError(compileResult, inputPath);
     throw new Error('Compilation failed');
   }
 
@@ -50,7 +50,7 @@ export async function compileRCL(inputPath: string, options: CompileOptions): Pr
 
   // Show all diagnostics
   if (diagnostics.length > 0) {
-    displayDiagnostics(diagnostics);
+    displayDiagnostics(diagnostics, inputPath);
   }
 
   // Fail if there are errors or compilation failed
@@ -116,7 +116,7 @@ export async function compileRCL(inputPath: string, options: CompileOptions): Pr
 /**
  * Handle compilation errors
  */
-function handleCompilationError(result: Result<ICompilationResult>): void {
+function handleCompilationError(result: Result<ICompilationResult>, inputPath?: string): void {
   console.error(chalk.red('❌ Compilation failed:'));
 
   if (!result.success) {
@@ -125,13 +125,13 @@ function handleCompilationError(result: Result<ICompilationResult>): void {
   }
 
   const { diagnostics } = result.value;
-  displayDiagnostics(diagnostics);
+  displayDiagnostics(diagnostics, inputPath);
 }
 
 /**
  * Display diagnostics
  */
-function displayDiagnostics(diagnostics: any[]): void {
+function displayDiagnostics(diagnostics: any[], inputPath?: string): void {
   for (const diagnostic of diagnostics) {
     const prefix =
       diagnostic.severity === 'error'
@@ -142,10 +142,14 @@ function displayDiagnostics(diagnostics: any[]): void {
 
     console.error(`  ${prefix} ${diagnostic.message}`);
 
-    if (diagnostic.file && diagnostic.range) {
+    // Show location if available
+    const file = diagnostic.file || inputPath;
+    if (file && diagnostic.range) {
       const line = diagnostic.range.start.line + 1;
-      const column = diagnostic.range.start.column + 1;
-      console.error(chalk.gray(`    at ${diagnostic.file}:${line}:${column}`));
+      const column = diagnostic.range.start.character ?? diagnostic.range.start.column ?? 0;
+      console.error(chalk.gray(`    at ${path.basename(file)}:${line}:${column + 1}`));
+    } else if (file) {
+      console.error(chalk.gray(`    in ${path.basename(file)}`));
     }
   }
 }
@@ -418,7 +422,7 @@ export async function generateDiagram(
   const compileResult = await compiler.compileFile(resolvedInput);
 
   if (!compileResult.success) {
-    handleCompilationError(compileResult);
+    handleCompilationError(compileResult, inputPath);
     throw new Error('Compilation failed');
   }
 

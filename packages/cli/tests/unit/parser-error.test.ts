@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { RCLCompiler } from '@rcs-lang/compiler';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 
 describe('Parser Error Handling', () => {
-  const compiler = new RCLCompiler();
+  const compiler = new RCLCompiler({ fileSystem: new MemoryFileSystem() });
 
   describe('Syntax Error Detection', () => {
     test('should detect missing agent name', async () => {

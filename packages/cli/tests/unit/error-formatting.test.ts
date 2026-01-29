@@ -3,11 +3,12 @@ import { exec } from 'node:child_process';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 import { RCLCompiler } from '@rcs-lang/compiler';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 
 const execAsync = promisify(exec);
 
 describe('Error Message Formatting', () => {
-  const compiler = new RCLCompiler();
+  const compiler = new RCLCompiler({ fileSystem: new MemoryFileSystem() });
   const cliPath = path.resolve(__dirname, '../../dist/index.js');
   const fixturesPath = path.resolve(__dirname, '../fixtures');
 
@@ -204,7 +205,7 @@ agent TestAgent
   });
 
   describe('CLI Error Output Format', () => {
-    test.skip('should format errors nicely in CLI output', async () => {
+    test('should format errors nicely in CLI output', async () => {
       const invalidFile = path.join(fixturesPath, 'invalid-syntax.rcl');
 
       try {
@@ -228,7 +229,7 @@ agent TestAgent
       }
     });
 
-    test.skip('should use colors or formatting for better readability', async () => {
+    test('should use colors or formatting for better readability', async () => {
       const invalidFile = path.join(fixturesPath, 'invalid-syntax.rcl');
 
       try {
@@ -246,7 +247,7 @@ agent TestAgent
       }
     });
 
-    test.skip('should summarize errors when there are many', async () => {
+    test('should summarize errors when there are many', async () => {
       const invalidFile = path.join(fixturesPath, 'invalid-syntax.rcl');
 
       try {

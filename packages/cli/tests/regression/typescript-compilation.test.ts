@@ -63,10 +63,10 @@ ${output}
 
 This indicates a regression in type safety that should be fixed immediately.
 `;
-          expect.fail(errorDetails);
+          throw new Error(errorDetails);
         } else {
           // Unexpected TypeScript error - still fail but with full context
-          expect.fail(`Unexpected TypeScript compilation error:\n${output}`);
+          throw new Error(`Unexpected TypeScript compilation error:\n${output}`);
         }
       }
     });
@@ -85,7 +85,7 @@ This indicates a regression in type safety that should be fixed immediately.
         expect(compilerOptions.noImplicitAny).toBe(false);
         expect(compilerOptions.resolveJsonModule).toBe(true);
       } catch (error: any) {
-        expect.fail(`Failed to read TypeScript configuration: ${error.message}`);
+        throw new Error(`Failed to read TypeScript configuration: ${error.message}`);
       }
     });
   });
@@ -141,7 +141,7 @@ This indicates a regression in type safety that should be fixed immediately.
 
         // Look for interface compatibility issues
         if (output.includes('not assignable') || output.includes('incompatible')) {
-          expect.fail(`Type compatibility issues with language-service package:\n${output}`);
+          throw new Error(`Type compatibility issues with language-service package:\n${output}`);
         }
       }
     });
@@ -166,7 +166,7 @@ This indicates a regression in type safety that should be fixed immediately.
             .map((line) => line.match(/'([^']+)'/)?.[1])
             .filter(Boolean);
 
-          expect.fail(
+          throw new Error(
             `Missing module imports detected:\n${missingModules.join('\n')}\n\nFull output:\n${output}`,
           );
         }
@@ -185,7 +185,7 @@ This indicates a regression in type safety that should be fixed immediately.
         });
 
         if (result.stdout.trim()) {
-          expect.fail(`Found relative imports outside package boundaries:\n${result.stdout}`);
+          throw new Error(`Found relative imports outside package boundaries:\n${result.stdout}`);
         }
       } catch (error: any) {
         // grep error is okay (no matches found)
@@ -197,7 +197,7 @@ This indicates a regression in type safety that should be fixed immediately.
   });
 
   describe('Build Output Validation', () => {
-    test.skip('should generate valid JavaScript output', async () => {
+    test('should generate valid JavaScript output', async () => {
       try {
         // Clean build
         await execAsync('npm run clean', { cwd: process.cwd() });
@@ -215,7 +215,7 @@ This indicates a regression in type safety that should be fixed immediately.
         const checkFiles = await execAsync('ls dist/', { cwd: process.cwd() });
         expect(checkFiles.stdout).toMatch(/\.js$/m);
       } catch (error: any) {
-        expect.fail(`Build failed: ${error.stdout || error.stderr || error.message}`);
+        throw new Error(`Build failed: ${error.stdout || error.stderr || error.message}`);
       }
     });
 
@@ -239,13 +239,13 @@ This indicates a regression in type safety that should be fixed immediately.
         }
       } catch (error: any) {
         const output = error.stderr || error.stdout || '';
-        expect.fail(`Declaration file generation failed:\n${output}`);
+        throw new Error(`Declaration file generation failed:\n${output}`);
       }
     });
   });
 
   describe('Runtime Type Safety', () => {
-    test.skip('should not have runtime type coercion issues', async () => {
+    test('should not have runtime type coercion issues', async () => {
       // This test ensures our TypeScript types match runtime behavior
       // Since the CLI is an ES module, we'll test that the build outputs are valid
       try {
