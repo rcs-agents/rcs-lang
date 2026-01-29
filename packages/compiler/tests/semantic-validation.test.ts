@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 import { RCLCompiler } from '../src/compiler.js';
 import { CompilationPipeline } from '../src/pipeline/compilationPipeline.js';
 import { ParseStage, TransformStage, ValidateStage } from '../src/stages/index.js';
@@ -13,7 +14,8 @@ describe('Semantic Validation', () => {
     pipeline.addStage(new ValidateStage());
     pipeline.addStage(new TransformStage());
 
-    compiler = new RCLCompiler(pipeline);
+    const memoryFs = new MemoryFileSystem();
+    compiler = new RCLCompiler({ fileSystem: memoryFs, pipeline });
   });
 
   describe('Context Variable Requirements', () => {

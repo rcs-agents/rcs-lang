@@ -3,7 +3,7 @@ import { RCLCompiler } from '@rcs-lang/compiler';
 import { generateD2Diagram, generateMermaidDiagram } from '@rcs-lang/compiler';
 import type { Result } from '@rcs-lang/core';
 import type { ICompilationResult, IFileSystem } from '@rcs-lang/core';
-import { FileSystemFactory } from '@rcs-lang/file-system';
+import { NodeFileSystem } from '@rcs-lang/file-system';
 import { AntlrRclParser } from '@rcs-lang/parser';
 import chalk from 'chalk';
 
@@ -19,7 +19,7 @@ export interface CompileOptions {
  * Compile RCL file using the new compiler infrastructure
  */
 export async function compileRCL(inputPath: string, options: CompileOptions): Promise<void> {
-  const fileSystem = FileSystemFactory.getDefault();
+  const fileSystem = new NodeFileSystem();
   const compiler = new RCLCompiler({ fileSystem });
 
   // Resolve input path
@@ -264,7 +264,7 @@ export async function parseRCL(
   inputPath: string,
   options: { pretty?: boolean; output?: string; exclude?: string[]; only?: string[] },
 ): Promise<void> {
-  const fileSystem = FileSystemFactory.getDefault();
+  const fileSystem = new NodeFileSystem();
   const parser = new AntlrRclParser();
 
   // Resolve input path
@@ -394,7 +394,7 @@ export async function generateDiagram(
     separateInvalid?: boolean;
   },
 ): Promise<void> {
-  const fileSystem = FileSystemFactory.getDefault();
+  const fileSystem = new NodeFileSystem();
   const compiler = new RCLCompiler({ fileSystem });
 
   // Resolve input path

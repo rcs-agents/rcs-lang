@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'bun:test';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 import { RCLCompiler } from '../src/compiler.js';
 
 describe('JavaScript Output Generation', () => {
   test('should generate valid JavaScript from RCL', async () => {
-    const compiler = new RCLCompiler();
+    const memoryFs = new MemoryFileSystem();
+    const compiler = new RCLCompiler({ fileSystem: memoryFs });
 
     const rclSource = `
 agent TestAgent

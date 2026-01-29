@@ -6,6 +6,7 @@ import {
   TransformStage,
   ValidateStage,
 } from '@rcs-lang/compiler';
+import { MemoryFileSystem } from '@rcs-lang/file-system';
 import type { AgentData, CompiledAgent, Diagnostic } from '../program/types.js';
 
 /**
@@ -31,7 +32,8 @@ export class Compiler {
       pipeline.addStage(new ValidateStage());
       pipeline.addStage(new TransformStage());
 
-      const compiler = new RCLCompiler(pipeline);
+      const memoryFs = new MemoryFileSystem();
+      const compiler = new RCLCompiler({ fileSystem: memoryFs, pipeline });
 
       // Compile from source content directly
       const result = await compiler.compile({

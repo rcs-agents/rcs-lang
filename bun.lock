@@ -152,10 +152,10 @@
       "name": "@rcs-lang/compiler",
       "version": "0.4.0",
       "dependencies": {
-        "@rcs-lang/core": "^0.3.4",
-        "@rcs-lang/csm": "^0.3.4",
-        "@rcs-lang/file-system": "^0.3.4",
-        "@rcs-lang/validation": "^0.3.4",
+        "@rcs-lang/core": "workspace:*",
+        "@rcs-lang/csm": "workspace:*",
+        "@rcs-lang/file-system": "workspace:*",
+        "@rcs-lang/validation": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "^1.3.6",
@@ -3246,27 +3246,15 @@
 
     "@rcs-lang/cli/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
-    "@rcs-lang/compiler/@rcs-lang/core": ["@rcs-lang/core@0.3.4", "", { "dependencies": { "@rcs-lang/ast": "workspace:*" } }, "sha512-OeQWpuPlEN+V8vOjZjppE3Xem2FQNnb597J3oiz7KadYTA0TA8G+g6tz7qxaqO4MJHX++cmIzY/mSdRsWQ1Aeg=="],
-
-    "@rcs-lang/compiler/@rcs-lang/csm": ["@rcs-lang/csm@0.3.4", "", { "dependencies": { "json-logic-js": "^2.0.2", "neverthrow": "^8.0.0" } }, "sha512-oDyCpI+U34Z8NUbnd4Fvco79f14ONAi2qbH6mtYIs9paDPRdi9uYP6K2W+H5RD76sjty7iG9olrr6Ex5Ai6orQ=="],
-
-    "@rcs-lang/compiler/@rcs-lang/file-system": ["@rcs-lang/file-system@0.3.4", "", { "dependencies": { "@rcs-lang/core": "^0.3.4" } }, "sha512-yqt4VUHpEkFBt+/NEFci49m9tLGnrZWY40+n6PAX44Nz+11NLC7wcX/6RI5+blINnbX5Khv+8p/qYGqN3wwVDw=="],
-
-    "@rcs-lang/compiler/@rcs-lang/validation": ["@rcs-lang/validation@0.3.5", "", { "dependencies": { "@rcs-lang/core": "workspace:*", "@rcs-lang/parser": "workspace:*" } }, "sha512-a82E8bSAUTdc1jIjhw8axAZTxA4KoF0+uKOgTghLTBg2kh52Qmf2wO97OjLHA6+c3O4EPXl6aTFGn0OSgRLVLA=="],
-
     "@rcs-lang/compiler/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
 
     "@rcs-lang/core/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
 
     "@rcs-lang/csm/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
 
-    "@rcs-lang/csm/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
-
     "@rcs-lang/diagram/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
 
     "@rcs-lang/file-system/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
-
-    "@rcs-lang/file-system/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
     "@rcs-lang/language-service/@types/node": ["@types/node@20.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-1GM9z6BJOv86qkPvzh2i6VW5+VVrXxCLknfmTkWEqz+6DqosiY28XUWCTmBcJ0ACzKqx/iwdIREfo1fwExIlkA=="],
 
@@ -3877,8 +3865,6 @@
     "@rcs-lang/ast/@types/node/undici-types": ["undici-types@7.8.0", "", {}, "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw=="],
 
     "@rcs-lang/cli/@types/node/undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "@rcs-lang/compiler/@rcs-lang/validation/@rcs-lang/core": ["@rcs-lang/core@workspace:packages/core"],
 
     "@rcs-lang/compiler/@types/node/undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 

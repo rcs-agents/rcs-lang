@@ -6,13 +6,17 @@ import type {
   ICompilerCapabilities,
   IFileSystem,
 } from '@rcs-lang/core';
-import { FileSystemFactory } from '@rcs-lang/file-system';
 import { D2Generator, JavaScriptGenerator, MermaidGenerator } from './generators/index.js';
 import { CompilationPipeline } from './pipeline/compilationPipeline.js';
 import { ParseStage, TransformStage, ValidateStage } from './stages/index.js';
 
 export interface CompilerOptions {
-  fileSystem?: IFileSystem;
+  /**
+   * The filesystem implementation to use.
+   * Required - use MemoryFileSystem for browser, NodeFileSystem for Node.js.
+   */
+  fileSystem: IFileSystem;
+  pipeline?: CompilationPipeline;
   strict?: boolean;
 }
 
@@ -123,16 +127,19 @@ export class RCLCompiler implements ICompiler {
   private d2Generator: D2Generator;
   private mermaidGenerator: MermaidGenerator;
 
-  constructor(optionsOrPipeline?: CompilerOptions | CompilationPipeline) {
-    // Support both constructor signatures for backward compatibility
-    if (optionsOrPipeline instanceof CompilationPipeline) {
-      this.pipeline = optionsOrPipeline;
-      this.fileSystem = FileSystemFactory.getDefault();
-    } else {
-      const options = optionsOrPipeline || {};
-      this.fileSystem = options.fileSystem || FileSystemFactory.getDefault();
+  constructor(options: CompilerOptions) {
+    if (!options.fileSystem) {
+      throw new Error(
+        'RCLCompiler requires a fileSystem. ' +
+        'Use MemoryFileSystem for browser, NodeFileSystem for Node.js.'
+      );
+    }
+    this.fileSystem = options.fileSystem;
 
-      // Set up default pipeline
+    // Set up pipeline (use provided or create default)
+    if (options.pipeline) {
+      this.pipeline = options.pipeline;
+    } else {
       this.pipeline = new CompilationPipeline();
       this.pipeline.addStage(new ParseStage());
       this.pipeline.addStage(new ValidateStage());
