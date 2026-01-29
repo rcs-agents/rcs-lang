@@ -5,7 +5,7 @@ prev: false
 title: "ImportStatement"
 ---
 
-Defined in: [ast.ts:29](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L29)
+Defined in: [ast.ts:29](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L29)
 
 An import statement.
 
@@ -23,7 +23,7 @@ ImportStatement ::= 'import' ImportPath ('as' IDENTIFIER)?
 
 > `optional` **alias**: [`Identifier`](/api/ast/interfaces/identifier/)
 
-Defined in: [ast.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L33)
+Defined in: [ast.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L33)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5b
 
 > **importPath**: `string`[]
 
-Defined in: [ast.ts:32](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L32)
+Defined in: [ast.ts:32](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L32)
 
 #### Spec
 
@@ -43,7 +43,7 @@ ImportPath ::= IDENTIFIER ('/' IDENTIFIER)*
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -55,4 +55,4 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e
 
 > **type**: `"ImportStatement"`
 
-Defined in: [ast.ts:30](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L30)
+Defined in: [ast.ts:30](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L30)

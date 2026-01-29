@@ -1,14 +1,19 @@
 {
   "name": "@rcs-lang/docs",
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.5.0",
+  "private": true,
   "description": "Documentation site for RCL (Rich Communication Language)",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@astrojs/markdoc": "^0.15.0",
@@ -37,5 +42,8 @@
     "starlight-package-managers": "^0.11.0",
     "starlight-typedoc": "^0.21.3",
     "typedoc": "^0.28.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0"
   }
 }

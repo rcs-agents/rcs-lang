@@ -41,9 +41,10 @@ export function Playground() {
 			const startTime = performance.now();
 
 			try {
-				// Dynamically import parser and compiler to avoid SSR issues
+				// Dynamically import parser, compiler, and filesystem to avoid SSR issues
 				const { parse } = await import('@rcs-lang/parser');
 				const { RCLCompiler } = await import('@rcs-lang/compiler');
+				const { MemoryFileSystem } = await import('@rcs-lang/file-system/browser');
 
 				const result = await parse(code);
 				const parseTime = performance.now() - startTime;
@@ -70,7 +71,8 @@ export function Playground() {
 
 				if (result.ast && !result.errors?.length) {
 					try {
-						const compiler = new RCLCompiler();
+						const memoryFs = new MemoryFileSystem();
+						const compiler = new RCLCompiler({ fileSystem: memoryFs });
 
 						// Compile to get output
 						const compileResult = await compiler.compile({

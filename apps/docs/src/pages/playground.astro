@@ -1,16 +1,28 @@
 ---
-import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { Playground } from '../components/playground/Playground';
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { Playground } from "../components/playground/Playground";
 ---
 
-<StarlightPage
-	frontmatter={{
-		title: 'RCL Playground',
-		description: 'Interactive playground for experimenting with RCL code',
-		template: 'splash',
-	}}
->
-	<div style="width: 100%; height: calc(100vh - 8rem); margin: 0 auto;">
-		<Playground client:only="react" />
-	</div>
-</StarlightPage>
+<style>
+  :root {
+    --sl-content-width: 100% !important;
+  }
+
+  .sl-markdown-content {
+    width: 100% !important;
+    height: calc(100vh - 8rem) !important;
+    margin: 0 auto !important;
+  }
+</style>
+
+<!-- <StarlightPage
+  frontmatter={{
+    title: "RCL Playground",
+    description: "Interactive playground for experimenting with RCL code",
+    template: "splash",
+  }}
+> -->
+<div style="width: 100%; height: calc(100vh - 8rem); margin: 0 auto;">
+  <Playground client:only="react" />
+</div>
+<!-- </StarlightPage> -->

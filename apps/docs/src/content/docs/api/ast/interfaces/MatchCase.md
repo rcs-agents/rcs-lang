@@ -5,7 +5,7 @@ prev: false
 title: "MatchCase"
 ---
 
-Defined in: [ast.ts:85](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L85)
+Defined in: [ast.ts:85](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L85)
 
 A case within a match block.
 
@@ -23,7 +23,7 @@ MatchCase ::= (STRING | NUMBER | ATOM | DEFAULT_CASE) ARROW TransitionTarget
 
 > **consequence**: [`FlowInvocation`](/api/ast/interfaces/flowinvocation/) \| [`ContextualizedValue`](/api/ast/interfaces/contextualizedvalue/) \| [`FlowTermination`](/api/ast/interfaces/flowtermination/) \| [`ContextOperationSequence`](/api/ast/interfaces/contextoperationsequence/)
 
-Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L88)
+Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L88)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [ast.ts:88](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5b
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -43,7 +43,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e
 
 > **type**: `"MatchCase"`
 
-Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L86)
+Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L86)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:86](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5b
 
 > **value**: [`StringLiteral`](/api/ast/interfaces/stringliteral/) \| [`NumericLiteral`](/api/ast/interfaces/numericliteral/) \| [`Atom`](/api/ast/interfaces/atom/) \| `"default"`
 
-Defined in: [ast.ts:87](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L87)
+Defined in: [ast.ts:87](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L87)

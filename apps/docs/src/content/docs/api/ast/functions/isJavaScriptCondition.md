@@ -7,7 +7,7 @@ title: "isJavaScriptCondition"
 
 > **isJavaScriptCondition**(`node`): `node is JavaScriptCondition`
 
-Defined in: [guards.ts:227](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/guards.ts#L227)
+Defined in: [guards.ts:227](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/guards.ts#L227)
 
 ## Parameters
 

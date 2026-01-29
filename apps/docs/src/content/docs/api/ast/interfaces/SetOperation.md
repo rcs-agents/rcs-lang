@@ -5,7 +5,7 @@ prev: false
 title: "SetOperation"
 ---
 
-Defined in: [ast.ts:337](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L337)
+Defined in: [ast.ts:337](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L337)
 
 A set operation.
 
@@ -23,7 +23,7 @@ SET Variable TO (RESULT | Value)
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e
 
 > **source**: [`Value`](/api/ast/type-aliases/value/) \| `"result"`
 
-Defined in: [ast.ts:339](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L339)
+Defined in: [ast.ts:339](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L339)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [ast.ts:339](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5
 
 > **target**: [`Variable`](/api/ast/interfaces/variable/) \| [`PropertyAccess`](/api/ast/interfaces/propertyaccess/)
 
-Defined in: [ast.ts:340](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L340)
+Defined in: [ast.ts:340](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L340)
 
 ***
 
@@ -51,4 +51,4 @@ Defined in: [ast.ts:340](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5
 
 > **type**: `"SetOperation"`
 
-Defined in: [ast.ts:338](https://github.com/rcs-agents/rcs-lang/blob/5fc8b9e6ee5bcb678869a4882d36480687a9db1c/packages/ast/src/ast.ts#L338)
+Defined in: [ast.ts:338](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L338)

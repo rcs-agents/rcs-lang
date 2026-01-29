@@ -12,25 +12,9 @@ import react from '@astrojs/react';
 export default defineConfig({
 	site: 'https://rcl.rcsagents.io',
 	vite: {
-		ssr: {
-			// Don't bundle these packages in SSR - they'll be loaded dynamically on the client
-			noExternal: [],
-			external: ['@rcs-lang/file-system', '@rcs-lang/compiler'],
-		},
 		optimizeDeps: {
-			exclude: ['@rcs-lang/file-system', '@rcs-lang/compiler', '@rcs-lang/parser'],
-		},
-		build: {
-			rollupOptions: {
-				external: (id) => {
-					// Exclude packages that use Node.js APIs from the bundle
-					return (
-						id.includes('@rcs-lang/file-system') ||
-						id.includes('node:fs') ||
-						id.includes('node:path')
-					);
-				},
-			},
+			// Exclude RCL packages from pre-bundling - they're dynamically imported in playground
+			exclude: ['@rcs-lang/compiler', '@rcs-lang/parser', '@rcs-lang/file-system'],
 		},
 	},
 	integrations: [
