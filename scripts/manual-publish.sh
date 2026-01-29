@@ -38,11 +38,19 @@ publish_package() {
     fi
 }
 
+# Helper to normalize package name (strip @rcs-lang/ prefix if present)
+normalize_package_name() {
+    local name=$1
+    # Remove @rcs-lang/ prefix if present
+    echo "${name#@rcs-lang/}"
+}
+
 # 2. Determine targets
 if [ $# -gt 0 ]; then
     echo "Publishing specific packages from arguments..."
     for name in "$@"; do
-        publish_package "$PACKAGES_DIR/$name"
+        normalized=$(normalize_package_name "$name")
+        publish_package "$PACKAGES_DIR/$normalized"
     done
 else
     echo "No package names provided. Publishing ALL packages in $PACKAGES_DIR..."

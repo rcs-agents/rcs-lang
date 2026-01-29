@@ -9,6 +9,7 @@
       "@rcs-lang/compiler",
       "@rcs-lang/core",
       "@rcs-lang/csm",
+      "@rcs-lang/diagram",
       "@rcs-lang/file-system",
       "@rcs-lang/language-service",
       "@rcs-lang/parser",
@@ -20,7 +21,7 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["rcl-language-support", "@rcs-lang/diagram", "@rcs-lang/docs"],
+  "ignore": ["rcl-language-support", "@rcs-lang/docs"],
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   }
