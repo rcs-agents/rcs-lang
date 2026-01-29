@@ -14,3 +14,8 @@ fileGroups:
     - "tsconfig.json"
   tests:
     - "tests/**/*"
+
+tasks:
+  test:
+    deps:
+      - build

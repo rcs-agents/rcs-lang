@@ -21,9 +21,11 @@ tasks:
     deps:
       - 'parser:build'
 
-
   typecheck:
     deps:
       - 'parser:build'
 
+  test:
+    deps:
+      - build
 

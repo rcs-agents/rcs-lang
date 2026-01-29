@@ -19,7 +19,11 @@ tasks:
   build:
     deps:
       - core:build
-      
+
+  test:
+    deps:
+      - build
+
   clean:
     command: rm -rf dist coverage
     platform: system
