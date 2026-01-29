@@ -46,6 +46,21 @@ tasks:
     outputs:
       - 'dist'
 
+  fix-esm-imports:
+    command: bun
+    args: [run, scripts/fix-esm-imports.ts]
+    deps:
+      - compile
+    inputs:
+      - 'dist/generated/*.js'
+      - 'scripts/fix-esm-imports.ts'
+    outputs:
+      - 'dist/generated/*.js'
+
+  build:
+    deps:
+      - fix-esm-imports
+
   test:
     command: bun
     args: [test]

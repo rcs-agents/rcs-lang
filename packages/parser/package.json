@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/parser",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,5 +29,9 @@
   "devDependencies": {
     "antlr-ng": "^1.0.10",
     "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

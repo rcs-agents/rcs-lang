@@ -65,3 +65,4 @@ apps/extension/.wdio-vscode-service
 
 .env
 test-results/
+.npmrc

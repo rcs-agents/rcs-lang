@@ -3,6 +3,7 @@
   "displayName": "RCL Language Support",
   "description": "Rich Communication Language (RCL) support for Visual Studio Code",
   "version": "0.1.0",
+  "private": true,
   "publisher": "rcl-lang",
   "license": "MIT",
   "type": "module",
