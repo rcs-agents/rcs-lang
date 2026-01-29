@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/compiler",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Compilation pipeline for RCL language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

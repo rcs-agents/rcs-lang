@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/parser",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
