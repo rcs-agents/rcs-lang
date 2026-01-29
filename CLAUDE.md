@@ -101,17 +101,23 @@ bun run docs:preview
 ```
 
 ### Publishing
+
+We use [changesets](https://github.com/changesets/changesets) for versioning and publishing. See [docs/CHANGESETS_QUICK_REFERENCE.md](docs/CHANGESETS_QUICK_REFERENCE.md) for details.
+
 ```bash
-# Bump version and prepare release
-bun run release:patch  # or minor/major
+# Add a changeset (do this after making changes)
+bun changeset:add
 
-# Dry run publish
-bun run publish:dry
+# Check what will be released
+bun changeset:status
 
-# Publish packages
-bun run publish:packages
+# Full release (build, test, version, publish, tag)
+bun run release
 
-# Publish VSCode extension
+# Verify workspace dependencies
+bun run check:workspace
+
+# Publish VSCode extension (separate process)
 bun run publish:extension
 ```
 
