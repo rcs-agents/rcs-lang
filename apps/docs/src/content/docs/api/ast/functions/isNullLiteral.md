@@ -7,7 +7,7 @@ title: "isNullLiteral"
 
 > **isNullLiteral**(`node`): `node is NullLiteral`
 
-Defined in: [guards.ts:110](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/guards.ts#L110)
+Defined in: [guards.ts:110](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/guards.ts#L110)
 
 ## Parameters
 

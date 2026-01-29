@@ -7,7 +7,7 @@ title: "FlowResult"
 
 > **FlowResult** = `"end"` \| `"cancel"` \| `"error"`
 
-Defined in: [ast.ts:315](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L315)
+Defined in: [ast.ts:315](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L315)
 
 A flow result type.
 

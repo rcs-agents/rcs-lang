@@ -5,7 +5,7 @@ prev: false
 title: "SpreadDirective"
 ---
 
-Defined in: [ast.ts:66](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L66)
+Defined in: [ast.ts:66](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L66)
 
 A spread directive to include attributes from another section.
 
@@ -23,7 +23,7 @@ SpreadDirective ::= SPREAD IDENTIFIER
 
 > `optional` **location**: [`SourceLocation`](/api/ast/interfaces/sourcelocation/)
 
-Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/position.ts#L33)
+Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/position.ts#L33)
 
 #### Inherited from
 
@@ -35,7 +35,7 @@ Defined in: [position.ts:33](https://github.com/rcs-agents/rcs-lang/blob/6bc0648
 
 > **reference**: [`Identifier`](/api/ast/interfaces/identifier/)
 
-Defined in: [ast.ts:68](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L68)
+Defined in: [ast.ts:68](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L68)
 
 ***
 
@@ -43,4 +43,4 @@ Defined in: [ast.ts:68](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bf
 
 > **type**: `"SpreadDirective"`
 
-Defined in: [ast.ts:67](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/ast.ts#L67)
+Defined in: [ast.ts:67](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/ast.ts#L67)

@@ -77,11 +77,10 @@ for (const pkgPath of packages) {
 
 if (totalIssues === 0) {
   console.log('✅ All internal dependencies use workspace:*');
-  console.log('   Safe to publish!');
   process.exit(0);
 } else {
   console.log(`❌ Found ${totalIssues} hard-coded version(s)`);
-  console.log('\nTo fix, run:');
-  console.log('  bun /private/tmp/claude-501/-work-rcs-rcl/00db68e8-2e61-42c9-b46d-6b4f5ed26836/scratchpad/fix-workspace-deps.js');
+  console.log('\nAll @rcs-lang/* dependencies must use "workspace:*"');
+  console.log('Please fix the above issues manually.');
   process.exit(1);
 }

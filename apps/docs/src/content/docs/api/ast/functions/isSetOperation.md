@@ -7,7 +7,7 @@ title: "isSetOperation"
 
 > **isSetOperation**(`node`): `node is SetOperation`
 
-Defined in: [guards.ts:215](https://github.com/rcs-agents/rcs-lang/blob/6bc0648217bff31ab32f404732496b47353bf026/packages/ast/src/guards.ts#L215)
+Defined in: [guards.ts:215](https://github.com/rcs-agents/rcs-lang/blob/e2c1fcc864c8a99ca00326a01512ebf19034c1e0/packages/ast/src/guards.ts#L215)
 
 ## Parameters
 

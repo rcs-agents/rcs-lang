@@ -1,5 +1,17 @@
 # @rcs-lang/language-service
 
+## 0.5.1
+
+### Patch Changes
+
+- Fixing broken dependencies
+- Updated dependencies
+  - @rcs-lang/compiler@0.5.1
+  - @rcs-lang/core@0.5.1
+  - @rcs-lang/parser@0.5.1
+  - @rcs-lang/types@0.5.1
+  - @rcs-lang/validation@0.5.1
+
 ## 0.5.0
 
 ### Minor Changes
