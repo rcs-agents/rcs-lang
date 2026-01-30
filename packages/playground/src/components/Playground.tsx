@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Splitter } from '@ark-ui/react/splitter';
 import { Editor } from './Editor';
 import { Toolbar } from './Toolbar';
 import { TabBar, type TabId } from './TabBar';
@@ -195,10 +196,22 @@ export function Playground({
 
 	return (
 		<div className={playgroundClassName}>
-			<Toolbar onSelectExample={handleSelectExample} onShare={handleShare} examples={availableExamples} />
+			<Toolbar
+				onSelectExample={handleSelectExample}
+				onShare={handleShare}
+				examples={availableExamples}
+				devMode={devToolsVisible}
+				onDevModeChange={setDevToolsVisible}
+			/>
 
-			<div className="playground-content">
-				<div className="editor-pane">
+			<Splitter.Root
+				className="playground-content"
+				defaultSize={[
+					{ id: 'editor', size: 50 },
+					{ id: 'output', size: 50 },
+				]}
+			>
+				<Splitter.Panel id="editor" className="editor-pane">
 					<Editor
 						value={source}
 						onChange={handleSourceChange}
@@ -219,19 +232,13 @@ export function Playground({
 							/>
 						</div>
 					)}
-				</div>
+				</Splitter.Panel>
 
-				<div className="output-pane">
+				<Splitter.ResizeTrigger id="editor:output" className="splitter-trigger" />
+
+				<Splitter.Panel id="output" className="output-pane">
 					<div className="output-pane-header">
 						<TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-						<button
-							className="dev-tools-toggle-btn"
-							onClick={() => setDevToolsVisible(!devToolsVisible)}
-							title={devToolsVisible ? 'Hide dev tools' : 'Show dev tools'}
-							type="button"
-						>
-							{devToolsVisible ? 'Hide' : 'Show'} Dev Tools
-						</button>
 					</div>
 
 					<div className="panel-container">
@@ -244,10 +251,12 @@ export function Playground({
 						{!isLoading && activeTab === 'simulator' && (
 							<SimulatorPanel
 								csm={compilationResult?.csm}
+								messages={compilationResult?.bundle?.messages}
 								extractedMessages={compilationResult?.extractedMessages}
 								agentName={agent?.name}
 								agentIconUrl={agent?.iconUrl}
 								hasErrors={hasErrors}
+								devToolsVisible={devToolsVisible}
 							/>
 						)}
 
@@ -271,8 +280,8 @@ export function Playground({
 							<AstPanel ast={compilationResult?.ast} />
 						)}
 					</div>
-				</div>
-			</div>
+				</Splitter.Panel>
+			</Splitter.Root>
 
 			{/* Diagnostics panel at the bottom (replaces Errors tab) */}
 			<DiagnosticsPanel diagnostics={compilationResult?.diagnostics || []} />

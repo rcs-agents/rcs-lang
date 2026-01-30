@@ -313,8 +313,43 @@ export class SimulatorEngine {
       }
     }
 
-    // Reset thread
+    // Reset thread and send initial message
     this.thread = []
+    await this.sendInitialMessage()
+  }
+
+  /**
+   * Send the initial message for the starting state
+   */
+  private async sendInitialMessage(): Promise<void> {
+    if (!this.runtimeState) return
+
+    // Generate the message for the initial state
+    const response = await this.generateResponseMessage({} as ProcessResult)
+
+    if (response) {
+      const agentMsg: AgentMessage = {
+        messageId: Date.now().toString(),
+        sendTime: new Date().toISOString(),
+        contentMessage: {
+          text: response.type === 'text' ? response.content : undefined,
+          richCard: response.type === 'richCard' || response.type === 'carousel' ? { /* TODO: better mapping */ } as any : undefined
+        }
+      }
+
+      if (response.type === 'text') {
+        agentMsg.contentMessage.text = response.content
+        agentMsg.contentMessage.suggestions = response.suggestions?.map((s: any) => ({
+          reply: { text: s.text, postbackData: s.action }
+        }))
+      }
+
+      const agentEntry: ThreadEntry = { agentMessage: agentMsg }
+      this.thread = [agentEntry]
+
+      this.callbacks.onMessageSent?.(agentMsg)
+      this.callbacks.onThreadChange?.(this.thread)
+    }
   }
 
   private updateRuntimeStateFromResult(result: ProcessResult, userInput: string, previousState: string, response?: any) {

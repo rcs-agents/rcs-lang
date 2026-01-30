@@ -36,8 +36,59 @@
 .toolbar-left,
 .toolbar-right {
 	display: flex;
-	gap: 0.5rem;
+	gap: 0.75rem;
 	align-items: center;
+}
+
+/* ============================================
+ * Dev Mode Switch
+ * ============================================ */
+.dev-mode-switch {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.dev-mode-switch-control {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	width: 36px;
+	height: 20px;
+	background: var(--colors-bg-muted);
+	border-radius: 10px;
+	transition: background 0.2s ease;
+}
+
+.dev-mode-switch[data-state="checked"] .dev-mode-switch-control {
+	background: var(--colors-accent-default);
+}
+
+.dev-mode-switch-thumb {
+	position: absolute;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	background: white;
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dev-mode-switch[data-state="checked"] .dev-mode-switch-thumb {
+	transform: translateX(16px);
+}
+
+.dev-mode-switch-label {
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--colors-fg-muted);
+	user-select: none;
+}
+
+.dev-mode-switch[data-state="checked"] .dev-mode-switch-label {
+	color: var(--colors-fg-default);
 }
 
 /* ============================================
@@ -274,18 +325,50 @@
 }
 
 .editor-pane {
-	flex: 1;
 	min-width: 0;
-	border-right: 1px solid var(--colors-border-muted);
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 }
 
 .output-pane {
-	flex: 1;
 	min-width: 0;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
+}
+
+/* ============================================
+ * Splitter
+ * ============================================ */
+.splitter-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--colors-border-muted);
+	transition: background 0.15s ease;
+	flex-shrink: 0;
+}
+
+.splitter-trigger:hover {
+	background: var(--colors-accent-default);
+}
+
+.splitter-trigger:focus-visible {
+	outline: 2px solid var(--colors-accent-default);
+	outline-offset: 2px;
+}
+
+/* Horizontal splitter (between editor and output) */
+.playground-content > .splitter-trigger {
+	width: 4px;
+	cursor: col-resize;
+}
+
+/* Horizontal splitter in simulator panel */
+.simulator-panel-content > .splitter-trigger {
+	width: 4px;
+	cursor: col-resize;
 }
 
 /* ============================================
@@ -358,7 +441,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 1rem;
+	padding: 0;
 	min-height: 100%;
 }
 
@@ -379,6 +462,10 @@
 	flex: 1;
 	overflow: auto;
 	padding: 1rem;
+}
+
+.panel-container:has(.simulator-panel) {
+	padding: 0;
 }
 
 .panel-empty {
@@ -897,26 +984,25 @@
 .simulator-panel {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: stretch;
 	justify-content: flex-start;
-	padding: 1rem;
-	min-height: 100%;
-	gap: 0.75rem;
+	height: 100%;
+	gap: 0;
 }
 
 .simulator-error-banner {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.5rem;
 	padding: 0.5rem 1rem;
 	background: rgba(239, 68, 68, 0.1);
-	border: 1px solid rgba(239, 68, 68, 0.3);
-	border-radius: var(--radii-l2);
+	border-bottom: 1px solid rgba(239, 68, 68, 0.3);
 	color: #ef4444;
 	font-size: 0.8rem;
 	font-weight: 500;
-	max-width: 320px;
 	text-align: center;
+	flex-shrink: 0;
 }
 
 .simulator-error-icon {
@@ -939,16 +1025,16 @@
 .simulator-preview-banner {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.5rem;
 	padding: 0.5rem 1rem;
 	background: rgba(59, 130, 246, 0.1);
-	border: 1px solid rgba(59, 130, 246, 0.3);
-	border-radius: var(--radii-l2);
+	border-bottom: 1px solid rgba(59, 130, 246, 0.3);
 	color: #3b82f6;
 	font-size: 0.8rem;
 	font-weight: 500;
-	max-width: 320px;
 	text-align: center;
+	flex-shrink: 0;
 }
 
 .simulator-preview-icon {
@@ -957,6 +1043,75 @@
 	justify-content: center;
 	flex-shrink: 0;
 	font-size: 1rem;
+}
+
+/* ============================================
+ * Simulator Panel with Dev Tools
+ * ============================================ */
+.simulator-panel-content {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+}
+
+.simulator-panel-main {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.simulator-dev-tools-panel {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.simulator-dev-tools {
+	width: 100%;
+	height: 100%;
+	background: var(--colors-bg-default);
+	display: flex;
+	flex-direction: column;
+}
+
+.simulator-dev-tools-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem 1rem;
+	background: var(--colors-bg-subtle);
+	border-bottom: 1px solid var(--colors-border-muted);
+	flex-shrink: 0;
+}
+
+.simulator-dev-tools-header h4 {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--colors-fg-default);
+}
+
+.simulator-dev-tools-content {
+	flex: 1;
+	overflow: auto;
+	padding: 0;
+	min-height: 0;
+}
+
+.simulator-dev-tools-content .code-viewer {
+	border: none;
+	border-radius: 0;
+	height: 100%;
+}
+
+.simulator-dev-tools-content .code-viewer-header {
+	display: none;
 }
 
 /* ============================================

@@ -52,20 +52,18 @@ export default defineConfig({
 			},
 		],
 		optimizeDeps: {
-			// Exclude RCL packages from pre-bundling - they're dynamically imported in playground
-			exclude: [
+			// Include core RCS packages for pre-bundling (needed for browser compilation)
+			include: [
+				'@rcs-lang/parser',
 				'@rcs-lang/compiler',
 				'@rcs-lang/csm',
-				'@rcs-lang/parser',
 				'@rcs-lang/file-system',
+				'@rcs-lang/file-system/browser',
+			],
+			// Exclude packages not needed in browser or with ESM issues
+			exclude: [
 				'@rcs-lang/diagram',
 				'@rcs-lang/diagram/web',
-				'@rcs-lang/playground',
-				'@rcs-lang/simulator',
-				'@rcs-lang/simulator/react',
-				'@ark-ui/react',
-				'@monaco-editor/react',
-				'lucide-react',
 				// Exclude solid-js - it's only for the simulator's solid variant
 				'solid-js',
 				'solid-js/web',
@@ -99,13 +97,11 @@ export default defineConfig({
 		},
 		build: {
 			rollupOptions: {
-				// For dynamic imports in playground, treat these as external
-				// They will be loaded from node_modules at runtime
+				// Only mark vscode-languageserver-types as external (server-side only)
+				// RCS packages need to be bundled for browser use in playground
 				external: (id) => {
 					if (id === 'vscode-languageserver-types') return true;
-					if (id.startsWith('@rcs-lang/parser')) return true;
-					if (id.startsWith('@rcs-lang/compiler')) return true;
-					if (id.startsWith('@rcs-lang/file-system')) return true;
+					// Diagram is only loaded on demand and can be external
 					if (id.startsWith('@rcs-lang/diagram')) return true;
 					return false;
 				},

@@ -1,4 +1,5 @@
 import { Menu } from '@ark-ui/react/menu';
+import { Switch } from '@ark-ui/react/switch';
 import { ChevronDown, Share2 as ShareIcon, FileCode, Workflow, MessageSquare, Bot } from 'lucide-react';
 import { examples as defaultExamples, type Example } from '../examples';
 import { twMerge } from 'tailwind-merge';
@@ -8,6 +9,8 @@ export interface ToolbarProps {
 	onShare: () => void;
 	examples?: Example[];
 	className?: string;
+	devMode?: boolean;
+	onDevModeChange?: (checked: boolean) => void;
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -24,7 +27,7 @@ const categoryLabels: Record<string, string> = {
 	full: 'Full Agents',
 };
 
-export function Toolbar({ onSelectExample, onShare, examples = defaultExamples, className }: ToolbarProps) {
+export function Toolbar({ onSelectExample, onShare, examples = defaultExamples, className, devMode = false, onDevModeChange }: ToolbarProps) {
 	const examplesByCategory = {
 		basic: examples.filter((e) => e.category === 'basic'),
 		flows: examples.filter((e) => e.category === 'flows'),
@@ -71,6 +74,17 @@ export function Toolbar({ onSelectExample, onShare, examples = defaultExamples, 
 			</div>
 
 			<div className="toolbar-right">
+				<Switch.Root
+					className="dev-mode-switch"
+					checked={devMode}
+					onCheckedChange={(details) => onDevModeChange?.(details.checked)}
+				>
+					<Switch.Control className="dev-mode-switch-control">
+						<Switch.Thumb className="dev-mode-switch-thumb" />
+					</Switch.Control>
+					<Switch.Label className="dev-mode-switch-label">Dev Mode</Switch.Label>
+					<Switch.HiddenInput />
+				</Switch.Root>
 				<button className="btn-outline" onClick={onShare} title="Share code via URL" type="button">
 					<ShareIcon size={16} />
 					<span>Share</span>

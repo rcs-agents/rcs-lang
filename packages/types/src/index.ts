@@ -38,6 +38,7 @@ export * from './agent-config.js';
 export * from './brand.js';
 export * from './tester.js';
 export * from './agent-event.js';
+export * from './user-message.js';
 export * from './file.js';
 export * from './integration.js';
 export * from './agent-bundle.js';

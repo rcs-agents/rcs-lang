@@ -42,6 +42,7 @@ import {
   isNumericLiteral,
   isPropertyAccess,
   isSection,
+  isSimpleTransition,
   isStringLiteral,
   isTypeTag,
   isValue,
@@ -437,10 +438,45 @@ export class TransformStage implements ICompilationStage {
             type: messageType,
           };
 
-          // Process message attributes
+          // Check for inline parameters (e.g., text Welcome "Hello!")
+          // For inline message definitions, the content is in parameters, not body
+          const params = (element as any).parameters;
+          if (params && Array.isArray(params) && params.length > 0) {
+            for (const param of params) {
+              const value = this.extractValue(param.value);
+              if (param.key) {
+                // Named parameter: key: value
+                message[param.key] = value;
+              } else if (messageType === 'text' && typeof value === 'string') {
+                // Positional parameter for text message - this is the text content
+                message.text = value;
+              } else if (typeof value === 'string') {
+                // For other message types, store as content
+                message.content = value;
+              } else {
+                // Store complex values directly
+                Object.assign(message, value);
+              }
+            }
+          }
+
+          // Process message body elements (for multi-line message definitions)
           for (const msgElement of element.body) {
             if (isAttribute(msgElement)) {
+              // Attribute: key: value
               message[msgElement.key] = this.extractValue(msgElement.value);
+            } else if (isValue(msgElement)) {
+              // Standalone value - for text messages, this is the text content
+              const value = this.extractValue(msgElement);
+              if (messageType === 'text' && typeof value === 'string') {
+                message.text = value;
+              } else if (typeof value === 'string') {
+                // For other message types, store as content
+                message.content = value;
+              } else {
+                // Store complex values directly
+                Object.assign(message, value);
+              }
             }
           }
 
@@ -561,6 +597,7 @@ export class TransformStage implements ICompilationStage {
     const state: CSMStateDefinition = {
       transitions: [],
       meta: {
+        // Default to state name, will be overwritten if a message reference is found
         messageId: stateName,
       },
     };
@@ -580,6 +617,32 @@ export class TransformStage implements ICompilationStage {
       } else if (isMatchBlock(element)) {
         // Process match block for transitions
         this.processMatchBlockCSM(element, state);
+      } else if (isSimpleTransition(element)) {
+        // Handle simple transition (-> MessageName)
+        // This is a message reference - extract the message ID
+        const target = element.target;
+        let messageId: string | undefined;
+
+        if (isContextualizedValue(target)) {
+          // Extract the base value as the message ID
+          // The value inside ContextualizedValue can be an Identifier
+          const innerValue = target.value;
+          if (isIdentifier(innerValue)) {
+            messageId = innerValue.value;
+          } else {
+            const baseValue = this.extractValue(innerValue);
+            if (typeof baseValue === 'string') {
+              messageId = baseValue;
+            }
+          }
+        } else {
+          // For FlowTermination, FlowInvocation, ContextOperationSequence
+          // these aren't message references, skip them
+        }
+
+        if (messageId) {
+          state.meta!.messageId = messageId;
+        }
       } else if (isValue(element)) {
         // Handle standalone values (e.g., transient state)
         const value = this.extractValue(element);
