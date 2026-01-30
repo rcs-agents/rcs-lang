@@ -1,5 +1,13 @@
 # @rcs-lang/rcx
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [a3adcda]
+  - @rcs-lang/types@2.0.1
+  - @rcs-lang/csm@2.0.1
+
 ## 0.2.1
 
 ### Patch Changes

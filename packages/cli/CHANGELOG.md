@@ -1,5 +1,16 @@
 # @rcs-lang/cli
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [a3adcda]
+  - @rcs-lang/compiler@2.0.1
+  - @rcs-lang/types@2.0.1
+  - @rcs-lang/core@2.0.1
+  - @rcs-lang/file-system@2.0.1
+  - @rcs-lang/parser@2.0.1
+
 ## 2.0.0
 
 ### Patch Changes

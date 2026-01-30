@@ -1,5 +1,12 @@
 # @rcs-lang/diagram
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [a3adcda]
+  - @rcs-lang/compiler@2.0.1
+
 ## 2.0.0
 
 ### Patch Changes

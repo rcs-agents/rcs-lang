@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/rcx",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "RCX - The native format for RCS Language, bridging visual design and execution",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/simulator",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "RCS Simulator for visualizing and testing RCS agents",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,5 +1,12 @@
 # @rcs-lang/parser
 
+## 2.0.1
+
+### Patch Changes
+
+- @rcs-lang/core@2.0.1
+- @rcs-lang/ast@2.0.1
+
 ## 2.0.0
 
 ### Patch Changes

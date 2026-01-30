@@ -1,5 +1,13 @@
 # @rcs-lang/core
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [a3adcda]
+  - @rcs-lang/types@2.0.1
+  - @rcs-lang/ast@2.0.1
+
 ## 2.0.0
 
 ### Major Changes
