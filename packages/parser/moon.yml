@@ -9,7 +9,9 @@ type: library
 language: typescript
 platform: bun
 
-dependsOn: []
+dependsOn:
+  - '@rcs-lang/ast'
+  - '@rcs-lang/core'
 
 tags:
   - test
@@ -38,6 +40,8 @@ tasks:
     command: tsc
     deps:
       - build-grammar
+      - '@rcs-lang/ast:build'
+      - '@rcs-lang/core:build'
     inputs:
       - 'src/**/*.g4'
       - 'src/**/*.ts'
