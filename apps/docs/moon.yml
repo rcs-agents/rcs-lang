@@ -18,6 +18,15 @@ tags:
   - documentation
   - rcl
 
+dependsOn:
+  - ast
+  - compiler
+  - csm
+  - diagram
+  - parser
+  - playground
+  - simulator
+
 tasks:
   build:
     command: astro build
@@ -27,6 +36,8 @@ tasks:
       - "package.json"
     outputs:
       - "dist"
+    deps:
+      - "^:build"
     env:
       NODE_ENV: "production"
 
