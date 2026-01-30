@@ -1,0 +1,47 @@
+{
+  "name": "@rcs-lang/rcx",
+  "version": "0.2.1",
+  "description": "RCX - The native format for RCS Language, bridging visual design and execution",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "moon run rcx:build",
+    "dev": "moon run rcx:build-watch",
+    "test": "moon run rcx:test",
+    "test:watch": "moon run rcx:test-watch",
+    "test:coverage": "moon run rcx:test-coverage",
+    "typecheck": "moon run rcx:typecheck",
+    "clean": "moon run rcx:clean",
+    "lint": "moon run rcx:lint",
+    "format": "moon run rcx:format"
+  },
+  "dependencies": {
+    "@rcs-lang/csm": "workspace:*",
+    "@rcs-lang/types": "workspace:*",
+    "@xyflow/react": "^12.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "tsup": "^8.3.5",
+    "typescript": "^5.5.3"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

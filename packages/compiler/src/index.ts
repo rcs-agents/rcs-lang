@@ -9,3 +9,6 @@ export * from './stages/index.js';
 
 // Generator exports
 export * from './generators/index.js';
+
+// Extractor exports
+export { extractMessages } from './extractors/message-extractor.js';

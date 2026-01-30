@@ -1,0 +1,18 @@
+agent MediaVideoDemo
+  displayName: "Media Demo"
+  start: MainFlow
+
+  config
+    description: "Simple video message"
+    color: "#6366F1"
+
+  flow MainFlow
+    start: ShowVideo
+
+    on ShowVideo
+      match @reply.text
+        :default -> ShowVideo
+
+  messages Messages
+    media ShowVideo <url https://rcsmaker.com/assets/sample_video_720x480_2mb.mp4>
+end

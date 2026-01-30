@@ -1,0 +1,38 @@
+{
+  "name": "Carousel",
+  "figmaId": "245:20186",
+  "description": "Horizontal scrolling carousel of business cards for RCS messaging",
+  "components": [
+    {
+      "name": "Carousel Business",
+      "figmaId": "245:20186",
+      "description": "Business card carousel with small and large variants",
+      "image": "component-screenshot.png"
+    }
+  ],
+  "usage": {
+    "import": "import './carousel.js';",
+    "element": "<rbx-carousel .cards=${cards} size=\"medium\" .onCardAction=${handleAction}></rbx-carousel>",
+    "props": {
+      "cards": "Array of CarouselCard objects with title, description, media, actions",
+      "size": "small | medium | large - card sizing",
+      "isAndroid": "boolean - platform styling",
+      "isDarkMode": "boolean - theme styling",
+      "onCardAction": "Function - callback when card action is clicked"
+    }
+  },
+  "designNotes": [
+    "Cards have 16:9 aspect ratio media",
+    "Small cards: 160px wide, Medium: 240px, Large: 320px",
+    "Supports horizontal scrolling with partial next card visible",
+    "Actions can be reply (gray) or action (blue) types",
+    "Android variant uses smaller border radius and font sizes",
+    "Media images lazy load for performance",
+    "Hover effects include subtle elevation changes"
+  ],
+  "cardStructure": {
+    "media": "Optional image with alt text",
+    "content": "Title (required), description (optional)",
+    "actions": "Array of reply/action buttons with callbacks"
+  }
+}

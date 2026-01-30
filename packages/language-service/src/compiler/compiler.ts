@@ -64,9 +64,11 @@ export class Compiler {
 
       // Convert to the format expected by language service
       return {
-        agent: output.agent,
-        messages: output.messages || {},
-        flows: output.flows || {},
+        agent: {
+          name: output.bundle.agent.displayName || "Unnamed Agent"
+        },
+        messages: output.bundle.messages || {},
+        flows: output.csm || {},
       };
     } catch (error) {
       this.addError(

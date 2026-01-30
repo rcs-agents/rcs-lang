@@ -1,6 +1,7 @@
 import type { Diagnostic } from './diagnostics.js';
 import type { IASTNode } from './parser.js';
 import type { Result } from './result.js';
+import type { AgentBundle } from '@rcs-lang/types';
 
 /**
  * Compilation input
@@ -12,24 +13,48 @@ export interface ICompilationInput {
 }
 
 /**
+ * Machine definition - the state machine with flows
+ */
+export interface IMachineDefinition {
+  id: string;
+  initialFlow: string;
+  flows: Record<string, any>;
+  meta?: {
+    name?: string;
+    description?: string;
+    version?: string;
+    tags?: string[];
+    custom?: Record<string, any>;
+  };
+}
+
+/**
+ * CSM Agent output - wraps a machine definition
+ * This matches the @rcs-lang/csm Agent interface
+ */
+export interface ICsmOutput {
+  /** Agent identifier */
+  id: string;
+  /** The machine that defines this agent's behavior */
+  machine: IMachineDefinition;
+  /** Agent metadata */
+  meta?: {
+    name?: string;
+    description?: string;
+    version?: string;
+    tags?: string[];
+    custom?: Record<string, any>;
+  };
+}
+
+/**
  * Compilation output
  */
 export interface ICompilationOutput {
-  agent: any;
-  messages: Record<string, any>;
-  flows: Record<string, any>;
-  csm?: {
-    id: string;
-    initialFlow: string;
-    flows: Record<string, any>;
-    meta?: {
-      name?: string;
-      description?: string;
-      version?: string;
-      tags?: string[];
-      custom?: Record<string, any>;
-    };
-  };
+  /** Runtime bundle with agent config and messages */
+  bundle: AgentBundle;
+  /** Compiled CSM state machine */
+  csm: ICsmOutput;
 }
 
 /**

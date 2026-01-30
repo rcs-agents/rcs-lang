@@ -1,0 +1,39 @@
+{
+  "name": "Conversation Core",
+  "figmaId": "245:8523",
+  "description": "Core conversation UI components including headers, status indicators, and branding elements for RCS Business Messaging",
+  "components": [
+    {
+      "name": "Conversation Header",
+      "figmaId": "245:8523",
+      "description": "Business conversation header with branding, verification badge, and navigation",
+      "image": "component-screenshot.png"
+    }
+  ],
+  "usage": {
+    "import": "import './conversation-header.js';",
+    "element": "<rbx-conversation-header .config=${headerConfig} .onBackClick=${handleBack}></rbx-conversation-header>",
+    "props": {
+      "config": "ConversationHeaderConfig object with branding and navigation settings",
+      "isAndroid": "boolean - platform styling",
+      "isDarkMode": "boolean - theme styling",
+      "onBackClick": "Function - callback for back button",
+      "onMenuClick": "Function - callback for menu button"
+    }
+  },
+  "designNotes": [
+    "Header includes brand logo, name, subtitle, and eyebrow text",
+    "Verification badge shows for verified business accounts",
+    "Navigation includes optional back and menu buttons",
+    "Android variant uses smaller spacing and different font sizes",
+    "Dark mode support with appropriate contrast colors",
+    "Responsive design with text truncation for long names",
+    "Hover states on interactive elements",
+    "Proper ARIA labels for accessibility"
+  ],
+  "headerStructure": {
+    "navigation": "Optional back button and menu button",
+    "branding": "Logo, brand name, verification badge, subtitle, eyebrow",
+    "responsive": "Text truncation and appropriate spacing for mobile"
+  }
+}

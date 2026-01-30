@@ -221,10 +221,13 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/core": "workspace:*",
     "@rcs-lang/language-service": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
     "sprotty": "^1.0.0",
     "sprotty-vscode-webview": "^1.0.0",
-    "vscode-languageclient": "^9.0.0"
+    "vscode-languageclient": "^9.0.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
   }
 }

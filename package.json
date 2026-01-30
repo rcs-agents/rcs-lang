@@ -15,6 +15,7 @@
   "packageManager": "bun@1.2.18",
   "workspaces": [
     "apps/*",
+    "apps/rcs-maker/*",
     "libs/*",
     "packages/*"
   ],

@@ -1,0 +1,31 @@
+project:
+  name: rcx
+  description: RCX - The native format for RCS Language
+
+type: library
+language: typescript
+
+dependsOn:
+  - csm
+  - types
+
+tags:
+  - tsup
+  - test
+  - typescript
+  - publish
+  - common
+
+tasks:
+  build:
+    deps:
+      - csm:build
+      - types:build
+
+  test:
+    deps:
+      - build
+
+  clean:
+    command: rm -rf dist coverage
+    platform: system

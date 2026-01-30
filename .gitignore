@@ -66,3 +66,7 @@ apps/extension/.wdio-vscode-service
 .env
 test-results/
 .npmrc
+
+*storybook.log
+storybook-static
+.playwright-mcp

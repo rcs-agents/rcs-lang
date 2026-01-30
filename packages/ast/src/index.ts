@@ -31,6 +31,7 @@ export type {
   FlowResultHandler,
   FlowResult,
   ContextOperation,
+  ContextOperationSequence,
   FlowTermination,
   SimpleTransition,
   StateReference,

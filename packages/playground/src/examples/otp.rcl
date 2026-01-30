@@ -1,0 +1,19 @@
+agent OtpDemo
+  displayName: "Authentication"
+  start: MainFlow
+
+  config
+    description: "OTP authentication message"
+    color: "#10B981"
+
+  flow MainFlow
+    start: SendOtp
+
+    on SendOtp
+      match @reply.text
+        :default -> SendOtp
+
+  messages Messages
+    text SendOtp "Your code is 123456 M8tue43FGT."
+      traffic: :authentication
+end

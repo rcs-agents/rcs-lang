@@ -217,7 +217,32 @@ function isOutputEmpty(output: any): boolean {
     return true;
   }
 
-  // Check if all main sections are empty objects
+  // Handle new ICompilationOutput structure (with bundle and csm)
+  if (output.bundle) {
+    const agent = output.bundle.agent || {};
+    const messages = output.bundle.messages?.messages || {};
+
+    const agentEmpty = Object.keys(agent).length === 0;
+    const messagesEmpty = Object.keys(messages).length === 0;
+
+    // Check CSM flows
+    const flows = output.csm?.machine?.flows || {};
+    const flowsEmpty = Object.keys(flows).length === 0;
+
+    // If all sections are empty, the output is considered empty
+    if (agentEmpty && messagesEmpty && flowsEmpty) {
+      return true;
+    }
+
+    // Check for required agent properties
+    if (!agentEmpty && !agent.displayName) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Legacy structure fallback (agent, messages, flows at top level)
   const agent = output.agent || {};
   const messages = output.messages || {};
   const flows = output.flows || {};
@@ -245,6 +270,37 @@ function isOutputEmpty(output: any): boolean {
 function generateJavaScript(data: any, name: string): string {
   const _safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
 
+  // Handle new ICompilationOutput structure (with bundle and csm)
+  if (data.bundle) {
+    const agent = data.bundle.agent || {};
+    const messages = data.bundle.messages?.messages || {};
+    const flows = data.csm?.machine?.flows || {};
+
+    return `// Generated from ${name}.rcl
+export const agent = ${JSON.stringify(agent, null, 2)};
+
+export const messages = ${JSON.stringify(messages, null, 2)};
+
+export const flows = ${JSON.stringify(flows, null, 2)};
+
+// Full bundle export
+export const bundle = ${JSON.stringify(data.bundle, null, 2)};
+
+// CSM state machine export
+export const csm = ${JSON.stringify(data.csm, null, 2)};
+
+// Convenience export
+export default {
+  agent,
+  messages,
+  flows,
+  bundle,
+  csm
+};
+`;
+  }
+
+  // Legacy structure fallback
   return `// Generated from ${name}.rcl
 export const agent = ${JSON.stringify(data.agent, null, 2)};
 
@@ -437,11 +493,11 @@ export async function generateDiagram(
 
   if (format === 'mermaid') {
     diagramContent = generateMermaidDiagram(output, {
-      title: output.agent.displayName || fileSystem.basename(inputPath, '.rcl'),
+      title: output.bundle.agent.displayName || fileSystem.basename(inputPath, '.rcl'),
     });
   } else {
     diagramContent = generateD2Diagram(output, {
-      title: output.agent.displayName || fileSystem.basename(inputPath, '.rcl'),
+      title: output.bundle.agent.displayName || fileSystem.basename(inputPath, '.rcl'),
       showErrorPaths: options.errorPaths !== false,
       separateInvalidOptions: options.separateInvalid !== false,
     });

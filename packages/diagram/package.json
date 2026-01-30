@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/diagram",
-  "version": "0.5.2",
+  "version": "2.0.0",
   "private": false,
   "description": "Interactive Sprotty-based diagram component for RCL flows",
   "main": "src/index.ts",
@@ -12,7 +12,7 @@
       "types": "./src/index.ts"
     },
     "./web": {
-      "import": "./src/web-diagram.js"
+      "import": "./dist/web-diagram.js"
     },
     "./styles": "./src/styles/diagram.css"
   },
@@ -31,6 +31,7 @@
     "elkjs": "^0.10.0",
     "inversify": "6.2.2",
     "reflect-metadata": "^0.2.2",
+    "snabbdom": "^3.6.3",
     "sprotty": "^1.4.0",
     "sprotty-protocol": "^1.4.0"
   },

@@ -1,0 +1,18 @@
+agent MediaGifDemo
+  displayName: "Media Demo"
+  start: MainFlow
+
+  config
+    description: "Simple GIF media message"
+    color: "#6366F1"
+
+  flow MainFlow
+    start: ShowGif
+
+    on ShowGif
+      match @reply.text
+        :default -> ShowGif
+
+  messages Messages
+    media ShowGif <url https://rcsmaker.com/assets/sample_gif.gif>
+end

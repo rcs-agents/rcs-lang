@@ -5,7 +5,10 @@ project:
 type: library
 language: typescript
 
-dependsOn: []
+dependsOn:
+  - ast
+  - core
+  - parser
 
 tags:
   - typescript
@@ -15,11 +18,16 @@ tags:
 tasks:
   build:
     deps:
-
+      - ~:typecheck
+      - ast:build
+      - core:build
+      - parser:build
 
   typecheck:
     deps:
-
+      - ast:build
+      - core:build
+      - parser:build
 
   test:
     deps:

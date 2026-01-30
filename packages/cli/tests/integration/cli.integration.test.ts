@@ -158,15 +158,14 @@ agent SimpleAgent
       // Parse JSON to verify it's valid
       const parsedJson = JSON.parse(jsonContent);
 
-      // Verify structure is not empty
-      expect(Object.keys(parsedJson)).toContain('agent');
-      expect(Object.keys(parsedJson)).toContain('messages');
-      expect(Object.keys(parsedJson)).toContain('flows');
+      // Verify structure uses new bundle/csm format
+      expect(Object.keys(parsedJson)).toContain('bundle');
+      expect(Object.keys(parsedJson)).toContain('csm');
 
       // Verify actual content exists (not just empty objects)
-      expect(Object.keys(parsedJson.agent).length).toBeGreaterThan(0);
-      expect(Object.keys(parsedJson.messages).length).toBeGreaterThan(0);
-      expect(Object.keys(parsedJson.flows).length).toBeGreaterThan(0);
+      expect(Object.keys(parsedJson.bundle.agent).length).toBeGreaterThan(0);
+      expect(Object.keys(parsedJson.bundle.messages.messages).length).toBeGreaterThan(0);
+      expect(Object.keys(parsedJson.csm.machine.flows).length).toBeGreaterThan(0);
 
       // Verify JS file contains exports
       expect(jsContent).toMatch(/export.*agent/);
@@ -199,11 +198,11 @@ agent EmptyAgent
         const jsonContent = await fs.readFile(jsonPath, 'utf-8');
         const parsedJson = JSON.parse(jsonContent);
 
-        // Should not have empty objects
-        if (Object.keys(parsedJson.flows).length === 0) {
+        // Should not have empty objects (using new bundle/csm structure)
+        if (Object.keys(parsedJson.csm?.machine?.flows || {}).length === 0) {
           throw new Error('Generated empty flows object - semantic validation should have caught this');
         }
-        if (Object.keys(parsedJson.messages).length === 0) {
+        if (Object.keys(parsedJson.bundle?.messages?.messages || {}).length === 0) {
           throw new Error(
             'Generated empty messages object - semantic validation should have caught this',
           );

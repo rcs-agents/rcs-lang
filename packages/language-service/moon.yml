@@ -7,7 +7,14 @@ project:
 type: library
 language: typescript
 
-dependsOn: []
+dependsOn:
+  - ast
+  - compiler
+  - core
+  - file-system
+  - parser
+  - types
+  - validation
 
 tags:
   - typescript
@@ -19,13 +26,25 @@ tags:
 tasks:
   build:
     deps:
-      - 'parser:build'
+      - ~:typecheck
+      - ast:build
+      - compiler:build
+      - core:build
+      - file-system:build
+      - parser:build
+      - types:build
+      - validation:build
 
   typecheck:
     deps:
-      - 'parser:build'
+      - ast:build
+      - compiler:build
+      - core:build
+      - file-system:build
+      - parser:build
+      - types:build
+      - validation:build
 
   test:
     deps:
       - build
-

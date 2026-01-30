@@ -240,25 +240,27 @@ agent ContentAgent
       const result = await compiler.compileSource(validRcl, 'test.rcl');
 
       if (result.success && result.output) {
-        const jsonOutput = result.output;
+        const output = result.output;
 
-        // Agent should have displayName
-        expect(jsonOutput.agent.displayName).toBe('Content Test');
+        // Agent should have displayName (new structure uses bundle.agent)
+        expect(output.bundle.agent.displayName).toBe('Content Test');
 
-        // Flows should have actual flow data
-        expect(Object.keys(jsonOutput.flows)).toContain('MainFlow');
-        expect(jsonOutput.flows.MainFlow.initial).toBe('Welcome');
-        expect(jsonOutput.flows.MainFlow.states).toBeDefined();
-        expect(Object.keys(jsonOutput.flows.MainFlow.states)).toContain('Welcome');
+        // Flows should have actual flow data (new structure uses csm.machine.flows)
+        const flows = output.csm.machine.flows;
+        expect(Object.keys(flows)).toContain('MainFlow');
+        expect(flows.MainFlow.initial).toBe('Welcome');
+        expect(flows.MainFlow.states).toBeDefined();
+        expect(Object.keys(flows.MainFlow.states)).toContain('Welcome');
 
-        // Messages should have actual message data
-        expect(Object.keys(jsonOutput.messages)).toContain('Welcome');
-        expect(jsonOutput.messages.Welcome.type).toBe('text');
+        // Messages should have actual message data (new structure uses bundle.messages.messages)
+        const messages = output.bundle.messages.messages;
+        expect(Object.keys(messages)).toContain('Welcome');
+        expect(messages.Welcome.type).toBe('text');
 
         // Output should not be empty
-        expect(Object.keys(jsonOutput.agent).length).toBeGreaterThan(0);
-        expect(Object.keys(jsonOutput.messages).length).toBeGreaterThan(0);
-        expect(Object.keys(jsonOutput.flows).length).toBeGreaterThan(0);
+        expect(Object.keys(output.bundle.agent).length).toBeGreaterThan(0);
+        expect(Object.keys(messages).length).toBeGreaterThan(0);
+        expect(Object.keys(flows).length).toBeGreaterThan(0);
       } else {
         expect.fail(
           `Valid RCL should compile successfully. Errors: ${JSON.stringify(result.errors)}`,
@@ -274,11 +276,12 @@ agent ContentAgent
       // If somehow output is generated, it should not be placeholder content
       if (result.output) {
         const outputStr = JSON.stringify(result.output);
+        // New structure uses bundle and csm, not top-level agent/messages/flows
         expect(outputStr).not.toMatch(
-          /\{\s*"agent":\s*\{\s*\}\s*,\s*"messages":\s*\{\s*\}\s*,\s*"flows":\s*\{\s*\}\s*\}/,
+          /\{\s*"bundle":\s*\{\s*"agent":\s*\{\s*\}\s*,\s*"messages":\s*\{\s*"messages":\s*\{\s*\}\s*\}\s*\}/,
         );
-        // Check that sections aren't empty
-        expect(Object.keys(result.output.agent || {}).length).toBeGreaterThan(0);
+        // Check that agent section isn't empty
+        expect(Object.keys(result.output.bundle?.agent || {}).length).toBeGreaterThan(0);
       }
     });
   });

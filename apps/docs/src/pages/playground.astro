@@ -1,6 +1,7 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
-import { Playground } from "../components/playground/Playground";
+import { Playground } from "@rcs-lang/playground";
+import "@rcs-lang/playground/index.css";
 ---
 
 <style>
@@ -23,6 +24,6 @@ import { Playground } from "../components/playground/Playground";
   }}
 > -->
 <div style="width: 100%; height: calc(100vh - 8rem); margin: 0 auto;">
-  <Playground client:only="react" />
+  <Playground client:only="react" mode="docs" />
 </div>
 <!-- </StarlightPage> -->

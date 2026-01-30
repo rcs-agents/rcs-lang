@@ -1,0 +1,55 @@
+project:
+  name: simulator
+  description: RCS Simulator for visualizing and testing RCS agents
+
+type: library
+language: typescript
+
+dependsOn:
+  - csm
+  - types
+
+tags:
+  - test
+  - typescript
+  - publish
+  - common
+  - biome
+  - dprint
+
+tasks:
+  build:
+    command: vite build --config vite.react.config.ts
+    platform: node
+    deps:
+      - csm:build
+      - rcx:build
+      - types:build
+    inputs:
+      - src/**/*
+      - vite.react.config.ts
+      - tsconfig.json
+    outputs:
+      - dist
+
+  dev:
+    command: vite
+    platform: node
+    local: true
+
+  typecheck:
+    command: tsc
+    args:
+      - --noEmit
+    platform: node
+    inputs:
+      - src/**/*
+      - tsconfig.json
+
+  test:
+    deps:
+      - build
+
+  clean:
+    command: rm -rf dist coverage
+    platform: system

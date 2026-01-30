@@ -2,11 +2,13 @@ agent HelloAgent
   displayName: "Hello"
 
   flow MainFlow
-    :start -> Greeting
-    Greeting -> :end
+    start: Greeting
+    
+    on Greeting
+      -> Welcome Message
   end
 
   messages Messages
-    text Greeting "Hello! Welcome to RCL."
+    text Welcome Message "Hello! Welcome to RCL."
   end
 end

@@ -98,9 +98,8 @@ import { AntlrRclParser } from './parser.js';
 // Export parser adapter
 export { AntlrAdapter } from './adapter.js';
 
-// Export symbol extractor
-export { RclSymbolExtractor } from './symbol-extractor.js';
-export type { SymbolExtractorOptions } from './symbol-extractor.js';
+// Symbol extractor is now exported via separate entry point: @rcs-lang/parser/symbol-extractor
+// This avoids bundling vscode-languageserver-types in browser builds
 
 // Export generated classes
 export { RclLexer, RclParser };

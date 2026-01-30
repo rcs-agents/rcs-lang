@@ -1,0 +1,122 @@
+{
+  "name": "@rcs-lang/simulator",
+  "version": "0.2.0",
+  "description": "RCS Simulator for visualizing and testing RCS agents",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "types": "./dist/react/index.d.ts"
+    },
+    "./lit": {
+      "import": "./dist/lit.js",
+      "types": "./dist/lit.d.ts"
+    },
+    "./solid": {
+      "import": "./dist/solid.js",
+      "types": "./dist/solid.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build --config vite.react.config.ts",
+    "build:moon": "moon run simulator:build",
+    "dev": "moon run simulator:dev",
+    "test": "moon run simulator:test",
+    "test:watch": "moon run simulator:test-watch",
+    "test:coverage": "moon run simulator:test-coverage",
+    "typecheck": "moon run simulator:typecheck",
+    "clean": "moon run simulator:clean",
+    "lint": "moon run simulator:lint",
+    "format": "moon run simulator:format",
+    "storybook:react": "storybook dev -p 6006 --config-dir src/react/.storybook",
+    "storybook:lit": "storybook dev -p 6007 --config-dir src/lit/.storybook",
+    "storybook:solid": "storybook dev -p 6008 --config-dir src/solid/.storybook",
+    "build-storybook:react": "storybook build --config-dir src/react/.storybook --output-dir storybook-static/react",
+    "build-storybook:lit": "storybook build --config-dir src/lit/.storybook --output-dir storybook-static/lit",
+    "build-storybook:solid": "storybook build --config-dir src/solid/.storybook --output-dir storybook-static/solid"
+  },
+  "dependencies": {
+    "@rcs-lang/csm": "workspace:*",
+    "@rcs-lang/rcx": "workspace:*",
+    "@rcs-lang/types": "workspace:*",
+    "clsx": "^2.1.1",
+    "eventemitter3": "^5.0.4",
+    "tailwind-merge": "^3.3.1"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "lucide-react": ">=0.300.0",
+    "solid-js": ">=1.9.0",
+    "lucide-solid": ">=0.500.0",
+    "lit": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "lucide-solid": {
+      "optional": true
+    },
+    "lit": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^5.0.0",
+    "@storybook/addon-a11y": "^10.2.1",
+    "@storybook/addon-docs": "^10.2.1",
+    "@storybook/react": "^10.2.1",
+    "@storybook/react-vite": "^10.2.1",
+    "@storybook/web-components": "^10.2.1",
+    "@storybook/web-components-vite": "^10.2.1",
+    "@tailwindcss/vite": "^4.1.10",
+    "@types/node": "^20.14.9",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
+    "lit": "^3.3.0",
+    "lucide-react": "^0.300.0",
+    "lucide-solid": "^0.514.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "solid-js": "^1.9.5",
+    "storybook": "^10.2.1",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.5.3",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.0",
+    "vite-plugin-solid": "^2.11.6",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

@@ -5,8 +5,6 @@
     { "path": "./packages/parser" },
     { "path": "./packages/cli" },
     { "path": "./packages/language-service" },
-    { "path": "./apps/extension" },
-    { "path": "./apps/extension/server" },
-    { "path": "./apps/extension/client" }
+    { "path": "./apps/extension" }
   ]
 }

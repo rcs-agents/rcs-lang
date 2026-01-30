@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/core",
-  "version": "0.5.2",
+  "version": "2.0.0",
   "private": false,
   "description": "Core types and interfaces for RCL language infrastructure",
   "main": "dist/index.js",
@@ -21,7 +21,8 @@
     "format": "moon run core:format"
   },
   "dependencies": {
-    "@rcs-lang/ast": "workspace:*"
+    "@rcs-lang/ast": "workspace:*",
+    "@rcs-lang/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

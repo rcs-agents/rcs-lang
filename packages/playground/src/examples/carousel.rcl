@@ -1,0 +1,65 @@
+agent CarouselDemo
+  displayName: "Nike Store"
+  start: MainFlow
+
+  config
+    description: "Carousel with multiple product cards"
+    logoUri: <url https://logo.clearbit.com/nike.com>
+    color: "#111111"
+
+  flow MainFlow
+    start: ProductCarousel
+
+    on ProductCarousel
+      match @reply.text
+        "Shop Now" -> :end
+        :default -> ProductCarousel
+
+  messages Messages
+    carousel ProductCarousel "Featured Products" :medium
+      richCard AlphaFly1 "Air Zoom AlphaFly 3 Flyknit sneakers" :medium
+        description: "Made from breathable Flyknit, they're fitted with an extra set of 'Air Zoom' units"
+        media: <url https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/da305c39-bc62-426e-8529-2566232c2145/W+AIR+ZOOM+ALPHAFLY+NEXT%25+3.png>
+        suggestions
+          action <dial "+1234567890"> "Call Now"
+            postback: "call_now"
+            fallback: <url https://example.com/call_now>
+          action <calendar "Event Title"> "Add to calendar"
+            postback: "add_to_calendar"
+            description: "Event Description"
+            start: <date "2025-04-13T13:00:00Z">
+            end: <date "2025-04-13T14:00:00Z">
+            fallback: <url https://example.com/add_to_calendar>
+
+      richCard AlphaFly2 "Air Zoom AlphaFly 3 Flyknit sneakers" :medium
+        description: "Fine-tuned for marathon speed, the Alphafly 3 helps push you beyond what you thought possible"
+        media: <url https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/ad573250-ae8d-4194-b957-3865e590c00b/W+AIR+ZOOM+ALPHAFLY+NEXT%25+3.png>
+        suggestions
+          action <dial "+1234567890"> "Call Now"
+            postback: "call_now"
+            fallback: <url https://example.com/call_now>
+          action <calendar "Event Title"> "Add to calendar"
+            postback: "add_to_calendar"
+            description: "Event Description"
+            start: <date "2025-04-13T13:00:00Z">
+            end: <date "2025-04-13T14:00:00Z">
+            fallback: <url https://example.com/add_to_calendar>
+
+      suggestions
+        reply "🛒 Shop Now!"
+        action <location "Nike near me"> "View Location"
+          postback: "view_location"
+          fallback: <url https://google.com>
+        action <dial "+1234567890"> "Call Now"
+          postback: "call_now"
+          fallback: <url https://example.com/call_now>
+        action <open https://example.com/new_arrivals> "New Arrivals"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+        action <calendar "Event Title"> "Add to calendar"
+          postback: "add_to_calendar"
+          description: "Event Description"
+          start: <date "2025-04-13T13:00:00Z">
+          end: <date "2025-04-13T14:00:00Z">
+          fallback: <url https://example.com/add_to_calendar>
+end

@@ -1,0 +1,49 @@
+{
+  "name": "Smart Chips",
+  "figmaId": "14:12469",
+  "description": "Smart reply and action chips for RCS Business Messaging conversations",
+  "components": [
+    {
+      "name": "Smart Reply",
+      "figmaId": "14:12476",
+      "description": "Simple text-based reply suggestions",
+      "image": "smart-reply.png"
+    },
+    {
+      "name": "Smart Replies Carousel",
+      "figmaId": "14:12478",
+      "description": "Horizontal scrolling list of reply suggestions",
+      "image": "smart-replies-carousel.png"
+    },
+    {
+      "name": "Smart Action",
+      "figmaId": "14:12479",
+      "description": "Action chips with icons (call, web, location, calendar)",
+      "image": "smart-action.png"
+    },
+    {
+      "name": "Smart Action Carousel",
+      "figmaId": "14:12498",
+      "description": "Horizontal scrolling list of action suggestions",
+      "image": "smart-action-carousel.png"
+    }
+  ],
+  "usage": {
+    "import": "import './smart-chips.js';",
+    "element": "<rbx-smart-chips .chips=${chips} .onChipClick=${handleChipClick}></rbx-smart-chips>",
+    "props": {
+      "chips": "Array of SmartChip objects (reply or action type)",
+      "layout": "horizontal | vertical",
+      "isAndroid": "boolean - platform styling",
+      "isDarkMode": "boolean - theme styling",
+      "onChipClick": "Function - callback when chip is clicked"
+    }
+  },
+  "designNotes": [
+    "Reply chips use neutral gray colors",
+    "Action chips use blue accent colors with icons",
+    "Android variant has slightly smaller font size and border radius",
+    "Supports both horizontal scrolling and vertical stacking layouts",
+    "Icons are included for common actions: phone, web, location, calendar"
+  ]
+}

@@ -10,16 +10,26 @@ export class JavaScriptGenerator {
     lines.push('');
 
     // Export agent
-    lines.push('export const agent = ' + JSON.stringify(output.agent, null, 2) + ';');
+    lines.push('export const agent = ' + JSON.stringify(output.bundle.agent, null, 2) + ';');
     lines.push('');
 
     // Export messages
-    lines.push('export const messages = ' + JSON.stringify(output.messages, null, 2) + ';');
+    lines.push('export const messages = ' + JSON.stringify(output.bundle.messages, null, 2) + ';');
     lines.push('');
 
     // Export flows (CSM format)
     lines.push('// CSM-compliant flow definitions');
-    lines.push('export const flows = ' + JSON.stringify(output.flows, null, 2) + ';');
+    lines.push('export const flows = ' + JSON.stringify(output.csm.machine.flows, null, 2) + ';');
+    lines.push('');
+
+    // Export machine definition
+    lines.push('// Machine definition');
+    lines.push('export const machine = ' + JSON.stringify(output.csm.machine, null, 2) + ';');
+    lines.push('');
+
+    // Export CSM Agent
+    lines.push('// Full CSM Agent definition');
+    lines.push('export const csm = ' + JSON.stringify(output.csm, null, 2) + ';');
     lines.push('');
 
     // Add convenience default export
@@ -27,7 +37,8 @@ export class JavaScriptGenerator {
     lines.push('export default {');
     lines.push('  agent,');
     lines.push('  messages,');
-    lines.push('  flows');
+    lines.push('  flows,');
+    lines.push('  csm');
     lines.push('};');
     lines.push('');
 

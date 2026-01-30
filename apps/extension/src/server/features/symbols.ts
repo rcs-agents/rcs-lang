@@ -1,6 +1,6 @@
 import type { ISymbol } from '@rcs-lang/core';
 import type { RCLParser } from '@rcs-lang/parser';
-import { RclSymbolExtractor } from '@rcs-lang/parser';
+import { RclSymbolExtractor } from '@rcs-lang/parser/symbol-extractor';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { DocumentSymbol, SymbolKind } from 'vscode-languageserver/node';
 

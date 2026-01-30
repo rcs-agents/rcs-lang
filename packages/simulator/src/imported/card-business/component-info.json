@@ -1,0 +1,40 @@
+{
+  "name": "Card Business",
+  "figmaId": "245:20195",
+  "description": "Business service cards with branding, media, pricing, and action buttons for RCS Business Messaging",
+  "components": [
+    {
+      "name": "Card Business",
+      "figmaId": "245:20195",
+      "description": "Complete business card with header branding, media, content, pricing, and actions",
+      "image": "component-screenshot.png"
+    }
+  ],
+  "usage": {
+    "import": "import './card-business.js';",
+    "element": "<rbx-card-business .card=${businessCard} size=\"medium\" .onAction=${handleAction}></rbx-card-business>",
+    "props": {
+      "card": "BusinessCard object with header, media, content, and actions",
+      "size": "small | medium | large - card sizing",
+      "isAndroid": "boolean - platform styling",
+      "isDarkMode": "boolean - theme styling",
+      "onAction": "Function - callback when action button is clicked"
+    }
+  },
+  "designNotes": [
+    "Header includes brand logo, name, subtitle, and eyebrow text",
+    "Media section supports 16:9 aspect ratio images/videos",
+    "Content supports title, description, feature lists, and pricing",
+    "Actions can be reply (gray), action (blue), or view (outline) types",
+    "Android variant uses smaller border radius and different fonts",
+    "Pricing section highlights cost with optional currency and period",
+    "Feature lists use bullet points with green accent color",
+    "Hover effects include elevation changes and color transitions"
+  ],
+  "cardStructure": {
+    "header": "Optional branding section with logo, name, subtitle, eyebrow",
+    "media": "Optional image/video with aspect ratio constraints",
+    "content": "Title (required), description, features array, pricing object",
+    "actions": "Array of reply/action/view buttons with callbacks"
+  }
+}

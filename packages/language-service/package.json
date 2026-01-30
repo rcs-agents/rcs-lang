@@ -1,6 +1,6 @@
 {
   "name": "@rcs-lang/language-service",
-  "version": "0.5.2",
+  "version": "2.0.0",
   "description": "Advanced language service providers for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,9 +17,11 @@
     "format": "moon run language-service:format"
   },
   "dependencies": {
-    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/ast": "workspace:*",
     "@rcs-lang/compiler": "workspace:*",
     "@rcs-lang/core": "workspace:*",
+    "@rcs-lang/file-system": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
     "@rcs-lang/types": "workspace:*",
     "@rcs-lang/validation": "workspace:*",
     "ajv": "^8.17.1",

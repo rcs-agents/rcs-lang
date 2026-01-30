@@ -40,3 +40,4 @@ export * from './tester.js';
 export * from './agent-event.js';
 export * from './file.js';
 export * from './integration.js';
+export * from './agent-bundle.js';

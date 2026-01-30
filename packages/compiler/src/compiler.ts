@@ -78,14 +78,24 @@ export class CompilerImpl implements ICompiler {
       return ok({ success: false, diagnostics });
     }
 
-    // Simple compilation result
+    // Simple compilation result with AgentBundle structure
+    const agentId = agentNode.name || 'Agent';
     const output = {
-      agent: {
-        name: agentNode.name,
-        displayName: agentNode.displayName,
+      bundle: {
+        agent: {
+          name: agentId,
+          displayName: agentNode.displayName,
+        } as any,
+        messages: { messages: {} },
       },
-      messages: {},
-      flows: {},
+      csm: {
+        id: agentId,
+        machine: {
+          id: agentId,
+          initialFlow: '',
+          flows: {},
+        },
+      },
     };
 
     return ok({ success: true, output, diagnostics });

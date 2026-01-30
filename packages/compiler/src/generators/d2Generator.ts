@@ -32,13 +32,13 @@ export class D2Generator {
     const lines: string[] = [];
 
     // Add title if provided
-    if (this.options.title || output.agent.displayName) {
-      lines.push(`title: ${this.options.title || output.agent.displayName}`);
+    if (this.options.title || output.bundle.agent.displayName) {
+      lines.push(`title: ${this.options.title || output.bundle.agent.displayName}`);
       lines.push('');
     }
 
     // Generate flow diagram
-    for (const [flowName, flow] of Object.entries(output.flows)) {
+    for (const [flowName, flow] of Object.entries(output.csm.machine.flows) as [string, any][]) {
       lines.push(`# Flow: ${flowName}`);
       lines.push('');
 
@@ -53,7 +53,7 @@ export class D2Generator {
       }
 
       // Process each state
-      for (const [stateName, state] of Object.entries(flow.states)) {
+      for (const [stateName, state] of Object.entries(flow.states as Record<string, any>)) {
         lines.push(...this.generateState(stateName, state, flow));
       }
     }

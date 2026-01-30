@@ -1,0 +1,18 @@
+agent MediaJpgDemo
+  displayName: "Media Demo"
+  start: MainFlow
+
+  config
+    description: "Simple JPG image message"
+    color: "#6366F1"
+
+  flow MainFlow
+    start: ShowImage
+
+    on ShowImage
+      match @reply.text
+        :default -> ShowImage
+
+  messages Messages
+    media ShowImage <url https://rcsmaker.com/assets/sample_image.jpg>
+end

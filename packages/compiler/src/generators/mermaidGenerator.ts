@@ -31,12 +31,12 @@ export class MermaidGenerator {
     lines.push(`flowchart ${this.options.direction}`);
 
     // Add title as comment
-    if (this.options.title || output.agent.displayName) {
-      lines.push(`    %% ${this.options.title || output.agent.displayName}`);
+    if (this.options.title || output.bundle.agent.displayName) {
+      lines.push(`    %% ${this.options.title || output.bundle.agent.displayName}`);
     }
 
     // Generate flow diagram
-    for (const [flowName, flow] of Object.entries(output.flows)) {
+    for (const [flowName, flow] of Object.entries(output.csm.machine.flows) as [string, any][]) {
       lines.push(`    %% Flow: ${flowName}`);
 
       // Start state
@@ -45,7 +45,7 @@ export class MermaidGenerator {
       }
 
       // Process each state
-      for (const [stateName, state] of Object.entries(flow.states)) {
+      for (const [stateName, state] of Object.entries(flow.states as Record<string, any>)) {
         lines.push(...this.generateState(stateName, state));
       }
     }

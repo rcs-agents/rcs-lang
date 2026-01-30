@@ -2,6 +2,7 @@ import type {
   Attribute,
   BooleanLiteral,
   ContextOperation,
+  ContextOperationSequence,
   Dictionary,
   DictionaryEntry,
   FlowInvocation,
@@ -28,6 +29,7 @@ import {
   isAtom,
   isAttribute,
   isBooleanLiteral,
+  isContextOperationSequence,
   isContextualizedValue,
   isDictionary,
   isEmbeddedCode,
@@ -90,6 +92,15 @@ interface CSMMachineDefinition {
 }
 
 /**
+ * Internal structure for building compilation output
+ */
+interface BuildOutput {
+  agent: Record<string, any>;
+  messages: Record<string, any>;
+  flows: Record<string, CSMMachineDefinition>;
+}
+
+/**
  * Transform stage - converts formal AST to output format
  */
 export class TransformStage implements ICompilationStage {
@@ -108,7 +119,13 @@ export class TransformStage implements ICompilationStage {
         const rclFile = this.unwrapAST(input.ast);
         const output = rclFile
           ? this.transformRclFile(rclFile)
-          : { agent: {}, messages: {}, flows: {} };
+          : {
+              bundle: { agent: {} as any, messages: { messages: {} } },
+              csm: {
+                id: 'Agent',
+                machine: { id: 'Agent', initialFlow: '', flows: {} },
+              }
+            };
 
         return ok({
           ...input,
@@ -164,49 +181,75 @@ export class TransformStage implements ICompilationStage {
    * Transform RclFile to compilation output
    */
   private transformRclFile(file: RclFile): ICompilationOutput {
-    const flows: Record<string, CSMMachineDefinition> = {};
     let agentName = 'Agent';
     let initialFlow = '';
-    
-    const output: ICompilationOutput = {
-      agent: {},
-      messages: {},
-      flows: {},
+
+    // Internal structure for building the output
+    const buildOutput = {
+      agent: {} as Record<string, any>,
+      messages: {} as Record<string, any>,
+      flows: {} as Record<string, CSMMachineDefinition>,
     };
 
-    // First pass: collect flows and agent info
-    for (const section of file.sections) {
-      if (section.sectionType === 'agent' && section.identifier) {
-        agentName = section.identifier.value;
-      }
-      if (section.sectionType === 'flow' && section.identifier) {
-        if (!initialFlow) {
-          initialFlow = section.identifier.value; // First flow becomes initial
+    // Recursively collect agent name and first flow from all sections
+    const collectInfo = (sections: Section[]): void => {
+      for (const section of sections) {
+        if (section.sectionType === 'agent' && section.identifier) {
+          agentName = section.identifier.value;
+        }
+        if (section.sectionType === 'flow' && section.identifier) {
+          if (!initialFlow) {
+            initialFlow = section.identifier.value; // First flow becomes initial
+          }
+        }
+        // Check nested sections in the body
+        for (const element of section.body) {
+          if (isSection(element)) {
+            collectInfo([element]);
+          }
         }
       }
-    }
+    };
+
+    collectInfo(file.sections);
 
     // Process all sections
     for (const section of file.sections) {
-      this.processSection(section, output);
-    }
-
-    // Collect flows from output.flows into a multi-flow machine
-    if (Object.keys(output.flows).length > 0) {
-      output.csm = {
-        id: agentName,
-        initialFlow: initialFlow,
-        flows: output.flows,
-        meta: {
-          name: agentName,
-        }
-      };
+      this.processSection(section, buildOutput);
     }
 
     // Apply defaults if we have them
     if (this.defaults) {
-      this.applyDefaults(output);
+      this.applyDefaults(buildOutput);
     }
+
+    // Build machine definition
+    const machine = {
+      id: agentName,
+      initialFlow: initialFlow,
+      flows: buildOutput.flows,
+      meta: {
+        name: agentName,
+      }
+    };
+
+    // Build CSM Agent output (wraps the machine)
+    const csm = {
+      id: agentName,
+      machine,
+      meta: {
+        name: agentName,
+      }
+    };
+
+    // Build the final output with AgentBundle structure
+    const output: ICompilationOutput = {
+      bundle: {
+        agent: buildOutput.agent as any,
+        messages: { messages: buildOutput.messages },
+      },
+      csm,
+    };
 
     return output;
   }
@@ -277,7 +320,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Process a section node
    */
-  private processSection(section: Section, output: ICompilationOutput): void {
+  private processSection(section: Section, output: BuildOutput): void {
     switch (section.sectionType) {
       case 'agent':
         this.processAgentSection(section, output);
@@ -301,7 +344,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Process agent section
    */
-  private processAgentSection(section: Section, output: ICompilationOutput): void {
+  private processAgentSection(section: Section, output: BuildOutput): void {
     if (section.identifier) {
       output.agent.name = section.identifier.value;
     }
@@ -349,7 +392,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Process flow section
    */
-  private processFlowSection(section: Section, output: ICompilationOutput): void {
+  private processFlowSection(section: Section, output: BuildOutput): void {
     if (!section.identifier) return;
 
     const flowName = section.identifier.value;
@@ -382,7 +425,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Process messages section
    */
-  private processMessagesSection(section: Section, output: ICompilationOutput): void {
+  private processMessagesSection(section: Section, output: BuildOutput): void {
     // Messages are typically defined as sub-sections
     for (const element of section.body) {
       if (isSection(element)) {
@@ -421,7 +464,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Process configuration section
    */
-  private processConfigSection(section: Section, output: ICompilationOutput): void {
+  private processConfigSection(section: Section, output: BuildOutput): void {
     // Configuration maps to agent properties
     for (const element of section.body) {
       if (isAttribute(element)) {
@@ -700,6 +743,41 @@ export class TransformStage implements ICompilationStage {
       };
     }
 
+    // Handle context operation sequences (set @var to value -> TargetState)
+    if (isContextOperationSequence(consequence)) {
+      const targetRef = consequence.target;
+      let targetStr: string;
+
+      // Extract the target state name
+      if (isIdentifier(targetRef)) {
+        targetStr = targetRef.value;
+      } else if (isVariable(targetRef)) {
+        targetStr = targetRef.name;
+      } else if (isPropertyAccess(targetRef)) {
+        targetStr = `${targetRef.object.name}.${targetRef.properties.join('.')}`;
+      } else if (isFlowTermination(targetRef)) {
+        targetStr = `:${targetRef.result}`;
+      } else {
+        targetStr = String(targetRef);
+      }
+
+      // Extract context updates from operations
+      const contextUpdates: Record<string, any> = {};
+      for (const operation of consequence.operations) {
+        const varName = this.extractVariableName(operation.target);
+        if (operation.source === 'result') {
+          contextUpdates[varName] = { var: 'result' };
+        } else {
+          contextUpdates[varName] = this.extractValue(operation.source);
+        }
+      }
+
+      return {
+        target: targetStr,
+        context: Object.keys(contextUpdates).length > 0 ? contextUpdates : undefined,
+      };
+    }
+
     // Handle simple values (including FlowTermination which is now part of Value)
     const target = this.extractValue(consequence);
     return {
@@ -753,7 +831,7 @@ export class TransformStage implements ICompilationStage {
   /**
    * Apply defaults to output
    */
-  private applyDefaults(output: ICompilationOutput): void {
+  private applyDefaults(output: BuildOutput): void {
     // Apply defaults to agent
     for (const [key, value] of Object.entries(this.defaults)) {
       if (!(key in output.agent)) {

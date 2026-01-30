@@ -1,0 +1,18 @@
+agent MediaPdfDemo
+  displayName: "Media Demo"
+  start: MainFlow
+
+  config
+    description: "Simple PDF document message"
+    color: "#6366F1"
+
+  flow MainFlow
+    start: ShowPdf
+
+    on ShowPdf
+      match @reply.text
+        :default -> ShowPdf
+
+  messages Messages
+    media ShowPdf <url https://rcsmaker.com/assets/rbm_and_verified_sms.pdf>
+end

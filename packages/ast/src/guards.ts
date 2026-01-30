@@ -9,6 +9,7 @@ import type {
   BooleanLiteral,
   Condition,
   ContextOperation,
+  ContextOperationSequence,
   ContextualizedValue,
   Dictionary,
   DictionaryEntry,
@@ -201,6 +202,10 @@ export function isFlowTermination(node: any): node is FlowTermination {
 
 export function isSimpleTransition(node: any): node is SimpleTransition {
   return hasType(node, 'SimpleTransition');
+}
+
+export function isContextOperationSequence(node: any): node is ContextOperationSequence {
+  return hasType(node, 'ContextOperationSequence');
 }
 
 export function isStateReference(node: any): node is StateReference {

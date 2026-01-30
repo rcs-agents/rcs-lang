@@ -11,8 +11,9 @@ language: typescript
 platform: node
 
 dependsOn:
-  - '@rcs-lang/parser'
-  - '@rcs-lang/language-service'
+  - core
+  - parser
+  - language-service
 
 tags:
   - typescript
@@ -24,16 +25,19 @@ tasks:
   # Override typescript tag to add deps
   build:
     deps:
-      - 'parser:build'
-      - '@rcs-lang/language-service:build'
+      - ~:typecheck
+      - core:build
+      - parser:build
+      - language-service:build
     env:
       NODE_ENV: "production"
 
-  # Override typescript tag to add deps  
+  # Override typescript tag to add deps
   typecheck:
     deps:
-      - 'parser:build'
-      - '@rcs-lang/language-service:build'
+      - core:build
+      - parser:build
+      - language-service:build
 
   # Extension tests require VSCode environment - just verify TypeScript compiles
   test:

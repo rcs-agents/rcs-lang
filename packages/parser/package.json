@@ -1,11 +1,21 @@
 {
   "name": "@rcs-lang/parser",
-  "version": "0.5.2",
+  "version": "2.0.0",
   "description": "ANTLR grammar for RCL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "private": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./symbol-extractor": {
+      "types": "./dist/symbol-extractor.d.ts",
+      "import": "./dist/symbol-extractor.js"
+    }
+  },
   "imports": {
     "#generated/*": "./src/generated/*",
     "#*": "./src/*"
@@ -28,7 +38,8 @@
   },
   "devDependencies": {
     "antlr-ng": "^1.0.10",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vscode-languageserver-types": "^3.17.5"
   },
   "publishConfig": {
     "access": "public",

@@ -1,0 +1,37 @@
+agent TextMessageDemo
+  displayName: "Nike Store"
+  start: MainFlow
+
+  config
+    description: "Promotional text message with various suggestion types"
+    logoUri: <url https://logo.clearbit.com/nike.com>
+    color: "#111111"
+
+  flow MainFlow
+    start: Promotion
+
+    on Promotion
+      match @reply.text
+        "Shop Now" -> :end
+        :default -> Promotion
+
+  messages Messages
+    text Promotion "Hey there! 👋 Those fresh Nike kicks you were eyeing are practically flying off the shelves! Imagine the spring in your step and the envious glances you'll get rocking the latest innovation in comfort and style. Don't miss out on experiencing the ultimate fusion of performance and street cred. Tap here to grab your pair before they're gone! 🔥👟"
+      suggestions
+        reply "🛒 Shop Now"
+        action <location "Nike near me"> "View Location"
+          postback: "view_location"
+          fallback: <url https://google.com>
+        action <dial "+1234567890"> "Call Now"
+          postback: "call_now"
+          fallback: <url https://example.com/call_now>
+        action <open https://example.com/new_arrivals> "New Arrivals"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+        action <calendar "Event Title"> "Add to calendar"
+          postback: "add_to_calendar"
+          description: "Event Description"
+          start: <date "2025-04-13T13:00:00Z">
+          end: <date "2025-04-13T14:00:00Z">
+          fallback: <url https://example.com/add_to_calendar>
+end

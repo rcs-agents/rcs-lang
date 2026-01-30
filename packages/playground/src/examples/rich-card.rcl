@@ -1,0 +1,41 @@
+agent RichCardDemo
+  displayName: "Nike Store"
+  start: MainFlow
+
+  config
+    description: "Standalone rich card with media and suggestions"
+    logoUri: <url https://logo.clearbit.com/nike.com>
+    color: "#111111"
+
+  flow MainFlow
+    start: ProductCard
+
+    on ProductCard
+      match @reply.text
+        "Shop Now" -> :end
+        :default -> ProductCard
+
+  messages Messages
+    richCard ProductCard "Nike Vomero 18" :tall
+      description: "Maximum cushioning in the Vomero provides a comfortable ride for everyday runs. Our softest, most cushioned ride."
+      media: <url https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/4d677534-954f-483e-a765-5bcb76775cb2/NIKE+VOMERO+18+%28GS%29.png>
+      orientation: :vertical
+      thumbnailAlignment: :left
+      suggestions
+        reply "🛒 Shop Now!"
+        action <location "Nike near me"> "View Location"
+          postback: "view_location"
+          fallback: <url https://google.com>
+        action <dial "+1234567890"> "Call Now"
+          postback: "call_now"
+          fallback: <url https://example.com/call_now>
+        action <open https://example.com/new_arrivals> "New Arrivals"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+        action <calendar "Event Title"> "Add to calendar"
+          postback: "add_to_calendar"
+          description: "Event Description"
+          start: <date "2025-04-13T13:00:00Z">
+          end: <date "2025-04-13T14:00:00Z">
+          fallback: <url https://example.com/add_to_calendar>
+end

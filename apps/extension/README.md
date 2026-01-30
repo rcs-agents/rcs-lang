@@ -5,6 +5,7 @@ This extension provides comprehensive language support for the Rich Communicatio
 ## Features
 
 ### ✅ Implemented
+
 - **Syntax Highlighting**: Full TextMate grammar support for RCL syntax
 - **Language Configuration**: Auto-closing pairs, brackets, indentation rules
 - **Code Completion**: Context-aware completions for RCL keywords and structures
@@ -15,6 +16,7 @@ This extension provides comprehensive language support for the Rich Communicatio
 - **Error Detection**: Basic syntax validation and diagnostics
 
 ### 🚧 Planned Features
+
 - **Go to Definition**: Navigate to symbol definitions
 - **Find References**: Find all usages of symbols
 - **Rename Symbols**: Rename symbols across files
@@ -26,6 +28,7 @@ This extension provides comprehensive language support for the Rich Communicatio
 ## Installation
 
 ### From Source
+
 1. Clone the repository
 2. Navigate to `apps/extension`
 3. Run `npm install`
@@ -34,6 +37,7 @@ This extension provides comprehensive language support for the Rich Communicatio
 6. Click "Install from VSIX" and select the generated `.vsix` file
 
 ### From Marketplace (Coming Soon)
+
 Search for "RCL Language Support" in the VS Code Extensions marketplace.
 
 ## Usage
@@ -52,17 +56,18 @@ agent TestAgent
   displayName: "Test RCS Agent"
   description: "A sample RCS agent"
 
-  flow WelcomeFlow
-    :start -> greeting
-    greeting: text "Hello! Welcome to our service."
-
-  messages Greetings
-    welcome: "Welcome to our service!"
-    goodbye: "Thank you for using our service!"
-
   configuration
     webhook_url: "https://example.com/webhook"
     timeout: 30s
+
+  flow MainFlow
+    start: Greeting
+
+    on Greeting
+      -> WelcomeMessage
+
+  messages
+    text WelcomeMessage "Welcome to our service!"
 ```
 
 ## Configuration
@@ -90,17 +95,20 @@ This extension uses the Language Server Protocol (LSP) for optimal performance:
 ## Development
 
 ### Building
+
 ```bash
 npm install
 npm run compile
 ```
 
 ### Testing
+
 ```bash
 npm test
 ```
 
 ### Debugging
+
 1. Open the extension in VS Code
 2. Press F5 to launch Extension Development Host
 3. Open a `.rcl` file to test the extension
@@ -116,6 +124,7 @@ npm test
 ## RCL Language Reference
 
 ### Basic Structure
+
 - **Agent**: Top-level definition of an RCS agent
 - **Flow**: Conversation flow with states and transitions
 - **Messages**: Reusable message templates
@@ -123,11 +132,13 @@ npm test
 - **Defaults**: Default values
 
 ### Keywords
+
 - `agent`, `flow`, `messages`, `configuration`, `defaults`, `import`
 - `True`, `False`, `Yes`, `No`, `On`, `Off`, `Enabled`, `Disabled`
 - `Null`, `None`, `Void`
 
 ### Data Types
+
 - Strings: `"text"` or multiline with `|`, `|-`, `+|`, `+|+`
 - Numbers: `42`, `3.14`, `1e10`
 - Durations: `30s`, `5m`, `P1Y2M3DT4H5M6S`

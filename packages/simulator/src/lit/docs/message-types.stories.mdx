@@ -1,0 +1,213 @@
+import { Meta, Story, Canvas } from '@storybook/blocks';
+import * as TextMessageStories from '../components/messages/text-message.stories.ts';
+import * as UserTextMessageStories from '../components/messages/user-text-message.stories.ts';
+import * as StandaloneCardStories from '../components/messages/standalone-card.stories.ts';
+import * as SuggestionsStories from '../components/messages/suggestions.stories.ts';
+
+<Meta title="Documentation/Message Types" />
+
+# RCS Message Types Documentation
+
+This documentation shows all supported RCS message types in both iOS and Android styles, helping you understand the visual differences and choose the right components for your implementation.
+
+## Text Messages
+
+Text messages are the most basic type of RCS message, displaying simple text content with optional suggestions.
+
+### Basic Text Message
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>iOS Style</h4>
+    <Canvas of={TextMessageStories.iOS_Light} />
+  </div>
+  <div>
+    <h4>Android Style</h4>
+    <Canvas of={TextMessageStories.Android_Light} />
+  </div>
+</div>
+
+### Text with Suggestions
+
+Text messages can include interactive suggestions that provide quick reply options or actions.
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>iOS with Suggestions</h4>
+    <Canvas of={TextMessageStories.With_Suggestions_iOS} />
+  </div>
+  <div>
+    <h4>Android with Suggestions</h4>
+    <Canvas of={TextMessageStories.With_Suggestions_Android} />
+  </div>
+</div>
+
+### OTP (One-Time Password) Messages
+
+Special authentication messages display a copy button for easy code access.
+
+<Canvas of={TextMessageStories.OTP_Message} />
+
+## User Messages
+
+User messages show what the user has sent, aligned to the right with platform-specific styling.
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>iOS User Message</h4>
+    <Canvas of={UserTextMessageStories.iOS_Light} />
+  </div>
+  <div>
+    <h4>Android User Message</h4>
+    <p><em>Note: Android includes read receipts (checkmark)</em></p>
+    <Canvas of={UserTextMessageStories.Android_Light} />
+  </div>
+</div>
+
+## Rich Cards
+
+Rich cards combine media, text, and interactive elements in a structured format.
+
+### Basic Rich Card
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>iOS Rich Card</h4>
+    <Canvas of={StandaloneCardStories.iOS_Light} />
+  </div>
+  <div>
+    <h4>Android Rich Card</h4>
+    <Canvas of={StandaloneCardStories.Android_Light} />
+  </div>
+</div>
+
+### Media Height Variations
+
+Rich cards support different media heights: SHORT, MEDIUM, and TALL.
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>Short Media</h4>
+    <Canvas of={StandaloneCardStories.Short_Media} />
+  </div>
+  <div>
+    <h4>Medium Media</h4>
+    <Canvas of={StandaloneCardStories.iOS_Light} />
+  </div>
+  <div>
+    <h4>Tall Media</h4>
+    <Canvas of={StandaloneCardStories.Tall_Media} />
+  </div>
+</div>
+
+### Text-Only Cards
+
+Cards can also contain only text content without media.
+
+<Canvas of={StandaloneCardStories.Text_Only} />
+
+## Suggestions
+
+Suggestions provide interactive elements that users can tap to send quick replies or trigger actions.
+
+### Outer Suggestions (Message-level)
+
+These appear outside message bubbles and vary significantly between platforms.
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>iOS Outer Suggestions</h4>
+    <p><em>Vertical list with blue text</em></p>
+    <Canvas of={SuggestionsStories.iOS_Outer_Light} />
+  </div>
+  <div>
+    <h4>Android Outer Suggestions</h4>
+    <p><em>Horizontal scrollable chips</em></p>
+    <Canvas of={SuggestionsStories.Android_Outer_Light} />
+  </div>
+</div>
+
+### Inner Suggestions (Card-level)
+
+These appear inside rich cards and provide structured action buttons.
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>Inner Suggestions (Light)</h4>
+    <Canvas of={SuggestionsStories.Inner_Suggestions_Light} />
+  </div>
+  <div>
+    <h4>Inner Suggestions (Dark)</h4>
+    <Canvas of={SuggestionsStories.Inner_Suggestions_Dark} />
+  </div>
+</div>
+
+### Action Types
+
+Suggestions can include various action types with appropriate icons:
+
+- **Reply**: Simple text response
+- **Open URL**: Web links
+- **Dial**: Phone calls
+- **View Location**: Map/location actions
+- **Calendar Event**: Schedule events
+
+<Canvas of={SuggestionsStories.Action_Suggestions} />
+
+## Dark Mode Support
+
+All message types support dark mode theming:
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+  <div>
+    <h4>Text Message Dark</h4>
+    <Canvas of={TextMessageStories.iOS_Dark} />
+  </div>
+  <div>
+    <h4>User Message Dark</h4>
+    <Canvas of={UserTextMessageStories.iOS_Dark} />
+  </div>
+  <div>
+    <h4>Rich Card Dark</h4>
+    <Canvas of={StandaloneCardStories.iOS_Dark} />
+  </div>
+</div>
+
+## Usage Guidelines
+
+### When to Use Each Type
+
+- **Text Messages**: Simple communications, notifications, confirmations
+- **User Messages**: Display what the user has sent back to the agent
+- **Rich Cards**: Product showcases, promotions, detailed information with media
+- **Suggestions**: When you want to guide user responses or provide quick actions
+
+### Platform Considerations
+
+- **iOS**: More minimal, uses system colors, suggestions in vertical lists
+- **Android**: Material Design elements, horizontal suggestion chips, read receipts
+- **Dark Mode**: Automatically adapts colors and contrast for better readability
+
+### Accessibility
+
+All components include:
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- High contrast color ratios
+- Screen reader compatible markup
+
+## Implementation
+
+```typescript
+import { 
+  TextMessage, 
+  UserTextMessage, 
+  StandaloneCard, 
+  Suggestions 
+} from '@rbx/simulator';
+
+// Use in your templates
+<rbx-text-message .message=${textMessage} .isAndroid=${false} />
+<rbx-user-text-message .message=${userMessage} .isAndroid=${true} />
+<rbx-standalone-card .message=${cardMessage} .isDarkMode=${true} />
+```

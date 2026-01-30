@@ -1,0 +1,36 @@
+agent WebviewDemo
+  displayName: "Nike Store"
+  start: MainFlow
+
+  config
+    description: "Rich card with webview action suggestions"
+    logoUri: <url https://logo.clearbit.com/nike.com>
+    color: "#111111"
+
+  flow MainFlow
+    start: ProductCard
+
+    on ProductCard
+      match @reply.text
+        :default -> ProductCard
+
+  messages Messages
+    richCard ProductCard "Nike Vomero 18" :tall
+      description: "Maximum cushioning in the Vomero provides a comfortable ride for everyday runs. Our softest, most cushioned ride has lightweight ZoomX foam stacked on top of responsive ReactX foam in the midsole."
+      media: <url https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/4d677534-954f-483e-a765-5bcb76775cb2/NIKE+VOMERO+18+%28GS%29.png>
+      orientation: :vertical
+      thumbnailAlignment: :left
+      suggestions
+        action <webview https://nike.com/new_arrivals :half> "Open webview (half)"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+          fallback: <url https://nike.com/new_arrivals>
+        action <webview https://nike.com/new_arrivals :tall> "Open webview (tall)"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+          fallback: <url https://nike.com/new_arrivals>
+        action <webview https://nike.com/new_arrivals :full> "Open webview (full)"
+          postback: "new_arrivals"
+          description: "View new arrivals"
+          fallback: <url https://nike.com/new_arrivals>
+end

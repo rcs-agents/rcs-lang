@@ -1,0 +1,61 @@
+{
+  "name": "@rcs-lang/playground",
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Interactive playground component for RCL language",
+  "author": "RCS Team",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles": "./dist/index.css",
+    "./dist/index.css": "./dist/index.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "generate:theme": "node scripts/generate-park-ui-theme.cjs"
+  },
+  "dependencies": {
+    "@ark-ui/react": "^4.4.2",
+    "@monaco-editor/react": "^4.6.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.469.0",
+    "lz-string": "^1.5.0",
+    "shiki": "^1.24.2",
+    "tailwind-merge": "^2.6.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@park-ui/tailwind-plugin": "^0.20.1",
+    "@rcs-lang/csm": "workspace:*",
+    "@rcs-lang/compiler": "workspace:*",
+    "@rcs-lang/diagram": "workspace:*",
+    "@rcs-lang/file-system": "workspace:*",
+    "@rcs-lang/parser": "workspace:*",
+    "@rcs-lang/simulator": "workspace:*",
+    "@rcs-lang/types": "workspace:*",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.3.4",
+    "monaco-editor": "^0.52.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}

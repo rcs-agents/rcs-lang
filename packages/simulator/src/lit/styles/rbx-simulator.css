@@ -1,0 +1,180 @@
+/**
+ * RBX Simulator Component Library Styles
+ * 
+ * Import this stylesheet to enable custom fonts and styling for the RBX Simulator components.
+ * 
+ * Usage:
+ *   import '@rbx/simulator/styles/rbx-simulator.css';
+ * 
+ * This stylesheet includes:
+ * - SF Pro Display font definitions for iOS simulation
+ * - CSS variables for font families
+ * - Default font styling for components
+ */
+
+/* ============================================
+   Font Face Definitions - SF Pro Display
+   ============================================ */
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Ultralight.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Thin.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Heavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url('../assets/fonts/San-Francisco-Pro-Fonts/SF-Pro-Display-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+
+:root {
+  /* Font Families */
+  --font-family-sf-pro-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-android: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+  
+  /* iOS System Colors */
+  --rbx-ios-blue: #007aff;
+  --rbx-ios-gray: #8e8e93;
+  --rbx-ios-gray-2: #aeaeb2;
+  --rbx-ios-gray-3: #c7c7cc;
+  --rbx-ios-gray-4: #d1d1d6;
+  --rbx-ios-gray-5: #e5e5ea;
+  --rbx-ios-gray-6: #f2f2f7;
+  
+  /* Android Material Colors */
+  --rbx-android-primary: #1e40af;
+  --rbx-android-primary-light: #3b82f6;
+  --rbx-android-surface: #ffffff;
+  --rbx-android-surface-variant: #f3f4f6;
+  --rbx-android-on-surface: #1f2937;
+  --rbx-android-outline: #9ca3af;
+  
+  /* Dark Mode Colors */
+  --rbx-dark-bg: #030712;
+  --rbx-dark-surface: #27272a;
+  --rbx-dark-text: #f3f4f6;
+}
+
+/* ============================================
+   Component Font Styling
+   ============================================ */
+
+/* iOS Components */
+rbx-device.ios,
+rbx-simulator-app .ios,
+rbx-text-message.ios,
+rbx-user-text-message.ios,
+rbx-standalone-card.ios,
+rbx-suggestions.ios,
+rbx-card-content.ios,
+rbx-chat.ios,
+rbx-bottom-bar.ios {
+  font-family: var(--font-family-sf-pro-display);
+}
+
+/* Android Components */
+rbx-device.android,
+rbx-simulator-app .android,
+rbx-text-message.android,
+rbx-user-text-message.android,
+rbx-standalone-card.android,
+rbx-suggestions.android,
+rbx-card-content.android,
+rbx-chat.android,
+rbx-bottom-bar.android {
+  font-family: var(--font-family-android);
+}
+
+/* ============================================
+   Optional: Component Default Styles
+   ============================================ */
+
+/* Ensure components have proper box-sizing */
+rbx-device,
+rbx-simulator-app,
+rbx-text-message,
+rbx-user-text-message,
+rbx-standalone-card,
+rbx-suggestions,
+rbx-card-content,
+rbx-chat,
+rbx-bottom-bar {
+  box-sizing: border-box;
+}
+
+rbx-device *,
+rbx-simulator-app *,
+rbx-text-message *,
+rbx-user-text-message *,
+rbx-standalone-card *,
+rbx-suggestions *,
+rbx-card-content *,
+rbx-chat *,
+rbx-bottom-bar * {
+  box-sizing: inherit;
+}
