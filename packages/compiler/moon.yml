@@ -18,10 +18,12 @@ tags:
 
 tasks:
   build:
-    deps: []
+    deps:
+      - "^:build"
 
   typecheck:
-    deps: []
+    deps:
+      - "^:build"
 
   test:
     deps:
